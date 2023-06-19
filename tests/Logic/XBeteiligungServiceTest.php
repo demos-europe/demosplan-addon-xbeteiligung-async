@@ -4,40 +4,12 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic;
 
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\CoreEntityInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\SingleDocumentInterface;
-use DemosEurope\DemosplanAddon\Contracts\PermissionsInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
-use DemosEurope\DemosplanAddon\Utilities\Json;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\DocumentCodeToTypeMapper;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XtaProcedureCreator;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XtaProcedureRemover;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XtaProcedureUpdater;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Beteiligung2PlanungBeteiligungNeuNOK0421;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Beteiligung2PlanungBeteiligungNeuNOK0421\Beteiligung2PlanungBeteiligungNeuNOK0421AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Beteiligung2PlanungBeteiligungNeuOK0411;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\IdentifikationNachrichtType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Planung2BeteiligungBeteiligungAktualisieren0402;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Planung2BeteiligungBeteiligungNeu0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GType;
-use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedureCreated;
-use Exception;
-use InvalidArgumentException;
-use JMS\Serializer\Exception\XmlErrorException;
-use JMS\Serializer\Serializer;
-use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Ramsey\Uuid\Uuid;
-use SimpleXMLElement;
-use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -48,17 +20,18 @@ class XBeteiligungServiceTest extends TestCase
     {
         parent::setUp();
 
+        $serializer = new SerializerFactory();
         $this->sut = new XBeteiligungService(
             $this->createMock(GlobalConfigInterface::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock(RouterInterface::class),
-            $this->createMock(SerializerFactory::class),
+            $serializer,
             $this->createMock(TranslatorInterface::class),
             $this->createMock(UserHandlerInterface::class)
         );
     }
 
-       public function testPlanung2BeteiligungBeteiligungNeu0401()
+    public function testPlanung2BeteiligungBeteiligungNeu0401()
     {
         $xml = '<ns6:planung2Beteiligung.BeteiligungNeu.0401 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ns2="http://xbeteiligung.de/addendum" xmlns:ns3="http://www.osci.de/xinneres/rueckweisung/3" xmlns:ns4="http://www.osci.de/xinneres/weiterleitung/4" xmlns:ns5="http://www.osci.de/xinneres/quittung/1" xmlns:ns6="http://xbeteiligung.de/V0103" xmlns:ns7="http://www.opengis.net/gml/3.2" xmlns:ns8="http://www.w3.org/1999/xlink" xmlns:ns9="http://www.xleitstelle.de/xbau/2/2" xmlns:ns10="http://docs.oasis-open.org/codelist/ns/genericode/1.0/" produkt="K1" produkthersteller="]init[ AG" standard="XBeteiligung" version="1.2.0">
@@ -163,6 +136,12 @@ class XBeteiligungServiceTest extends TestCase
 </ns6:planung2Beteiligung.BeteiligungNeu.0401>
 
 ';
+        $procedure = $this->createMock(ProcedureInterface::class);
+        $procedure->method('getId')->willReturn('ID_7606f622-439b-4929-8625-0856c161409e');
+        $event = new PostProcedureCreatedEvent($procedure);
+
+        $procedureXml = $this->sut->createProcedure401FromObject($procedure);
+
         $isValid = $this->sut->isValidMessage($xml, true, 'xbeteiligung-planung2beteiligung.xsd');
         self::assertTrue($isValid);
     }

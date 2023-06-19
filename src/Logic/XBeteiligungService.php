@@ -10,6 +10,7 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -32,6 +33,12 @@ class XBeteiligungService
     ) {
         $this->serializer                           = $serializerFactory->getSerializer();
     }
+
+    public function createProcedure401FromObject(ProcedureInterface $procedure): string
+    {
+        return '';
+    }
+
     /**
      * Validates a message against a given xsd file located in plugin xsd folder.
      */
