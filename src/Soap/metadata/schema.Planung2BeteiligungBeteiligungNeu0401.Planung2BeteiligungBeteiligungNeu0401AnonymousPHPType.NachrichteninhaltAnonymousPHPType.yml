@@ -1,0 +1,32 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungNeu0401\Planung2BeteiligungBeteiligungNeu0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType:
+    properties:
+        vorgangsID:
+            expose: true
+            access_type: public_method
+            serialized_name: vorgangsID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/0/9'
+            accessor:
+                getter: getVorgangsID
+                setter: setVorgangsID
+            type: string
+        initiator:
+            expose: true
+            access_type: public_method
+            serialized_name: initiator
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/0/9'
+            accessor:
+                getter: getInitiator
+                setter: setInitiator
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType
+        beteiligung:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/0/9'
+            accessor:
+                getter: getBeteiligung
+                setter: setBeteiligung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungType

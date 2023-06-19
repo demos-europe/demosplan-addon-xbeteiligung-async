@@ -1,0 +1,9 @@
+demosplan_addon:
+  humanName: XBeteiligung
+  vendor: DEMOS plan GmbH
+  description: |
+    This plugin provides Handling of XBeteiligung messages.
+  entry: DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAddon
+  permissionInitializer: DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\PermissionInitializer
+
+

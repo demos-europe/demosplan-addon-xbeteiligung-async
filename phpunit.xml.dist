@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+        colors                                     = "true"
+        beStrictAboutOutputDuringTests             = "true"
+        beStrictAboutTestsThatDoNotTestAnything    = "false"
+        convertDeprecationsToExceptions            = "false"
+        verbose                                    = "true"
+        bootstrap                                  = "vendor/autoload.php"
+>
+
+    <testsuites>
+        <testsuite name="XBeteiligung Test Suite">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <coverage>
+        <include>
+            <directory>./src</directory>
+        </include>
+        <exclude>
+            <directory>./src/Soap</directory>
+        </exclude>
+    </coverage>
+</phpunit>

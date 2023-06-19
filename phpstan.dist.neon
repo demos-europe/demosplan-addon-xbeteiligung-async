@@ -1,0 +1,7 @@
+parameters:
+    excludePaths:
+        - src/Soap/*
+    level: 0
+    paths:
+        - src
+        - tests

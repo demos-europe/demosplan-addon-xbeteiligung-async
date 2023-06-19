@@ -1,0 +1,26 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftType\HausnummernBisAnonymousPHPType:
+    properties:
+        hausnummerBis:
+            expose: true
+            access_type: public_method
+            serialized_name: hausnummer.bis
+            accessor:
+                getter: getHausnummerBis
+                setter: setHausnummerBis
+            type: string
+        hausnummerbuchstabezusatzzifferBis:
+            expose: true
+            access_type: public_method
+            serialized_name: hausnummerbuchstabezusatzziffer.bis
+            accessor:
+                getter: getHausnummerbuchstabezusatzzifferBis
+                setter: setHausnummerbuchstabezusatzzifferBis
+            type: string
+        teilnummerderhausnummerBis:
+            expose: true
+            access_type: public_method
+            serialized_name: teilnummerderhausnummer.bis
+            accessor:
+                getter: getTeilnummerderhausnummerBis
+                setter: setTeilnummerderhausnummerBis
+            type: string

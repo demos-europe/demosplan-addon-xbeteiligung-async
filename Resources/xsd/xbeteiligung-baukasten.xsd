@@ -1,0 +1,731 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/0/9"
+           xmlns:dinspec91379="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"
+           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/1"
+           xmlns:xibehoerde="http://www.osci.de/xinneres/behoerde/5"
+           xmlns:xida="http://www.osci.de/xinneres/datum/2"
+           xmlns:xink="http://www.osci.de/xinneres/basisnachricht/5"
+           targetNamespace="https://www.xleitstelle.de/xbeteiligung/0/9"
+           version="1.0"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XBeteiligung</nameLang>
+            <nameKurz>XBeteiligung</nameKurz>
+            <nameTechnisch>xbeteiligung</nameTechnisch>
+            <kennung>urn:xoev-de:xleitstelle:standard:xbeteiligung</kennung>
+            <beschreibung>Beteiligungsverfahren - OZG</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.0</version>
+            <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren im Kontext des OZG</beschreibung>
+            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVHandbuch>2.4</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 3</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:include schemaLocation="xbeteiligung-codes.xsd"/>
+   <xs:import schemaLocation="din-91379-datatypes.xsd"
+              namespace="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"/>
+   <xs:import schemaLocation="xbau-kernmodul-datentypen.xsd"
+              namespace="http://www.xleitstelle.de/xbau/kernmodul/1/1"/>
+   <xs:import schemaLocation="xinneres-basisnachricht.xsd"
+              namespace="http://www.osci.de/xinneres/basisnachricht/5"/>
+   <xs:import schemaLocation="xinneres-behoerde.xsd"
+              namespace="http://www.osci.de/xinneres/behoerde/5"/>
+   <xs:import schemaLocation="xinneres-datum.xsd"
+              namespace="http://www.osci.de/xinneres/datum/2"/>
+   <xs:complexType name="AkteurRolle">
+      <xs:annotation>
+         <xs:documentation>Dieser Typ bezeichnet die Rolle eines am Vorhaben beteiligten Akteurs.</xs:documentation>
+      </xs:annotation>
+      <xs:choice>
+         <xs:element name="code" type="xbeteiligung:Code.AkteurRolle">
+            <xs:annotation>
+               <xs:documentation>Angabe der Rolle des Beteiligten.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="nichtgelisteterWert" type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Freitextangabe für die Rolle des Beteiligten.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="AkteurVorhaben">
+      <xs:annotation>
+         <xs:documentation>Der Datentyp benennt Akteure des Vorhabens, für das eine Beteiligung initiert wird.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="veranlasser" type="xbauk:Organisation">
+            <xs:annotation>
+               <xs:documentation>Hier wird Behörde oder Stelle genannt, die für das Verfahren rechtlich verantwortlich ist.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="weitereAkteure" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>Dieser Abschnitt fasst die Daten zu einem weiteren Akteur zusammen. Für jeden Akteur ist ein Element zu instanziieren.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+               <xs:sequence>
+                  <xs:element name="akteur" type="xbauk:Organisation">
+                     <xs:annotation>
+                        <xs:documentation>Daten des Beteilgten.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="rolle" type="xbeteiligung:AkteurRolle">
+                     <xs:annotation>
+                        <xs:documentation>Hier ist die Rolle des Beteiligten anzugeben.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:complexType>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Anlagen">
+      <xs:annotation>
+         <xs:documentation>Dieser Typ dient dazu, die Metadaten zu Verfahrensunterlagen aufzunehmen, die einer XBeteiligungs-Kommunikation als Anlagen beigefügt sind.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="anlage"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:MetadatenAnlage"
+                     form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Jede Instanz dieses Elements steht für eine Anlage (Primärdokument) zur übermittelten Fachnachricht.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Beteiligung">
+      <xs:annotation>
+         <xs:documentation>Komponente der Datentypen, die eine Aufforderung zur Beteiligung beschreiben.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="akteurVorhaben" type="xbeteiligung:AkteurVorhaben">
+            <xs:annotation>
+               <xs:documentation>Am Planungsvorhaben beteiligte Akteure.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="planname" type="dinspec91379:datatypeC"/>
+         <xs:element name="planart" minOccurs="0" type="xbeteiligung:Code.Planart"/>
+         <xs:element name="planID" type="xink:UUID">
+            <xs:annotation>
+               <xs:documentation>Hier ist die ID des Planverfahrens zu übermitteln, innerhalb dessen das Beteiligungsverfahren durchgeführt wird.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beschreibungPlanungsanlass"
+                     minOccurs="0"
+                     type="dinspec91379:datatypeC"/>
+         <xs:element name="flaechenabgrenzungWmsUrl" minOccurs="0" type="xs:anyURI">
+            <xs:annotation>
+               <xs:documentation>K1 erstellt einen parametrisierten Link für einen WMS-Aufruf</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beschreibungGeltungsbereich"
+                     minOccurs="0"
+                     type="dinspec91379:datatypeC"/>
+         <xs:element name="zeitraum" minOccurs="0" type="xbeteiligung:Zeitraum">
+            <xs:annotation>
+               <xs:documentation>Zeitraum (Beginn und Ende) einer Beteiligungsphase.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="bekanntmachung" type="xida:Tagesdatum"/>
+         <xs:element name="verfahren" minOccurs="0" type="xbeteiligung:Verfahren">
+            <xs:annotation>
+               <xs:documentation>In diesem Element können Verfahren spezifiziert werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="anlagen"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Anlagen">
+            <xs:annotation>
+               <xs:documentation>Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Fehler">
+      <xs:sequence>
+         <xs:element name="beschreibung" type="dinspec91379:datatypeC"/>
+         <xs:element name="art" minOccurs="0" type="xbeteiligung:Code.Fehlerart"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="FehlerhafteUnterlage">
+      <xs:sequence>
+         <xs:element name="fehlerbeschreibung" type="dinspec91379:datatypeC"/>
+         <xs:element name="fileID" type="xs:ID">
+            <xs:annotation>
+               <xs:documentation>ID der Unterlage.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="art" minOccurs="0" type="xbeteiligung:Code.Fehlerart"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Georeferenzierung">
+      <xs:annotation>
+         <xs:documentation>Element zur Verortung der einer Stellungnahme.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="punkt"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbauk:GeoreferenziertePunkte"/>
+         <xs:element name="flaeche"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbauk:GeoreferenzierteFlaeche"/>
+         <xs:element name="linie"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbauk:GeoreferenzierteLinie"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Identifikation">
+      <xs:annotation>
+         <xs:documentation>Unter "Identifikation" werden die Informationen zusammengefasst, die die eindeutige Identifikation von Objekten in einem fachlichen Kontext erlauben.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="id" minOccurs="0" type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Die ID sichert die eindeutige Identifikation von Objekten in einem fachlichen Kontext. Anmerkung: Hier geht es ausschließlich um fachliche Identifikationen wie Steuernummer, Krankenverischerungsnummer, Personalausweisnummer ...</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beschreibung" minOccurs="0" type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Die "beschreibung" dient der näheren Charakterisierung des fachlichen Kontext der Identifikation.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="gueltigkeit" minOccurs="0" type="xbeteiligung:Zeitraum">
+            <xs:annotation>
+               <xs:documentation>Angaben zum Gültigkeitszeitraum einer Identifikationsnummer.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Identifikation.Nachricht">
+      <xs:annotation>
+         <xs:documentation>Identifkationsmerkmale zu einer Nachricht. Dieser Typ kann im ID-Block zu einer Nachricht verwendet werden oder in einem Abschnitt, der auf eine Nachricht referenziert.</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xink:Identifikation.Nachricht">
+            <xs:sequence>
+               <xs:element name="nachrichtenUUID" type="xink:UUID" form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Hier wird der Universally Unique Identifier (UUID) der Nachricht mitgeteilt, der das primäre Identifikationsmerkmal einer Nachricht darstellt. Der UUID der Nachricht ist weltweit eindeutig. So wird es möglich, Nachrichten hersteller- und anwendungsübergreifend eindeutig zu identifizieren. Für jede Nachricht muss eine neue UUID erzeugt werden, um eine eindeutige Identifikation der Nachricht sicherzustellen. Insbesondere ist es nicht zulässig, in einer korrigierten Nachricht (bspw. nach Erhalt einer RTS-Nachricht) die UUID der ursprünglichen Nachricht wiederzuverwenden. Sofern eine einmal erzeugte Nachricht ein weiteres Mal gesendet werden soll (bspw. aufgrund von Problemen beim Nachrichtentransport), muss die UUID nicht angepasst werden.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="nachrichtentyp"
+                           type="xbeteiligung:Code.XBeteiligungNachrichten"
+                           form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Die eindeutige Identifizierungsnummer für einen Nachrichtentyp. Der konkret zu verwendende Datentyp für die Übermittlung des Schlüsselwertes wird durch den Fachstandard auf Schemaebene festgelegt.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="erstellungszeitpunkt" type="xs:dateTime" form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Der Zeitpunkt, an dem die Nachricht erstellt wurde. Dieses Feld wird durch das Fachverfahren beim Erstellen der Nachricht gefüllt. Hier ist explizit nicht der Sende- und Empfangszeitpunkt festgehalten, denn die können in der Regel der Transportschicht entnommen werden.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+            </xs:sequence>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="InfoFoeb">
+      <xs:annotation>
+         <xs:documentation>Informationen für die Frühzeitige Öffentlichkeitsbeteiligung</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="amtlicherAnzeigerNummer" minOccurs="0" type="xs:integer">
+            <xs:annotation>
+               <xs:documentation>Das Ende eines Zeitraumes beschreibt den Zeitpunkt, ab dem ein Sachverhalt endet bzw. nicht mehr rechtskräftig ist. Das Ende ist Teil der Dauer des Zeitraumes. Anmerkung: Bei der Ableitung von Fachkomponenten sollten zusätzliche Festlegungen getroffen werden wie das Ende des Zeitraums zu interpretieren ist. z.B.: "Wird ein Monat als Ende angegeben, dann gilt der letzte Tag des Monats als Ende des Zeitraums" Beispiel: identisch mit *Fristdatum (Bau) *Ablaufdatum (Finanz) *Faelligkeitsdatum (Finanz) *Wirksamkeitsdatum der Aufhebung/Scheidung der Ehe (Personenstand)</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="amtlicherAnzeigerSeite" minOccurs="0" type="xs:integer"/>
+         <xs:element name="amtlicherAnzeigerLink" minOccurs="0" type="xs:anyURI"/>
+         <xs:element name="bekanntmachungsdatum" minOccurs="0" type="xs:date"/>
+         <xs:element name="foebBeschreibung" minOccurs="0" type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Beschreibungfeld, falls foebArt=Sonstiges Verfahren</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="zeitraum" minOccurs="0" type="xbeteiligung:Zeitraum"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="InfoOeffentlicheAuslegung">
+      <xs:annotation>
+         <xs:documentation>Informationsobjekt für die Öffentliche Auslegung</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="amtlicherAnzeigerNummer" minOccurs="0" type="xs:integer">
+            <xs:annotation>
+               <xs:documentation>Das Ende eines Zeitraumes beschreibt den Zeitpunkt, ab dem ein Sachverhalt endet bzw. nicht mehr rechtskräftig ist. Das Ende ist Teil der Dauer des Zeitraumes. Anmerkung: Bei der Ableitung von Fachkomponenten sollten zusätzliche Festlegungen getroffen werden wie das Ende des Zeitraums zu interpretieren ist. z.B.: "Wird ein Monat als Ende angegeben, dann gilt der letzte Tag des Monats als Ende des Zeitraums" Beispiel: identisch mit *Fristdatum (Bau) *Ablaufdatum (Finanz) *Faelligkeitsdatum (Finanz) *Wirksamkeitsdatum der Aufhebung/Scheidung der Ehe (Personenstand)</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="amtlicherAnzeigerSeite" minOccurs="0" type="xs:integer"/>
+         <xs:element name="amtlicherAnzeigerLink" minOccurs="0" type="xs:anyURI"/>
+         <xs:element name="auslegungszeitraum"
+                     minOccurs="0"
+                     type="xbeteiligung:Zeitraum"/>
+         <xs:element name="bekanntmachungsdatum" minOccurs="0" type="xs:date"/>
+         <xs:element name="nachrichtTOEBDatum" minOccurs="0" type="xs:date"/>
+         <xs:element name="unterschriftleitungDatum" minOccurs="0" type="xs:date"/>
+         <xs:element name="versandZwischennachrichtenDatum" minOccurs="0" type="xs:date"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="MetadatenAnlage">
+      <xs:annotation>
+         <xs:documentation>Dieser Kernmodul-Basistyp bildet die Metadaten zu einer Anlage ab, die gemäß der Architektur der Übertragung von Primärdokumenten im Zusammenhang mit einer Fachnachricht benötigt werden.</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xbauk:MetadatenAnlage">
+            <xs:sequence>
+               <xs:element name="bezeichnung"
+                           minOccurs="0"
+                           type="dinspec91379:datatypeC"
+                           form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Hier ist eine deskriptive Bezeichnung der Anlage einzutragen.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="versionsnummer"
+                           minOccurs="0"
+                           type="xs:positiveInteger"
+                           form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Hier ist eine Versionsnummer einzutragen. Sie dient dazu, Anlagen zu unterscheiden, die dieselbe Bezeichnung tragen.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="datum" minOccurs="0" type="xs:date" form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Hier ist das Datum der Erstellung bzw. der letzten Bearbeitung dieser Anlage einzutragen.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="anlageart"
+                           minOccurs="0"
+                           type="xbeteiligung:Code.Verfahrensunterlagetyp"
+                           form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Unterhalb dieses Elements wird die Art der Anlage über eine Codeliste spezifiziert.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="mimeType" type="xbauk:Code.XBau-MimeType" form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Dieses Element nennt - analog zur Übermittlung von E-Mail-Anlagen - den MIME-Typ der angehängten oder verlinkten Anlage (z.B. text/xml, text/plain, application/gzip oder application/pdf). Die Angabe ist mandatorisch, weil eine für den Empfänger zur Verarbeitung der Daten notwendige Information.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="anhangOderVerlinkung"
+                           minOccurs="0"
+                           type="xbauk:AnhangOderVerlinkung"
+                           form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Dieses Elements enthält die Angabe, ob die Anlage (i) als Anhang mit dieser XBau-Nachricht übermittelt wird oder ob sie (ii) über einen Link zugänglich gemacht wird, der in diese XBau-Nachricht eingetragen ist.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+            </xs:sequence>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Nachricht.B2G">
+      <xs:annotation>
+         <xs:documentation>Nachrichtenstruktur für die Kommunikation: Unternehmen ("Business") an Behörde ("Government").</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="nachrichtenkopf.B2G"
+                     type="xbeteiligung:Nachrichtenkopf.B2G"
+                     form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Dieses Element enthält die Kopfinformationen zu Nachrichten des vorliegenden Typs.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+      <xs:attribute name="produkt" type="dinspec91379:datatypeC" use="required">
+         <xs:annotation>
+            <xs:documentation>In diesem Attribut ist der Name des Produktes (der Software) einzutragen, mit dem diese Nachricht erstellt worden ist.</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="produkthersteller"
+                    type="dinspec91379:datatypeC"
+                    use="required">
+         <xs:annotation>
+            <xs:documentation>In diesem Attribut ist der Name der Firma oder der Organisation einzutragen, die für das DV-Verfahren verantwortlich ist, mit dem diese Nachricht erstellt worden ist.</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="produktversion" type="dinspec91379:datatypeC" use="optional">
+         <xs:annotation>
+            <xs:documentation>In diesem Attribut sollen ergänzende Hinweise zu dem Produkt, mit dem diese Nachricht erstellt worden ist, eingetragen werden. Dies sind Angaben, die für eine möglichst präzise Identifikation im Fehlerfall hilfreich sind, wie zum Beispiel Version und Patchlevel.</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="standard" type="dinspec91379:datatypeC" use="required">
+         <xs:annotation>
+            <xs:documentation>In diesem Attribut wird der Name des Standards übermittelt, aus dem die Nachricht stammt. Der Name des Standards wird durch den Fachstandard als fixed-Value auf Schemaebene festgelegt (z. B. XPersonenstand).</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="test" type="dinspec91379:datatypeC" use="optional">
+         <xs:annotation>
+            <xs:documentation>Dieses Attribut ist optional. Ist es vorhanden, so sagt dies aus, dass es sich um eine Nachricht handelt, die (aus Sicht des Senders der Nachricht) nicht im normalen Produktivbetrieb behandelt werden soll. Über den Inhalt des Attributes wird nichts weiter ausgesagt, dies kann bilateral zwischen den Kommunikationspartnern vereinbart werden.</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="version" type="dinspec91379:datatypeC" use="required">
+         <xs:annotation>
+            <xs:documentation>In diesem Attribut wird die Version des Standards übermittelt, aus dem die Nachricht stammt. Die Versionsbezeichnung wird durch den Fachstandard als fixed-Value auf Schemaebene festgelegt (z. B. 1.5.0).</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+   </xs:complexType>
+   <xs:complexType name="Nachricht.G2B">
+      <xs:annotation>
+         <xs:documentation>Nachrichtenstruktur für die Kommunikation: Behörde ("Government") an Unternehmen ("Business").</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="nachrichtenkopf.G2B" type="xbeteiligung:Nachrichtenkopf.G2B">
+            <xs:annotation>
+               <xs:documentation>Dieses Element enthält die Kopfinformationen zu Nachrichten des vorliegenden Typs.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+      <xs:attribute name="produkt" type="dinspec91379:datatypeC" use="required">
+         <xs:annotation>
+            <xs:documentation>In diesem Attribut ist der Name des Produktes (der Software) einzutragen, mit dem diese Nachricht erstellt worden ist.</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="produkthersteller"
+                    type="dinspec91379:datatypeC"
+                    use="required">
+         <xs:annotation>
+            <xs:documentation>In diesem Attribut ist der Name der Firma oder der Organisation einzutragen, die für das DV-Verfahren verantwortlich ist, mit dem diese Nachricht erstellt worden ist.</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="produktversion" type="dinspec91379:datatypeC" use="optional">
+         <xs:annotation>
+            <xs:documentation>In diesem Attribut sollen ergänzende Hinweise zu dem Produkt, mit dem diese Nachricht erstellt worden ist, eingetragen werden. Dies sind Angaben, die für eine möglichst präzise Identifikation im Fehlerfall hilfreich sind, wie zum Beispiel Version und Patchlevel.</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="standard" type="dinspec91379:datatypeC" use="required">
+         <xs:annotation>
+            <xs:documentation>In diesem Attribut wird der Name des Standards übermittelt, aus dem die Nachricht stammt. Der Name des Standards wird durch den Fachstandard als fixed-Value auf Schemaebene festgelegt (z. B. XPersonenstand).</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="test" type="dinspec91379:datatypeC" use="optional">
+         <xs:annotation>
+            <xs:documentation>Dieses Attribut ist optional. Ist es vorhanden, so sagt dies aus, dass es sich um eine Nachricht handelt, die (aus Sicht des Senders der Nachricht) nicht im normalen Produktivbetrieb behandelt werden soll. Über den Inhalt des Attributes wird nichts weiter ausgesagt, dies kann bilateral zwischen den Kommunikationspartnern vereinbart werden.</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="version" type="dinspec91379:datatypeC" use="required">
+         <xs:annotation>
+            <xs:documentation>In diesem Attribut wird die Version des Standards übermittelt, aus dem die Nachricht stammt. Die Versionsbezeichnung wird durch den Fachstandard als fixed-Value auf Schemaebene festgelegt (z. B. 1.5.0).</xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+   </xs:complexType>
+   <xs:complexType name="Nachricht.G2G">
+      <xs:annotation>
+         <xs:documentation>Nachrichtenstruktur für die Kommunikation von Behörden (bzw. öffentlichen Stellen oder Diensten) mit anderen Behörden (bzw. öffentlichen Stellen oder Diensten). Ein Antragsservice oder ein Portal, welches im Auftrag einer öffentlichen Stelle betrieben wird - z.B. auch im Rahmen der OZG-Umsetzung - ist eine solche öffentliche Stelle, die als Leser oder Autor im Sinne dieses Nachrichtenkopfs abgebildet wird.</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xink:Nachricht.G2G">
+            <xs:sequence>
+               <xs:element name="nachrichtenkopf"
+                           type="xbeteiligung:Nachrichtenkopf.G2G"
+                           form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Dieses Element enthält die Kopfinformationen zu Nachrichten des vorliegenden Typs.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="produkt" type="dinspec91379:datatypeC" use="required">
+               <xs:annotation>
+                  <xs:documentation>In diesem Attribut ist der Name des Produktes (der Software) einzutragen, mit dem diese Nachricht erstellt worden ist.</xs:documentation>
+               </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="produkthersteller"
+                          type="dinspec91379:datatypeC"
+                          use="required">
+               <xs:annotation>
+                  <xs:documentation>In diesem Attribut ist der Name der Firma oder der Organisation einzutragen, die für das DV-Verfahren verantwortlich ist, mit dem diese Nachricht erstellt worden ist.</xs:documentation>
+               </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="produktversion" type="dinspec91379:datatypeC" use="optional">
+               <xs:annotation>
+                  <xs:documentation>In diesem Attribut sollen ergänzende Hinweise zu dem Produkt, mit dem diese Nachricht erstellt worden ist, eingetragen werden. Dies sind Angaben, die für eine möglichst präzise Identifikation im Fehlerfall hilfreich sind, wie zum Beispiel Version und Patchlevel.</xs:documentation>
+               </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="standard"
+                          type="dinspec91379:datatypeC"
+                          use="required"
+                          fixed="XBeteiligung">
+               <xs:annotation>
+                  <xs:documentation>In diesem Attribut wird der Name des Standards übermittelt, aus dem die Nachricht stammt. Der Name des Standards wird durch den Fachstandard als fixed-Value auf Schemaebene festgelegt (z.B. XBau-Hochbau).</xs:documentation>
+               </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="test" type="dinspec91379:datatypeC" use="optional">
+               <xs:annotation>
+                  <xs:documentation>Dieses Attribut ist optional. Ist es vorhanden, so sagt dies aus, dass es sich um eine Nachricht handelt, die (aus Sicht des Senders der Nachricht) nicht im normalen Produktivbetrieb behandelt werden soll. Über den Inhalt des Attributes wird nichts weiter ausgesagt, dies kann bilateral zwischen den Kommunikationspartnern vereinbart werden.</xs:documentation>
+               </xs:annotation>
+            </xs:attribute>
+            <xs:attribute name="version"
+                          type="dinspec91379:datatypeC"
+                          use="required"
+                          fixed="0.9">
+               <xs:annotation>
+                  <xs:documentation>In diesem Attribut wird die Version des Standards übermittelt, aus dem die Nachricht stammt. Die Versionsbezeichnung wird durch den Fachstandard als fixed-Value auf Schemaebene festgelegt (z.B. 1.5.0).</xs:documentation>
+               </xs:annotation>
+            </xs:attribute>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Nachrichtenkopf.B2G">
+      <xs:annotation>
+         <xs:documentation>Nachrichtenkopf für Nachrichten von Unternehmen an Behörden.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="identifikation.nachricht"
+                     type="xbeteiligung:Identifikation.Nachricht"
+                     form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Hier werden die Identifkationsmerkmale zur vorliegenden Nachricht genannt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="leser" type="xibehoerde:Behoerde" form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Hier wird die Fachbehörde bzw. Organisation genannt, für die die vorliegende Nachricht bestimmt ist.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="autor" type="xbauk:Akteur" form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Hier wird die Fachbehörde bzw. Organisation genannt, die die vorliegende Nachricht erstellt hat.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Nachrichtenkopf.G2B">
+      <xs:annotation>
+         <xs:documentation>Nachrichtenkopf für Nachrichten von Behörden an Unternehmen.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="identifikation.nachricht"
+                     type="xbeteiligung:Identifikation.Nachricht"
+                     form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Hier werden die Identifkationsmerkmale zur vorliegenden Nachricht genannt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="leser" type="xbauk:Akteur" form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Hier wird die Fachbehörde bzw. Organisation genannt, für die die vorliegende Nachricht bestimmt ist.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="autor"
+                     type="xibehoerde:Behoerde.Erreichbar"
+                     form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Hier wird die Fachbehörde bzw. Organisation genannt, die die vorliegende Nachricht erstellt hat.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Nachrichtenkopf.G2G">
+      <xs:annotation>
+         <xs:documentation>Nachrichtenkopf für Nachrichten von Behörden (bzw. öffentlichen Stellen oder Diensten) an andere Behörden (bzw. öffentliche Stellen oder Dienste).</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xink:Nachrichtenkopf.G2G">
+            <xs:sequence>
+               <xs:element name="identifikation.nachricht"
+                           type="xbeteiligung:Identifikation.Nachricht"
+                           form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Hier werden die Identifkationsmerkmale zur vorliegenden Nachricht genannt.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="leser" type="xibehoerde:Behoerde" form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Hier wird die Fachbehörde bzw. Organisation genannt, für die die vorliegende Nachricht bestimmt ist.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="autor"
+                           type="xibehoerde:Behoerde.Erreichbar"
+                           form="unqualified">
+                  <xs:annotation>
+                     <xs:documentation>Hier wird die Fachbehörde bzw. Organisation genannt, die die vorliegende Nachricht erstellt hat.</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+            </xs:sequence>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Stellungnahme">
+      <xs:annotation>
+         <xs:documentation>Dieser Datentyp dient der Übermittlung von Stellungnahmen von Institutionen.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="stellungnahmeID" type="xink:UUID"/>
+         <xs:element name="stellungnahmeVerfahrenID" type="dinspec91379:datatypeC"/>
+         <xs:element name="beteiligungsID" type="xink:UUID"/>
+         <xs:element name="planID" type="xink:UUID"/>
+         <xs:element name="status" type="xbeteiligung:Code.StatusDerStellungnahme"/>
+         <xs:element name="verfasser" minOccurs="0" type="xbauk:Organisation">
+            <xs:annotation>
+               <xs:documentation>Für die Stellungnahme verantwortliche Organisation bzw. Behörde.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="titel" minOccurs="0" type="dinspec91379:datatypeC"/>
+         <xs:element name="beschreibung" minOccurs="0" type="dinspec91379:datatypeC"/>
+         <xs:element name="datum" minOccurs="0" type="xs:date"/>
+         <xs:element name="vormerkung"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Code.Vormerkung"/>
+         <xs:element name="zuordnung"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Zuordnung"/>
+         <xs:element name="zustimmung" minOccurs="0" type="xbeteiligung:Zustimmung">
+            <xs:annotation>
+               <xs:documentation>Element zur Spezifizierung einer Zustimmung.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="georeferenzierung"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Georeferenzierung"/>
+         <xs:element name="prioritaet"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.PrioritaetDerStellungnahme"/>
+         <xs:element name="abwaegungsvorschlag"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Abwaegungsvorschlag"/>
+         <xs:element name="schlagwort"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="dinspec91379:datatypeC"/>
+         <xs:element name="anlagen"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Anlagen">
+            <xs:annotation>
+               <xs:documentation>Die der Stellungsnahme zugehörigen Anlagen werden in diesem Element referenziert.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Unterverfahrensteilschritt">
+      <xs:sequence>
+         <xs:element name="uvtscode"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Unterverfahrensteilschritt"/>
+         <xs:element name="mandatory" minOccurs="0" type="xs:boolean"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Verfahren">
+      <xs:annotation>
+         <xs:documentation>Element zur Spezifizierung eines Verfahrens.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="verfahrenstypID" minOccurs="0" type="xs:ID"/>
+         <xs:element name="verfahrenstyp"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Verfahrenstyp"/>
+         <xs:element name="verfahrensschritt"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Code.Verfahrensschritt"/>
+         <xs:element name="verfahrensteilschritt"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Verfahrensteilschritt"/>
+         <xs:element name="unterverfahrensteilschritt"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Code.Unterverfahrensteilschritt"/>
+         <xs:element name="verfahrensart"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Code.Verfahrensart"/>
+         <xs:element name="zustaendigkeit" type="xbeteiligung:Code.Zustaendigkeit"/>
+         <xs:element name="aktuelleMitteilung" minOccurs="0" type="xs:string"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Verfahrensteilschritt">
+      <xs:sequence>
+         <xs:element name="verfahrensteilschrittcode"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Verfahrensteilschritt"/>
+         <xs:element name="mindestdauer" minOccurs="0" type="xs:int"/>
+         <xs:element name="maxdauer" minOccurs="0" type="xs:int"/>
+         <xs:element name="unterverfahrensteilschritte"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Unterverfahrensteilschritt"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Verfahrensverweis">
+      <xs:sequence>
+         <xs:element name="planID" type="xs:ID"/>
+         <xs:element name="planname" minOccurs="0" type="dinspec91379:datatypeC"/>
+         <xs:element name="arbeitstitel" minOccurs="0" type="dinspec91379:datatypeC"/>
+         <xs:element name="verfahrenstyp" type="xbeteiligung:Code.Verfahrenstyp"/>
+         <xs:element name="verfahrensart" type="xbeteiligung:Code.Verfahrensart"/>
+         <xs:element name="vfdbID" minOccurs="0" type="dinspec91379:datatypeC"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Zeitraum">
+      <xs:annotation>
+         <xs:documentation>Der Zeitraum kennzeichnet einen Abschnitt auf einem Zeitstrahl durch Angabe von Beginn und/oder Ende.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="beginn" minOccurs="0" type="xs:date">
+            <xs:annotation>
+               <xs:documentation>Der Beginn eines Zeitraums beschreibt den Zeitpunkt, ab dem ein Sachverhalt eintritt bzw. rechtskräftig wirksam ist. Der Beginn ist immer Teil der Dauer des Zeitraumes.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="ende" minOccurs="0" type="xs:date">
+            <xs:annotation>
+               <xs:documentation>Das Ende eines Zeitraumes beschreibt den Zeitpunkt, ab dem ein Sachverhalt endet bzw. nicht mehr rechtskräftig ist. Das Ende ist Teil der Dauer des Zeitraumes.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="zusatz" minOccurs="0" type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Der Zusatz enthält weitere textuelle Beschreibungen des festgelegten Zeitraums.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Zuordnung">
+      <xs:annotation>
+         <xs:documentation>Fachliche Zuordnung einer Stellungnahme.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="zuordnungID" type="xs:ID"/>
+         <xs:element name="zuordnungCode"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Zuordnung"/>
+         <xs:element name="vonCharNr" minOccurs="0" type="xs:nonNegativeInteger"/>
+         <xs:element name="bisCharNr" minOccurs="0" type="xs:nonNegativeInteger"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Zustimmung">
+      <xs:annotation>
+         <xs:documentation>Element zur Spezifizierung einer Zustimmung in einer Stellungnahme.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="kommunikation"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbauk:Kommunikation">
+            <xs:annotation>
+               <xs:documentation>"Kommunikation" fasst Angaben zur Erreichbarkeit über elektronische Kommunikationskanäle (z.B. Telefon, Fax, E-Mail) zusammen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="artDerStellungnahme" type="xbeteiligung:Code.ArtDerStellungnahme"/>
+         <xs:element name="artDerRueckmeldung" type="xbeteiligung:Code.ArtDerRueckmeldung"/>
+         <xs:element name="nutzername" minOccurs="0" type="dinspec91379:datatypeC"/>
+      </xs:sequence>
+   </xs:complexType>
+</xs:schema>

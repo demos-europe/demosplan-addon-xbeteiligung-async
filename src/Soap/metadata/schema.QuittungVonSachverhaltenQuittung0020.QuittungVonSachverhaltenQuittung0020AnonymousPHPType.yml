@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungVonSachverhaltenQuittung0020\QuittungVonSachverhaltenQuittung0020AnonymousPHPType:
+    properties:
+        ursprungsnachricht:
+            expose: true
+            access_type: public_method
+            serialized_name: ursprungsnachricht
+            accessor:
+                getter: getUrsprungsnachricht
+                setter: setUrsprungsnachricht
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type
+        quittung:
+            expose: true
+            access_type: public_method
+            serialized_name: quittung
+            accessor:
+                getter: getQuittung
+                setter: setQuittung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungType

@@ -1,0 +1,59 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType:
+    properties:
+        name:
+            expose: true
+            access_type: public_method
+            serialized_name: name
+            accessor:
+                getter: getName
+                setter: setName
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationType
+        anschrift:
+            expose: true
+            access_type: public_method
+            serialized_name: anschrift
+            accessor:
+                getter: getAnschrift
+                setter: setAnschrift
+            xml_list:
+                inline: true
+                entry_name: anschrift
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnschriftType>
+        kommunikation:
+            expose: true
+            access_type: public_method
+            serialized_name: kommunikation
+            accessor:
+                getter: getKommunikation
+                setter: setKommunikation
+            xml_list:
+                inline: true
+                entry_name: kommunikation
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationType>
+        vertreter:
+            expose: true
+            access_type: public_method
+            serialized_name: vertreter
+            accessor:
+                getter: getVertreter
+                setter: setVertreter
+            xml_list:
+                inline: true
+                entry_name: vertreter
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameNatuerlichePersonType>
+        ansprechpartner:
+            expose: true
+            access_type: public_method
+            serialized_name: ansprechpartner
+            accessor:
+                getter: getAnsprechpartner
+                setter: setAnsprechpartner
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameNatuerlichePersonType
+        registereintrag:
+            expose: true
+            access_type: public_method
+            serialized_name: registereintrag
+            accessor:
+                getter: getRegistereintrag
+                setter: setRegistereintrag
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RegistereintragType

@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AuslandsanschriftDruckbildType:
+    properties:
+        staat:
+            expose: true
+            access_type: public_method
+            serialized_name: staat
+            accessor:
+                getter: getStaat
+                setter: setStaat
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeZielstaatType
+        anschriftzone:
+            expose: true
+            access_type: public_method
+            serialized_name: anschriftzone
+            accessor:
+                getter: getAnschriftzone
+                setter: setAnschriftzone
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeileAufschriftType>
+            xml_list:
+                inline: false
+                entry_name: zeile.anschrift
+                skip_when_empty: true

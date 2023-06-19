@@ -1,0 +1,26 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GType:
+    properties:
+        identifikationNachricht:
+            expose: true
+            access_type: public_method
+            serialized_name: identifikation.nachricht
+            accessor:
+                getter: getIdentifikationNachricht
+                setter: setIdentifikationNachricht
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtType
+        leser:
+            expose: true
+            access_type: public_method
+            serialized_name: leser
+            accessor:
+                getter: getLeser
+                setter: setLeser
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeType
+        autor:
+            expose: true
+            access_type: public_method
+            serialized_name: autor
+            accessor:
+                getter: getAutor
+                setter: setAutor
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarType

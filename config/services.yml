@@ -1,0 +1,28 @@
+services:
+    _defaults:
+        # automatically injects dependencies in your services
+        autowire: true
+        # automatically registers your services as commands, event subscribers, etc.
+        autoconfigure: true
+        # this means you cannot fetch services directly from the container via $container->get()
+        # if you need to do this, you can override this setting on individual services
+        public: false
+
+    DemosEurope\DemosplanAddon\XBeteiligung\:
+        resource: '../src/*'
+        exclude:
+            - '../src/{Test}'
+
+    DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAddon:
+        lazy: true
+
+    DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSubscriber:
+        tags: [ kernel.event_subscriber ]
+
+    DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAnySimpleTypeHandler:
+        lazy: true
+
+    DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService:
+        lazy: true
+
+

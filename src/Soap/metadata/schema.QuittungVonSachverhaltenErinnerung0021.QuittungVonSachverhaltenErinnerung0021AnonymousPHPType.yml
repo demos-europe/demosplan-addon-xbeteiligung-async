@@ -1,0 +1,26 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungVonSachverhaltenErinnerung0021\QuittungVonSachverhaltenErinnerung0021AnonymousPHPType:
+    properties:
+        ursprungsnachricht:
+            expose: true
+            access_type: public_method
+            serialized_name: ursprungsnachricht
+            accessor:
+                getter: getUrsprungsnachricht
+                setter: setUrsprungsnachricht
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type
+        quittung:
+            expose: true
+            access_type: public_method
+            serialized_name: quittung
+            accessor:
+                getter: getQuittung
+                setter: setQuittung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungType
+        erinnerungsstufe:
+            expose: true
+            access_type: public_method
+            serialized_name: erinnerungsstufe
+            accessor:
+                getter: getErinnerungsstufe
+                setter: setErinnerungsstufe
+            type: int

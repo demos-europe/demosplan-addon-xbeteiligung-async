@@ -1,0 +1,26 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TeilbekanntesDatumType:
+    properties:
+        jahrMonatTag:
+            expose: true
+            access_type: public_method
+            serialized_name: jahrMonatTag
+            accessor:
+                getter: getJahrMonatTag
+                setter: setJahrMonatTag
+            type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Date
+        jahrMonat:
+            expose: true
+            access_type: public_method
+            serialized_name: jahrMonat
+            accessor:
+                getter: getJahrMonat
+                setter: setJahrMonat
+            type: int
+        jahr:
+            expose: true
+            access_type: public_method
+            serialized_name: jahr
+            accessor:
+                getter: getJahr
+                setter: setJahr
+            type: int

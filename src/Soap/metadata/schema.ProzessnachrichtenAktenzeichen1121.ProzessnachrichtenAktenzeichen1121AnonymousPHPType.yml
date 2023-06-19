@@ -1,0 +1,10 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenAktenzeichen1121\ProzessnachrichtenAktenzeichen1121AnonymousPHPType:
+    properties:
+        bezug:
+            expose: true
+            access_type: public_method
+            serialized_name: bezug
+            accessor:
+                getter: getBezug
+                setter: setBezug
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType

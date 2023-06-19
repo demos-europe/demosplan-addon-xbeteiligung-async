@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xiaz="http://www.osci.de/xinneres/azrnummer/2"
+           xmlns:dinspec91379="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"
+           targetNamespace="http://www.osci.de/xinneres/azrnummer/2"
+           version="2"
+           elementFormDefault="unqualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XInneres-Basismodul</nameLang>
+            <nameKurz>XInneres-Basismodul</nameKurz>
+            <nameTechnisch>xinneres.basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:kosit:standard:xinneres.basismodul</kennung>
+            <beschreibung>Im Auftrag des AK I hat die PG Standard bisher unter anderem die fachlichen Vorgaben und die Struktur der Meldeanschrift für die Bereiche Ausländer-, Melde- und Personenstandswesen harmonisiert. Der vorliegende Standard XInneres bildet auf technischer Ebene eine Klammer vor den Standards der Innenverwaltung. An dieser Stelle können gemeinsam genutzte Komponenten definiert werden. In der ersten Version von XInneres definiert der Standard die Datentypen für die Darstellung der Meldeanschrift.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>9</version>
+            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+         <title>AZR-Nummer</title>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="din-91379-datatypes.xsd"
+              namespace="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"/>
+   <xs:simpleType name="AZRNummer">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>AZR-Nummer</title>
+         </xs:appinfo>
+         <xs:documentation>Mit diesem Datentyp wird die AZR-Nummer übermittelt. Sie beginnt mit sechs Ziffern, die das Datum der Erstanlage des AZR-Datensatzes wie folgt darstellen: JJMMTT. Darauf folgt eine beliebige Folge von sechs weiteren Ziffern.</xs:documentation>
+      </xs:annotation>
+      <xs:restriction base="dinspec91379:datatypeC">
+         <xs:pattern value="[0-9]{2}([0][0-9]|[1][0-2])([0-2][0-9]|[3][0-1])[0-9]{6}"/>
+      </xs:restriction>
+   </xs:simpleType>
+</xs:schema>

@@ -1,0 +1,21 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RueckweisungRueckweisungsgrundType:
+    properties:
+        grund:
+            expose: true
+            access_type: public_method
+            serialized_name: grund
+            accessor:
+                getter: getGrund
+                setter: setGrund
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeFehlercodeXInneresType
+        grundSpezifisch:
+            expose: true
+            access_type: public_method
+            serialized_name: grundSpezifisch
+            accessor:
+                getter: getGrundSpezifisch
+                setter: setGrundSpezifisch
+            xml_list:
+                inline: true
+                entry_name: grundSpezifisch
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RueckweisungGrundSpezifischType>

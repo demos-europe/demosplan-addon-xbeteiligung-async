@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungType:
+    properties:
+        ursprungsereignis:
+            expose: true
+            access_type: public_method
+            serialized_name: ursprungsereignis
+            accessor:
+                getter: getUrsprungsereignis
+                setter: setUrsprungsereignis
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType
+        sachverhalt:
+            expose: true
+            access_type: public_method
+            serialized_name: sachverhalt
+            accessor:
+                getter: getSachverhalt
+                setter: setSachverhalt
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeQuittungsrelevanterSachverhaltType

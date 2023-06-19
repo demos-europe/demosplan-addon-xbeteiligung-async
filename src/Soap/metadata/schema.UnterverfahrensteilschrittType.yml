@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\UnterverfahrensteilschrittType:
+    properties:
+        uvtscode:
+            expose: true
+            access_type: public_method
+            serialized_name: uvtscode
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/0/9'
+            accessor:
+                getter: getUvtscode
+                setter: setUvtscode
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeUnterverfahrensteilschrittType
+        mandatory:
+            expose: true
+            access_type: public_method
+            serialized_name: mandatory
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/0/9'
+            accessor:
+                getter: getMandatory
+                setter: setMandatory
+            type: bool

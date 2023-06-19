@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenAktenzeichen1121:
+    xml_root_name: 'ns-eb2a7509:prozessnachrichten.aktenzeichen.1121'
+    xml_root_namespace: 'http://www.xleitstelle.de/xbau/kernmodul/1/1'

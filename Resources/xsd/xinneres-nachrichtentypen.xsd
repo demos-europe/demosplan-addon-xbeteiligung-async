@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xint="http://www.osci.de/xinneres/nachrichtentypen/5"
+           xmlns:xibehoerde="http://www.osci.de/xinneres/behoerde/5"
+           xmlns:xink="http://www.osci.de/xinneres/basisnachricht/5"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="http://www.osci.de/xinneres/nachrichtentypen/5"
+           version="5"
+           elementFormDefault="unqualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XInneres-Basismodul</nameLang>
+            <nameKurz>XInneres-Basismodul</nameKurz>
+            <nameTechnisch>xinneres.basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:kosit:standard:xinneres.basismodul</kennung>
+            <beschreibung>Im Auftrag des AK I hat die PG Standard bisher unter anderem die fachlichen Vorgaben und die Struktur der Meldeanschrift für die Bereiche Ausländer-, Melde- und Personenstandswesen harmonisiert. Der vorliegende Standard XInneres bildet auf technischer Ebene eine Klammer vor den Standards der Innenverwaltung. An dieser Stelle können gemeinsam genutzte Komponenten definiert werden. In der ersten Version von XInneres definiert der Standard die Datentypen für die Darstellung der Meldeanschrift.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>9</version>
+            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+         <title>Gemeinsame Datentypen der administrativen Nachrichten</title>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="xinneres-basisnachricht.xsd"
+              namespace="http://www.osci.de/xinneres/basisnachricht/5"/>
+   <xs:import schemaLocation="xinneres-behoerde.xsd"
+              namespace="http://www.osci.de/xinneres/behoerde/5"/>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:complexType name="Code.Nachrichtentyp">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Nachrichtentypen in XInneres</nameLang>
+               <nameKurz>Nachrichtentypen in XInneres</nameKurz>
+               <nameTechnisch>nachrichtentyp</nameTechnisch>
+               <kennung>urn:de:xinneres:codeliste:nachrichtentyp</kennung>
+               <beschreibung>Die Liste von eindeutigen Bezeichner für Nachrichtentypen im XInneres-Basismodul.</beschreibung>
+               <herausgebernameLang>Koordinierungsstelle für IT-Standards</herausgebernameLang>
+               <herausgebernameKurz>KoSIT</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>4</version>
+               <versionCodelistenHandbuch>1.1</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <key>
+                  <spaltennameLang>key</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </key>
+               <name>
+                  <spaltennameLang>name</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </name>
+            </codelistenspalten>
+            <genutzteCodeSpalte>key</genutzteCodeSpalte>
+            <title>Nachrichtentypen in xrecent</title>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="0010">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>rueckweisung.asynchron.0010</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="0020">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>quittungVonSachverhalten.quittung.0020</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="0021">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>quittungVonSachverhalten.erinnerung.0021</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="0030">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>weiterleitung.weiterleitung.0030</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="0031">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>weiterleitung.abgabe.0031</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="0032">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>weiterleitung.nichtzustaendigkeit.0032</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+               <xs:element name="name" type="xs:normalizedString" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:de:xinneres:codeliste:nachrichtentyp"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="4"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Identifikation.Nachricht.XInneres">
+      <xs:annotation>
+         <xs:documentation>Dieser Typ enthält die für die Identifikation einer Nachricht des xinneres-basismoduls erforderlichen Informationen.</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xink:Identifikation.Nachricht">
+            <xs:sequence>
+               <xs:element name="nachrichtenUUID" type="xink:UUID"/>
+               <xs:element name="nachrichtentyp" type="xint:Code.Nachrichtentyp">
+                  <xs:annotation>
+                     <xs:documentation>Die eindeutige Identifizierungsnummer für den Typ der Nachricht aus dem xinneres-basismodul .</xs:documentation>
+                  </xs:annotation>
+               </xs:element>
+               <xs:element name="erstellungszeitpunkt" type="xs:dateTime"/>
+            </xs:sequence>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Nachrichtenkopf.G2G.XInneres">
+      <xs:annotation>
+         <xs:documentation>Nachrichtenkopf für Nachrichten des xinneres-basismoduls zwischen Behörden und anderen (öffentlichen) Stellen.</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xink:Nachrichtenkopf.G2G">
+            <xs:sequence>
+               <xs:element name="identifikation.nachricht"
+                           type="xint:Identifikation.Nachricht.XInneres"/>
+               <xs:element name="leser" type="xibehoerde:Behoerde"/>
+               <xs:element name="autor" type="xibehoerde:Behoerde.Erreichbar"/>
+            </xs:sequence>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+</xs:schema>

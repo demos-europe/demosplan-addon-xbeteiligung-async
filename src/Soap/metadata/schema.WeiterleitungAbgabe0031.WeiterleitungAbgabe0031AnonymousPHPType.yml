@@ -1,0 +1,34 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungAbgabe0031\WeiterleitungAbgabe0031AnonymousPHPType:
+    properties:
+        zustaendigeStelle:
+            expose: true
+            access_type: public_method
+            serialized_name: zustaendigeStelle
+            accessor:
+                getter: getZustaendigeStelle
+                setter: setZustaendigeStelle
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeType
+        weitergeleiteteNachricht:
+            expose: true
+            access_type: public_method
+            serialized_name: weitergeleiteteNachricht
+            accessor:
+                getter: getWeitergeleiteteNachricht
+                setter: setWeitergeleiteteNachricht
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type
+        weitergeleitetesEreignis:
+            expose: true
+            access_type: public_method
+            serialized_name: weitergeleitetesEreignis
+            accessor:
+                getter: getWeitergeleitetesEreignis
+                setter: setWeitergeleitetesEreignis
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType
+        bemerkungen:
+            expose: true
+            access_type: public_method
+            serialized_name: bemerkungen
+            accessor:
+                getter: getBemerkungen
+                setter: setBemerkungen
+            type: string

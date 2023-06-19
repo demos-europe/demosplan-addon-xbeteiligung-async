@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xirts="http://www.osci.de/xinneres/rueckweisung/4"
+           xmlns:dinspec91379="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"
+           xmlns:xikomm="http://www.osci.de/xinneres/kommunikation/4"
+           xmlns:xink="http://www.osci.de/xinneres/basisnachricht/5"
+           xmlns:xint="http://www.osci.de/xinneres/nachrichtentypen/5"
+           xmlns:xipa="http://www.osci.de/xinneres/postanschrift/4"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="http://www.osci.de/xinneres/rueckweisung/4"
+           version="4"
+           elementFormDefault="unqualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XInneres-Basismodul</nameLang>
+            <nameKurz>XInneres-Basismodul</nameKurz>
+            <nameTechnisch>xinneres.basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:kosit:standard:xinneres.basismodul</kennung>
+            <beschreibung>Im Auftrag des AK I hat die PG Standard bisher unter anderem die fachlichen Vorgaben und die Struktur der Meldeanschrift für die Bereiche Ausländer-, Melde- und Personenstandswesen harmonisiert. Der vorliegende Standard XInneres bildet auf technischer Ebene eine Klammer vor den Standards der Innenverwaltung. An dieser Stelle können gemeinsam genutzte Komponenten definiert werden. In der ersten Version von XInneres definiert der Standard die Datentypen für die Darstellung der Meldeanschrift.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>9</version>
+            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+         <title>Die Rückweisung von Nachrichten</title>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="din-91379-datatypes.xsd"
+              namespace="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"/>
+   <xs:import schemaLocation="xinneres-basisnachricht.xsd"
+              namespace="http://www.osci.de/xinneres/basisnachricht/5"/>
+   <xs:import schemaLocation="xinneres-kommunikation.xsd"
+              namespace="http://www.osci.de/xinneres/kommunikation/4"/>
+   <xs:import schemaLocation="xinneres-nachrichtentypen.xsd"
+              namespace="http://www.osci.de/xinneres/nachrichtentypen/5"/>
+   <xs:import schemaLocation="xinneres-postanschrift.xsd"
+              namespace="http://www.osci.de/xinneres/postanschrift/4"/>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:complexType name="Code.Fehlercode.Spezifisch">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Kontextspezifische Fehlercodes</title>
+         </xs:appinfo>
+         <xs:documentation>Mit diesem Datentyp werden (Kontext) spezifische Fehlercodes in der Rückweisungsnachricht aus dem xinneres-basismodul übermittelt. Es wird ein Typ-4 Codedatentyp verwendet, mit dem Schlüssel aus beliebigen Schlüsseltabellen übermittelt werden können, die sich mittels listURI und listVersionID identifizieren lassen. Die verwendeten Schlüsseltabellen müssen im XRepository im Genericode-Format veröffentlicht sein.</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token"/>
+               <xs:element name="name" type="xs:normalizedString" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="listURI" type="xs:anyURI" use="required"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.Fehlercode.XInneres">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Fehlercodes in XInneres</nameLang>
+               <nameKurz>Fehlercodes in XInneres</nameKurz>
+               <nameTechnisch>fehlercodes</nameTechnisch>
+               <kennung>urn:de:xinneres:codeliste:fehlercodes</kennung>
+               <beschreibung>Diese Tabelle führt mögliche Gründe für eine Rücksendung einer Nachricht an den Absender auf. Mit dem Präfix des jeweiligen Schlüssels wird folgende Systematik festgelegt: T (Transportproblem), X (formales Problem mit XML), V (Versionsproblem), S (nicht spezifikationskonform).</beschreibung>
+               <herausgebernameLang>Koordinierungsstelle für IT-Standards</herausgebernameLang>
+               <herausgebernameKurz>KoSIT</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>2</version>
+               <versionCodelistenHandbuch>1.1</versionCodelistenHandbuch>
+               <aenderungZurVorversion>Der Code S030 wurde aufgenommen.</aenderungZurVorversion>
+            </versionCodeliste>
+            <codelistenspalten>
+               <key>
+                  <spaltennameLang>key</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </key>
+               <name>
+                  <spaltennameLang>name</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </name>
+            </codelistenspalten>
+            <genutzteCodeSpalte>key</genutzteCodeSpalte>
+            <title>Fehlercodes in XInneres</title>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code">
+                  <xs:simpleType>
+                     <xs:restriction base="xs:token">
+                        <xs:enumeration value="S001">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Die Nachricht ist nicht UTF-8 codiert.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S010">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Ungültige Schlüsseltabelle.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S011">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Ungültiger Schlüssel in einer Schlüsseltabelle.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S020">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Fehlerhafte Einzelfälle</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S030">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: In der Nachricht ist mindestens ein mandatorisches Kindelement des Typs dinspec91379:datatypeC leer (d. h. mit einer Zeichenkette der Länge 0) enthalten, für das keine Ausnahmeregelung seitens des Fachmoduls besteht.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S100">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Rückweisung aufgrund erneuter Lieferung eines bereits erfolgreich verarbeiteten Datensatzes</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="S999">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform aus anderen Gründen.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T000">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Das Zertifikat des Absenders ist abgelaufen.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T001">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Das Zertifikat des Absenders ist widerrufen.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T002">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Das Zertifikat des Absenders ist nicht gültig.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T003">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Das Zertifikat des Absenders fehlt.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T010">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Signatur der Inhaltsdaten fehlt oder hat nicht das geforderte Signaturniveau.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T011">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Signatur der Inhaltsdaten ist nicht gültig (Integrität verletzt).</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T020">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Inhaltsdaten können von dem Empfänger nicht dechiffriert werden.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T070">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Der Absender ist zur Inanspruchnahme dieses Dienstes nicht berechtigt.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T080">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Nachricht ist dem falschen Empfänger / Leser zugestellt worden, d. h. im Nachrichtenkopf ist eine abweichende Empfängerbehörde eingetragen (Irrläufer).</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="T099">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Sonstiger Verstoß gegen Anforderungen des OSCI-Transport-Profils</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="V000">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Nicht spezifikationskonform: Die Nachricht kann in der Version, die in der Nachricht angegeben wird, vom Empfänger nicht bearbeitet werden (Der Dienst ist in dieser Version nicht oder nicht mehr bereit).</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="X000">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Nachricht ist kein wohlgeformtes XML-Dokument.</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                        <xs:enumeration value="X001">
+                           <xs:annotation>
+                              <xs:appinfo>
+                                 <name>Die Nachricht ist nicht valide zu dem Schema der in der Nachricht angegebenen Version</name>
+                              </xs:appinfo>
+                           </xs:annotation>
+                        </xs:enumeration>
+                     </xs:restriction>
+                  </xs:simpleType>
+               </xs:element>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:de:xinneres:codeliste:fehlercodes"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="2"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Nachricht.G2G.Rueckweisung" abstract="true">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Basisnachricht für die Rückweisung von Nachrichten</title>
+         </xs:appinfo>
+         <xs:documentation>Dieser Typ realisiert die abstrakte Oberklasse für alle Fehlernachrichten .</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xink:Nachricht.G2G">
+            <xs:sequence>
+               <xs:element name="nachrichtenkopf" type="xint:Nachrichtenkopf.G2G.XInneres"/>
+            </xs:sequence>
+            <xs:attribute name="produkt" type="dinspec91379:datatypeC" use="required"/>
+            <xs:attribute name="produkthersteller"
+                          type="dinspec91379:datatypeC"
+                          use="required"/>
+            <xs:attribute name="produktversion" type="dinspec91379:datatypeC" use="optional"/>
+            <xs:attribute name="standard"
+                          type="dinspec91379:datatypeC"
+                          use="required"
+                          fixed="XInneres-Rueckweisung"/>
+            <xs:attribute name="test" type="dinspec91379:datatypeC" use="optional"/>
+            <xs:attribute name="version"
+                          type="dinspec91379:datatypeC"
+                          use="required"
+                          fixed="4"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Rueckweisung.Einzelfall">
+      <xs:annotation>
+         <xs:documentation>Mit diesem Typ können Angaben zu einem zurückgewiesenen Einzelfall aus einer Sammelnachricht übermittelt werden.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="identifikation.ereignis" type="xink:Identifikation.Ereignis">
+            <xs:annotation>
+               <xs:documentation>Hier werden die Informationen übermittelt, mit denen der Einzelfall in der (Sammel-)Nachricht eindeutig identifiziert werden kann.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="grund"
+                     maxOccurs="unbounded"
+                     type="xirts:Rueckweisung.Rueckweisungsgrund">
+            <xs:annotation>
+               <xs:documentation>Für jeden Einzelfall sind hier die Gründe zu übermitteln, aufgrund derer der Einzelfall zurückgewiesen wird.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Rueckweisung.GrundSpezifisch">
+      <xs:annotation>
+         <xs:documentation>In diesem Datentyp wird ein Grund für die Rückweisung der Nachricht in Form eines beliebigen kontextspezifischen Fehlercodes (bspw. aus dem BZSt-Fehlerkatalog) oder einer Fehlerbeschreibung genauer spezifiziert. Sofern in einem (fachlichen) Prozess kontextspezifische Fehlercodes verwendet werden, ist dies durch das xinneres-fachmodul in der Prozessbeschreibung vorzugeben und die zu verwendende Schlüsseltabelle festzulegen.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="fehlercode"
+                     minOccurs="0"
+                     type="xirts:Code.Fehlercode.Spezifisch">
+            <xs:annotation>
+               <xs:documentation>In diesem Element wird ein Fehlercode übermittelt. Die zugrundeliegende Schlüsseltabelle muss mit der listURI (bspw. urn:de:bund:bzst:schluessel:rts.fehlercodes) und listVersionID (bspw. 2016-01-19) identifiziert werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="fehlerbeschreibung"
+                     minOccurs="0"
+                     type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Alternativ oder ergänzend zu dem übermittelten Fehlercode können hier weitere Hinweise übermittelt werden, die der Klärung des Sachverhalts dienen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Rueckweisung.RueckweisendeStelle">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Rückweisende Stelle</title>
+         </xs:appinfo>
+         <xs:documentation>Die rückweisende Stelle kann eine der Institutionen sein, die sich auf dem Weg zwischen Autor und Leser befinden.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="pruefinstanz" type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Mit diesem Element wird die Stelle bezeichnet, die die Nachricht beanstandet hat.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="anschrift" type="xipa:PostalischeInlandsanschrift"/>
+         <xs:element name="erreichbarkeit"
+                     maxOccurs="unbounded"
+                     type="xikomm:Kommunikation"/>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Rueckweisung.Rueckweisungsgrund">
+      <xs:annotation>
+         <xs:documentation>Mit diesem Element wird ein Grund übermittelt, aus dem die Nachricht zurückgewiesen wird. Die im Rahmen der hier zu verwendenden Schlüsseltabelle zur Verfügung gestellten Rückweisungsgründe sind kontextunabhängig und finden in allen xinneres-fachmodulen Anwendung. Die allgemeinen Rückweisungsgründe können durch kontextspezifische Gründe erläutert werden. Sofern in diesem Element xinneres-fachmodul-spezifische Rückweisungsgründe übermittelt werden sollen, ist in dem Kindelement grund der Schlüssel S999 und in den Kindelementen grundSpezifisch ein oder mehrere dem xinneres-fachmodul entstammende Rückweisungsgründe zu übermitteln.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="grund" type="xirts:Code.Fehlercode.XInneres">
+            <xs:annotation>
+               <xs:documentation>Mit diesem Element wird ein Grund übermittelt, aus dem die Nachricht zurückgewiesen wird. Die im Rahmen der hier zu verwendenden Schlüsseltabelle zur Verfügung gestellten Rückweisungsgründe sind kontextunabhängig und finden daher in allen xinneres-fachmodulen Anwendung. Sofern der Schlüssel S999 verwendet wird, sind ergänzende Angaben in dem Element grundSpezifisch verpflichtend zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="grundSpezifisch"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xirts:Rueckweisung.GrundSpezifisch">
+            <xs:annotation>
+               <xs:documentation>In diesem Element können weitere - im Allgemeinen kontextspezifische Angaben - zu dem Grund übermittelt werden, aus dem die Nachricht zurückgewiesen wird.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Rueckweisung.Template" abstract="true">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Vorlage für Rückweisungscontainer</title>
+         </xs:appinfo>
+         <xs:documentation>Dieser Typ realisiert die abstrakte Oberklasse aller Rückweisungscontainer.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="rueckweisendeStelle"
+                     minOccurs="0"
+                     type="xirts:Rueckweisung.RueckweisendeStelle">
+            <xs:annotation>
+               <xs:documentation>Dieses Kindelement ist nur dann zu übermitteln, wenn die Nachricht nicht von dem ursprünglich adressierten Leser zurückgesandt wird, sondern von einer anderen Stelle (zum Beispiel einer Clearingstelle, die im Auftrag der ursprünglich adressierten Behörde eine Prüfung eingehender Nachrichten nach formalen Kriterien durchführt). Wird dieses Element nicht übermittelt, ist die rückweisende Stelle der zurückgewiesenen Nachricht (Kindelement nachricht) zu entnehmen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="rueckweisungsgrund"
+                     maxOccurs="unbounded"
+                     type="xirts:Rueckweisung.Rueckweisungsgrund">
+            <xs:annotation>
+               <xs:documentation>In diesem Element werden die Gründe mitgeteilt, aufgrund derer die Nachricht zurückgesandt wird. Generell ist so vorzugehen, dass die Gründe für die Rückweisung so präzise und vollständig wie möglich bezeichnet werden, um eine schnelle Klärung des Sachverhalts zu ermöglichen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="transportinformationen"
+                     minOccurs="0"
+                     type="xirts:Rueckweisung.Transportinformationen">
+            <xs:annotation>
+               <xs:documentation>In diesem Element sind Informationen zu übermitteln, die bei dem Empfang einer als fehlerhaft betrachteten Nachricht möglicherweise der Transportebene entnommen werden konnten. Diese Angaben können gemacht werden, um dem Leser oder Empfänger einer Rücksendenachricht die Identifikation der als fehlerhaft betrachteten und nunmehr zurückgesandten Nachricht zu erleichtern. Alle Kindelemente dieses Elementes sind optional, da keine verbindlichen Anforderungen an das Transportprotokoll gestellt werden können.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="nichtVerarbeitbarerEinzelfall"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xirts:Rueckweisung.Einzelfall">
+            <xs:annotation>
+               <xs:documentation>Mit diesem Element werden die nicht verarbeitbaren Einzelfälle aus der zurückgewiesenen (Sammel-)Nachricht kenntlich gemacht. Für jeden nicht verarbeitbaren Einzelfall sind neben den Identifikationsdaten die Gründe mitzuteilen, aufgrund derer der Einzelfall nicht verarbeitet werden konnte. Diese Gründe sind so präzise und vollständig wie möglich zu bezeichnen, um eine schnelle Klärung des Sachverhalts zu ermöglichen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="idNachricht"
+                     minOccurs="0"
+                     type="xink:Identifikation.Nachricht">
+            <xs:annotation>
+               <xs:documentation>In diesem Kindelement wird die die Rückweisung auslösende fachliche Nachricht identifiziert. Sofern die Ursprungsnachricht schemakonform ist, muss das Element idNachricht übermittelt werden. Ist die Ursprungsnachricht nicht schemakonform kann die Übermittlung des Elements entfallen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="nachricht" minOccurs="0" type="xs:base64Binary">
+            <xs:annotation>
+               <xs:documentation>Dieses Element enthält die aus den genannten Gründen zurückgewiesene ursprüngliche Nachricht. Um technische Probleme mit verschachtelten XML-Dokumenten zu vermeiden, ist der zurückgewiesene Inhalt immer base64-codiert zurückzusenden. Sollte es sich bei der ursprünglichen Nachricht um eine Sammelnachricht gehandelt haben, müssen die Einzelfälle, die korrekt verarbeitet wurden, aus der hier übermittelten Nachricht entfernt worden sein. Die hier übermittelte Nachricht enthält also nur Einzelfälle, die nicht verarbeitet worden sind. Für jeden nicht verarbeiteten Einzelfall ist ein Element nichtVerarbeitbarerEinzelfall mit einer entsprechenden begruendung zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Rueckweisung.Template.Asynchron">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Inhalt der asynchronen Rückweisung</title>
+         </xs:appinfo>
+         <xs:documentation>Dieser Typ beinhaltet die Inhalte für die asynchrone Rückweisung von Nachrichten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xirts:Rueckweisung.Template">
+            <xs:sequence>
+               <xs:element name="rueckweisendeStelle"
+                           minOccurs="0"
+                           type="xirts:Rueckweisung.RueckweisendeStelle"/>
+               <xs:element name="rueckweisungsgrund"
+                           maxOccurs="unbounded"
+                           type="xirts:Rueckweisung.Rueckweisungsgrund"/>
+               <xs:element name="transportinformationen"
+                           minOccurs="0"
+                           type="xirts:Rueckweisung.Transportinformationen"/>
+               <xs:element name="nichtVerarbeitbarerEinzelfall"
+                           minOccurs="0"
+                           maxOccurs="unbounded"
+                           type="xirts:Rueckweisung.Einzelfall"/>
+               <xs:element name="idNachricht"
+                           minOccurs="0"
+                           type="xink:Identifikation.Nachricht.Typ4"/>
+               <xs:element name="nachricht" type="xs:base64Binary"/>
+            </xs:sequence>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Rueckweisung.Transportinformationen">
+      <xs:annotation>
+         <xs:documentation>Mit diesem Typ können Angaben zu den Transportinformationen der zurückgewiesenen Nachricht übermittelt werden.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="nachrichtenId" minOccurs="0" type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Hier kann eine Identifikation der aus den genannten Gründen zurückgewiesenen Nachricht übermittelt werden, sofern sich diese aus dem Transportprotokoll entnehmen lässt. Im Falle von OSCI-Transport wäre hier die messageID des Transportumschlages zu nutzen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="betreff" minOccurs="0" type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Inhalt der Betreff- oder Subject-Zeile der aus den genannten Gründen zurückgewiesenen Nachricht übermittelt werden, sofern sich diese aus dem Transportprotokoll entnehmen lässt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="sendezeitpunkt" minOccurs="0" type="xs:dateTime">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Zeitpunkt des Versands der aus den genannten Gründen zurückgewiesenen Nachricht übermittelt werden, sofern sich dieser aus dem Transportprotokoll entnehmen lässt.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="ergaenzendeHinweise"
+                     minOccurs="0"
+                     type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Hier können weitere Angaben gemacht werden, die dem Empfänger der aus den genannten Gründen zurückgewiesenen Nachricht helfen, diese in seinem Verfahren zu identifizieren.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:element name="rueckweisung.asynchron.0010">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Grundsätzlich alle Kommunikationteilnehmer im XInneres-Verbund</autor>
+            <leser>Grundsätzlich alle Kommunikationteilnehmer im XInneres-Verbund</leser>
+            <rechtsgrundlage>Unterschiedliche bundesrechtliche und landesrechtliche Regelungen</rechtsgrundlage>
+            <title>Rückweisungsnachricht (asynchron)</title>
+         </xs:appinfo>
+         <xs:documentation>Mit dieser Nachricht wird eine an eine Behörde gerichtete Nachricht als fehlerhaft an die sendende Behörde zurückgewiesen, die erhaltene Nachricht wurde nicht verarbeitet. Diese Nachricht ist für die Verwendung in asynchronen Prozessen konzipiert.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xirts:Nachricht.G2G.Rueckweisung">
+               <xs:sequence>
+                  <xs:element name="rueckweisung" type="xirts:Rueckweisung.Template.Asynchron">
+                     <xs:annotation>
+                        <xs:documentation>Inhalte der Rückweisungsnachricht</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+</xs:schema>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="https://www.xleitstelle.de/xbeteiligung/0/9"
+           version="1.0"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:include schemaLocation="xbeteiligung-baukasten.xsd"/>
+   <xs:include schemaLocation="xbeteiligung-beteiligung2planung.xsd"/>
+   <xs:include schemaLocation="xbeteiligung-codes.xsd"/>
+   <xs:include schemaLocation="xbeteiligung-planung2beteiligung.xsd"/>
+</xs:schema>

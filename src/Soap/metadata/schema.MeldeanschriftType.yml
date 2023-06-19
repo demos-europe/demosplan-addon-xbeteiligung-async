@@ -1,0 +1,90 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MeldeanschriftType:
+    properties:
+        gemeindeschluessel:
+            expose: true
+            access_type: public_method
+            serialized_name: gemeindeschluessel
+            accessor:
+                getter: getGemeindeschluessel
+                setter: setGemeindeschluessel
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeGemeindeVZAmtlicherGemeindeschluesselType
+        hausnummer:
+            expose: true
+            access_type: public_method
+            serialized_name: hausnummer
+            accessor:
+                getter: getHausnummer
+                setter: setHausnummer
+            type: string
+        hausnummerBuchstabeZusatzziffer:
+            expose: true
+            access_type: public_method
+            serialized_name: hausnummerBuchstabeZusatzziffer
+            accessor:
+                getter: getHausnummerBuchstabeZusatzziffer
+                setter: setHausnummerBuchstabeZusatzziffer
+            type: string
+        postleitzahl:
+            expose: true
+            access_type: public_method
+            serialized_name: postleitzahl
+            accessor:
+                getter: getPostleitzahl
+                setter: setPostleitzahl
+            type: string
+        stockwerkswohnungsnummer:
+            expose: true
+            access_type: public_method
+            serialized_name: stockwerkswohnungsnummer
+            accessor:
+                getter: getStockwerkswohnungsnummer
+                setter: setStockwerkswohnungsnummer
+            type: string
+        strasse:
+            expose: true
+            access_type: public_method
+            serialized_name: strasse
+            accessor:
+                getter: getStrasse
+                setter: setStrasse
+            type: string
+        teilnummerDerHausnummer:
+            expose: true
+            access_type: public_method
+            serialized_name: teilnummerDerHausnummer
+            accessor:
+                getter: getTeilnummerDerHausnummer
+                setter: setTeilnummerDerHausnummer
+            type: string
+        wohnort:
+            expose: true
+            access_type: public_method
+            serialized_name: wohnort
+            accessor:
+                getter: getWohnort
+                setter: setWohnort
+            type: string
+        wohnortFruehererGemeindename:
+            expose: true
+            access_type: public_method
+            serialized_name: wohnortFruehererGemeindename
+            accessor:
+                getter: getWohnortFruehererGemeindename
+                setter: setWohnortFruehererGemeindename
+            type: string
+        wohnungsinhaber:
+            expose: true
+            access_type: public_method
+            serialized_name: wohnungsinhaber
+            accessor:
+                getter: getWohnungsinhaber
+                setter: setWohnungsinhaber
+            type: string
+        zusatzangaben:
+            expose: true
+            access_type: public_method
+            serialized_name: zusatzangaben
+            accessor:
+                getter: getZusatzangaben
+                setter: setZusatzangaben
+            type: string

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xiaa="http://www.osci.de/xinneres/auslandsanschrift/4"
+           xmlns:dinspec91379="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"
+           xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
+           targetNamespace="http://www.osci.de/xinneres/auslandsanschrift/4"
+           version="4"
+           elementFormDefault="unqualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XInneres-Basismodul</nameLang>
+            <nameKurz>XInneres-Basismodul</nameKurz>
+            <nameTechnisch>xinneres.basismodul</nameTechnisch>
+            <kennung>urn:xoev-de:kosit:standard:xinneres.basismodul</kennung>
+            <beschreibung>Im Auftrag des AK I hat die PG Standard bisher unter anderem die fachlichen Vorgaben und die Struktur der Meldeanschrift für die Bereiche Ausländer-, Melde- und Personenstandswesen harmonisiert. Der vorliegende Standard XInneres bildet auf technischer Ebene eine Klammer vor den Standards der Innenverwaltung. An dieser Stelle können gemeinsam genutzte Komponenten definiert werden. In der ersten Version von XInneres definiert der Standard die Datentypen für die Darstellung der Meldeanschrift.</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>9</version>
+            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
+            <versionXGenerator>3.0.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:import schemaLocation="din-91379-datatypes.xsd"
+              namespace="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"/>
+   <xs:import schemaLocation="xoev-code.xsd"
+              namespace="http://xoev.de/schemata/code/1_0"/>
+   <xs:complexType name="Auslandsanschrift.Anschriftzone">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Anschriftzone in der Auslandsanschrift</title>
+         </xs:appinfo>
+         <xs:documentation>Dieser Datentyp enthält die für die Zustellung im Ausland erforderlichen Angaben zur Anschriftzone, außer der Angabe des Staates. Diese Angaben beinhalten alle zur Adressierung erforderlichen Angaben inkl. des Namens der Person und bestehen aus bis zu fünf Zeilen. Diese Zeilen sind beginnend mit der Nummer 4 lückenlos zu durchzunummerieren.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="zeile.anschrift"
+                     minOccurs="2"
+                     maxOccurs="5"
+                     type="xiaa:ZeileAufschrift">
+            <xs:annotation>
+               <xs:documentation>Hier sind pro Zeile der Anschriftzone jeweils der eigentliche inhalt und die zeilennummer zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Auslandsanschrift.Druckbild">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Datentyp für das Druckbild einer Auslandsanschrift</title>
+            <implementationHint>Sofern dieser Datentyp verwendet wird, um Inhalte des DSMeld-Blattes 1233 zu übermitteln, gelten die strengeren Regelungen aus dem DSMeld.</implementationHint>
+         </xs:appinfo>
+         <xs:documentation>Dieser Datentyp repräsentiert das Druckbild einer Anschrift im Ausland, indem die Anschriftzone eines Brieffensters gemäß DIN 5008 abgebildet wird. Die Anschriftzone setzt sich aus einem Schlüsselwert für den Zielstaat und bis zu fünf weiteren Zeilen für die übrigen Adressierungsangaben zusammen. Angaben zur Vermerkzone können mit diesem Datentypen nicht abgebildet werden. Die ersten fünf Zeilen werden mit den Angaben zur Anschrift im Ausland gefüllt. Leerzeilen sind dabei nicht zulässig. Entsprechend DIN 5008 sind die Zeilen beginnend mit der Nummer 4 lückenlos durchzunummerieren und Zeilennummern nicht mehrfach zu verwenden. Der Ortsname in der Anschrift sollte in Großbuchstaben und in der Sprache des Zielstaates erfasst und übermittelt werden. Für die Erstellung des Druckbildes ist der übermittelte Schlüsselwert des Zielstaates in eine für die Zustellung geeignete Klartextform - d. h. in Großbuchstaben und in die deutsche Sprache - zu überführen.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="staat" type="xiaa:Code.Zielstaat">
+            <xs:annotation>
+               <xs:documentation>Hier ist Staatenschlüssel des Zielstaats aus der aktuell gültigen Staats- und Gebietssystematik des Statistischen Bundesamtes zu übermitteln. Da mit dem Datentyp Auslandsanschrift.Druckbild nur Auslandsanschriften übermittelt werden dürfen, ist die Verwendung des Schlüssels 000 (Deutschland) nicht zulässig.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="anschriftzone"
+                     minOccurs="0"
+                     type="xiaa:Auslandsanschrift.Anschriftzone">
+            <xs:annotation>
+               <xs:documentation>Hier sind zeilenweise die für die Zustellung erforderlichen Angaben zur Anschriftzone zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="Code.Zielstaat">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Codeliste Staat aus der Staats- und Gebietssystematik des Statistischen Bundesamtes</nameLang>
+               <nameKurz>DESTATIS Staatenliste</nameKurz>
+               <nameTechnisch>Staat</nameTechnisch>
+               <kennung>urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:staat</kennung>
+               <beschreibung>Die Codeliste Staat (eigenständige, von Deutschland diplomatisch anerkannte derzeitige Staaten). Tabelle von Staaten und Staatsangehörigkeiten. Enthalten sind alle Staaten im vollen politischen Sinne. Entspricht inhaltlich dem "Verzeichnis der Staatennamen für den amtlichen Gebrauch" des Auswärtigen Amtes. Enthalten sind z.B. Einträge für: Frankreich, Italien, Vereinigtes Königreich; nicht aber für: Französisch-Guayana, die britischen Jungferninseln oder Jersey. Neben den amtlichen Bezeichnungen (Kurzform und Vollform) und der Staatsangehörigkeit als Adjektiv/Adverb ist auch der jeweilige Suchbegriff aus dem Länderverzeichnis des Auswärtigen Amtes aufgeführt (der Suchbegriff ist eine griffige Bezeichnung des Staates). Die Angaben umfassen zudem den numerischen Destatis-Code, den 2- und 3-stelligen alphabetischen ISO 3166-1 Code sowie ggf. das Datum der Selbständigkeit bzw. Gründung nach den Angaben des Auswärtigen Amtes.</beschreibung>
+               <herausgebernameLang>Statistisches Bundesamt</herausgebernameLang>
+               <herausgebernameKurz>DESTATIS</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+         <xs:documentation>Die genutzte Codeliste ist eine auf der Staats- und Gebietssystematik des Statistischen Bundesamtes basierende Liste von Schlüsselwerten zur eindeutigen Bezeichnung von Staaten im Kontext der Übermittlung eines Druckbildes einer Anschrift im Ausland. Für die Übermittlung in XInneres ist die jeweils gültige Fassung der Staats- und Gebietssystematik zu verwenden.</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token"/>
+               <xs:element name="name" type="xs:normalizedString" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:de:bund:destatis:bevoelkerungsstatistik:schluessel:staat"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="ZeileAufschrift">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Aufschriftzeile</title>
+         </xs:appinfo>
+         <xs:documentation>Dieser Datentyp repräsentiert eine Zeile einer Aufschrift gemäß DIN 5008 und besteht aus dem Inhalt der Zeile sowie der Angabe der Zeilennummer in der Aufschrift. Sofern dieser Datentyp für die Übermittlung einer Zeile der Anschriftzone verwendet wird, sind ausschließlich die Zeilennummern 4 bis 8 zu verwenden. Zeilen der Vermerkzone werden in dem Datentyp Auslandsanschrift.Druckbild nicht übermittelt. Sofern in einem xinneres-fachmodul der Bedarf besteht, kann der Datentyp aber im Rahmen der Einbindung in das xinneres-fachmodul um weitere ZeileAufschrift-Kindelemente für die Vermerkzone ergänzt werden. Für diese Zeilen sind ausschließlich die Zeilennummern 1 bis 3 zu verwenden.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="zeilennummer" type="xiaa:ZeileAufschrift.Zeilennummer">
+            <xs:annotation>
+               <xs:documentation>Die Angabe, in welcher Zeile der Inhalt in der Aufschrift auftauchen soll.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="inhalt" type="xiaa:ZeileAufschrift.Inhalt">
+            <xs:annotation>
+               <xs:documentation>Hier ist der Inhalt der Aufschriftzeile anzugeben.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:simpleType name="ZeileAufschrift.Inhalt">
+      <xs:annotation>
+         <xs:documentation>Dieser Datentyp beschreibt den Inhalt einer Aufschriftzeile.</xs:documentation>
+      </xs:annotation>
+      <xs:restriction base="dinspec91379:datatypeC">
+         <xs:maxLength value="35"/>
+         <xs:minLength value="1"/>
+         <xs:pattern value="[^&#xA;&#x9;&#xD;]*"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="ZeileAufschrift.Zeilennummer">
+      <xs:annotation>
+         <xs:documentation>Dieser Datentyp beschreibt die Zeilennummer einer Aufschriftzeile.</xs:documentation>
+      </xs:annotation>
+      <xs:restriction base="xs:nonNegativeInteger">
+         <xs:maxInclusive value="8"/>
+         <xs:minInclusive value="1"/>
+      </xs:restriction>
+   </xs:simpleType>
+</xs:schema>

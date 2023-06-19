@@ -1,0 +1,45 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungWeiterleitung0030\WeiterleitungWeiterleitung0030AnonymousPHPType:
+    properties:
+        weiterleitendeStelle:
+            expose: true
+            access_type: public_method
+            serialized_name: weiterleitendeStelle
+            accessor:
+                getter: getWeiterleitendeStelle
+                setter: setWeiterleitendeStelle
+            xml_list:
+                inline: true
+                entry_name: weiterleitendeStelle
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType>
+        ausloesendeStelle:
+            expose: true
+            access_type: public_method
+            serialized_name: ausloesendeStelle
+            accessor:
+                getter: getAusloesendeStelle
+                setter: setAusloesendeStelle
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarType
+        weitergeleiteteNachricht:
+            expose: true
+            access_type: public_method
+            serialized_name: weitergeleiteteNachricht
+            accessor:
+                getter: getWeitergeleiteteNachricht
+                setter: setWeitergeleiteteNachricht
+            type: GoetasWebservices\Xsd\XsdToPhp\Jms\Base64Encoded
+        weitergeleiteteNachrichtTyp:
+            expose: true
+            access_type: public_method
+            serialized_name: weitergeleiteteNachrichtTyp
+            accessor:
+                getter: getWeitergeleiteteNachrichtTyp
+                setter: setWeitergeleiteteNachrichtTyp
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4Type
+        bemerkungen:
+            expose: true
+            access_type: public_method
+            serialized_name: bemerkungen
+            accessor:
+                getter: getBemerkungen
+                setter: setBemerkungen
+            type: string

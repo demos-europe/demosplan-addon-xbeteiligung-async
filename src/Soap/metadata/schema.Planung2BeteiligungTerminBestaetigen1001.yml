@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungTerminBestaetigen1001:
+    xml_root_name: planung2Beteiligung.TerminBestaetigen.1001
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/0/9'
