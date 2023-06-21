@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeileAufschriftTypeType:
+    properties:
+        zeilennummer:
+            expose: true
+            access_type: public_method
+            serialized_name: zeilennummer
+            accessor:
+                getter: getZeilennummer
+                setter: setZeilennummer
+            type: int
+        inhalt:
+            expose: true
+            access_type: public_method
+            serialized_name: inhalt
+            accessor:
+                getter: getInhalt
+                setter: setInhalt
+            type: string

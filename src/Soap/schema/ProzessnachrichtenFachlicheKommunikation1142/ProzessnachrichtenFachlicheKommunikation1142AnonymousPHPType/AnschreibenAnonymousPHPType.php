@@ -17,7 +17,7 @@ class AnschreibenAnonymousPHPType
     /**
      * Hier wird der formatierte Text übermittelt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertType $textFormatiert
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertTypeType $textFormatiert
      */
     private $textFormatiert = null;
 
@@ -92,7 +92,7 @@ class AnschreibenAnonymousPHPType
      *
      * Hier wird der formatierte Text übermittelt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertTypeType
      */
     public function getTextFormatiert()
     {
@@ -104,10 +104,10 @@ class AnschreibenAnonymousPHPType
      *
      * Hier wird der formatierte Text übermittelt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertType $textFormatiert
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertTypeType $textFormatiert
      * @return self
      */
-    public function setTextFormatiert(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertType $textFormatiert = null)
+    public function setTextFormatiert(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertTypeType $textFormatiert = null)
     {
         $this->textFormatiert = $textFormatiert;
         return $this;

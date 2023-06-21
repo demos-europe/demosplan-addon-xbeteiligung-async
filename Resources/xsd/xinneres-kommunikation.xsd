@@ -18,7 +18,7 @@
          </standard>
          <versionStandard>
             <version>9</version>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
@@ -30,7 +30,7 @@
               namespace="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"/>
    <xs:import schemaLocation="xoev-code.xsd"
               namespace="http://xoev.de/schemata/code/1_0"/>
-   <xs:complexType name="Code.Erreichbarkeit">
+   <xs:complexType name="Code.ErreichbarkeitType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -136,12 +136,12 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Kommunikation">
+   <xs:complexType name="KommunikationType">
       <xs:annotation>
          <xs:documentation>Angaben zur Erreichbarkeit einer Behörde oder einer Person (Telefon, Fax, E-Mail, etc.).</xs:documentation>
       </xs:annotation>
       <xs:sequence>
-         <xs:element name="kanal" type="xikomm:Code.Erreichbarkeit">
+         <xs:element name="kanal" type="xikomm:Code.ErreichbarkeitType">
             <xs:annotation>
                <xs:documentation>Es wird angegeben, über welches Kommunikationsmedium (z. B. Telefon, E-Mail) die Erreichbarkeit gegeben ist.</xs:documentation>
             </xs:annotation>

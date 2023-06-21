@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType:
+    properties:
+        gebaeude:
+            expose: true
+            access_type: public_method
+            serialized_name: gebaeude
+            accessor:
+                getter: getGebaeude
+                setter: setGebaeude
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType
+        postfach:
+            expose: true
+            access_type: public_method
+            serialized_name: postfach
+            accessor:
+                getter: getPostfach
+                setter: setPostfach
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftPostfachanschriftTypeType

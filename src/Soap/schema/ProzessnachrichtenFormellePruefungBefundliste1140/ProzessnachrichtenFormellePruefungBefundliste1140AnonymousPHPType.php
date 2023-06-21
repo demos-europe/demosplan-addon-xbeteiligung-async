@@ -2,24 +2,24 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenFormellePruefungBefundliste1140;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 
 /**
  * Class representing ProzessnachrichtenFormellePruefungBefundliste1140AnonymousPHPType
  */
-class ProzessnachrichtenFormellePruefungBefundliste1140AnonymousPHPType extends NachrichtG2GType
+class ProzessnachrichtenFormellePruefungBefundliste1140AnonymousPHPType extends NachrichtG2GTypeType
 {
     /**
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      */
     private $bezug = null;
 
     /**
      * In diesem Element sind die Ergebnisse der formellen Prüfung enthalten. Sie haben die Form einer Liste von Mängeln des geprüften Gegenstandes.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BefundlisteFormellType\BefundAnonymousPHPType[] $befundliste
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BefundlisteFormellTypeType\BefundAnonymousPHPType[] $befundliste
      */
     private $befundliste = null;
 
@@ -35,7 +35,7 @@ class ProzessnachrichtenFormellePruefungBefundliste1140AnonymousPHPType extends 
      *
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
      */
     public function getBezug()
     {
@@ -47,10 +47,10 @@ class ProzessnachrichtenFormellePruefungBefundliste1140AnonymousPHPType extends 
      *
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      * @return self
      */
-    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug)
+    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug)
     {
         $this->bezug = $bezug;
         return $this;
@@ -62,9 +62,9 @@ class ProzessnachrichtenFormellePruefungBefundliste1140AnonymousPHPType extends 
      * In diesem Element sind die Ergebnisse der formellen Prüfung enthalten. Sie haben die Form einer Liste von Mängeln des geprüften Gegenstandes.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BefundlisteFormellType\BefundAnonymousPHPType $befund
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BefundlisteFormellTypeType\BefundAnonymousPHPType $befund
      */
-    public function addToBefundliste(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BefundlisteFormellType\BefundAnonymousPHPType $befund)
+    public function addToBefundliste(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BefundlisteFormellTypeType\BefundAnonymousPHPType $befund)
     {
         $this->befundliste[] = $befund;
         return $this;
@@ -101,7 +101,7 @@ class ProzessnachrichtenFormellePruefungBefundliste1140AnonymousPHPType extends 
      *
      * In diesem Element sind die Ergebnisse der formellen Prüfung enthalten. Sie haben die Form einer Liste von Mängeln des geprüften Gegenstandes.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BefundlisteFormellType\BefundAnonymousPHPType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BefundlisteFormellTypeType\BefundAnonymousPHPType[]
      */
     public function getBefundliste()
     {
@@ -113,7 +113,7 @@ class ProzessnachrichtenFormellePruefungBefundliste1140AnonymousPHPType extends 
      *
      * In diesem Element sind die Ergebnisse der formellen Prüfung enthalten. Sie haben die Form einer Liste von Mängeln des geprüften Gegenstandes.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BefundlisteFormellType\BefundAnonymousPHPType[] $befundliste
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BefundlisteFormellTypeType\BefundAnonymousPHPType[] $befundliste
      * @return self
      */
     public function setBefundliste(array $befundliste)

@@ -20,7 +20,7 @@
          </standard>
          <versionStandard>
             <version>9</version>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
@@ -36,42 +36,7 @@
               namespace="http://www.osci.de/xinneres/postanschrift/4"/>
    <xs:import schemaLocation="xoev-code.xsd"
               namespace="http://xoev.de/schemata/code/1_0"/>
-   <xs:complexType name="Behoerde">
-      <xs:annotation>
-         <xs:appinfo>
-            <title>Behörde</title>
-         </xs:appinfo>
-         <xs:documentation>Dieser Typ enthält Angaben über den Namen und die Erreichbarkeit einer Behörde. Eine Behörde im Sinne des Verwaltungsverfahrensgesetzes ist jede Stelle, die Aufgaben der öffentlichen Verwaltung wahrnimmt.</xs:documentation>
-      </xs:annotation>
-      <xs:sequence>
-         <xs:element name="behoerdenkennung" type="xibehoerde:Behoerdenkennung">
-            <xs:annotation>
-               <xs:documentation>Es wird die eindeutige Behördenkennung angegeben, über die die Behörde im DVDV ermittelt werden kann. Diese hier übermittelte Behördenkennung muss es dem Leser einer Nachricht ermöglichen, den Autor einer Nachricht im DVDV zu ermitteln um diesem ggf. erforderliche elektronische Mitteilungen senden zu können (bspw. Quittungen oder Fehlernachrichten).</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="erreichbarkeit"
-                     minOccurs="0"
-                     maxOccurs="unbounded"
-                     type="xikomm:Kommunikation">
-            <xs:annotation>
-               <xs:documentation>Angaben zur Erreichbarkeit dieser Behörde per Telefon, Telefax, E-Mail etc.</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="anschrift"
-                     minOccurs="0"
-                     type="xipa:PostalischeInlandsanschrift">
-            <xs:annotation>
-               <xs:documentation>Die Anschrift dieser Behörde (für persönliches Erscheinen oder die Zusendung von Dokumenten per Briefpost an die Behörde).</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="behoerdenname" type="dinspec91379:datatypeC">
-            <xs:annotation>
-               <xs:documentation>Es ist der Name der Behörde zu übermitteln. Er dient auch dazu, eine ggfs. erforderliche manuelle Klärung zu beschleunigen, indem bspw. der Autor einer Nachricht im Klartext übermittelt, an welche Behörde er die Nachricht schicken wollte.</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-      </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="Behoerde.Erreichbar">
+   <xs:complexType name="Behoerde.ErreichbarType">
       <xs:annotation>
          <xs:appinfo>
             <title>Erreichbare Behörde</title>
@@ -79,21 +44,21 @@
          <xs:documentation>Dieser Typ enthält Angaben über den Namen und die Erreichbarkeit einer Behörde. Eine Behörde im Sinne des Verwaltungsverfahrensgesetzes ist jede Stelle, die Aufgaben der öffentlichen Verwaltung wahrnimmt. Anders als in dem Typ Behoerde sind in diesem Typen alle Angaben zur Kontaktaufnahme mit der übermittelten Behörde Pflichtelemente.</xs:documentation>
       </xs:annotation>
       <xs:complexContent>
-         <xs:restriction base="xibehoerde:Behoerde">
+         <xs:restriction base="xibehoerde:BehoerdeType">
             <xs:sequence>
-               <xs:element name="behoerdenkennung" type="xibehoerde:Behoerdenkennung">
+               <xs:element name="behoerdenkennung" type="xibehoerde:BehoerdenkennungType">
                   <xs:annotation>
                      <xs:documentation>Es wird die eindeutige Behördenkennung angegeben, über die die Behörde im DVDV ermittelt werden kann. Diese hier übermittelte Behördenkennung muss es dem Leser einer Nachricht ermöglichen, den Autor einer Nachricht im DVDV zu ermitteln um diesem ggf. erforderliche elektronische Mitteilungen senden zu können (bspw. Quittungen oder Fehlernachrichten).</xs:documentation>
                   </xs:annotation>
                </xs:element>
                <xs:element name="erreichbarkeit"
                            maxOccurs="unbounded"
-                           type="xikomm:Kommunikation">
+                           type="xikomm:KommunikationType">
                   <xs:annotation>
                      <xs:documentation>Angaben zur Erreichbarkeit dieser Behörde per Telefon, Telefax, E-Mail etc.</xs:documentation>
                   </xs:annotation>
                </xs:element>
-               <xs:element name="anschrift" type="xipa:PostalischeInlandsanschrift">
+               <xs:element name="anschrift" type="xipa:PostalischeInlandsanschriftType">
                   <xs:annotation>
                      <xs:documentation>Die Anschrift dieser Behörde (für persönliches Erscheinen oder die Zusendung von Dokumenten per Briefpost an die Behörde).</xs:documentation>
                   </xs:annotation>
@@ -107,17 +72,52 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Behoerdenkennung">
+   <xs:complexType name="BehoerdeType">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Behörde</title>
+         </xs:appinfo>
+         <xs:documentation>Dieser Typ enthält Angaben über den Namen und die Erreichbarkeit einer Behörde. Eine Behörde im Sinne des Verwaltungsverfahrensgesetzes ist jede Stelle, die Aufgaben der öffentlichen Verwaltung wahrnimmt.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="behoerdenkennung" type="xibehoerde:BehoerdenkennungType">
+            <xs:annotation>
+               <xs:documentation>Es wird die eindeutige Behördenkennung angegeben, über die die Behörde im DVDV ermittelt werden kann. Diese hier übermittelte Behördenkennung muss es dem Leser einer Nachricht ermöglichen, den Autor einer Nachricht im DVDV zu ermitteln um diesem ggf. erforderliche elektronische Mitteilungen senden zu können (bspw. Quittungen oder Fehlernachrichten).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="erreichbarkeit"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xikomm:KommunikationType">
+            <xs:annotation>
+               <xs:documentation>Angaben zur Erreichbarkeit dieser Behörde per Telefon, Telefax, E-Mail etc.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="anschrift"
+                     minOccurs="0"
+                     type="xipa:PostalischeInlandsanschriftType">
+            <xs:annotation>
+               <xs:documentation>Die Anschrift dieser Behörde (für persönliches Erscheinen oder die Zusendung von Dokumenten per Briefpost an die Behörde).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="behoerdenname" type="dinspec91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Es ist der Name der Behörde zu übermitteln. Er dient auch dazu, eine ggfs. erforderliche manuelle Klärung zu beschleunigen, indem bspw. der Autor einer Nachricht im Klartext übermittelt, an welche Behörde er die Nachricht schicken wollte.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="BehoerdenkennungType">
       <xs:annotation>
          <xs:documentation>Die Behoerdenkennung fasst die Elemente zusammen, unter denen eine Behörde als Anbieter elektronischer Services im DVDV verzeichnet ist. Sie besteht aus einem Präfix und der eigentlichen Kennung. Grundsätzlich gibt es zu jedem Präfix eine entsprechende Schlüsseltabelle für die Kennung. Zum Beispiel werden Standesämter über das Präfix psw und die Standesamtsnummer adressiert.</xs:documentation>
       </xs:annotation>
       <xs:sequence>
-         <xs:element name="praefix" type="xibehoerde:Code.Praefix">
+         <xs:element name="praefix" type="xibehoerde:Code.PraefixType">
             <xs:annotation>
                <xs:documentation>Klasse für Behördenkennungen. Die Liste der Präfixe für Behördenkennungen wird durch das Bundesverwaltungsamt (BVA) als koordinierende Stelle für das DVDV verwaltet.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="kennung" type="xibehoerde:Code.Behoerdenkennung">
+         <xs:element name="kennung" type="xibehoerde:Code.BehoerdenkennungType">
             <xs:annotation>
                <xs:appinfo>
                   <implementationHint>Solange die Aktualität der für die Adressierung verwendeten Schlüsseltabellen nicht gegeben ist, wird vollständig auf die Plausibilisierung der listVersionID verzichtet.</implementationHint>
@@ -127,7 +127,7 @@
          </xs:element>
       </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="Code.Behoerdenkennung">
+   <xs:complexType name="Code.BehoerdenkennungType">
       <xs:annotation>
          <xs:documentation>Die zu verwendende Schlüsseltabelle ergibt sich aus dem Nachrichtenkontext. Zum Beispiel ist bei der Datenübermittlung an ein Standesamt die Schlüsseltabelle der Standesamtsnummern und somit eine Standesamtsnummer als Behördenkennung zu verwenden.</xs:documentation>
       </xs:annotation>
@@ -142,7 +142,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.DVDV.Behoerdenschluessel">
+   <xs:complexType name="Code.DVDV.BehoerdenschluesselType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -170,7 +170,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Praefix">
+   <xs:complexType name="Code.PraefixType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>

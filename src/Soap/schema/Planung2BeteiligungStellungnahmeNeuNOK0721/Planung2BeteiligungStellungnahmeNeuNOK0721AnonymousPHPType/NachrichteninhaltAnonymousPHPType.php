@@ -24,7 +24,7 @@ class NachrichteninhaltAnonymousPHPType
     /**
      * Beschreibung der Fehler.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType[] $fehler
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerTypeType[] $fehler
      */
     private $fehler = [
         
@@ -88,9 +88,9 @@ class NachrichteninhaltAnonymousPHPType
      * Beschreibung der Fehler.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType $fehler
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerTypeType $fehler
      */
-    public function addToFehler(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType $fehler)
+    public function addToFehler(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerTypeType $fehler)
     {
         $this->fehler[] = $fehler;
         return $this;
@@ -127,7 +127,7 @@ class NachrichteninhaltAnonymousPHPType
      *
      * Beschreibung der Fehler.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerTypeType[]
      */
     public function getFehler()
     {
@@ -139,7 +139,7 @@ class NachrichteninhaltAnonymousPHPType
      *
      * Beschreibung der Fehler.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType[] $fehler
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerTypeType[] $fehler
      * @return self
      */
     public function setFehler(array $fehler = null)

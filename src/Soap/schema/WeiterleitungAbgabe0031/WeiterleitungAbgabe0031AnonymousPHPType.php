@@ -2,31 +2,31 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungAbgabe0031;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GWeiterleitungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GWeiterleitungTypeType;
 
 /**
  * Class representing WeiterleitungAbgabe0031AnonymousPHPType
  */
-class WeiterleitungAbgabe0031AnonymousPHPType extends NachrichtG2GWeiterleitungType
+class WeiterleitungAbgabe0031AnonymousPHPType extends NachrichtG2GWeiterleitungTypeType
 {
     /**
      * Hier werden Angaben zu der Behörde übermittelt, an die die fachliche Nachricht weitergeleitet wurde.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeType $zustaendigeStelle
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType $zustaendigeStelle
      */
     private $zustaendigeStelle = null;
 
     /**
      * In diesem Kindelement wird die den Prozess auslösende fachliche Nachricht identifiziert.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type $weitergeleiteteNachricht
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType $weitergeleiteteNachricht
      */
     private $weitergeleiteteNachricht = null;
 
     /**
      * In diesem Kindelement werden Angaben zur Identifizierung des Geschäftsvorfalls übermittelt, der den Prozess ausgelöst hat. Das Kindelement ist nur dann zu befüllen, wenn die den Prozess auslösende fachliche Nachricht identifizierende Angaben zu dem Geschäftsvorfall enthält.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType $weitergeleitetesEreignis
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisTypeType $weitergeleitetesEreignis
      */
     private $weitergeleitetesEreignis = null;
 
@@ -42,7 +42,7 @@ class WeiterleitungAbgabe0031AnonymousPHPType extends NachrichtG2GWeiterleitungT
      *
      * Hier werden Angaben zu der Behörde übermittelt, an die die fachliche Nachricht weitergeleitet wurde.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType
      */
     public function getZustaendigeStelle()
     {
@@ -54,10 +54,10 @@ class WeiterleitungAbgabe0031AnonymousPHPType extends NachrichtG2GWeiterleitungT
      *
      * Hier werden Angaben zu der Behörde übermittelt, an die die fachliche Nachricht weitergeleitet wurde.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeType $zustaendigeStelle
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType $zustaendigeStelle
      * @return self
      */
-    public function setZustaendigeStelle(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeType $zustaendigeStelle)
+    public function setZustaendigeStelle(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType $zustaendigeStelle)
     {
         $this->zustaendigeStelle = $zustaendigeStelle;
         return $this;
@@ -68,7 +68,7 @@ class WeiterleitungAbgabe0031AnonymousPHPType extends NachrichtG2GWeiterleitungT
      *
      * In diesem Kindelement wird die den Prozess auslösende fachliche Nachricht identifiziert.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType
      */
     public function getWeitergeleiteteNachricht()
     {
@@ -80,10 +80,10 @@ class WeiterleitungAbgabe0031AnonymousPHPType extends NachrichtG2GWeiterleitungT
      *
      * In diesem Kindelement wird die den Prozess auslösende fachliche Nachricht identifiziert.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type $weitergeleiteteNachricht
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType $weitergeleiteteNachricht
      * @return self
      */
-    public function setWeitergeleiteteNachricht(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type $weitergeleiteteNachricht)
+    public function setWeitergeleiteteNachricht(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType $weitergeleiteteNachricht)
     {
         $this->weitergeleiteteNachricht = $weitergeleiteteNachricht;
         return $this;
@@ -94,7 +94,7 @@ class WeiterleitungAbgabe0031AnonymousPHPType extends NachrichtG2GWeiterleitungT
      *
      * In diesem Kindelement werden Angaben zur Identifizierung des Geschäftsvorfalls übermittelt, der den Prozess ausgelöst hat. Das Kindelement ist nur dann zu befüllen, wenn die den Prozess auslösende fachliche Nachricht identifizierende Angaben zu dem Geschäftsvorfall enthält.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisTypeType
      */
     public function getWeitergeleitetesEreignis()
     {
@@ -106,10 +106,10 @@ class WeiterleitungAbgabe0031AnonymousPHPType extends NachrichtG2GWeiterleitungT
      *
      * In diesem Kindelement werden Angaben zur Identifizierung des Geschäftsvorfalls übermittelt, der den Prozess ausgelöst hat. Das Kindelement ist nur dann zu befüllen, wenn die den Prozess auslösende fachliche Nachricht identifizierende Angaben zu dem Geschäftsvorfall enthält.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType $weitergeleitetesEreignis
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisTypeType $weitergeleitetesEreignis
      * @return self
      */
-    public function setWeitergeleitetesEreignis(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType $weitergeleitetesEreignis = null)
+    public function setWeitergeleitetesEreignis(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisTypeType $weitergeleitetesEreignis = null)
     {
         $this->weitergeleitetesEreignis = $weitergeleitetesEreignis;
         return $this;

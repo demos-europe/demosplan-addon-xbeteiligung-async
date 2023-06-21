@@ -1,0 +1,32 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfB2GTypeType:
+    properties:
+        identifikationNachricht:
+            expose: true
+            access_type: public_method
+            serialized_name: identifikation.nachricht
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getIdentifikationNachricht
+                setter: setIdentifikationNachricht
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType
+        leser:
+            expose: true
+            access_type: public_method
+            serialized_name: leser
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getLeser
+                setter: setLeser
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType
+        autor:
+            expose: true
+            access_type: public_method
+            serialized_name: autor
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getAutor
+                setter: setAutor
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurTypeType

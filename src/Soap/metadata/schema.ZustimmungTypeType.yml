@@ -1,0 +1,46 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZustimmungTypeType:
+    properties:
+        kommunikation:
+            expose: true
+            access_type: public_method
+            serialized_name: kommunikation
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getKommunikation
+                setter: setKommunikation
+            xml_list:
+                inline: true
+                entry_name: kommunikation
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType>
+        artDerStellungnahme:
+            expose: true
+            access_type: public_method
+            serialized_name: artDerStellungnahme
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getArtDerStellungnahme
+                setter: setArtDerStellungnahme
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerStellungnahmeTypeType
+        artDerRueckmeldung:
+            expose: true
+            access_type: public_method
+            serialized_name: artDerRueckmeldung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getArtDerRueckmeldung
+                setter: setArtDerRueckmeldung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerRueckmeldungTypeType
+        nutzername:
+            expose: true
+            access_type: public_method
+            serialized_name: nutzername
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getNutzername
+                setter: setNutzername
+            type: string

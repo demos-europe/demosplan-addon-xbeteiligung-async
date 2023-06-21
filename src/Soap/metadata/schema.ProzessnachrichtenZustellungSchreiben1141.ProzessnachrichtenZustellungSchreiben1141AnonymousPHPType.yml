@@ -7,7 +7,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenZustellung
             accessor:
                 getter: getBezug
                 setter: setBezug
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
         anschreiben:
             expose: true
             access_type: public_method
@@ -27,7 +27,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenZustellung
             accessor:
                 getter: getAngebotFuerAntwortLeser
                 setter: setAngebotFuerAntwortLeser
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerlinkungType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerlinkungTypeType
         anlagen:
             expose: true
             access_type: public_method
@@ -35,7 +35,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenZustellung
             accessor:
                 getter: getAnlagen
                 setter: setAnlagen
-            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType>
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType>
             xml_list:
                 inline: false
                 entry_name: anlage

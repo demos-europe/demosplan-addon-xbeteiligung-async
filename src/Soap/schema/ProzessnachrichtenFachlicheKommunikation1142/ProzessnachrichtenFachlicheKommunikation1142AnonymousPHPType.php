@@ -2,17 +2,17 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenFachlicheKommunikation1142;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 
 /**
  * Class representing ProzessnachrichtenFachlicheKommunikation1142AnonymousPHPType
  */
-class ProzessnachrichtenFachlicheKommunikation1142AnonymousPHPType extends NachrichtG2GType
+class ProzessnachrichtenFachlicheKommunikation1142AnonymousPHPType extends NachrichtG2GTypeType
 {
     /**
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      */
     private $bezug = null;
 
@@ -26,7 +26,7 @@ class ProzessnachrichtenFachlicheKommunikation1142AnonymousPHPType extends Nachr
     /**
      * Mit diesem Element können Metadaten zu Anlagen übermittelt werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[] $anlagen
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[] $anlagen
      */
     private $anlagen = null;
 
@@ -35,7 +35,7 @@ class ProzessnachrichtenFachlicheKommunikation1142AnonymousPHPType extends Nachr
      *
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
      */
     public function getBezug()
     {
@@ -47,10 +47,10 @@ class ProzessnachrichtenFachlicheKommunikation1142AnonymousPHPType extends Nachr
      *
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      * @return self
      */
-    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug)
+    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug)
     {
         $this->bezug = $bezug;
         return $this;
@@ -88,9 +88,9 @@ class ProzessnachrichtenFachlicheKommunikation1142AnonymousPHPType extends Nachr
      * Mit diesem Element können Metadaten zu Anlagen übermittelt werden.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType $anlage
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType $anlage
      */
-    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType $anlage)
+    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType $anlage)
     {
         $this->anlagen[] = $anlage;
         return $this;
@@ -127,7 +127,7 @@ class ProzessnachrichtenFachlicheKommunikation1142AnonymousPHPType extends Nachr
      *
      * Mit diesem Element können Metadaten zu Anlagen übermittelt werden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[]
      */
     public function getAnlagen()
     {
@@ -139,7 +139,7 @@ class ProzessnachrichtenFachlicheKommunikation1142AnonymousPHPType extends Nachr
      *
      * Mit diesem Element können Metadaten zu Anlagen übermittelt werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[] $anlagen
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[] $anlagen
      * @return self
      */
     public function setAnlagen(array $anlagen = null)

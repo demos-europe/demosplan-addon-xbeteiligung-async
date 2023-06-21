@@ -1,0 +1,15 @@
+<?php
+
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
+
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312\Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312AnonymousPHPType;
+
+/**
+ * Class representing Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312
+ *
+ * Quittierungsnachricht einer erfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente.
+ */
+class Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312 extends Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312AnonymousPHPType
+{
+}
+

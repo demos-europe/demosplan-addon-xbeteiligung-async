@@ -20,7 +20,7 @@
          </standard>
          <versionStandard>
             <version>9</version>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
@@ -37,7 +37,7 @@
               namespace="http://www.osci.de/xinneres/nachrichtentypen/5"/>
    <xs:import schemaLocation="xoev-code.xsd"
               namespace="http://xoev.de/schemata/code/1_0"/>
-   <xs:complexType name="Code.QuittungsrelevanterSachverhalt">
+   <xs:complexType name="Code.QuittungsrelevanterSachverhaltType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -123,7 +123,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Nachricht.G2G.QuittungVonSachverhalten" abstract="true">
+   <xs:complexType name="Nachricht.G2G.QuittungVonSachverhaltenType" abstract="true">
       <xs:annotation>
          <xs:appinfo>
             <title>Basisnachricht für die Quittung von Sachverhalten</title>
@@ -131,9 +131,9 @@
          <xs:documentation>Dieser Datentyp stellt den abstrakten Basistyp für die Nachrichten im Bereich der Quittung von Sachverhalten dar.</xs:documentation>
       </xs:annotation>
       <xs:complexContent>
-         <xs:restriction base="xink:Nachricht.G2G">
+         <xs:restriction base="xink:Nachricht.G2GType">
             <xs:sequence>
-               <xs:element name="nachrichtenkopf" type="xint:Nachrichtenkopf.G2G.XInneres">
+               <xs:element name="nachrichtenkopf" type="xint:Nachrichtenkopf.G2G.XInneresType">
                   <xs:annotation>
                      <xs:documentation>Mit diesem Element werden die Daten zum XInneres-Nachrichtenkopf übermittelt.</xs:documentation>
                   </xs:annotation>
@@ -180,17 +180,17 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Quittung">
+   <xs:complexType name="QuittungType">
       <xs:annotation>
          <xs:documentation>Dieser Datentyp umfasst alle Informationen, die zur Quittung eines Sachverhalts erforderlich sind.</xs:documentation>
       </xs:annotation>
       <xs:sequence>
-         <xs:element name="ursprungsereignis" type="xink:Identifikation.Ereignis">
+         <xs:element name="ursprungsereignis" type="xink:Identifikation.EreignisType">
             <xs:annotation>
                <xs:documentation>Mit diesem Element werden die Informationen übermittelt, mit denen der Einzelfall in der ursprünglichen Nachricht bzw. Sammelnachricht eindeutig identifiziert werden kann.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="sachverhalt" type="xiqu:Code.QuittungsrelevanterSachverhalt">
+         <xs:element name="sachverhalt" type="xiqu:Code.QuittungsrelevanterSachverhaltType">
             <xs:annotation>
                <xs:documentation>Mit diesem Element wird der quittungsrelevante Sachverhalt in der Form eines Codes übermittelt.</xs:documentation>
             </xs:annotation>
@@ -209,14 +209,14 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xiqu:Nachricht.G2G.QuittungVonSachverhalten">
+            <xs:extension base="xiqu:Nachricht.G2G.QuittungVonSachverhaltenType">
                <xs:sequence>
-                  <xs:element name="ursprungsnachricht" type="xink:Identifikation.Nachricht.Typ4">
+                  <xs:element name="ursprungsnachricht" type="xink:Identifikation.Nachricht.Typ4Type">
                      <xs:annotation>
                         <xs:documentation>Mit diesem Element wird die Ursprungsnachricht referenziert, die quittungsrelevante Inhalte enthielt.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="quittung" type="xiqu:Quittung">
+                  <xs:element name="quittung" type="xiqu:QuittungType">
                      <xs:annotation>
                         <xs:documentation>Mit diesem Element werden die Informationen zum quittungsrelevanten Sachverhalt übermittelt.</xs:documentation>
                      </xs:annotation>
@@ -238,14 +238,14 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xiqu:Nachricht.G2G.QuittungVonSachverhalten">
+            <xs:extension base="xiqu:Nachricht.G2G.QuittungVonSachverhaltenType">
                <xs:sequence>
-                  <xs:element name="ursprungsnachricht" type="xink:Identifikation.Nachricht.Typ4">
+                  <xs:element name="ursprungsnachricht" type="xink:Identifikation.Nachricht.Typ4Type">
                      <xs:annotation>
                         <xs:documentation>Mit diesem Element wird die Ursprungsnachricht referenziert, die quittungsrelevante Inhalte enthielt.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="quittung" type="xiqu:Quittung">
+                  <xs:element name="quittung" type="xiqu:QuittungType">
                      <xs:annotation>
                         <xs:documentation>Mit diesem Element werden die Informationen zum quittungsrelevanten Sachverhalt übermittelt, dessen Quittung erwartet wird.</xs:documentation>
                      </xs:annotation>

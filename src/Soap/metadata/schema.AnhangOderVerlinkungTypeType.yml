@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungTypeType:
+    properties:
+        anhang:
+            expose: true
+            access_type: public_method
+            serialized_name: anhang
+            accessor:
+                getter: getAnhang
+                setter: setAnhang
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangTypeType
+        uriVerlinkung:
+            expose: true
+            access_type: public_method
+            serialized_name: uriVerlinkung
+            accessor:
+                getter: getUriVerlinkung
+                setter: setUriVerlinkung
+            type: string

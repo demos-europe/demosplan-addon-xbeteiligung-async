@@ -2,17 +2,17 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungWeiterleitung0030;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GWeiterleitungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GWeiterleitungTypeType;
 
 /**
  * Class representing WeiterleitungWeiterleitung0030AnonymousPHPType
  */
-class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterleitungType
+class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterleitungTypeType
 {
     /**
      * In diesem Element wird die vollständige Liste der Behörden übermittelt, die im Laufe des Prozesses die fachliche Nachricht weitergeleitet haben. Diese Liste wird gebildet, indem die Behörde, die die Weiterleitungsnachricht erstellt, sich selbst an die (ggf. leere) Liste der weiterleitendeStellen anhängt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType[] $weiterleitendeStelle
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType[] $weiterleitendeStelle
      */
     private $weiterleitendeStelle = [
         
@@ -21,7 +21,7 @@ class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterl
     /**
      * In diesem Element werden Informationen zu der den Prozess auslösenden Behörde übermittelt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarType $ausloesendeStelle
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType $ausloesendeStelle
      */
     private $ausloesendeStelle = null;
 
@@ -35,7 +35,7 @@ class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterl
     /**
      * In diesem Kindelement wird der Nachrichtentyp der weitergeleiteten Nachricht übermittelt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4Type $weitergeleiteteNachrichtTyp
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4TypeType $weitergeleiteteNachrichtTyp
      */
     private $weitergeleiteteNachrichtTyp = null;
 
@@ -52,9 +52,9 @@ class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterl
      * In diesem Element wird die vollständige Liste der Behörden übermittelt, die im Laufe des Prozesses die fachliche Nachricht weitergeleitet haben. Diese Liste wird gebildet, indem die Behörde, die die Weiterleitungsnachricht erstellt, sich selbst an die (ggf. leere) Liste der weiterleitendeStellen anhängt.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType $weiterleitendeStelle
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType $weiterleitendeStelle
      */
-    public function addToWeiterleitendeStelle(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType $weiterleitendeStelle)
+    public function addToWeiterleitendeStelle(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType $weiterleitendeStelle)
     {
         $this->weiterleitendeStelle[] = $weiterleitendeStelle;
         return $this;
@@ -91,7 +91,7 @@ class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterl
      *
      * In diesem Element wird die vollständige Liste der Behörden übermittelt, die im Laufe des Prozesses die fachliche Nachricht weitergeleitet haben. Diese Liste wird gebildet, indem die Behörde, die die Weiterleitungsnachricht erstellt, sich selbst an die (ggf. leere) Liste der weiterleitendeStellen anhängt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType[]
      */
     public function getWeiterleitendeStelle()
     {
@@ -103,7 +103,7 @@ class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterl
      *
      * In diesem Element wird die vollständige Liste der Behörden übermittelt, die im Laufe des Prozesses die fachliche Nachricht weitergeleitet haben. Diese Liste wird gebildet, indem die Behörde, die die Weiterleitungsnachricht erstellt, sich selbst an die (ggf. leere) Liste der weiterleitendeStellen anhängt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType[] $weiterleitendeStelle
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType[] $weiterleitendeStelle
      * @return self
      */
     public function setWeiterleitendeStelle(array $weiterleitendeStelle)
@@ -117,7 +117,7 @@ class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterl
      *
      * In diesem Element werden Informationen zu der den Prozess auslösenden Behörde übermittelt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType
      */
     public function getAusloesendeStelle()
     {
@@ -129,10 +129,10 @@ class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterl
      *
      * In diesem Element werden Informationen zu der den Prozess auslösenden Behörde übermittelt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarType $ausloesendeStelle
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType $ausloesendeStelle
      * @return self
      */
-    public function setAusloesendeStelle(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarType $ausloesendeStelle)
+    public function setAusloesendeStelle(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType $ausloesendeStelle)
     {
         $this->ausloesendeStelle = $ausloesendeStelle;
         return $this;
@@ -169,7 +169,7 @@ class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterl
      *
      * In diesem Kindelement wird der Nachrichtentyp der weitergeleiteten Nachricht übermittelt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4Type
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4TypeType
      */
     public function getWeitergeleiteteNachrichtTyp()
     {
@@ -181,10 +181,10 @@ class WeiterleitungWeiterleitung0030AnonymousPHPType extends NachrichtG2GWeiterl
      *
      * In diesem Kindelement wird der Nachrichtentyp der weitergeleiteten Nachricht übermittelt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4Type $weitergeleiteteNachrichtTyp
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4TypeType $weitergeleiteteNachrichtTyp
      * @return self
      */
-    public function setWeitergeleiteteNachrichtTyp(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4Type $weitergeleiteteNachrichtTyp)
+    public function setWeitergeleiteteNachrichtTyp(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4TypeType $weitergeleiteteNachrichtTyp)
     {
         $this->weitergeleiteteNachrichtTyp = $weitergeleiteteNachrichtTyp;
         return $this;

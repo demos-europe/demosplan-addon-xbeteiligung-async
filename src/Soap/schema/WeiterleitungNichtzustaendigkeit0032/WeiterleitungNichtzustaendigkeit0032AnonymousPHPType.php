@@ -2,17 +2,17 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungNichtzustaendigkeit0032;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GWeiterleitungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GWeiterleitungTypeType;
 
 /**
  * Class representing WeiterleitungNichtzustaendigkeit0032AnonymousPHPType
  */
-class WeiterleitungNichtzustaendigkeit0032AnonymousPHPType extends NachrichtG2GWeiterleitungType
+class WeiterleitungNichtzustaendigkeit0032AnonymousPHPType extends NachrichtG2GWeiterleitungTypeType
 {
     /**
      * In diesem Element werden Informationen zu den Behörden übermittelt, die im Laufe des Prozesses die fachliche Nachricht weitergeleitet haben. Die Behörde, die die Nachricht über die ungeklärte Zuständigkeit an die den Prozess auslösende Behörde erstellt, ist nicht als weiterleitende Stelle zu übermitteln.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType[] $weiterleitendeStelle
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType[] $weiterleitendeStelle
      */
     private $weiterleitendeStelle = [
         
@@ -21,14 +21,14 @@ class WeiterleitungNichtzustaendigkeit0032AnonymousPHPType extends NachrichtG2GW
     /**
      * In diesem Kindelement wird die den Prozess auslösende fachliche Nachricht identifiziert.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type $zustaendigkeitUngeklaertNachricht
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType $zustaendigkeitUngeklaertNachricht
      */
     private $zustaendigkeitUngeklaertNachricht = null;
 
     /**
      * In diesem Kindelement werden Angaben zur Identifizierung des Geschäftsvorfalls übermittelt, der den Prozess ausgelöst hat. Das Kindelement ist nur dann zu befüllen, wenn die den Prozess auslösende fachliche Nachricht identifizierende Angaben zu dem Geschäftsvorfall enthält.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType $zustaendigkeitUngeklaertEreignis
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisTypeType $zustaendigkeitUngeklaertEreignis
      */
     private $zustaendigkeitUngeklaertEreignis = null;
 
@@ -45,9 +45,9 @@ class WeiterleitungNichtzustaendigkeit0032AnonymousPHPType extends NachrichtG2GW
      * In diesem Element werden Informationen zu den Behörden übermittelt, die im Laufe des Prozesses die fachliche Nachricht weitergeleitet haben. Die Behörde, die die Nachricht über die ungeklärte Zuständigkeit an die den Prozess auslösende Behörde erstellt, ist nicht als weiterleitende Stelle zu übermitteln.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType $weiterleitendeStelle
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType $weiterleitendeStelle
      */
-    public function addToWeiterleitendeStelle(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType $weiterleitendeStelle)
+    public function addToWeiterleitendeStelle(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType $weiterleitendeStelle)
     {
         $this->weiterleitendeStelle[] = $weiterleitendeStelle;
         return $this;
@@ -84,7 +84,7 @@ class WeiterleitungNichtzustaendigkeit0032AnonymousPHPType extends NachrichtG2GW
      *
      * In diesem Element werden Informationen zu den Behörden übermittelt, die im Laufe des Prozesses die fachliche Nachricht weitergeleitet haben. Die Behörde, die die Nachricht über die ungeklärte Zuständigkeit an die den Prozess auslösende Behörde erstellt, ist nicht als weiterleitende Stelle zu übermitteln.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType[]
      */
     public function getWeiterleitendeStelle()
     {
@@ -96,7 +96,7 @@ class WeiterleitungNichtzustaendigkeit0032AnonymousPHPType extends NachrichtG2GW
      *
      * In diesem Element werden Informationen zu den Behörden übermittelt, die im Laufe des Prozesses die fachliche Nachricht weitergeleitet haben. Die Behörde, die die Nachricht über die ungeklärte Zuständigkeit an die den Prozess auslösende Behörde erstellt, ist nicht als weiterleitende Stelle zu übermitteln.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType[] $weiterleitendeStelle
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType[] $weiterleitendeStelle
      * @return self
      */
     public function setWeiterleitendeStelle(array $weiterleitendeStelle = null)
@@ -110,7 +110,7 @@ class WeiterleitungNichtzustaendigkeit0032AnonymousPHPType extends NachrichtG2GW
      *
      * In diesem Kindelement wird die den Prozess auslösende fachliche Nachricht identifiziert.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType
      */
     public function getZustaendigkeitUngeklaertNachricht()
     {
@@ -122,10 +122,10 @@ class WeiterleitungNichtzustaendigkeit0032AnonymousPHPType extends NachrichtG2GW
      *
      * In diesem Kindelement wird die den Prozess auslösende fachliche Nachricht identifiziert.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type $zustaendigkeitUngeklaertNachricht
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType $zustaendigkeitUngeklaertNachricht
      * @return self
      */
-    public function setZustaendigkeitUngeklaertNachricht(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type $zustaendigkeitUngeklaertNachricht)
+    public function setZustaendigkeitUngeklaertNachricht(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType $zustaendigkeitUngeklaertNachricht)
     {
         $this->zustaendigkeitUngeklaertNachricht = $zustaendigkeitUngeklaertNachricht;
         return $this;
@@ -136,7 +136,7 @@ class WeiterleitungNichtzustaendigkeit0032AnonymousPHPType extends NachrichtG2GW
      *
      * In diesem Kindelement werden Angaben zur Identifizierung des Geschäftsvorfalls übermittelt, der den Prozess ausgelöst hat. Das Kindelement ist nur dann zu befüllen, wenn die den Prozess auslösende fachliche Nachricht identifizierende Angaben zu dem Geschäftsvorfall enthält.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisTypeType
      */
     public function getZustaendigkeitUngeklaertEreignis()
     {
@@ -148,10 +148,10 @@ class WeiterleitungNichtzustaendigkeit0032AnonymousPHPType extends NachrichtG2GW
      *
      * In diesem Kindelement werden Angaben zur Identifizierung des Geschäftsvorfalls übermittelt, der den Prozess ausgelöst hat. Das Kindelement ist nur dann zu befüllen, wenn die den Prozess auslösende fachliche Nachricht identifizierende Angaben zu dem Geschäftsvorfall enthält.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType $zustaendigkeitUngeklaertEreignis
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisTypeType $zustaendigkeitUngeklaertEreignis
      * @return self
      */
-    public function setZustaendigkeitUngeklaertEreignis(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType $zustaendigkeitUngeklaertEreignis = null)
+    public function setZustaendigkeitUngeklaertEreignis(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisTypeType $zustaendigkeitUngeklaertEreignis = null)
     {
         $this->zustaendigkeitUngeklaertEreignis = $zustaendigkeitUngeklaertEreignis;
         return $this;

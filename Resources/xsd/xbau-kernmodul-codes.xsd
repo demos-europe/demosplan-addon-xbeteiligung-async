@@ -18,7 +18,7 @@
          <versionStandard>
             <version>1.1</version>
             <beschreibung>Das XBau-Kernmodul wurde in dieser Version ergänzt um weitere generische Prozessnachrichten, beispielsweise zum Einstellen von Dokumenten in einen Projektraum des Antragsportals. Oder zur informellen Kommunikation der an einem Vorgang Beteiligten (was in der Praxis bisher als E-Mail-Kommunikation ablief). Die Datentypen zu Metadaten von Bauvorlagen (und sonstigen Anlagen zu XBau-Nachrichten) wurden konsolidiert. Jetzt muss ein Dokument entweder als Anhang (Attachment) mit einer XBau-Nachricht versendet werden oder per Link (z.B. auf eine Ressource in einem DMS) referenziert werden, der in der XBau-Nachricht enthalten ist (keine base64-Kodierung mehr innerhalb der XBau-Fachnachricht). Außerdem sind jetzt auch im XBau-Kernmodul Definitionen für DVDV-Dienste mit den passenden WSDL-Vorlagedateien enthalten.</beschreibung>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0</versionModellierungswerkzeug>
@@ -28,7 +28,7 @@
    </xs:annotation>
    <xs:import schemaLocation="xoev-code.xsd"
               namespace="http://xoev.de/schemata/code/1_0"/>
-   <xs:complexType name="Code.Ablageort">
+   <xs:complexType name="Code.AblageortType">
       <xs:annotation>
          <xs:documentation>Diese Codeliste enthält Ablageorte des Projektraums, an dem ein Dokument abgelegt werden soll. In diesen Typ ist eine auszuwählende bzw. selbst zu definierende Codeliste einzubinden, die eine solche Klassifikation bietet. Im Anwendungskontext sind in die Attribute des vorliegenden Typs die Codelisten-URI und die Nummer der Version der ausgewählten Codeliste (in die XBau-Nachrichteninstanzen) einzutragen.</xs:documentation>
       </xs:annotation>
@@ -42,7 +42,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.AmtlicherGemeindeschluessel">
+   <xs:complexType name="Code.AmtlicherGemeindeschluesselType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -70,7 +70,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.AmtlicherRegionalschluessel">
+   <xs:complexType name="Code.AmtlicherRegionalschluesselType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -98,7 +98,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.AnlageArt">
+   <xs:complexType name="Code.AnlageArtType">
       <xs:annotation>
          <xs:documentation>Dieser Code-Datentyp dient der Einbindung einer Codeliste, die Arten von Bauvorlagen oder sonstigen Anlagen unterscheidet, die einer XBau-Nachricht als Anlage beigefügt sein können. In diesen Typ ist eine auszuwählende bzw. selbst zu definierende Codeliste einzubinden, die eine solche Klassifikation bietet. Im Anwendungskontext sind in die Attribute des vorliegenden Typs die Codelisten-URI und die Nummer der Version der ausgewählten Codeliste (in die XBau-Nachrichteninstanzen) einzutragen. Codelisten, die im Rahmen des Betriebs XBau definiert und im XRepository (www.xrepository.de) bereitgestellt werden, und ggf. für den vorliegenden Zweck geeignet sein können: urn:xoev-de:xbau:codeliste:anlagen</xs:documentation>
       </xs:annotation>
@@ -112,7 +112,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Bezirk">
+   <xs:complexType name="Code.BezirkType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -140,7 +140,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Bundesland">
+   <xs:complexType name="Code.BundeslandType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -168,7 +168,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Erreichbarkeit">
+   <xs:complexType name="Code.ErreichbarkeitType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -196,7 +196,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.FormelleBefundeArt">
+   <xs:complexType name="Code.FormelleBefundeArtType">
       <xs:annotation>
          <xs:documentation>Arten von Befunden einer universell einsetzbaren Befundliste für die formelle Prüfung von Anträgen, Anzeigen und Erklärungen. In diesen Typ ist eine auszuwählende bzw. selbst zu definierende Codeliste einzubinden, die eine solche Klassifikation bietet. Im Anwendungskontext sind in die Attribute des vorliegenden Typs die Codelisten-URI und die Nummer der Version der ausgewählten Codeliste (in die XBau-Nachrichteninstanzen) einzutragen. Als Muster wurde die Codeliste Befunde einer formellen Prüfung (URI: urn:xoev-de:xbau:codeliste:formellebefundeart) als Angebot zur Einbindung für diesen Typ bereitgestellt. Die angebotene Codeliste ist im XRepository (www.xrepository.de) unter dem Stichwort "XBau" auffindbar und kann von dort im XML-Format OASIS Genericode abgerufen werden.</xs:documentation>
       </xs:annotation>
@@ -210,7 +210,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Gemeindeteil">
+   <xs:complexType name="Code.GemeindeteilType">
       <xs:annotation>
          <xs:documentation>Diese Codeliste steht für lokal definierte Schlüssel, die die Gemeindeteile einer Gemeinde bezeichnen. Dieser Schlüssel ist, weil nur innerhalb eines Landes definiert, nicht Bestandteil des Amtlichen Gemeindeschlüssels (AGS). In diesen Typ ist eine auszuwählende bzw. selbst zu definierende Codeliste einzubinden, die eine solche Klassifikation bietet. Im Anwendungskontext sind in die Attribute des vorliegenden Typs die Codelisten-URI und die Nummer der Version der ausgewählten Codeliste (in die XBau-Nachrichteninstanzen) einzutragen.</xs:documentation>
       </xs:annotation>
@@ -224,7 +224,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Kreis">
+   <xs:complexType name="Code.KreisType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -252,7 +252,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Registergericht">
+   <xs:complexType name="Code.RegistergerichtType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -279,7 +279,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Staat">
+   <xs:complexType name="Code.StaatType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -307,7 +307,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.XBau-KernmodulNachrichten">
+   <xs:complexType name="Code.XBau-KernmodulNachrichtenType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -426,7 +426,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.XBau-MimeType">
+   <xs:complexType name="Code.XBau-MimeTypeType">
       <xs:annotation>
          <xs:documentation>Dieser Code-Typ steht für eine Benennung des MimeTypes einer über XBau bereitgestellten Ressource. In diesen Typ ist eine auszuwählende bzw. selbst zu definierende Codeliste einzubinden, die eine dafür passende Auflistung bietet. Im Anwendungskontext sind in die Attribute des vorliegenden Typs die Codelisten-URI und die Nummer der Version der ausgewählten Codeliste (in die XBau-Nachrichteninstanzen) einzutragen. Als Muster wurde eine passende Codeliste definiert und als Angebot zur Einbindung für diesen Typ bereitgestellt. Diese Codeliste kann auf Antrag erweitert bzw. geändert werden. Sie ist im XRepository (www.xrepository.de) unter der Codelisten-URI urn:xoev-de:xbau:codeliste:xbau-mimetypes auffindbar und kann von dort im XML-Format OASIS Genericode abgerufen werden.</xs:documentation>
       </xs:annotation>
@@ -440,7 +440,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.XBau.Fehlerkennzahl">
+   <xs:complexType name="Code.XBau.FehlerkennzahlType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>

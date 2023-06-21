@@ -18,7 +18,7 @@
          </standard>
          <versionStandard>
             <version>9</version>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
@@ -30,7 +30,7 @@
               namespace="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"/>
    <xs:import schemaLocation="xoev-code.xsd"
               namespace="http://xoev.de/schemata/code/1_0"/>
-   <xs:complexType name="Auslandsanschrift.Anschriftzone">
+   <xs:complexType name="Auslandsanschrift.AnschriftzoneType">
       <xs:annotation>
          <xs:appinfo>
             <title>Anschriftzone in der Auslandsanschrift</title>
@@ -41,14 +41,14 @@
          <xs:element name="zeile.anschrift"
                      minOccurs="2"
                      maxOccurs="5"
-                     type="xiaa:ZeileAufschrift">
+                     type="xiaa:ZeileAufschriftType">
             <xs:annotation>
                <xs:documentation>Hier sind pro Zeile der Anschriftzone jeweils der eigentliche inhalt und die zeilennummer zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
       </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="Auslandsanschrift.Druckbild">
+   <xs:complexType name="Auslandsanschrift.DruckbildType">
       <xs:annotation>
          <xs:appinfo>
             <title>Datentyp für das Druckbild einer Auslandsanschrift</title>
@@ -57,21 +57,21 @@
          <xs:documentation>Dieser Datentyp repräsentiert das Druckbild einer Anschrift im Ausland, indem die Anschriftzone eines Brieffensters gemäß DIN 5008 abgebildet wird. Die Anschriftzone setzt sich aus einem Schlüsselwert für den Zielstaat und bis zu fünf weiteren Zeilen für die übrigen Adressierungsangaben zusammen. Angaben zur Vermerkzone können mit diesem Datentypen nicht abgebildet werden. Die ersten fünf Zeilen werden mit den Angaben zur Anschrift im Ausland gefüllt. Leerzeilen sind dabei nicht zulässig. Entsprechend DIN 5008 sind die Zeilen beginnend mit der Nummer 4 lückenlos durchzunummerieren und Zeilennummern nicht mehrfach zu verwenden. Der Ortsname in der Anschrift sollte in Großbuchstaben und in der Sprache des Zielstaates erfasst und übermittelt werden. Für die Erstellung des Druckbildes ist der übermittelte Schlüsselwert des Zielstaates in eine für die Zustellung geeignete Klartextform - d. h. in Großbuchstaben und in die deutsche Sprache - zu überführen.</xs:documentation>
       </xs:annotation>
       <xs:sequence>
-         <xs:element name="staat" type="xiaa:Code.Zielstaat">
+         <xs:element name="staat" type="xiaa:Code.ZielstaatType">
             <xs:annotation>
                <xs:documentation>Hier ist Staatenschlüssel des Zielstaats aus der aktuell gültigen Staats- und Gebietssystematik des Statistischen Bundesamtes zu übermitteln. Da mit dem Datentyp Auslandsanschrift.Druckbild nur Auslandsanschriften übermittelt werden dürfen, ist die Verwendung des Schlüssels 000 (Deutschland) nicht zulässig.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="anschriftzone"
                      minOccurs="0"
-                     type="xiaa:Auslandsanschrift.Anschriftzone">
+                     type="xiaa:Auslandsanschrift.AnschriftzoneType">
             <xs:annotation>
                <xs:documentation>Hier sind zeilenweise die für die Zustellung erforderlichen Angaben zur Anschriftzone zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
       </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="Code.Zielstaat">
+   <xs:complexType name="Code.ZielstaatType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -100,27 +100,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="ZeileAufschrift">
-      <xs:annotation>
-         <xs:appinfo>
-            <title>Aufschriftzeile</title>
-         </xs:appinfo>
-         <xs:documentation>Dieser Datentyp repräsentiert eine Zeile einer Aufschrift gemäß DIN 5008 und besteht aus dem Inhalt der Zeile sowie der Angabe der Zeilennummer in der Aufschrift. Sofern dieser Datentyp für die Übermittlung einer Zeile der Anschriftzone verwendet wird, sind ausschließlich die Zeilennummern 4 bis 8 zu verwenden. Zeilen der Vermerkzone werden in dem Datentyp Auslandsanschrift.Druckbild nicht übermittelt. Sofern in einem xinneres-fachmodul der Bedarf besteht, kann der Datentyp aber im Rahmen der Einbindung in das xinneres-fachmodul um weitere ZeileAufschrift-Kindelemente für die Vermerkzone ergänzt werden. Für diese Zeilen sind ausschließlich die Zeilennummern 1 bis 3 zu verwenden.</xs:documentation>
-      </xs:annotation>
-      <xs:sequence>
-         <xs:element name="zeilennummer" type="xiaa:ZeileAufschrift.Zeilennummer">
-            <xs:annotation>
-               <xs:documentation>Die Angabe, in welcher Zeile der Inhalt in der Aufschrift auftauchen soll.</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="inhalt" type="xiaa:ZeileAufschrift.Inhalt">
-            <xs:annotation>
-               <xs:documentation>Hier ist der Inhalt der Aufschriftzeile anzugeben.</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-      </xs:sequence>
-   </xs:complexType>
-   <xs:simpleType name="ZeileAufschrift.Inhalt">
+   <xs:simpleType name="ZeileAufschrift.InhaltType">
       <xs:annotation>
          <xs:documentation>Dieser Datentyp beschreibt den Inhalt einer Aufschriftzeile.</xs:documentation>
       </xs:annotation>
@@ -130,7 +110,7 @@
          <xs:pattern value="[^&#xA;&#x9;&#xD;]*"/>
       </xs:restriction>
    </xs:simpleType>
-   <xs:simpleType name="ZeileAufschrift.Zeilennummer">
+   <xs:simpleType name="ZeileAufschrift.ZeilennummerType">
       <xs:annotation>
          <xs:documentation>Dieser Datentyp beschreibt die Zeilennummer einer Aufschriftzeile.</xs:documentation>
       </xs:annotation>
@@ -139,4 +119,24 @@
          <xs:minInclusive value="1"/>
       </xs:restriction>
    </xs:simpleType>
+   <xs:complexType name="ZeileAufschriftType">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Aufschriftzeile</title>
+         </xs:appinfo>
+         <xs:documentation>Dieser Datentyp repräsentiert eine Zeile einer Aufschrift gemäß DIN 5008 und besteht aus dem Inhalt der Zeile sowie der Angabe der Zeilennummer in der Aufschrift. Sofern dieser Datentyp für die Übermittlung einer Zeile der Anschriftzone verwendet wird, sind ausschließlich die Zeilennummern 4 bis 8 zu verwenden. Zeilen der Vermerkzone werden in dem Datentyp Auslandsanschrift.Druckbild nicht übermittelt. Sofern in einem xinneres-fachmodul der Bedarf besteht, kann der Datentyp aber im Rahmen der Einbindung in das xinneres-fachmodul um weitere ZeileAufschrift-Kindelemente für die Vermerkzone ergänzt werden. Für diese Zeilen sind ausschließlich die Zeilennummern 1 bis 3 zu verwenden.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="zeilennummer" type="xiaa:ZeileAufschrift.ZeilennummerType">
+            <xs:annotation>
+               <xs:documentation>Die Angabe, in welcher Zeile der Inhalt in der Aufschrift auftauchen soll.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="inhalt" type="xiaa:ZeileAufschrift.InhaltType">
+            <xs:annotation>
+               <xs:documentation>Hier ist der Inhalt der Aufschriftzeile anzugeben.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
 </xs:schema>

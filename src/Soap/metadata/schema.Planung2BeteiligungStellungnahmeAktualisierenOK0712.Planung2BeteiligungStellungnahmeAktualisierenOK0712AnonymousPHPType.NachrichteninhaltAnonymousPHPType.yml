@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungStellungn
             access_type: public_method
             serialized_name: vorgangsID
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/0/9'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
             accessor:
                 getter: getVorgangsID
                 setter: setVorgangsID
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungStellungn
             access_type: public_method
             serialized_name: stellungnahmeID
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/0/9'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
             accessor:
                 getter: getStellungnahmeID
                 setter: setStellungnahmeID

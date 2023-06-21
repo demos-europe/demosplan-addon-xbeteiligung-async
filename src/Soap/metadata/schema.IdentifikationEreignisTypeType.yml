@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisTypeType:
+    properties:
+        ereignisZeitpunkt:
+            expose: true
+            access_type: public_method
+            serialized_name: ereignis.zeitpunkt
+            accessor:
+                getter: getEreignisZeitpunkt
+                setter: setEreignisZeitpunkt
+            type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\DateTime
+        ereignisZeichen:
+            expose: true
+            access_type: public_method
+            serialized_name: ereignis.zeichen
+            accessor:
+                getter: getEreignisZeichen
+                setter: setEreignisZeichen
+            type: string

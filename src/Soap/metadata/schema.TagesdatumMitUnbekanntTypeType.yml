@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TagesdatumMitUnbekanntTypeType:
+    properties:
+        datum:
+            expose: true
+            access_type: public_method
+            serialized_name: datum
+            accessor:
+                getter: getDatum
+                setter: setDatum
+            type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Date
+        unbekannt:
+            expose: true
+            access_type: public_method
+            serialized_name: unbekannt
+            accessor:
+                getter: getUnbekannt
+                setter: setUnbekannt
+            type: bool

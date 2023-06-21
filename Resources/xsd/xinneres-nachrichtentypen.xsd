@@ -19,7 +19,7 @@
          </standard>
          <versionStandard>
             <version>9</version>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
@@ -34,7 +34,7 @@
               namespace="http://www.osci.de/xinneres/behoerde/5"/>
    <xs:import schemaLocation="xoev-code.xsd"
               namespace="http://xoev.de/schemata/code/1_0"/>
-   <xs:complexType name="Code.Nachrichtentyp">
+   <xs:complexType name="Code.NachrichtentypType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -134,15 +134,15 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Identifikation.Nachricht.XInneres">
+   <xs:complexType name="Identifikation.Nachricht.XInneresType">
       <xs:annotation>
          <xs:documentation>Dieser Typ enthält die für die Identifikation einer Nachricht des xinneres-basismoduls erforderlichen Informationen.</xs:documentation>
       </xs:annotation>
       <xs:complexContent>
-         <xs:restriction base="xink:Identifikation.Nachricht">
+         <xs:restriction base="xink:Identifikation.NachrichtType">
             <xs:sequence>
-               <xs:element name="nachrichtenUUID" type="xink:UUID"/>
-               <xs:element name="nachrichtentyp" type="xint:Code.Nachrichtentyp">
+               <xs:element name="nachrichtenUUID" type="xink:UUIDType"/>
+               <xs:element name="nachrichtentyp" type="xint:Code.NachrichtentypType">
                   <xs:annotation>
                      <xs:documentation>Die eindeutige Identifizierungsnummer für den Typ der Nachricht aus dem xinneres-basismodul .</xs:documentation>
                   </xs:annotation>
@@ -152,17 +152,17 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Nachrichtenkopf.G2G.XInneres">
+   <xs:complexType name="Nachrichtenkopf.G2G.XInneresType">
       <xs:annotation>
          <xs:documentation>Nachrichtenkopf für Nachrichten des xinneres-basismoduls zwischen Behörden und anderen (öffentlichen) Stellen.</xs:documentation>
       </xs:annotation>
       <xs:complexContent>
-         <xs:restriction base="xink:Nachrichtenkopf.G2G">
+         <xs:restriction base="xink:Nachrichtenkopf.G2GType">
             <xs:sequence>
                <xs:element name="identifikation.nachricht"
-                           type="xint:Identifikation.Nachricht.XInneres"/>
-               <xs:element name="leser" type="xibehoerde:Behoerde"/>
-               <xs:element name="autor" type="xibehoerde:Behoerde.Erreichbar"/>
+                           type="xint:Identifikation.Nachricht.XInneresType"/>
+               <xs:element name="leser" type="xibehoerde:BehoerdeType"/>
+               <xs:element name="autor" type="xibehoerde:Behoerde.ErreichbarType"/>
             </xs:sequence>
          </xs:restriction>
       </xs:complexContent>

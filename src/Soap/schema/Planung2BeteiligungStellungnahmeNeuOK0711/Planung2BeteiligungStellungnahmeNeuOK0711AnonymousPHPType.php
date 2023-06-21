@@ -2,12 +2,12 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungStellungnahmeNeuOK0711;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 
 /**
  * Class representing Planung2BeteiligungStellungnahmeNeuOK0711AnonymousPHPType
  */
-class Planung2BeteiligungStellungnahmeNeuOK0711AnonymousPHPType extends NachrichtG2GType
+class Planung2BeteiligungStellungnahmeNeuOK0711AnonymousPHPType extends NachrichtG2GTypeType
 {
     /**
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungStellungnahmeNeuOK0711\Planung2BeteiligungStellungnahmeNeuOK0711AnonymousPHPType\NachrichteninhaltAnonymousPHPType $nachrichteninhalt

@@ -2,24 +2,24 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungVonSachverhaltenQuittung0020;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GQuittungVonSachverhaltenType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GQuittungVonSachverhaltenTypeType;
 
 /**
  * Class representing QuittungVonSachverhaltenQuittung0020AnonymousPHPType
  */
-class QuittungVonSachverhaltenQuittung0020AnonymousPHPType extends NachrichtG2GQuittungVonSachverhaltenType
+class QuittungVonSachverhaltenQuittung0020AnonymousPHPType extends NachrichtG2GQuittungVonSachverhaltenTypeType
 {
     /**
      * Mit diesem Element wird die Ursprungsnachricht referenziert, die quittungsrelevante Inhalte enthielt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type $ursprungsnachricht
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType $ursprungsnachricht
      */
     private $ursprungsnachricht = null;
 
     /**
      * Mit diesem Element werden die Informationen zum quittungsrelevanten Sachverhalt übermittelt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungType $quittung
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungTypeType $quittung
      */
     private $quittung = null;
 
@@ -28,7 +28,7 @@ class QuittungVonSachverhaltenQuittung0020AnonymousPHPType extends NachrichtG2GQ
      *
      * Mit diesem Element wird die Ursprungsnachricht referenziert, die quittungsrelevante Inhalte enthielt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType
      */
     public function getUrsprungsnachricht()
     {
@@ -40,10 +40,10 @@ class QuittungVonSachverhaltenQuittung0020AnonymousPHPType extends NachrichtG2GQ
      *
      * Mit diesem Element wird die Ursprungsnachricht referenziert, die quittungsrelevante Inhalte enthielt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type $ursprungsnachricht
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType $ursprungsnachricht
      * @return self
      */
-    public function setUrsprungsnachricht(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type $ursprungsnachricht)
+    public function setUrsprungsnachricht(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType $ursprungsnachricht)
     {
         $this->ursprungsnachricht = $ursprungsnachricht;
         return $this;
@@ -54,7 +54,7 @@ class QuittungVonSachverhaltenQuittung0020AnonymousPHPType extends NachrichtG2GQ
      *
      * Mit diesem Element werden die Informationen zum quittungsrelevanten Sachverhalt übermittelt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungTypeType
      */
     public function getQuittung()
     {
@@ -66,10 +66,10 @@ class QuittungVonSachverhaltenQuittung0020AnonymousPHPType extends NachrichtG2GQ
      *
      * Mit diesem Element werden die Informationen zum quittungsrelevanten Sachverhalt übermittelt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungType $quittung
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungTypeType $quittung
      * @return self
      */
-    public function setQuittung(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungType $quittung)
+    public function setQuittung(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungTypeType $quittung)
     {
         $this->quittung = $quittung;
         return $this;

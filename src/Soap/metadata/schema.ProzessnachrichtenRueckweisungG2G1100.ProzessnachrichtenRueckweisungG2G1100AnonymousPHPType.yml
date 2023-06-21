@@ -7,4 +7,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenRueckweisu
             accessor:
                 getter: getRueckweisungDaten
                 setter: setRueckweisungDaten
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RueckweisungType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RueckweisungTypeType

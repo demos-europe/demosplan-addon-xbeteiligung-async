@@ -1,0 +1,10 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ReferenzAbfrageTypeType:
+    properties:
+        referenzAbfrage:
+            expose: true
+            access_type: public_method
+            serialized_name: referenzAbfrage
+            accessor:
+                getter: getReferenzAbfrage
+                setter: setReferenzAbfrage
+            type: string

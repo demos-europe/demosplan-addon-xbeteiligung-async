@@ -1,0 +1,74 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfahrenTypeType:
+    properties:
+        verfahrenstypID:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrenstypID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getVerfahrenstypID
+                setter: setVerfahrenstypID
+            type: string
+        verfahrenstyp:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrenstyp
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getVerfahrenstyp
+                setter: setVerfahrenstyp
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrenstypTypeType
+        verfahrensteilschritt:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensteilschritt
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getVerfahrensteilschritt
+                setter: setVerfahrensteilschritt
+            xml_list:
+                inline: true
+                entry_name: verfahrensteilschritt
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfahrensteilschrittTypeType>
+        unterverfahrensteilschritt:
+            expose: true
+            access_type: public_method
+            serialized_name: unterverfahrensteilschritt
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getUnterverfahrensteilschritt
+                setter: setUnterverfahrensteilschritt
+            xml_list:
+                inline: true
+                entry_name: unterverfahrensteilschritt
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeUnterverfahrensteilschrittTypeType>
+        zustaendigkeit:
+            expose: true
+            access_type: public_method
+            serialized_name: zustaendigkeit
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getZustaendigkeit
+                setter: setZustaendigkeit
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeZustaendigkeitTypeType
+        aktuelleMitteilung:
+            expose: true
+            access_type: public_method
+            serialized_name: aktuelleMitteilung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getAktuelleMitteilung
+                setter: setAktuelleMitteilung
+            xml_list:
+                inline: true
+                entry_name: aktuelleMitteilung
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            type: array<string>

@@ -1,0 +1,15 @@
+<?php
+
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
+
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219\Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219AnonymousPHPType;
+
+/**
+ * Class representing Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219
+ *
+ * Diese Quittierungsnachricht wird nach einem erfolgreichen Löschversuch einer Beteiligung versendet.
+ */
+class Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219 extends Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219AnonymousPHPType
+{
+}
+

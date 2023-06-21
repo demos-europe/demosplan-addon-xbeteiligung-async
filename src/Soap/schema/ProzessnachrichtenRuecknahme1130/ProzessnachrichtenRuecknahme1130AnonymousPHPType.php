@@ -2,17 +2,17 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenRuecknahme1130;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 
 /**
  * Class representing ProzessnachrichtenRuecknahme1130AnonymousPHPType
  */
-class ProzessnachrichtenRuecknahme1130AnonymousPHPType extends NachrichtG2GType
+class ProzessnachrichtenRuecknahme1130AnonymousPHPType extends NachrichtG2GTypeType
 {
     /**
      * In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Eine Referenzierung auf eine Nachricht wird in diese Nachricht nicht eingetragen.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      */
     private $bezug = null;
 
@@ -26,7 +26,7 @@ class ProzessnachrichtenRuecknahme1130AnonymousPHPType extends NachrichtG2GType
     /**
      * Ggf. will der Antragsteller der Rücknahme des Antrags ein Schreiben beilegen. Das lässt sich mit diesem Element abbilden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[] $anlagen
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[] $anlagen
      */
     private $anlagen = null;
 
@@ -35,7 +35,7 @@ class ProzessnachrichtenRuecknahme1130AnonymousPHPType extends NachrichtG2GType
      *
      * In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Eine Referenzierung auf eine Nachricht wird in diese Nachricht nicht eingetragen.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
      */
     public function getBezug()
     {
@@ -47,10 +47,10 @@ class ProzessnachrichtenRuecknahme1130AnonymousPHPType extends NachrichtG2GType
      *
      * In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Eine Referenzierung auf eine Nachricht wird in diese Nachricht nicht eingetragen.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      * @return self
      */
-    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug)
+    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug)
     {
         $this->bezug = $bezug;
         return $this;
@@ -128,9 +128,9 @@ class ProzessnachrichtenRuecknahme1130AnonymousPHPType extends NachrichtG2GType
      * Ggf. will der Antragsteller der Rücknahme des Antrags ein Schreiben beilegen. Das lässt sich mit diesem Element abbilden.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType $anlage
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType $anlage
      */
-    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType $anlage)
+    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType $anlage)
     {
         $this->anlagen[] = $anlage;
         return $this;
@@ -167,7 +167,7 @@ class ProzessnachrichtenRuecknahme1130AnonymousPHPType extends NachrichtG2GType
      *
      * Ggf. will der Antragsteller der Rücknahme des Antrags ein Schreiben beilegen. Das lässt sich mit diesem Element abbilden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[]
      */
     public function getAnlagen()
     {
@@ -179,7 +179,7 @@ class ProzessnachrichtenRuecknahme1130AnonymousPHPType extends NachrichtG2GType
      *
      * Ggf. will der Antragsteller der Rücknahme des Antrags ein Schreiben beilegen. Das lässt sich mit diesem Element abbilden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[] $anlagen
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[] $anlagen
      * @return self
      */
     public function setAnlagen(array $anlagen = null)

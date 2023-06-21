@@ -9,7 +9,7 @@
       <xs:appinfo>
          <versionStandard>
             <version/>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch/>
             <versionXGenerator/>
             <versionModellierungswerkzeug/>
@@ -18,40 +18,40 @@
       </xs:appinfo>
       <xs:documentation>GML 3.2.1 profile for NAS version 6.0_B</xs:documentation>
    </xs:annotation>
-   <xs:complexType name="AbstractCurveType" abstract="true">
+   <xs:complexType name="AbstractCurveTypeType" abstract="true">
       <xs:complexContent>
-         <xs:extension base="gml:AbstractGeometricPrimitiveType"/>
+         <xs:extension base="gml:AbstractGeometricPrimitiveTypeType"/>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="AbstractGMLType" abstract="true"/>
-   <xs:complexType name="AbstractGeometricPrimitiveType" abstract="true">
+   <xs:complexType name="AbstractGMLTypeType" abstract="true"/>
+   <xs:complexType name="AbstractGeometricPrimitiveTypeType" abstract="true">
       <xs:complexContent>
-         <xs:extension base="gml:AbstractGeometryType"/>
+         <xs:extension base="gml:AbstractGeometryTypeType"/>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="AbstractGeometryType" abstract="true">
+   <xs:complexType name="AbstractGeometryTypeType" abstract="true">
       <xs:complexContent>
-         <xs:extension base="gml:AbstractGMLType"/>
+         <xs:extension base="gml:AbstractGMLTypeType"/>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="AbstractSurfaceType" abstract="true">
+   <xs:complexType name="AbstractSurfaceTypeType" abstract="true">
       <xs:complexContent>
-         <xs:extension base="gml:AbstractGeometricPrimitiveType"/>
+         <xs:extension base="gml:AbstractGeometricPrimitiveTypeType"/>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="CurveType">
+   <xs:complexType name="CurveTypeType">
       <xs:complexContent>
-         <xs:extension base="gml:AbstractCurveType"/>
+         <xs:extension base="gml:AbstractCurveTypeType"/>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="PointType">
+   <xs:complexType name="PointTypeType">
       <xs:complexContent>
-         <xs:extension base="gml:AbstractGeometricPrimitiveType"/>
+         <xs:extension base="gml:AbstractGeometricPrimitiveTypeType"/>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="PolygonType">
+   <xs:complexType name="PolygonTypeType">
       <xs:complexContent>
-         <xs:extension base="gml:AbstractSurfaceType"/>
+         <xs:extension base="gml:AbstractSurfaceTypeType"/>
       </xs:complexContent>
    </xs:complexType>
 </xs:schema>

@@ -22,7 +22,7 @@
          </standard>
          <versionStandard>
             <version>9</version>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
@@ -43,7 +43,7 @@
               namespace="http://www.osci.de/xinneres/postanschrift/4"/>
    <xs:import schemaLocation="xoev-code.xsd"
               namespace="http://xoev.de/schemata/code/1_0"/>
-   <xs:complexType name="Code.Fehlercode.Spezifisch">
+   <xs:complexType name="Code.Fehlercode.SpezifischType">
       <xs:annotation>
          <xs:appinfo>
             <title>Kontextspezifische Fehlercodes</title>
@@ -61,7 +61,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Fehlercode.XInneres">
+   <xs:complexType name="Code.Fehlercode.XInneresType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -259,7 +259,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Nachricht.G2G.Rueckweisung" abstract="true">
+   <xs:complexType name="Nachricht.G2G.RueckweisungType" abstract="true">
       <xs:annotation>
          <xs:appinfo>
             <title>Basisnachricht für die Rückweisung von Nachrichten</title>
@@ -267,9 +267,9 @@
          <xs:documentation>Dieser Typ realisiert die abstrakte Oberklasse für alle Fehlernachrichten .</xs:documentation>
       </xs:annotation>
       <xs:complexContent>
-         <xs:restriction base="xink:Nachricht.G2G">
+         <xs:restriction base="xink:Nachricht.G2GType">
             <xs:sequence>
-               <xs:element name="nachrichtenkopf" type="xint:Nachrichtenkopf.G2G.XInneres"/>
+               <xs:element name="nachrichtenkopf" type="xint:Nachrichtenkopf.G2G.XInneresType"/>
             </xs:sequence>
             <xs:attribute name="produkt" type="dinspec91379:datatypeC" use="required"/>
             <xs:attribute name="produkthersteller"
@@ -288,33 +288,33 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Rueckweisung.Einzelfall">
+   <xs:complexType name="Rueckweisung.EinzelfallType">
       <xs:annotation>
          <xs:documentation>Mit diesem Typ können Angaben zu einem zurückgewiesenen Einzelfall aus einer Sammelnachricht übermittelt werden.</xs:documentation>
       </xs:annotation>
       <xs:sequence>
-         <xs:element name="identifikation.ereignis" type="xink:Identifikation.Ereignis">
+         <xs:element name="identifikation.ereignis" type="xink:Identifikation.EreignisType">
             <xs:annotation>
                <xs:documentation>Hier werden die Informationen übermittelt, mit denen der Einzelfall in der (Sammel-)Nachricht eindeutig identifiziert werden kann.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="grund"
                      maxOccurs="unbounded"
-                     type="xirts:Rueckweisung.Rueckweisungsgrund">
+                     type="xirts:Rueckweisung.RueckweisungsgrundType">
             <xs:annotation>
                <xs:documentation>Für jeden Einzelfall sind hier die Gründe zu übermitteln, aufgrund derer der Einzelfall zurückgewiesen wird.</xs:documentation>
             </xs:annotation>
          </xs:element>
       </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="Rueckweisung.GrundSpezifisch">
+   <xs:complexType name="Rueckweisung.GrundSpezifischType">
       <xs:annotation>
          <xs:documentation>In diesem Datentyp wird ein Grund für die Rückweisung der Nachricht in Form eines beliebigen kontextspezifischen Fehlercodes (bspw. aus dem BZSt-Fehlerkatalog) oder einer Fehlerbeschreibung genauer spezifiziert. Sofern in einem (fachlichen) Prozess kontextspezifische Fehlercodes verwendet werden, ist dies durch das xinneres-fachmodul in der Prozessbeschreibung vorzugeben und die zu verwendende Schlüsseltabelle festzulegen.</xs:documentation>
       </xs:annotation>
       <xs:sequence>
          <xs:element name="fehlercode"
                      minOccurs="0"
-                     type="xirts:Code.Fehlercode.Spezifisch">
+                     type="xirts:Code.Fehlercode.SpezifischType">
             <xs:annotation>
                <xs:documentation>In diesem Element wird ein Fehlercode übermittelt. Die zugrundeliegende Schlüsseltabelle muss mit der listURI (bspw. urn:de:bund:bzst:schluessel:rts.fehlercodes) und listVersionID (bspw. 2016-01-19) identifiziert werden.</xs:documentation>
             </xs:annotation>
@@ -328,7 +328,7 @@
          </xs:element>
       </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="Rueckweisung.RueckweisendeStelle">
+   <xs:complexType name="Rueckweisung.RueckweisendeStelleType">
       <xs:annotation>
          <xs:appinfo>
             <title>Rückweisende Stelle</title>
@@ -341,18 +341,18 @@
                <xs:documentation>Mit diesem Element wird die Stelle bezeichnet, die die Nachricht beanstandet hat.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="anschrift" type="xipa:PostalischeInlandsanschrift"/>
+         <xs:element name="anschrift" type="xipa:PostalischeInlandsanschriftType"/>
          <xs:element name="erreichbarkeit"
                      maxOccurs="unbounded"
-                     type="xikomm:Kommunikation"/>
+                     type="xikomm:KommunikationType"/>
       </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="Rueckweisung.Rueckweisungsgrund">
+   <xs:complexType name="Rueckweisung.RueckweisungsgrundType">
       <xs:annotation>
          <xs:documentation>Mit diesem Element wird ein Grund übermittelt, aus dem die Nachricht zurückgewiesen wird. Die im Rahmen der hier zu verwendenden Schlüsseltabelle zur Verfügung gestellten Rückweisungsgründe sind kontextunabhängig und finden in allen xinneres-fachmodulen Anwendung. Die allgemeinen Rückweisungsgründe können durch kontextspezifische Gründe erläutert werden. Sofern in diesem Element xinneres-fachmodul-spezifische Rückweisungsgründe übermittelt werden sollen, ist in dem Kindelement grund der Schlüssel S999 und in den Kindelementen grundSpezifisch ein oder mehrere dem xinneres-fachmodul entstammende Rückweisungsgründe zu übermitteln.</xs:documentation>
       </xs:annotation>
       <xs:sequence>
-         <xs:element name="grund" type="xirts:Code.Fehlercode.XInneres">
+         <xs:element name="grund" type="xirts:Code.Fehlercode.XInneresType">
             <xs:annotation>
                <xs:documentation>Mit diesem Element wird ein Grund übermittelt, aus dem die Nachricht zurückgewiesen wird. Die im Rahmen der hier zu verwendenden Schlüsseltabelle zur Verfügung gestellten Rückweisungsgründe sind kontextunabhängig und finden daher in allen xinneres-fachmodulen Anwendung. Sofern der Schlüssel S999 verwendet wird, sind ergänzende Angaben in dem Element grundSpezifisch verpflichtend zu übermitteln.</xs:documentation>
             </xs:annotation>
@@ -360,14 +360,45 @@
          <xs:element name="grundSpezifisch"
                      minOccurs="0"
                      maxOccurs="unbounded"
-                     type="xirts:Rueckweisung.GrundSpezifisch">
+                     type="xirts:Rueckweisung.GrundSpezifischType">
             <xs:annotation>
                <xs:documentation>In diesem Element können weitere - im Allgemeinen kontextspezifische Angaben - zu dem Grund übermittelt werden, aus dem die Nachricht zurückgewiesen wird.</xs:documentation>
             </xs:annotation>
          </xs:element>
       </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="Rueckweisung.Template" abstract="true">
+   <xs:complexType name="Rueckweisung.Template.AsynchronType">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Inhalt der asynchronen Rückweisung</title>
+         </xs:appinfo>
+         <xs:documentation>Dieser Typ beinhaltet die Inhalte für die asynchrone Rückweisung von Nachrichten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xirts:Rueckweisung.TemplateType">
+            <xs:sequence>
+               <xs:element name="rueckweisendeStelle"
+                           minOccurs="0"
+                           type="xirts:Rueckweisung.RueckweisendeStelleType"/>
+               <xs:element name="rueckweisungsgrund"
+                           maxOccurs="unbounded"
+                           type="xirts:Rueckweisung.RueckweisungsgrundType"/>
+               <xs:element name="transportinformationen"
+                           minOccurs="0"
+                           type="xirts:Rueckweisung.TransportinformationenType"/>
+               <xs:element name="nichtVerarbeitbarerEinzelfall"
+                           minOccurs="0"
+                           maxOccurs="unbounded"
+                           type="xirts:Rueckweisung.EinzelfallType"/>
+               <xs:element name="idNachricht"
+                           minOccurs="0"
+                           type="xink:Identifikation.Nachricht.Typ4Type"/>
+               <xs:element name="nachricht" type="xs:base64Binary"/>
+            </xs:sequence>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Rueckweisung.TemplateType" abstract="true">
       <xs:annotation>
          <xs:appinfo>
             <title>Vorlage für Rückweisungscontainer</title>
@@ -377,21 +408,21 @@
       <xs:sequence>
          <xs:element name="rueckweisendeStelle"
                      minOccurs="0"
-                     type="xirts:Rueckweisung.RueckweisendeStelle">
+                     type="xirts:Rueckweisung.RueckweisendeStelleType">
             <xs:annotation>
                <xs:documentation>Dieses Kindelement ist nur dann zu übermitteln, wenn die Nachricht nicht von dem ursprünglich adressierten Leser zurückgesandt wird, sondern von einer anderen Stelle (zum Beispiel einer Clearingstelle, die im Auftrag der ursprünglich adressierten Behörde eine Prüfung eingehender Nachrichten nach formalen Kriterien durchführt). Wird dieses Element nicht übermittelt, ist die rückweisende Stelle der zurückgewiesenen Nachricht (Kindelement nachricht) zu entnehmen.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="rueckweisungsgrund"
                      maxOccurs="unbounded"
-                     type="xirts:Rueckweisung.Rueckweisungsgrund">
+                     type="xirts:Rueckweisung.RueckweisungsgrundType">
             <xs:annotation>
                <xs:documentation>In diesem Element werden die Gründe mitgeteilt, aufgrund derer die Nachricht zurückgesandt wird. Generell ist so vorzugehen, dass die Gründe für die Rückweisung so präzise und vollständig wie möglich bezeichnet werden, um eine schnelle Klärung des Sachverhalts zu ermöglichen.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="transportinformationen"
                      minOccurs="0"
-                     type="xirts:Rueckweisung.Transportinformationen">
+                     type="xirts:Rueckweisung.TransportinformationenType">
             <xs:annotation>
                <xs:documentation>In diesem Element sind Informationen zu übermitteln, die bei dem Empfang einer als fehlerhaft betrachteten Nachricht möglicherweise der Transportebene entnommen werden konnten. Diese Angaben können gemacht werden, um dem Leser oder Empfänger einer Rücksendenachricht die Identifikation der als fehlerhaft betrachteten und nunmehr zurückgesandten Nachricht zu erleichtern. Alle Kindelemente dieses Elementes sind optional, da keine verbindlichen Anforderungen an das Transportprotokoll gestellt werden können.</xs:documentation>
             </xs:annotation>
@@ -399,14 +430,14 @@
          <xs:element name="nichtVerarbeitbarerEinzelfall"
                      minOccurs="0"
                      maxOccurs="unbounded"
-                     type="xirts:Rueckweisung.Einzelfall">
+                     type="xirts:Rueckweisung.EinzelfallType">
             <xs:annotation>
                <xs:documentation>Mit diesem Element werden die nicht verarbeitbaren Einzelfälle aus der zurückgewiesenen (Sammel-)Nachricht kenntlich gemacht. Für jeden nicht verarbeitbaren Einzelfall sind neben den Identifikationsdaten die Gründe mitzuteilen, aufgrund derer der Einzelfall nicht verarbeitet werden konnte. Diese Gründe sind so präzise und vollständig wie möglich zu bezeichnen, um eine schnelle Klärung des Sachverhalts zu ermöglichen.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="idNachricht"
                      minOccurs="0"
-                     type="xink:Identifikation.Nachricht">
+                     type="xink:Identifikation.NachrichtType">
             <xs:annotation>
                <xs:documentation>In diesem Kindelement wird die die Rückweisung auslösende fachliche Nachricht identifiziert. Sofern die Ursprungsnachricht schemakonform ist, muss das Element idNachricht übermittelt werden. Ist die Ursprungsnachricht nicht schemakonform kann die Übermittlung des Elements entfallen.</xs:documentation>
             </xs:annotation>
@@ -418,38 +449,7 @@
          </xs:element>
       </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="Rueckweisung.Template.Asynchron">
-      <xs:annotation>
-         <xs:appinfo>
-            <title>Inhalt der asynchronen Rückweisung</title>
-         </xs:appinfo>
-         <xs:documentation>Dieser Typ beinhaltet die Inhalte für die asynchrone Rückweisung von Nachrichten.</xs:documentation>
-      </xs:annotation>
-      <xs:complexContent>
-         <xs:restriction base="xirts:Rueckweisung.Template">
-            <xs:sequence>
-               <xs:element name="rueckweisendeStelle"
-                           minOccurs="0"
-                           type="xirts:Rueckweisung.RueckweisendeStelle"/>
-               <xs:element name="rueckweisungsgrund"
-                           maxOccurs="unbounded"
-                           type="xirts:Rueckweisung.Rueckweisungsgrund"/>
-               <xs:element name="transportinformationen"
-                           minOccurs="0"
-                           type="xirts:Rueckweisung.Transportinformationen"/>
-               <xs:element name="nichtVerarbeitbarerEinzelfall"
-                           minOccurs="0"
-                           maxOccurs="unbounded"
-                           type="xirts:Rueckweisung.Einzelfall"/>
-               <xs:element name="idNachricht"
-                           minOccurs="0"
-                           type="xink:Identifikation.Nachricht.Typ4"/>
-               <xs:element name="nachricht" type="xs:base64Binary"/>
-            </xs:sequence>
-         </xs:restriction>
-      </xs:complexContent>
-   </xs:complexType>
-   <xs:complexType name="Rueckweisung.Transportinformationen">
+   <xs:complexType name="Rueckweisung.TransportinformationenType">
       <xs:annotation>
          <xs:documentation>Mit diesem Typ können Angaben zu den Transportinformationen der zurückgewiesenen Nachricht übermittelt werden.</xs:documentation>
       </xs:annotation>
@@ -490,9 +490,9 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xirts:Nachricht.G2G.Rueckweisung">
+            <xs:extension base="xirts:Nachricht.G2G.RueckweisungType">
                <xs:sequence>
-                  <xs:element name="rueckweisung" type="xirts:Rueckweisung.Template.Asynchron">
+                  <xs:element name="rueckweisung" type="xirts:Rueckweisung.Template.AsynchronType">
                      <xs:annotation>
                         <xs:documentation>Inhalte der Rückweisungsnachricht</xs:documentation>
                      </xs:annotation>

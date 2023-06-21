@@ -7,4 +7,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RueckweisungAsynchron0010\Ru
             accessor:
                 getter: getRueckweisung
                 setter: setRueckweisung
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RueckweisungTemplateAsynchronType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RueckweisungTemplateAsynchronTypeType

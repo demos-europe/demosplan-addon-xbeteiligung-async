@@ -1,0 +1,15 @@
+<?php
+
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
+
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222\Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222AnonymousPHPType;
+
+/**
+ * Class representing Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222
+ *
+ * Negative Quittierungsnachricht einer misserfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente.
+ */
+class Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222 extends Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222AnonymousPHPType
+{
+}
+

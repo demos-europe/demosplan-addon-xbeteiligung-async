@@ -16,7 +16,7 @@
          </standard>
          <versionStandard>
             <version>9</version>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
@@ -24,15 +24,7 @@
          </versionStandard>
       </xs:appinfo>
    </xs:annotation>
-   <xs:simpleType name="Jahr">
-      <xs:annotation>
-         <xs:documentation>Mit diesem Datentyp wird ein teilweise bekanntes Datum übermittelt. Vom Datum ist nur das Jahr bekannt.</xs:documentation>
-      </xs:annotation>
-      <xs:restriction base="xs:gYear">
-         <xs:pattern value="[0-9]{4}"/>
-      </xs:restriction>
-   </xs:simpleType>
-   <xs:simpleType name="JahrMonat">
+   <xs:simpleType name="JahrMonatType">
       <xs:annotation>
          <xs:documentation>Mit diesem Datentyp wird ein teilweise bekanntes Datum übermittelt. Vom Datum sind nur Jahr und Monat bekannt.</xs:documentation>
       </xs:annotation>
@@ -40,18 +32,15 @@
          <xs:pattern value="[0-9]{4}-[0-9]{2}"/>
       </xs:restriction>
    </xs:simpleType>
-   <xs:simpleType name="Tagesdatum">
+   <xs:simpleType name="JahrType">
       <xs:annotation>
-         <xs:appinfo>
-            <title>Vollständig bekanntes Datum</title>
-         </xs:appinfo>
-         <xs:documentation>Mit diesem Datentyp wird ein vollständig bekanntes Datum übermittelt. Anders als in xs:date ist hier die Angabe einer Zeitzone jedoch nicht möglich.</xs:documentation>
+         <xs:documentation>Mit diesem Datentyp wird ein teilweise bekanntes Datum übermittelt. Vom Datum ist nur das Jahr bekannt.</xs:documentation>
       </xs:annotation>
-      <xs:restriction base="xs:date">
-         <xs:pattern value="[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+      <xs:restriction base="xs:gYear">
+         <xs:pattern value="[0-9]{4}"/>
       </xs:restriction>
    </xs:simpleType>
-   <xs:complexType name="TagesdatumMitUnbekannt">
+   <xs:complexType name="TagesdatumMitUnbekanntType">
       <xs:annotation>
          <xs:appinfo>
             <title>Tagesdatum oder unbekannt</title>
@@ -59,7 +48,7 @@
          <xs:documentation>Mit diesem Datentyp kann entweder ein vollständiges Tagesdatum übermittelt werden oder angegeben werden, dass ein Tagesdatum unbekannt ist. Falls das Tagesdatum vollständig bekannt ist, wird dieses im Kindelement datum übermittelt. Andernfalls wird das Kindelement unbekannt übermittelt, welches den Wert true enthält.</xs:documentation>
       </xs:annotation>
       <xs:choice>
-         <xs:element name="datum" type="xida:Tagesdatum">
+         <xs:element name="datum" type="xida:TagesdatumType">
             <xs:annotation>
                <xs:documentation>Das vollständig bekannte Datum.</xs:documentation>
             </xs:annotation>
@@ -71,32 +60,18 @@
          </xs:element>
       </xs:choice>
    </xs:complexType>
-   <xs:complexType name="TeilbekanntesDatum">
+   <xs:simpleType name="TagesdatumType">
       <xs:annotation>
          <xs:appinfo>
-            <title>Teilweise bekanntes Datum</title>
+            <title>Vollständig bekanntes Datum</title>
          </xs:appinfo>
-         <xs:documentation>Mit diesem Datentyp kann entweder ein vollständig bekanntes oder ein teilweise bekanntes Datum übermittelt werden. Die Angabe einer Zeitzone ist in keinem Fall möglich.</xs:documentation>
+         <xs:documentation>Mit diesem Datentyp wird ein vollständig bekanntes Datum übermittelt. Anders als in xs:date ist hier die Angabe einer Zeitzone jedoch nicht möglich.</xs:documentation>
       </xs:annotation>
-      <xs:choice>
-         <xs:element name="jahrMonatTag" type="xida:Tagesdatum">
-            <xs:annotation>
-               <xs:documentation>Angabe eines vollständigen Datums</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="jahrMonat" type="xida:JahrMonat">
-            <xs:annotation>
-               <xs:documentation>Angabe eines Datums mit Jahr und Monat</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="jahr" type="xida:Jahr">
-            <xs:annotation>
-               <xs:documentation>Angabe eines Datums durch eine Jahresangabe</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-      </xs:choice>
-   </xs:complexType>
-   <xs:complexType name="TeilbekanntesDatumMitUnbekannt">
+      <xs:restriction base="xs:date">
+         <xs:pattern value="[0-9]{4}-[0-9]{2}-[0-9]{2}"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:complexType name="TeilbekanntesDatumMitUnbekanntType">
       <xs:annotation>
          <xs:appinfo>
             <title>Teilweise bekanntes Datum oder unbekannt</title>
@@ -104,7 +79,7 @@
          <xs:documentation>Mit diesem Datentyp kann entweder ein teilweise bekanntes Datum übermittelt oder angegeben werden, dass ein Tagesdatum vollständig unbekannt ist. Ist das Datum vollständig unbekannt, wird das Kindelement unbekannt übermittelt, welches den Wert true enthält.</xs:documentation>
       </xs:annotation>
       <xs:choice>
-         <xs:element name="teilbekanntesDatum" type="xida:TeilbekanntesDatum">
+         <xs:element name="teilbekanntesDatum" type="xida:TeilbekanntesDatumType">
             <xs:annotation>
                <xs:documentation>Das teilweise bekannte Datum</xs:documentation>
             </xs:annotation>
@@ -112,6 +87,31 @@
          <xs:element name="unbekannt" fixed="true" type="xs:boolean">
             <xs:annotation>
                <xs:documentation>Die Verwendung dieses Merkmals zeigt an, dass das Datum vollständig unbekannt ist.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="TeilbekanntesDatumType">
+      <xs:annotation>
+         <xs:appinfo>
+            <title>Teilweise bekanntes Datum</title>
+         </xs:appinfo>
+         <xs:documentation>Mit diesem Datentyp kann entweder ein vollständig bekanntes oder ein teilweise bekanntes Datum übermittelt werden. Die Angabe einer Zeitzone ist in keinem Fall möglich.</xs:documentation>
+      </xs:annotation>
+      <xs:choice>
+         <xs:element name="jahrMonatTag" type="xida:TagesdatumType">
+            <xs:annotation>
+               <xs:documentation>Angabe eines vollständigen Datums</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="jahrMonat" type="xida:JahrMonatType">
+            <xs:annotation>
+               <xs:documentation>Angabe eines Datums mit Jahr und Monat</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="jahr" type="xida:JahrType">
+            <xs:annotation>
+               <xs:documentation>Angabe eines Datums durch eine Jahresangabe</xs:documentation>
             </xs:annotation>
          </xs:element>
       </xs:choice>

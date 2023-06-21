@@ -17,7 +17,7 @@
          </standard>
          <versionStandard>
             <version>9</version>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
@@ -27,7 +27,7 @@
    </xs:annotation>
    <xs:import schemaLocation="din-91379-datatypes.xsd"
               namespace="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"/>
-   <xs:complexType name="Lichtbild">
+   <xs:complexType name="LichtbildType">
       <xs:annotation>
          <xs:documentation>Mit diesem Datentyp wird ein Lichtbild im Binärformat übermittelt, inklusive der Angabe des Bildformats als MIME-Type.</xs:documentation>
       </xs:annotation>

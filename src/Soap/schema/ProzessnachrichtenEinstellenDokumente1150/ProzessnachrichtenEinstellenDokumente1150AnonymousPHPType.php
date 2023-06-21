@@ -2,31 +2,31 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenEinstellenDokumente1150;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 
 /**
  * Class representing ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType
  */
-class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends NachrichtG2GType
+class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends NachrichtG2GTypeType
 {
     /**
      * Hier können Eintragungen vorgenommen werden, falls sich das Dokument einem vorhandenen Vorgang zuordnen lässt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      */
     private $bezug = null;
 
     /**
      * Mit diesem Element kann ein Ablageort innerhalb der jeweiligen Struktur des Portals bzw. der Plattform für das Dokument angegeben werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeAblageortType $ablageort
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeAblageortTypeType $ablageort
      */
     private $ablageort = null;
 
     /**
      * In diesem Element werden die Metadaten zur Anlage übermittelt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[] $anlagen
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[] $anlagen
      */
     private $anlagen = null;
 
@@ -35,7 +35,7 @@ class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends Nachrich
      *
      * Hier können Eintragungen vorgenommen werden, falls sich das Dokument einem vorhandenen Vorgang zuordnen lässt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
      */
     public function getBezug()
     {
@@ -47,10 +47,10 @@ class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends Nachrich
      *
      * Hier können Eintragungen vorgenommen werden, falls sich das Dokument einem vorhandenen Vorgang zuordnen lässt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      * @return self
      */
-    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug)
+    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug)
     {
         $this->bezug = $bezug;
         return $this;
@@ -61,7 +61,7 @@ class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends Nachrich
      *
      * Mit diesem Element kann ein Ablageort innerhalb der jeweiligen Struktur des Portals bzw. der Plattform für das Dokument angegeben werden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeAblageortType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeAblageortTypeType
      */
     public function getAblageort()
     {
@@ -73,10 +73,10 @@ class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends Nachrich
      *
      * Mit diesem Element kann ein Ablageort innerhalb der jeweiligen Struktur des Portals bzw. der Plattform für das Dokument angegeben werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeAblageortType $ablageort
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeAblageortTypeType $ablageort
      * @return self
      */
-    public function setAblageort(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeAblageortType $ablageort = null)
+    public function setAblageort(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeAblageortTypeType $ablageort = null)
     {
         $this->ablageort = $ablageort;
         return $this;
@@ -88,9 +88,9 @@ class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends Nachrich
      * In diesem Element werden die Metadaten zur Anlage übermittelt.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType $anlage
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType $anlage
      */
-    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType $anlage)
+    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType $anlage)
     {
         $this->anlagen[] = $anlage;
         return $this;
@@ -127,7 +127,7 @@ class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends Nachrich
      *
      * In diesem Element werden die Metadaten zur Anlage übermittelt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[]
      */
     public function getAnlagen()
     {
@@ -139,7 +139,7 @@ class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends Nachrich
      *
      * In diesem Element werden die Metadaten zur Anlage übermittelt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[] $anlagen
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[] $anlagen
      * @return self
      */
     public function setAnlagen(array $anlagen)

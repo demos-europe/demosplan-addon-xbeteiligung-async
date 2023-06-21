@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RueckweisungGrundSpezifischTypeType:
+    properties:
+        fehlercode:
+            expose: true
+            access_type: public_method
+            serialized_name: fehlercode
+            accessor:
+                getter: getFehlercode
+                setter: setFehlercode
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeFehlercodeSpezifischTypeType
+        fehlerbeschreibung:
+            expose: true
+            access_type: public_method
+            serialized_name: fehlerbeschreibung
+            accessor:
+                getter: getFehlerbeschreibung
+                setter: setFehlerbeschreibung
+            type: string

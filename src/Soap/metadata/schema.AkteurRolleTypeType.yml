@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurRolleTypeType:
+    properties:
+        code:
+            expose: true
+            access_type: public_method
+            serialized_name: code
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getCode
+                setter: setCode
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeAkteurRolleTypeType
+        nichtgelisteterWert:
+            expose: true
+            access_type: public_method
+            serialized_name: nichtgelisteterWert
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getNichtgelisteterWert
+                setter: setNichtgelisteterWert
+            type: string

@@ -17,7 +17,7 @@
          </standard>
          <versionStandard>
             <version>9</version>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP4</versionModellierungswerkzeug>
@@ -27,7 +27,7 @@
    </xs:annotation>
    <xs:import schemaLocation="xoev-code.xsd"
               namespace="http://xoev.de/schemata/code/1_0"/>
-   <xs:complexType name="Code.GemeindeVZ.AmtlicherGemeindeschluessel">
+   <xs:complexType name="Code.GemeindeVZ.AmtlicherGemeindeschluesselType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>

@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungTerminBes
             access_type: public_method
             serialized_name: nachrichteninhalt
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/0/9'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
             accessor:
                 getter: getNachrichteninhalt
                 setter: setNachrichteninhalt

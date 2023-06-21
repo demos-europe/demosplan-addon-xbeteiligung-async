@@ -2,17 +2,17 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenEingangsbestaetigung1120;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 
 /**
  * Class representing ProzessnachrichtenEingangsbestaetigung1120AnonymousPHPType
  */
-class ProzessnachrichtenEingangsbestaetigung1120AnonymousPHPType extends NachrichtG2GType
+class ProzessnachrichtenEingangsbestaetigung1120AnonymousPHPType extends NachrichtG2GTypeType
 {
     /**
      * Dieses Element enthält, um Bezug zu nehmen, die Vorgangsnummer bzw. die Referenz des Antrags (Zeichen des Antragstellers). Außerdem enthält es - mandatorisch - eine Referenzierung auf die Nachricht, durch die der Antrag (modifizierter Antrag) bzw. die Anzeige eingereicht worden ist, deren Empfang bestätigt wird.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      */
     private $bezug = null;
 
@@ -28,7 +28,7 @@ class ProzessnachrichtenEingangsbestaetigung1120AnonymousPHPType extends Nachric
      *
      * Dieses Element enthält, um Bezug zu nehmen, die Vorgangsnummer bzw. die Referenz des Antrags (Zeichen des Antragstellers). Außerdem enthält es - mandatorisch - eine Referenzierung auf die Nachricht, durch die der Antrag (modifizierter Antrag) bzw. die Anzeige eingereicht worden ist, deren Empfang bestätigt wird.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
      */
     public function getBezug()
     {
@@ -40,10 +40,10 @@ class ProzessnachrichtenEingangsbestaetigung1120AnonymousPHPType extends Nachric
      *
      * Dieses Element enthält, um Bezug zu nehmen, die Vorgangsnummer bzw. die Referenz des Antrags (Zeichen des Antragstellers). Außerdem enthält es - mandatorisch - eine Referenzierung auf die Nachricht, durch die der Antrag (modifizierter Antrag) bzw. die Anzeige eingereicht worden ist, deren Empfang bestätigt wird.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      * @return self
      */
-    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug)
+    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug)
     {
         $this->bezug = $bezug;
         return $this;

@@ -8,7 +8,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2Beteiligun
 class NachrichteninhaltAnonymousPHPType
 {
     /**
-     * Die Vorgangs-ID der Nachrichten 401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.
+     * Die Vorgangs-ID der Nachrichten 0401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.
      *
      * @var string $vorgangsID
      */
@@ -24,7 +24,7 @@ class NachrichteninhaltAnonymousPHPType
     /**
      * Gets as vorgangsID
      *
-     * Die Vorgangs-ID der Nachrichten 401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.
+     * Die Vorgangs-ID der Nachrichten 0401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.
      *
      * @return string
      */
@@ -36,7 +36,7 @@ class NachrichteninhaltAnonymousPHPType
     /**
      * Sets a new vorgangsID
      *
-     * Die Vorgangs-ID der Nachrichten 401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.
+     * Die Vorgangs-ID der Nachrichten 0401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.
      *
      * @param string $vorgangsID
      * @return self

@@ -2,17 +2,17 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenQuittierungRuecknahme1131;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 
 /**
  * Class representing ProzessnachrichtenQuittierungRuecknahme1131AnonymousPHPType
  */
-class ProzessnachrichtenQuittierungRuecknahme1131AnonymousPHPType extends NachrichtG2GType
+class ProzessnachrichtenQuittierungRuecknahme1131AnonymousPHPType extends NachrichtG2GTypeType
 {
     /**
      * In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Es ist die Nachricht des Antragstellers zu referenzieren, mittels derer er über seine Absicht informiert hat, den Antrag zurückzunehmen.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      */
     private $bezug = null;
 
@@ -35,7 +35,7 @@ class ProzessnachrichtenQuittierungRuecknahme1131AnonymousPHPType extends Nachri
      *
      * In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Es ist die Nachricht des Antragstellers zu referenzieren, mittels derer er über seine Absicht informiert hat, den Antrag zurückzunehmen.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
      */
     public function getBezug()
     {
@@ -47,10 +47,10 @@ class ProzessnachrichtenQuittierungRuecknahme1131AnonymousPHPType extends Nachri
      *
      * In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Es ist die Nachricht des Antragstellers zu referenzieren, mittels derer er über seine Absicht informiert hat, den Antrag zurückzunehmen.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      * @return self
      */
-    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug)
+    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug)
     {
         $this->bezug = $bezug;
         return $this;

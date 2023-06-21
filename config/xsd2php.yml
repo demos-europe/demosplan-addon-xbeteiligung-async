@@ -25,7 +25,7 @@ xsd2php:
     'http://www.osci.de/xinneres/quittung/3': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
     'http://www.osci.de/xinneres/rueckweisung/4': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
     'http://www.osci.de/xinneres/weiterleitung/5': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'https://www.xleitstelle.de/xbeteiligung/0/9': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
+    'https://www.xleitstelle.de/xbeteiligung/1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
     'http://xbeteiligung.de/V0103': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap'
 
   destinations_php:

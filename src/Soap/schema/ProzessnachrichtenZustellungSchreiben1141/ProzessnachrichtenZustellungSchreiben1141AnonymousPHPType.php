@@ -2,17 +2,17 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenZustellungSchreiben1141;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 
 /**
  * Class representing ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType
  */
-class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends NachrichtG2GType
+class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends NachrichtG2GTypeType
 {
     /**
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen. Oder Angabe einer Vorgangsnummer für zukünftige Bezugnahme auf diese Nachricht.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      */
     private $bezug = null;
 
@@ -26,14 +26,14 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
     /**
      * Dieses Element kann verwendet werden, um Webressourcen für ggf. nötige Reaktionen des Lesers auf die vorliegende Nachricht anzugeben .
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerlinkungType $angebotFuerAntwortLeser
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerlinkungTypeType $angebotFuerAntwortLeser
      */
     private $angebotFuerAntwortLeser = null;
 
     /**
      * Dieses Element ist für Anlagen zur Nachricht zu verwenden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[] $anlagen
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[] $anlagen
      */
     private $anlagen = null;
 
@@ -42,7 +42,7 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
      *
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen. Oder Angabe einer Vorgangsnummer für zukünftige Bezugnahme auf diese Nachricht.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
      */
     public function getBezug()
     {
@@ -54,10 +54,10 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
      *
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen. Oder Angabe einer Vorgangsnummer für zukünftige Bezugnahme auf diese Nachricht.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
      * @return self
      */
-    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugType $bezug)
+    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug)
     {
         $this->bezug = $bezug;
         return $this;
@@ -134,7 +134,7 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
      *
      * Dieses Element kann verwendet werden, um Webressourcen für ggf. nötige Reaktionen des Lesers auf die vorliegende Nachricht anzugeben .
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerlinkungType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerlinkungTypeType
      */
     public function getAngebotFuerAntwortLeser()
     {
@@ -146,10 +146,10 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
      *
      * Dieses Element kann verwendet werden, um Webressourcen für ggf. nötige Reaktionen des Lesers auf die vorliegende Nachricht anzugeben .
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerlinkungType $angebotFuerAntwortLeser
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerlinkungTypeType $angebotFuerAntwortLeser
      * @return self
      */
-    public function setAngebotFuerAntwortLeser(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerlinkungType $angebotFuerAntwortLeser = null)
+    public function setAngebotFuerAntwortLeser(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerlinkungTypeType $angebotFuerAntwortLeser = null)
     {
         $this->angebotFuerAntwortLeser = $angebotFuerAntwortLeser;
         return $this;
@@ -161,9 +161,9 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
      * Dieses Element ist für Anlagen zur Nachricht zu verwenden.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType $anlage
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType $anlage
      */
-    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType $anlage)
+    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType $anlage)
     {
         $this->anlagen[] = $anlage;
         return $this;
@@ -200,7 +200,7 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
      *
      * Dieses Element ist für Anlagen zur Nachricht zu verwenden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[]
      */
     public function getAnlagen()
     {
@@ -212,7 +212,7 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
      *
      * Dieses Element ist für Anlagen zur Nachricht zu verwenden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektType[] $anlagen
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[] $anlagen
      * @return self
      */
     public function setAnlagen(array $anlagen = null)

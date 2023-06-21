@@ -1,0 +1,42 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KodierungFlurstueckTypeType:
+    properties:
+        gemarkung:
+            expose: true
+            access_type: public_method
+            serialized_name: gemarkung
+            accessor:
+                getter: getGemarkung
+                setter: setGemarkung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KodierungFlurstueckTypeType\GemarkungAnonymousPHPType
+        flur:
+            expose: true
+            access_type: public_method
+            serialized_name: flur
+            accessor:
+                getter: getFlur
+                setter: setFlur
+            type: string
+        zaehler:
+            expose: true
+            access_type: public_method
+            serialized_name: zaehler
+            accessor:
+                getter: getZaehler
+                setter: setZaehler
+            type: string
+        nenner:
+            expose: true
+            access_type: public_method
+            serialized_name: nenner
+            accessor:
+                getter: getNenner
+                setter: setNenner
+            type: string
+        folge:
+            expose: true
+            access_type: public_method
+            serialized_name: folge
+            accessor:
+                getter: getFolge
+                setter: setFolge
+            type: string

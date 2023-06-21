@@ -7,7 +7,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungVonSachverhaltenErin
             accessor:
                 getter: getUrsprungsnachricht
                 setter: setUrsprungsnachricht
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType
         quittung:
             expose: true
             access_type: public_method
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungVonSachverhaltenErin
             accessor:
                 getter: getQuittung
                 setter: setQuittung
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\QuittungTypeType
         erinnerungsstufe:
             expose: true
             access_type: public_method

@@ -17,7 +17,7 @@ class NachrichteninhaltAnonymousPHPType
     /**
      * Dieses Element enthält die Stellungnahme der beteiligten Stelle.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType $stellungnahme
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeTypeType $stellungnahme
      */
     private $stellungnahme = null;
 
@@ -52,7 +52,7 @@ class NachrichteninhaltAnonymousPHPType
      *
      * Dieses Element enthält die Stellungnahme der beteiligten Stelle.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeTypeType
      */
     public function getStellungnahme()
     {
@@ -64,10 +64,10 @@ class NachrichteninhaltAnonymousPHPType
      *
      * Dieses Element enthält die Stellungnahme der beteiligten Stelle.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType $stellungnahme
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeTypeType $stellungnahme
      * @return self
      */
-    public function setStellungnahme(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType $stellungnahme = null)
+    public function setStellungnahme(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeTypeType $stellungnahme = null)
     {
         $this->stellungnahme = $stellungnahme;
         return $this;

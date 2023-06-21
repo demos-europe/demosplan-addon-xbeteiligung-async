@@ -17,7 +17,7 @@
          <versionStandard>
             <version>1.1</version>
             <beschreibung>Das XBau-Kernmodul wurde in dieser Version ergänzt um weitere generische Prozessnachrichten, beispielsweise zum Einstellen von Dokumenten in einen Projektraum des Antragsportals. Oder zur informellen Kommunikation der an einem Vorgang Beteiligten (was in der Praxis bisher als E-Mail-Kommunikation ablief). Die Datentypen zu Metadaten von Bauvorlagen (und sonstigen Anlagen zu XBau-Nachrichten) wurden konsolidiert. Jetzt muss ein Dokument entweder als Anhang (Attachment) mit einer XBau-Nachricht versendet werden oder per Link (z.B. auf eine Ressource in einem DMS) referenziert werden, der in der XBau-Nachricht enthalten ist (keine base64-Kodierung mehr innerhalb der XBau-Fachnachricht). Außerdem sind jetzt auch im XBau-Kernmodul Definitionen für DVDV-Dienste mit den passenden WSDL-Vorlagedateien enthalten.</beschreibung>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0</versionModellierungswerkzeug>
@@ -25,7 +25,7 @@
          </versionStandard>
       </xs:appinfo>
    </xs:annotation>
-   <xs:simpleType name="Dezimal.XBau">
+   <xs:simpleType name="Dezimal.XBauType">
       <xs:annotation>
          <xs:documentation>Dieser Datentyp stellt numerische Werte mit zwei Nachkommastellen dar. Er kann für Zahlen genutzt werden, die mit dieser Präzision sinnvoll sind. Darum erlaubt der Datentyp Dezimal.XBau zum Beispiel bei der Übertragung der Einheit Meter (m) eine Präzision von einem Zentimeter.</xs:documentation>
       </xs:annotation>

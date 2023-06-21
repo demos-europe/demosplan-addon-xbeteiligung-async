@@ -19,4 +19,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenFachlicheK
             accessor:
                 getter: getTextFormatiert
                 setter: setTextFormatiert
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertTypeType

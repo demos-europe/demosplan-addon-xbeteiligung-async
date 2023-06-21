@@ -19,7 +19,7 @@
          <versionStandard>
             <version>1.1</version>
             <beschreibung>Das XBau-Kernmodul wurde in dieser Version ergänzt um weitere generische Prozessnachrichten, beispielsweise zum Einstellen von Dokumenten in einen Projektraum des Antragsportals. Oder zur informellen Kommunikation der an einem Vorgang Beteiligten (was in der Praxis bisher als E-Mail-Kommunikation ablief). Die Datentypen zu Metadaten von Bauvorlagen (und sonstigen Anlagen zu XBau-Nachrichten) wurden konsolidiert. Jetzt muss ein Dokument entweder als Anhang (Attachment) mit einer XBau-Nachricht versendet werden oder per Link (z.B. auf eine Ressource in einem DMS) referenziert werden, der in der XBau-Nachricht enthalten ist (keine base64-Kodierung mehr innerhalb der XBau-Fachnachricht). Außerdem sind jetzt auch im XBau-Kernmodul Definitionen für DVDV-Dienste mit den passenden WSDL-Vorlagedateien enthalten.</beschreibung>
-            <versionXOEVProfil>2.0.0</versionXOEVProfil>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0</versionModellierungswerkzeug>
@@ -43,9 +43,9 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbauk:Nachricht.G2G">
+            <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="rueckweisungDaten" type="xbauk:Rueckweisung">
+                  <xs:element name="rueckweisungDaten" type="xbauk:RueckweisungType">
                      <xs:annotation>
                         <xs:documentation>Mit diesem Element wird der Fehler einer gegebenenen Nachricht benannt, der zu der vorliegenden Rückweisung geführt hat.</xs:documentation>
                      </xs:annotation>
@@ -64,14 +64,14 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbauk:Nachricht.G2G">
+            <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:Bezug">
+                  <xs:element name="bezug" type="xbauk:BezugType">
                      <xs:annotation>
                         <xs:documentation>Dieses Element enthält, um Bezug zu nehmen, die Vorgangsnummer bzw. die Referenz des Antrags (Zeichen des Antragstellers). Außerdem enthält es - mandatorisch - eine Referenzierung auf die Nachricht, durch die der Antrag (modifizierter Antrag) bzw. die Anzeige eingereicht worden ist, deren Empfang bestätigt wird.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="information" minOccurs="0" type="xbauk:Text">
+                  <xs:element name="information" minOccurs="0" type="xbauk:TextType">
                      <xs:annotation>
                         <xs:documentation>Hier kann die Bauaufsichtsbehörde (bzw. Aufsichtsbehörde für den Breitbandausbau) ergänzend erläuternden Text in die Nachricht einfügen.</xs:documentation>
                      </xs:annotation>
@@ -90,9 +90,9 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xink:Nachricht.G2G">
+            <xs:extension base="xink:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:Bezug">
+                  <xs:element name="bezug" type="xbauk:BezugType">
                      <xs:annotation>
                         <xs:documentation>Dieses Element enthält zur Information die Vorgangsnummer bzw. das Aktenzeichen, unter der die Behörde das Anliegen bearbeitet. Mit der Angabe der Referenz des Antragstellers wird der Bezug für diesen hergestellt. Eine Referenzierung auf eine Nachricht wird in diese Nachricht nicht eingetragen.</xs:documentation>
                      </xs:annotation>
@@ -111,19 +111,19 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbauk:Nachricht.G2G">
+            <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:Bezug">
+                  <xs:element name="bezug" type="xbauk:BezugType">
                      <xs:annotation>
                         <xs:documentation>In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Eine Referenzierung auf eine Nachricht wird in diese Nachricht nicht eingetragen.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="information" minOccurs="0" type="xbauk:Text">
+                  <xs:element name="information" minOccurs="0" type="xbauk:TextType">
                      <xs:annotation>
                         <xs:documentation>Hier kann optional durch den Antragsteller eine Begründung eingetragen werden.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="anlagen" minOccurs="0" type="xbauk:Anlagen">
+                  <xs:element name="anlagen" minOccurs="0" type="xbauk:AnlagenType">
                      <xs:annotation>
                         <xs:documentation>Ggf. will der Antragsteller der Rücknahme des Antrags ein Schreiben beilegen. Das lässt sich mit diesem Element abbilden.</xs:documentation>
                      </xs:annotation>
@@ -142,9 +142,9 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbauk:Nachricht.G2G">
+            <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:Bezug">
+                  <xs:element name="bezug" type="xbauk:BezugType">
                      <xs:annotation>
                         <xs:documentation>In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Es ist die Nachricht des Antragstellers zu referenzieren, mittels derer er über seine Absicht informiert hat, den Antrag zurückzunehmen.</xs:documentation>
                      </xs:annotation>
@@ -154,7 +154,7 @@
                         <xs:documentation>Falls die Rücknahme des Antrags durch die Bauaufsichtsbehörde (bzw. Aufsichtsbehörde für den Breitbandausbau) akzeptiert wurde, wird in diesem Element "true" übermittelt. Andernfalls wird "false" übermittelt. Dann ist eine Rücknahme des Antrags nicht mehr möglich, weil bereits ein Bescheid erteilt wurde, der dem Antragsteller auf dem vorgesehenen Wege zugehen wird oder bereits zugegangen ist.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="information" minOccurs="0" type="xbauk:Text">
+                  <xs:element name="information" minOccurs="0" type="xbauk:TextType">
                      <xs:annotation>
                         <xs:documentation>Hier kann optional eine Begründung oder Erläuterung der Bauaufsichtsbehörde (bzw. Aufsichtsbehörde für den Breitbandausbau) eingetragen werden.</xs:documentation>
                      </xs:annotation>
@@ -173,14 +173,14 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbauk:Nachricht.G2G">
+            <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:Bezug">
+                  <xs:element name="bezug" type="xbauk:BezugType">
                      <xs:annotation>
                         <xs:documentation>Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="befundliste" type="xbauk:BefundlisteFormell">
+                  <xs:element name="befundliste" type="xbauk:BefundlisteFormellType">
                      <xs:annotation>
                         <xs:documentation>In diesem Element sind die Ergebnisse der formellen Prüfung enthalten. Sie haben die Form einer Liste von Mängeln des geprüften Gegenstandes.</xs:documentation>
                      </xs:annotation>
@@ -204,26 +204,26 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbauk:Nachricht.G2G">
+            <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:Bezug">
+                  <xs:element name="bezug" type="xbauk:BezugType">
                      <xs:annotation>
                         <xs:documentation>Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen. Oder Angabe einer Vorgangsnummer für zukünftige Bezugnahme auf diese Nachricht.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="anschreiben" type="xbauk:Text">
+                  <xs:element name="anschreiben" type="xbauk:TextType">
                      <xs:annotation>
                         <xs:documentation>In dieses Element ist der Anschreibentext der Nachricht einzutragen.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
                   <xs:element name="angebotFuerAntwortLeser"
                               minOccurs="0"
-                              type="xbauk:Verlinkung">
+                              type="xbauk:VerlinkungType">
                      <xs:annotation>
                         <xs:documentation>Dieses Element kann verwendet werden, um Webressourcen für ggf. nötige Reaktionen des Lesers auf die vorliegende Nachricht anzugeben .</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="anlagen" minOccurs="0" type="xbauk:Anlagen">
+                  <xs:element name="anlagen" minOccurs="0" type="xbauk:AnlagenType">
                      <xs:annotation>
                         <xs:documentation>Dieses Element ist für Anlagen zur Nachricht zu verwenden.</xs:documentation>
                      </xs:annotation>
@@ -242,9 +242,9 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbauk:Nachricht.G2G">
+            <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:Bezug">
+                  <xs:element name="bezug" type="xbauk:BezugType">
                      <xs:annotation>
                         <xs:documentation>Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen.</xs:documentation>
                      </xs:annotation>
@@ -255,12 +255,12 @@
                      </xs:annotation>
                      <xs:complexType>
                         <xs:choice>
-                           <xs:element name="textUnformatiert" type="xbauk:Text">
+                           <xs:element name="textUnformatiert" type="xbauk:TextType">
                               <xs:annotation>
                                  <xs:documentation>Hier wird der unformatierte Text übermittelt.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="textFormatiert" type="xbauk:TextFormatiert">
+                           <xs:element name="textFormatiert" type="xbauk:TextFormatiertType">
                               <xs:annotation>
                                  <xs:documentation>Hier wird der formatierte Text übermittelt.</xs:documentation>
                               </xs:annotation>
@@ -268,7 +268,7 @@
                         </xs:choice>
                      </xs:complexType>
                   </xs:element>
-                  <xs:element name="anlagen" minOccurs="0" type="xbauk:Anlagen">
+                  <xs:element name="anlagen" minOccurs="0" type="xbauk:AnlagenType">
                      <xs:annotation>
                         <xs:documentation>Mit diesem Element können Metadaten zu Anlagen übermittelt werden.</xs:documentation>
                      </xs:annotation>
@@ -287,19 +287,19 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbauk:Nachricht.G2G">
+            <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:Bezug">
+                  <xs:element name="bezug" type="xbauk:BezugType">
                      <xs:annotation>
                         <xs:documentation>Hier können Eintragungen vorgenommen werden, falls sich das Dokument einem vorhandenen Vorgang zuordnen lässt.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="ablageort" minOccurs="0" type="xbauk:Code.Ablageort">
+                  <xs:element name="ablageort" minOccurs="0" type="xbauk:Code.AblageortType">
                      <xs:annotation>
                         <xs:documentation>Mit diesem Element kann ein Ablageort innerhalb der jeweiligen Struktur des Portals bzw. der Plattform für das Dokument angegeben werden.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
-                  <xs:element name="anlagen" type="xbauk:Anlagen">
+                  <xs:element name="anlagen" type="xbauk:AnlagenType">
                      <xs:annotation>
                         <xs:documentation>In diesem Element werden die Metadaten zur Anlage übermittelt.</xs:documentation>
                      </xs:annotation>

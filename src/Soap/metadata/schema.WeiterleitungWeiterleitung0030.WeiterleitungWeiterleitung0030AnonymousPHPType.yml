@@ -10,7 +10,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungWeiterleitung00
             xml_list:
                 inline: true
                 entry_name: weiterleitendeStelle
-            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleType>
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitendeStelleTypeType>
         ausloesendeStelle:
             expose: true
             access_type: public_method
@@ -18,7 +18,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungWeiterleitung00
             accessor:
                 getter: getAusloesendeStelle
                 setter: setAusloesendeStelle
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType
         weitergeleiteteNachricht:
             expose: true
             access_type: public_method
@@ -34,7 +34,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungWeiterleitung00
             accessor:
                 getter: getWeitergeleiteteNachrichtTyp
                 setter: setWeitergeleiteteNachrichtTyp
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4Type
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeNachrichtentypTyp4TypeType
         bemerkungen:
             expose: true
             access_type: public_method

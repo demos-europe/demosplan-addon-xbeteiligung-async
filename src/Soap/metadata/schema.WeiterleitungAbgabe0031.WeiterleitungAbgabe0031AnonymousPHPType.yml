@@ -7,7 +7,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungAbgabe0031\Weit
             accessor:
                 getter: getZustaendigeStelle
                 setter: setZustaendigeStelle
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType
         weitergeleiteteNachricht:
             expose: true
             access_type: public_method
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungAbgabe0031\Weit
             accessor:
                 getter: getWeitergeleiteteNachricht
                 setter: setWeitergeleiteteNachricht
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4Type
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTyp4TypeType
         weitergeleitetesEreignis:
             expose: true
             access_type: public_method
@@ -23,7 +23,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\WeiterleitungAbgabe0031\Weit
             accessor:
                 getter: getWeitergeleitetesEreignis
                 setter: setWeitergeleitetesEreignis
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationEreignisTypeType
         bemerkungen:
             expose: true
             access_type: public_method
