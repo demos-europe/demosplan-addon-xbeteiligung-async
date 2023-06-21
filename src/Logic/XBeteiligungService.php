@@ -29,6 +29,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeTy
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneNeu0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneNeu0401\Planung2BeteiligungBeteiligungKommuneNeu0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType;
@@ -65,14 +67,18 @@ class XBeteiligungService
     public function createProcedure401FromObject(ProcedureInterface $procedure): string
     {
         $procedureCreated401Object = new Planung2BeteiligungBeteiligungKommuneNeu0401();
-        $procedureCreated401Object->setNachrichtenkopf($this->createMessageHeadFor($procedureCreated401Object));
-        $procedureCreated401Object->setNachrichteninhalt($this->generateMain401MessageContent($procedure));
-        $procedureCreated401Object->setProdukt('');
-        $procedureCreated401Object->setProdukthersteller('');
-        $procedureCreated401Object->setProduktversion('');
-        $procedureCreated401Object->setStandard('');
-        $procedureCreated401Object->setTest('');
-        $procedureCreated401Object->setVersion('');
+        $procedureCreated401Object->setNachrichtenkopf(
+            $this->createMessageHeadFor($procedureCreated401Object)
+        ); // required
+        $procedureCreated401Object->setNachrichteninhalt(
+            $this->generateMain401MessageContent($procedure)
+        ); // required
+        $procedureCreated401Object->setProdukt(''); // required
+        $procedureCreated401Object->setProdukthersteller(''); // required
+        $procedureCreated401Object->setProduktversion(''); // optional
+        $procedureCreated401Object->setStandard(''); // required
+        $procedureCreated401Object->setTest(''); // optional
+        $procedureCreated401Object->setVersion(''); // required
 
         return '';
     }
@@ -108,9 +114,9 @@ class XBeteiligungService
     private function createMessageHeadFor(NachrichtG2GTypeType $messageObject): NachrichtenkopfG2GTypeType
     {
         $messageHead = new NachrichtenkopfG2GTypeType();
-        $messageHead->setIdentifikationNachricht($this->createMessageIdentification($messageObject));
-        $messageHead->setLeser($this->createReaderInformation());
-        $messageHead->setAutor($this->createAuthorInformation());
+        $messageHead->setIdentifikationNachricht($this->createMessageIdentification($messageObject)); // required
+        $messageHead->setLeser($this->createReaderInformation()); // required
+        $messageHead->setAutor($this->createAuthorInformation()); // required
 
         return $messageHead;
     }
@@ -280,13 +286,13 @@ class XBeteiligungService
      */
     private function createMessageIdentification(NachrichtG2GTypeType $messageObject): IdentifikationNachrichtTypeType
     {
-        if ($messageObject instanceof Planung2BeteiligungBeteiligungNeu0401) {
+        if ($messageObject instanceof Planung2BeteiligungBeteiligungKommuneNeu0401) {
             $code = '0401';
             $name = 'planung2Beteiligung.BeteiligungNeu.0401';
-        } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungAktualisieren0402) {
+        } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungKommuneAktualisieren0402) {
             $code = '0402';
             $name = 'planung2Beteiligung.BeteiligungAktualisieren.0402';
-        } elseif ($messageObject instanceof  Planung2BeteiligungBeteiligungLoeschen0409) {
+        } elseif ($messageObject instanceof  Planung2BeteiligungBeteiligungKommuneLoeschen0409) {
             $code = '0409';
             $name = 'planung2Beteiligung.BeteiligungLoeschen.0409';
         } else {
@@ -304,9 +310,10 @@ class XBeteiligungService
         $messageTypeCode->setName($name);
         $messageTypeCode->setCode($code);
 
-        $identificationMessage->setNachrichtenUUID($this->uuid());
-        $identificationMessage->setErstellungszeitpunkt(new DateTime());
-        $identificationMessage->setNachrichtentyp($messageTypeCode);
+        // id has to match pattern: '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+        $identificationMessage->setNachrichtenUUID($this->uuid()); // required
+        $identificationMessage->setErstellungszeitpunkt(new DateTime()); // required
+        $identificationMessage->setNachrichtentyp($messageTypeCode); // required
 
         return $identificationMessage;
     }
