@@ -14,21 +14,25 @@ use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnschriftTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneNeu0401;
@@ -37,6 +41,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschr
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType\HausnummernBisAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftPostfachanschriftTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfahrenTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumTypeType;
 use Exception;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Routing\RouterInterface;
@@ -83,30 +89,53 @@ class XBeteiligungService
         return '';
     }
 
-    // todo does the id matter here?
     private function generateMain401MessageContent(ProcedureInterface $procedure): NachrichteninhaltAnonymousPHPType
     {
         $messageContent = new NachrichteninhaltAnonymousPHPType();
-        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setVorgangsID($this->uuid());  // required
+        $messageContent->setBeteiligung($this->generateParticipationContent($procedure)); // optional
 
-        $organisationType = new OrganisationTypeType();
-
-        $organisationName = new NameOrganisationTypeType();
-        $organisationName->setName($procedure->getOrga()?->getName() ?? '');
-        $organisationType->setName($organisationName);
-        $postalInformation = new AnschriftTypeType();
-        $postalInformation->setStrasse($procedure->getOrga()?->getStreet() ?? '');
-        $postalInformation->setHausnummer($procedure->getOrga()?->getHouseNumber() ?? '');
-        $postalInformation->setPostleitzahl($procedure->getOrga()?->getPostalcode() ?? '');
-        $postalInformation->setOrt($procedure->getOrga()?->getCity() ?? '');
-        $organisationType->setAnschrift([$postalInformation]);
-        $messageContent->setInitiator($organisationType);
-
-        $beteiligungType = new BeteiligungTypeType();
-
-
-        $messageContent->setBeteiligung();
+        return $messageContent;
     }
+
+    private function generateParticipationContent(ProcedureInterface $procedure): BeteiligungKommuneTypeType
+    {
+        $participationType = new BeteiligungKommuneTypeType();
+        $participationType->setAkteurVorhaben(new AkteurVorhabenTypeType()); // required
+        $participationType->setPlanname($procedure->getName()); // required
+        $planType
+        $participationType->setPlanart(new CodePlanartKommuneTypeType()); // optional - we want to use it
+        // Hier ist die ID des Planverfahrens zu übermitteln, innerhalb dessen das Beteiligungsverfahren durchgeführt wird
+        $participationType->setPlanID($procedure->getXtaPlanId()); // required
+        $participationType->setBeschreibungPlanungsanlass($procedure->getDesc()); // optional - we want to use it
+        $participationType->setFlaechenabgrenzungUrl(''); // optional - we want to use it
+        $participationType->setGeltungsbereich(''); // required - we dont want to use it
+        $participationType->setRaeumlicheBeschreibung(''); // required - we dont want it
+        $participationType->setZeitraum(new ZeitraumTypeType()); // optional - we want to use it
+        $participationType->setBekanntmachung(new DateTime()); // required - we dont want it
+        // verfahren?
+        $participationType->setAnlagen([new MetadatenAnlageTypeType()]); // optional - we want to use it
+        $participationType->setVerfahrensschritt(new CodeVerfahrensschrittTypeType()); // required - we want to use it
+        // $participationType->setVerfahrensart(new CodeVerfahrensartTypeType()); // optional
+        $participationType->setAktuelleMitteilung(['', '']); // optional - we want to use it
+        // $participationType->setArbeitstitel(''); // optional
+        // $participationType->setPlanart(new CodePlanartKommuneTypeType()); // otional
+        $participationType->setDurchgang(1); // required not documented not wanted
+
+        // Hier ist die räumliche Beschreibung des Geltungsbereichs als Polygon im Format GeoJSON FG Notation zu über-
+        //mitteln.
+
+
+        // Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
+
+
+
+
+
+        return $participationType;
+    }
+
+
 
     /**
      * @throws Exception
@@ -125,10 +154,10 @@ class XBeteiligungService
     private function createReaderInformation(): BehoerdeTypeType
     {
         $reader = new BehoerdeTypeType();
-        $reader->setBehoerdenkennung($this->addReadingAuthorityIdentificationType());
-        // $reader->setErreichbarkeit($this->addReaderCommunicationType());
-        // $reader->setAnschrift($this->addReaderPostalInformation());
-        $reader->setBehoerdenname('');
+        $reader->setBehoerdenkennung($this->addReadingAuthorityIdentificationType()); // required
+//        $reader->setErreichbarkeit($this->addReaderCommunicationType()); // optional list
+//        $reader->setAnschrift($this->addReaderPostalInformation()); // optional
+        $reader->setBehoerdenname(''); // required
 
         return $reader;
     }
@@ -137,10 +166,10 @@ class XBeteiligungService
     private function createAuthorInformation(): BehoerdeErreichbarTypeType
     {
         $author = new BehoerdeErreichbarTypeType();
-        $author->setBehoerdenkennung($this->addAuthorityIdentificationOfAuthor());
-        $author->setErreichbarkeit($this->addAuthorCommunicationType());
-        $author->setAnschrift($this->addAuthorPostalInformation());
-        $author->setBehoerdenname('');
+        $author->setBehoerdenkennung($this->addAuthorityIdentificationOfAuthor()); // required
+        $author->setErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
+        $author->setAnschrift($this->addAuthorPostalInformation()); // required
+        $author->setBehoerdenname(''); // required
 
         return $author;
     }
@@ -155,14 +184,14 @@ class XBeteiligungService
         $prefixType->setListURI('');
         $prefixType->setName('');
         $prefixType->setCode('diplanfhh');
-        $authorityIdentificationType->setPraefix($prefixType);
+        $authorityIdentificationType->setPraefix($prefixType); // required
 
         $codeAuthorityIdentification = new CodeBehoerdenkennungTypeType();
         $codeAuthorityIdentification->setListVersionID('');
         $codeAuthorityIdentification->setListURI('');
         $codeAuthorityIdentification->setName('');
         $codeAuthorityIdentification->setCode('0400');
-        $authorityIdentificationType->setKennung($codeAuthorityIdentification);
+        $authorityIdentificationType->setKennung($codeAuthorityIdentification); // required
 
         return $authorityIdentificationType;
     }
@@ -177,33 +206,36 @@ class XBeteiligungService
         $prefixType->setListURI('');
         $prefixType->setName('');
         $prefixType->setCode('diplanfhh');
-        $authorityIdentificationType->setPraefix($prefixType);
+        $authorityIdentificationType->setPraefix($prefixType); // required
 
         $codeAuthorityIdentification = new CodeBehoerdenkennungTypeType();
         $codeAuthorityIdentification->setListVersionID('');
         $codeAuthorityIdentification->setListURI('');
         $codeAuthorityIdentification->setName('');
         $codeAuthorityIdentification->setCode('0200');
-        $authorityIdentificationType->setKennung($codeAuthorityIdentification);
+        $authorityIdentificationType->setKennung($codeAuthorityIdentification); // required
 
         return $authorityIdentificationType;
     }
 
-    // todo information needs to be provided
     /**
      * @return array<int, KommunikationTypeType>
      */
     private function addReaderCommunicationType(): array
     {
-        $communicationType = new KommunikationTypeType(); // seemingly optional
+        $communicationType = new KommunikationTypeType();
         $comCode = new CodeErreichbarkeitTypeType();
+        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger, 06 -> Pager, 07 -> Sonstiges
         $comCode->setCode('');
         $comCode->setName('');
         $comCode->setListURI('');
         $comCode->setListVersionID('');
-        $communicationTypeList = [$communicationType];
+        $communicationType->setKanal($comCode); // required
+        // kennung: In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
+        $communicationType->setKennung(''); // required
+        $communicationType->setZusatz(''); // optional
 
-        return $communicationTypeList;
+        return [$communicationType];
     }
 
     // todo information needs to be provided
@@ -212,40 +244,43 @@ class XBeteiligungService
      */
     private function addAuthorCommunicationType(): array
     {
-        $communicationType = new KommunikationTypeType(); // seemingly optional
+        $communicationType = new KommunikationTypeType();
         $comCode = new CodeErreichbarkeitTypeType();
+        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger, 06 -> Pager, 07 -> Sonstiges
         $comCode->setCode('');
         $comCode->setName('');
         $comCode->setListURI('');
         $comCode->setListVersionID('');
-        $communicationTypeList = [$communicationType];
+        $communicationType->setKanal($comCode); // required
+        // kennung: In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
+        $communicationType->setKennung(''); // required
+        $communicationType->setZusatz(''); // optional
 
-        return $communicationTypeList;
+        return [$communicationType];
     }
 
-    // todo information needs to be provided
     private function addReaderPostalInformation(): PostalischeInlandsanschriftTypeType
     {
-        $postAddress = new PostalischeInlandsanschriftTypeType(); // seemingly optional
+        $postAddress = new PostalischeInlandsanschriftTypeType();
 
-        $buildingAddress = new PostalischeInlandsanschriftGebaeudeanschriftTypeType(); // seemingly optional
+        $buildingAddress = new PostalischeInlandsanschriftGebaeudeanschriftTypeType();
         $buildingNumber = new HausnummernBisAnonymousPHPType();
         $buildingNumber->setHausnummerBis('');
         $buildingNumber->setHausnummerbuchstabezusatzzifferBis('');
         $buildingNumber->setTeilnummerderhausnummerBis('');
-        $buildingAddress->setHausnummernBis($buildingNumber);
-        $buildingAddress->setWohnort('');
-        $buildingAddress->setPostleitzahl('');
-        $buildingAddress->setHausnummer('');
-        $buildingAddress->setHausnummerBuchstabeZusatzziffer('');
-        $buildingAddress->setStockwerkswohnungsnummer('');
-        $buildingAddress->setStrasse('');
-        $postAddress->setGebaeude($buildingAddress);
+        $buildingAddress->setHausnummernBis($buildingNumber); // optional
+        $buildingAddress->setWohnort(''); // required
+        $buildingAddress->setPostleitzahl(''); // required
+        $buildingAddress->setHausnummer(''); // optional
+        $buildingAddress->setHausnummerBuchstabeZusatzziffer(''); // optional
+        $buildingAddress->setStockwerkswohnungsnummer(''); // optional
+        $buildingAddress->setStrasse(''); // required
+        $postAddress->setGebaeude($buildingAddress); // required
 
-        $postMailBoxAddress = new PostalischeInlandsanschriftPostfachanschriftTypeType(); // seemingly optional
-        $postMailBoxAddress->setPostfach('')
-            ->setPostleitzahl('')
-            ->setWohnort('')
+        $postMailBoxAddress = new PostalischeInlandsanschriftPostfachanschriftTypeType();
+        $postMailBoxAddress->setPostfach('') // optional
+            ->setPostleitzahl('') // required
+            ->setWohnort('') // required
         ;
         $postAddress->setPostfach($postMailBoxAddress);
 
@@ -255,28 +290,28 @@ class XBeteiligungService
     // todo information needs to be provided
     private function addAuthorPostalInformation(): PostalischeInlandsanschriftTypeType
     {
-        $postAddress = new PostalischeInlandsanschriftTypeType(); // seemingly optional
+        $postAddress = new PostalischeInlandsanschriftTypeType();
 
-        $buildingAddress = new PostalischeInlandsanschriftGebaeudeanschriftTypeType(); // seemingly optional
+        $buildingAddress = new PostalischeInlandsanschriftGebaeudeanschriftTypeType();
         $buildingNumber = new HausnummernBisAnonymousPHPType();
         $buildingNumber->setHausnummerBis('');
         $buildingNumber->setHausnummerbuchstabezusatzzifferBis('');
         $buildingNumber->setTeilnummerderhausnummerBis('');
-        $buildingAddress->setHausnummernBis($buildingNumber);
-        $buildingAddress->setWohnort('');
-        $buildingAddress->setPostleitzahl('');
-        $buildingAddress->setHausnummer('');
-        $buildingAddress->setHausnummerBuchstabeZusatzziffer('');
-        $buildingAddress->setStockwerkswohnungsnummer('');
-        $buildingAddress->setStrasse('');
-        $postAddress->setGebaeude($buildingAddress);
+        $buildingAddress->setHausnummernBis($buildingNumber); // optional
+        $buildingAddress->setWohnort(''); // required
+        $buildingAddress->setPostleitzahl(''); // required
+        $buildingAddress->setHausnummer(''); // optional
+        $buildingAddress->setHausnummerBuchstabeZusatzziffer(''); // optional
+        $buildingAddress->setStockwerkswohnungsnummer(''); // oprional
+        $buildingAddress->setStrasse(''); // required
+        $postAddress->setGebaeude($buildingAddress); // required
 
-        $postMailBoxAddress = new PostalischeInlandsanschriftPostfachanschriftTypeType(); // seemingly optional
-        $postMailBoxAddress->setPostfach('')
-            ->setPostleitzahl('')
-            ->setWohnort('')
+        $postMailBoxAddress = new PostalischeInlandsanschriftPostfachanschriftTypeType();
+        $postMailBoxAddress->setPostfach('') // optional
+            ->setPostleitzahl('') // required
+            ->setWohnort('') // required
         ;
-        $postAddress->setPostfach($postMailBoxAddress);
+        $postAddress->setPostfach($postMailBoxAddress); // required
 
         return $postAddress;
     }
