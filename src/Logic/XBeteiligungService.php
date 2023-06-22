@@ -10,6 +10,7 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
+use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
@@ -33,6 +34,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneNeu0401;
@@ -101,36 +104,56 @@ class XBeteiligungService
     private function generateParticipationContent(ProcedureInterface $procedure): BeteiligungKommuneTypeType
     {
         $participationType = new BeteiligungKommuneTypeType();
-        $participationType->setAkteurVorhaben(new AkteurVorhabenTypeType()); // required
+
+        $procedureInitiatingOrganisation = new AkteurVorhabenTypeType();
+        // kteurVorhaben
+        $organisationType = new OrganisationTypeType();
+        $organisationName = new NameOrganisationTypeType();
+        $organisationName->setName($procedure->getOrga()?->getName() ?? '');
+        $organisationType->setName($organisationName);
+        $procedureInitiatingOrganisation->setVeranlasser($organisationType);
+        $participationType->setAkteurVorhaben($procedureInitiatingOrganisation); // required
+
         $participationType->setPlanname($procedure->getName()); // required
-        $planType
-        $participationType->setPlanart(new CodePlanartKommuneTypeType()); // optional - we want to use it
+        // planart
+        $planType = new CodePlanartKommuneTypeType();
+        $planType->setCode('1000')
+            ->setName('Einfacher Bebauungsplan')
+            ->setListVersionID('1.0')
+            ->setListURI('urn:xoev-de:xleitstelle:codeliste:planart');
+        $participationType->setPlanart($planType); // optional - we want to use it
+
         // Hier ist die ID des Planverfahrens zu übermitteln, innerhalb dessen das Beteiligungsverfahren durchgeführt wird
-        $participationType->setPlanID($procedure->getXtaPlanId()); // required
+        $participationType->setPlanID($procedure->getXtaPlanId() ?? $procedure->getId()); // required
         $participationType->setBeschreibungPlanungsanlass($procedure->getDesc()); // optional - we want to use it
         $participationType->setFlaechenabgrenzungUrl(''); // optional - we want to use it
+
+        // Hier ist die räumliche Beschreibung des Geltungsbereichs als Polygon im Format GeoJSON FG Notation zu über-
+        // mitteln. todo Format wird noch geprüft.
         $participationType->setGeltungsbereich(''); // required - we dont want to use it
         $participationType->setRaeumlicheBeschreibung(''); // required - we dont want it
-        $participationType->setZeitraum(new ZeitraumTypeType()); // optional - we want to use it
-        $participationType->setBekanntmachung(new DateTime()); // required - we dont want it
-        // verfahren?
+        // zeitraum
+        $timeSpan = new ZeitraumTypeType();
+        $timeSpan->setBeginn($procedure->getStartDate());
+        $timeSpan->setEnde($procedure->getEndDate());
+        $participationType->setZeitraum($timeSpan); // optional - we want to use it
+
+        // Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
+        $participationType->setBekanntmachung(
+            $procedure->getStartDate()->sub(new DateInterval('P7D'))
+        ); // required - we dont want it
+        // verfahren? wird hier an dieser Stelle in Excel-sheet gelistet
+        // todo email an Stefan Conrad ist raus - der MetadatenAnlageTypeType ist broken zur Zeit
         $participationType->setAnlagen([new MetadatenAnlageTypeType()]); // optional - we want to use it
+
+        // todo Code liste urn:xoev-de:xleitstelle:codeliste:verfahrensschritt existiert nicht
         $participationType->setVerfahrensschritt(new CodeVerfahrensschrittTypeType()); // required - we want to use it
         // $participationType->setVerfahrensart(new CodeVerfahrensartTypeType()); // optional
+        // todo die sind scheinbar nicht an der Procedure entity
         $participationType->setAktuelleMitteilung(['', '']); // optional - we want to use it
         // $participationType->setArbeitstitel(''); // optional
         // $participationType->setPlanart(new CodePlanartKommuneTypeType()); // otional
         $participationType->setDurchgang(1); // required not documented not wanted
-
-        // Hier ist die räumliche Beschreibung des Geltungsbereichs als Polygon im Format GeoJSON FG Notation zu über-
-        //mitteln.
-
-
-        // Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
-
-
-
-
 
         return $participationType;
     }
