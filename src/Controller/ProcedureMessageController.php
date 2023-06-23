@@ -65,7 +65,7 @@ class ProcedureMessageController extends APIController
      * @return ProcedureMessage|Response
      */
 
-    public function importNewImportableProcedureMessage(ProcedureInterface $procedure, string $authToken, ProcedureMessage $procedureMessage)
+    public function importNewImportableProcedureMessage(string $authToken, string $id)
     {
         if ($authToken !== $this->getParameter('xbeteiligung_api_token')) {
             return new Response(null, Response::HTTP_NO_CONTENT, []);
@@ -73,15 +73,9 @@ class ProcedureMessageController extends APIController
 
         // we have to check if a corresponding procedure exists and get it if so
         try {
-            return $this->ProcedureMessageRepository->createProcedureMessage($procedure);
+            $this->ProcedureMessageRepository->getProcedureMessage($id);
         } catch (NoResultException|NonUniqueResultException $e) {
-            $this->logger->warning('No unique procedure found for given account ID, deleting account.', [
-                'exception' => $e->getMessage()
-            ]);
-
-            $this->ProcedureMessageRepository->updateObject($procedureMessage);
-        } catch (Throwable $e) {
-            $this->logger->error('Could not fetch all mails for given account ID', [
+            $this->logger->warning('No unique procedure message found for given ID', [
                 'exception' => $e->getMessage()
             ]);
         }
