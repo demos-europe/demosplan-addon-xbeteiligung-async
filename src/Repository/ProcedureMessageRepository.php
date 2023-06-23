@@ -61,7 +61,7 @@ class ProcedureMessageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Create a ProcedureMEssage with necessary properties
+     * Create a ProcedureMessage with necessary properties
      * and validate it.
      *
      * @throws InvalidArgumentException
