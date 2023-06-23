@@ -13,6 +13,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenTypeType;
@@ -37,9 +38,11 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneAktualisieren0402\Planung2BeteiligungBeteiligungKommuneAktualisieren0402AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneLoeschen0409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneLoeschen0409\Planung2BeteiligungBeteiligungKommuneLoeschen0409AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneNeu0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneNeu0401\Planung2BeteiligungBeteiligungKommuneNeu0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneNeu0401\Planung2BeteiligungBeteiligungKommuneNeu0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType\HausnummernBisAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftPostfachanschriftTypeType;
@@ -55,7 +58,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class XBeteiligungService
 {
-    public const XBETEILIGUNG_VERSION = 'V11';
+    public const XBETEILIGUNG_VERSION = '1.0';
+    public const STANDARD = 'XBeteiligung';
     private \JMS\Serializer\Serializer $serializer;
 
     public function __construct(
@@ -73,30 +77,98 @@ class XBeteiligungService
     /**
      * @throws Exception
      */
-    public function createProcedure401FromObject(ProcedureInterface $procedure): string
+    public function createProcedureNew401FromObject(ProcedureInterface $procedure): string
     {
         $procedureCreated401Object = new Planung2BeteiligungBeteiligungKommuneNeu0401();
+        $procedureCreated401Object = $this->setProdukctInfo($procedureCreated401Object); // required
         $procedureCreated401Object->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureCreated401Object)
         ); // required
         $procedureCreated401Object->setNachrichteninhalt(
             $this->generateMain401MessageContent($procedure)
         ); // required
-        $procedureCreated401Object->setProdukt(''); // required
-        $procedureCreated401Object->setProdukthersteller(''); // required
-        $procedureCreated401Object->setProduktversion(''); // optional
-        $procedureCreated401Object->setStandard(''); // required
-        $procedureCreated401Object->setTest(''); // optional
-        $procedureCreated401Object->setVersion(''); // required
 
-        return '';
+        return $this->serializeData($procedureCreated401Object);
     }
 
-    private function generateMain401MessageContent(ProcedureInterface $procedure): NachrichteninhaltAnonymousPHPType
+    /**
+     * @throws Exception
+     */
+    public function createProcedureUpdate402FromObject(ProcedureInterface $procedure): string
     {
-        $messageContent = new NachrichteninhaltAnonymousPHPType();
+        $procedureUpdated402Object = new Planung2BeteiligungBeteiligungKommuneAktualisieren0402();
+        $procedureUpdated402Object = $this->setProdukctInfo($procedureUpdated402Object); // required
+        $procedureUpdated402Object->setNachrichtenkopf(
+            $this->createMessageHeadFor($procedureUpdated402Object)
+        ); // required
+        $procedureUpdated402Object->setNachrichteninhalt(
+            $this->generateMain402MessageContent($procedure)
+        ); // required
+
+        return $this->serializeData($procedureUpdated402Object);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function createProcedureDeleted409FromObject(ProcedureInterface $procedure): string
+    {
+        $procedureDeleted409Object = new Planung2BeteiligungBeteiligungKommuneLoeschen0409();
+        $procedureDeleted409Object = $this->setProdukctInfo($procedureDeleted409Object); // required
+        $procedureDeleted409Object->setNachrichtenkopf(
+            $this->createMessageHeadFor($procedureDeleted409Object)
+        ); // required
+        $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedure));
+
+        return $this->serializeData($procedureDeleted409Object);
+    }
+
+    private function serializeData($data): string
+    {
+        $xml = $this->serializer->serialize($data, 'xml');
+        $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+
+        return $xml->asXML() ?? '';
+    }
+
+    private function setProdukctInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
+    {
+        $messageObject->setProdukt('A1'); // required
+        $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
+        $messageObject->setProduktversion(self::XBETEILIGUNG_VERSION); // optional
+        $messageObject->setStandard(self::STANDARD); // required
+        // $messageObject->setTest(''); // optional
+        $messageObject->setVersion(self::XBETEILIGUNG_VERSION); // required
+
+        return $messageObject;
+    }
+
+    private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
+    {
+        $messageContent = new Nachrichteninhalt401();
         $messageContent->setVorgangsID($this->uuid());  // required
         $messageContent->setBeteiligung($this->generateParticipationContent($procedure)); // optional
+
+        return $messageContent;
+    }
+
+    private function generateMain402MessageContent(ProcedureInterface $procedure): Nachrichteninhalt402
+    {
+        $messageContent = new Nachrichteninhalt402();
+        $messageContent->setVorgangsID($this->uuid());
+        // todo the documentation says the return type of generateParticipationContent should be identical for 401,402
+        // it is not - email to stephan.conrad is sent.
+        $messageContent->setBeteiligung($this->generateParticipationContent($procedure)); // optional
+
+        return $messageContent;
+    }
+
+    private function generateMain409MessageContent(ProcedureInterface $procedure): Nachrichteninhalt409
+    {
+        $messageContent = new Nachrichteninhalt409();
+        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setPlanID($procedure->getXtaPlanId() ?? $procedure->getId());
+        $messageContent->setBeteiligungsID($procedure->getId());
 
         return $messageContent;
     }
@@ -144,7 +216,7 @@ class XBeteiligungService
         ); // required - we dont want it
         // verfahren? wird hier an dieser Stelle in Excel-sheet gelistet
         // todo email an Stefan Conrad ist raus - der MetadatenAnlageTypeType ist broken zur Zeit
-        $participationType->setAnlagen([new MetadatenAnlageTypeType()]); // optional - we want to use it
+        // $participationType->setAnlagen([new MetadatenAnlageTypeType()]); // optional - we want to use it
 
         // todo Code liste urn:xoev-de:xleitstelle:codeliste:verfahrensschritt existiert nicht
         $participationType->setVerfahrensschritt(new CodeVerfahrensschrittTypeType()); // required - we want to use it
@@ -346,13 +418,13 @@ class XBeteiligungService
     {
         if ($messageObject instanceof Planung2BeteiligungBeteiligungKommuneNeu0401) {
             $code = '0401';
-            $name = 'planung2Beteiligung.BeteiligungNeu.0401';
+            $name = 'planung2Beteiligung.BeteiligungKommuneNeu.0401';
         } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungKommuneAktualisieren0402) {
             $code = '0402';
-            $name = 'planung2Beteiligung.BeteiligungAktualisieren.0402';
+            $name = 'planung2Beteiligung.BeteiligungKommuneAktualisieren.0402';
         } elseif ($messageObject instanceof  Planung2BeteiligungBeteiligungKommuneLoeschen0409) {
             $code = '0409';
-            $name = 'planung2Beteiligung.BeteiligungLoeschen.0409';
+            $name = 'planung2Beteiligung.BeteiligungKommuneLoeschen.0409';
         } else {
             $this->logger->error('Class '.$messageObject::class.' not supported yet');
             throw new Exception(

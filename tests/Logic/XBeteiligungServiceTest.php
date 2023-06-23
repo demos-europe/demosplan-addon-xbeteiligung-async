@@ -2,8 +2,10 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic;
 
+use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
@@ -138,9 +140,18 @@ class XBeteiligungServiceTest extends TestCase
 ';
         $procedure = $this->createMock(ProcedureInterface::class);
         $procedure->method('getId')->willReturn('ID_7606f622-439b-4929-8625-0856c161409e');
-        $event = new PostProcedureCreatedEvent($procedure);
+        $procedure->method('getXtaPlanId')->willReturn('ID_7606f622-439b-4929-8625-0856c161409e');
+        $orga = $this->createMock(OrgaInterface::class);
+        $orga->method('getName')->willReturn('SoFreshAndSoClean');
+        $procedure->method('getOrga')->willReturn($orga);
+        $procedure->method('getName')->willReturn('Mars 2050');
+        $procedure->method('getDesc')->willReturn('return will be planned on the fly :)');
+        $procedure->method('getStartDate')->willReturn(new DateTime());
+        $procedure->method('getEndDate')->willReturn((new DateTime())->add(new DateInterval('P7D')));
 
-        $procedureXml = $this->sut->createProcedure401FromObject($procedure);
+
+        $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
+        echo ($procedureXml);
 
         $isValid = $this->sut->isValidMessage($xml, true, 'xbeteiligung-planung2beteiligung.xsd');
         self::assertTrue($isValid);
