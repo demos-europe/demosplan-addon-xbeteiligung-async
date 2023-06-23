@@ -33,5 +33,6 @@ class XBeteiligungAddonExtension extends AbstractAddonExtension
             new FileLocator(__DIR__.'/../../config')
         );
         $loader->load('services.yml');
+        $loader->load('parameters_default.yml');
     }
 }
