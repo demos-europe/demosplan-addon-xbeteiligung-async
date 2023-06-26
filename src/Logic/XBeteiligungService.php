@@ -12,8 +12,9 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateInterval;
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInterface;
+use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenTypeType;
@@ -50,6 +51,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschr
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfahrenTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumTypeType;
 use Exception;
+use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Routing\RouterInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
@@ -63,14 +65,16 @@ class XBeteiligungService
     private \JMS\Serializer\Serializer $serializer;
 
     public function __construct(
+        private readonly GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository,
         private readonly GlobalConfigInterface  $globalConfig,
         private readonly LoggerInterface        $logger,
-        private readonly RouterInterface                         $router,
+        private readonly RouterInterface        $router,
         SerializerFactory                       $serializerFactory,
-        private readonly TranslatorInterface                     $translator,
-        private readonly UserHandlerInterface                    $userHandler,
+        private readonly TranslatorInterface    $translator,
+        private readonly UserHandlerInterface   $userHandler,
+
     ) {
-        $this->serializer                           = $serializerFactory->getSerializer();
+        $this->serializer = $serializerFactory->getSerializer();
     }
 
     // todo information needs to be gathered
@@ -267,6 +271,50 @@ class XBeteiligungService
         $author->setBehoerdenname(''); // required
 
         return $author;
+    }
+
+    private function generateFaceBoundaryWMS_Url(ProcedureInterface $procedure): string
+    {
+        $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
+
+        if (null === $rootCategory) {
+            // Currently, all procedures have a root layer category
+            throw new InvalidArgumentException('Procedure has no root layer category, cannot add layers');
+        }
+
+        $gisLayers = $rootCategory->getGisLayers();
+        $basemapGisLayer = null;
+        /** @var GisLayerInterface $gisLayer */
+        foreach ($gisLayers as $gisLayer) {
+            if ('basemap' === $gisLayer->getName()) {
+                $basemapGisLayer = $gisLayer;
+            }
+        }
+        $bboxArray = explode(',', $procedure->getSettings()->getBoundingBox());
+
+        $west = (float)$bboxArray[0];
+        $east = (float)$bboxArray[2];
+        $south = (float)$bboxArray[1];
+        $north = (float)$bboxArray[3];
+        $absWidth = abs($west - $east);
+        $absHeight = abs($south - $north);
+
+        $url = $basemapGisLayer->getUrl();
+        $serviceType = '?SERVICE=WMS';
+        $version = '&VERSION=' . $basemapGisLayer->getLayerVersion();
+        $request = '&REQUEST=GetMap';
+        $format = '&FORMAT=image%2Fpng';
+        $transparent = '&TRANSPARENT=true';
+        $layers = '&LAYERS=' . str_replace(',', '%2C', $basemapGisLayer->getLayers());
+        $width = '&WIDTH=' . '512';
+        $height = '&HEIGHT=' . 512 * ($absHeight / $absWidth);
+        $crs = '&CRS=EPSG%3A3857';
+        $styles = '&STYLES=';
+        $bbox = '&BBOX=' . str_replace(',', '%2C', $procedure->getSettings()->getBoundingBox());
+
+
+        return $url . $serviceType . $version . $request . $format . $transparent . $layers . $width .
+            $height . $crs . $styles . $bbox;
     }
 
     // todo information needs to be provided
