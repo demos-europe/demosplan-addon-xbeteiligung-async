@@ -39,7 +39,7 @@ class ProcedureMessage implements UuidEntityInterface
      *
      * @var ProcedureInterface
      *
-     * @ORM\OneToMany(targetEntity="demosplan\DemosPlanCoreBundle\Entity\Procedure\Procedure", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="demosplan\DemosPlanCoreBundle\Entity\Procedure\Procedure", mappedBy="id", cascade={"persist", "remove"})
      * @ORM\JoinColumn(nullable = false, referencedColumnName="_p_id", unique=true)
      */
     private $procedure;
