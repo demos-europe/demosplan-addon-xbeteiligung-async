@@ -7,9 +7,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAddon;
 
 class Features extends AbstractPermissionMeta
 {
-    public static function feature_create_procedure_from_XBeteiligungMessage(): self
+    public static function feature_get_XBeteiligungMessage_from_procedure(): self
     {
-        return new self('feature_create_procedure_from_XBeteiligungMessage');
+        return new self('feature_get_XBeteiligungMessage_from_procedure');
     }
 
     public function getAddonIdentifier(): ?string

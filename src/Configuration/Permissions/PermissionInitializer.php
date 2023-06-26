@@ -19,7 +19,7 @@ class PermissionInitializer implements PermissionInitializerInterface
     public function configurePermissions(ResolvablePermissionCollectionInterface $permissionCollection): void
     {
         $permissionCollection->configurePermissionInstance(
-            Features::feature_create_procedure_from_XBeteiligungMessage(),
+            Features::feature_get_XBeteiligungMessage_from_procedure(),
             PermissionConditionBuilder::start()
                 ->enableAlways()
         );
