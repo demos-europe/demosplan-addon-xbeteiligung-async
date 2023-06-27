@@ -16,5 +16,5 @@ use DemosEurope\DemosplanAddon\Addon;
 
 class XBeteiligungAddon extends Addon
 {
-    public const ADDON_NAME = 'demos-europe/demosplan-addon-xbeteiligung';
+    public const ADDON_NAME = 'demos-europe/demosplan-addon-xbeteiligung-async';
 }
