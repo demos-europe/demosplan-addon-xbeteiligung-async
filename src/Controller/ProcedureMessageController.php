@@ -21,17 +21,10 @@ use Throwable;
 
 class ProcedureMessageController extends APIController
 {
-
     /**
      * Triggers a fetch for all given ProcedureMessage-urls to retrieve last update from Procedure
      * and saves them as new ProcedureMessage.
      *
-     * @Route(
-     *        path="/api/procedure/{authToken}/{id}/",
-     *        methods={"POST"},
-     *        name="dplan_api_procedure_messages_insert",
-     *        options={"expose": true})
-     *     )
      *
      * **PLEASE NOTE**: We technically want feature_import_ProcedureMessage as access
      * permission here. Due to current time constraints, this is not possible as we
@@ -42,7 +35,7 @@ class ProcedureMessageController extends APIController
      *
      * @return Response
      */
-
+    #[Route(path: '/api/procedure/{authToken}/{id}/', methods: ['GET'], name: 'dplan_api_procedure_messages_insert', options: ['expose' => true])]
     public function importNewImportableProcedureMessage(ProcedureMessageRepository $procedureMessageRepository,string $authToken, string $id)
     {
         if ($authToken !== $this->getParameter('xbeteiligung_api_token')) {
