@@ -46,19 +46,19 @@ class ProcedureMessageController extends APIController
     public function importNewImportableProcedureMessage(ProcedureMessageRepository $procedureMessageRepository,string $authToken, string $id)
     {
         if ($authToken !== $this->getParameter('xbeteiligung_api_token')) {
-            return new Response(null, Response::HTTP_NO_CONTENT, []);
+            return $this->createEmptyResponse();
         }
 
         // we have to check if a corresponding procedure exists and get it if so
         try {
-            $procedureMessageRepository->getProcedureMessage($id);
+            $message = $procedureMessageRepository->getProcedureMessage($id);
         } catch (NoResultException|NonUniqueResultException $e) {
             $this->logger->warning('No unique procedure message found for given ID', [
                 'exception' => $e->getMessage()
             ]);
         }
 
-        return new Response(null, Response::HTTP_NO_CONTENT, []);
+        return $this->createResponse([$message], 200);
     }
 
 }
