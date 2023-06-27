@@ -25,11 +25,10 @@
         "goetas-webservices/xsd-reader": "^0.3.7",
         "jms/serializer": "^3.23",
         "proj4php/proj4php": "^2.0",
-        "symfony/security-core": "^5.4",
-        "doctrine/doctrine-bundle": "2.7.2",
-        "symfony/http-client": "^6.2",
+        "doctrine/doctrine-bundle": "^2",
+        "symfony/http-client": "5.*.*",
         "symfony/http-kernel": "^6.0",
-        "gedmo/doctrine-extensions": "^3.11"
+        "gedmo/doctrine-extensions": "^3.11",
         "ext-libxml": "*"
     },
     "config": {
