@@ -30,6 +30,7 @@ class ProcedureMessageController extends APIController
      *        path="/api/procedure/{authToken}/{id}/",
      *        methods={"POST"},
      *        name="dplan_api_procedure_messages_insert"
+     *        options={"expose": true})
      *     )
      *
      * **PLEASE NOTE**: We technically want feature_import_ProcedureMessage as access
