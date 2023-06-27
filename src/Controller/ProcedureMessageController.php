@@ -27,7 +27,7 @@ class ProcedureMessageController extends APIController
      * and saves them as new ProcedureMessage.
      *
      * @Route(
-     *        path="/api/procedure/{id}/",
+     *        path="/api/procedure/{authToken}/{id}/",
      *        methods={"POST"},
      *        name="dplan_api_procedure_messages_insert"
      *     )
