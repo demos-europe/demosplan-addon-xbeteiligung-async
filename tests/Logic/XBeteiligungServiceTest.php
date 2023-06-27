@@ -7,6 +7,7 @@ use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
@@ -24,6 +25,7 @@ class XBeteiligungServiceTest extends TestCase
 
         $serializer = new SerializerFactory();
         $this->sut = new XBeteiligungService(
+            $this->createMock(GisLayerCategoryRepositoryInterface::class),
             $this->createMock(GlobalConfigInterface::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock(RouterInterface::class),
