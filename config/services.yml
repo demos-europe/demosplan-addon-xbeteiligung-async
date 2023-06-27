@@ -25,4 +25,7 @@ services:
     DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService:
         lazy: true
 
+    DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository:
+        arguments:
+            $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage'
 
