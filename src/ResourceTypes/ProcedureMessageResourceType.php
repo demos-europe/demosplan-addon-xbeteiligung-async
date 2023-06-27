@@ -82,9 +82,6 @@ class ProcedureMessageResourceType extends AddonResourceType implements Updatabl
     public function isAvailable(): bool
     {
         return true;
-//        return $this->permissionEvaluator->isPermissionEnabled(
-//            Features::feature_get_XBeteiligungMessage_from_procedure()
-//        );
     }
 
     /**
