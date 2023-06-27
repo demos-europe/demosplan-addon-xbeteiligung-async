@@ -39,7 +39,7 @@ class ProcedureMessageController extends APIController
      * in the near future. Until then, access is limited with a purpose-generated
      * token stored in `xbeteiligung_api_token`.
      *
-     * @return ProcedureMessage|Response
+     * @return Response
      */
 
     public function importNewImportableProcedureMessage(ProcedureMessageRepository $procedureMessageRepository,string $authToken, string $id)
