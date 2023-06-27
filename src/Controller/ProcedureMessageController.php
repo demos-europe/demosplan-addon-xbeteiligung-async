@@ -21,36 +21,13 @@ use Throwable;
 
 class ProcedureMessageController extends APIController
 {
-    public function __construct(
-        LoggerInterface $apiLogger,
-        FieldsValidator $fieldsValidator,
-        PrefilledTypeProvider $resourceTypeProvider,
-        TranslatorInterface $translator,
-        LoggerInterface $logger,
-        GlobalConfigInterface $globalConfig,
-        MessageBagInterface $messageBag,
-        SchemaPathProcessor $schemaPathProcessor,
-        ProcedureMessageRepository $ProcedureMessageRepository
-    ) {
-        parent::__construct(
-            $apiLogger,
-            $resourceTypeProvider,
-            $fieldsValidator,
-            $translator,
-            $logger,
-            $globalConfig,
-            $messageBag,
-            $schemaPathProcessor
-        );
-        $this->ProcedureMessageRepository = $ProcedureMessageRepository;
-    }
 
     /**
      * Triggers a fetch for all given ProcedureMessage-urls to retrieve last update from Procedure
      * and saves them as new ProcedureMessage.
      *
      * @Route(
-     *        path="/api/plugins/x-beteiligung/{ProcedureMessage}",
+     *        path="/api/procedure/{procedure}/",
      *        methods={"POST"},
      *        name="dplan_api_procedure_messages_insert"
      *     )
@@ -65,7 +42,7 @@ class ProcedureMessageController extends APIController
      * @return ProcedureMessage|Response
      */
 
-    public function importNewImportableProcedureMessage(string $authToken, string $id)
+    public function importNewImportableProcedureMessage(ProcedureMessageRepository $procedureMessageRepository,string $authToken, string $id)
     {
         if ($authToken !== $this->getParameter('xbeteiligung_api_token')) {
             return new Response(null, Response::HTTP_NO_CONTENT, []);
@@ -73,7 +50,7 @@ class ProcedureMessageController extends APIController
 
         // we have to check if a corresponding procedure exists and get it if so
         try {
-            $this->ProcedureMessageRepository->getProcedureMessage($id);
+            $procedureMessageRepository->getProcedureMessage($id);
         } catch (NoResultException|NonUniqueResultException $e) {
             $this->logger->warning('No unique procedure message found for given ID', [
                 'exception' => $e->getMessage()
