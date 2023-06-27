@@ -22,7 +22,7 @@ class RueckweisungTypeType
     /**
      * Identifikationsmerkmale der zurückgewiesenen XBau-Nachricht, die der Autor der Rückweisung zu einem Zeitpunkt in der Vergangenheit empfangen hat.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType $idNachricht
+     * @var \Jms\Handler\GmlAnyTypeHandler $idNachricht
      */
     private $idNachricht = null;
 
@@ -104,7 +104,7 @@ class RueckweisungTypeType
      *
      * Identifikationsmerkmale der zurückgewiesenen XBau-Nachricht, die der Autor der Rückweisung zu einem Zeitpunkt in der Vergangenheit empfangen hat.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType
+     * @return \Jms\Handler\GmlAnyTypeHandler
      */
     public function getIdNachricht()
     {
@@ -116,10 +116,10 @@ class RueckweisungTypeType
      *
      * Identifikationsmerkmale der zurückgewiesenen XBau-Nachricht, die der Autor der Rückweisung zu einem Zeitpunkt in der Vergangenheit empfangen hat.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType $idNachricht
+     * @param \Jms\Handler\GmlAnyTypeHandler $idNachricht
      * @return self
      */
-    public function setIdNachricht(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType $idNachricht)
+    public function setIdNachricht(\Jms\Handler\GmlAnyTypeHandler $idNachricht)
     {
         $this->idNachricht = $idNachricht;
         return $this;

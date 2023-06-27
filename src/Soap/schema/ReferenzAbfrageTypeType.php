@@ -13,7 +13,7 @@ class ReferenzAbfrageTypeType
     /**
      * Maschinell erzeugter Identifier, der die Anfrage (nicht die Anfragenachricht) eindeutig kennzeichnet.
      *
-     * @var string $referenzAbfrage
+     * @var \Jms\Handler\GmlAnyTypeHandler $referenzAbfrage
      */
     private $referenzAbfrage = null;
 
@@ -22,7 +22,7 @@ class ReferenzAbfrageTypeType
      *
      * Maschinell erzeugter Identifier, der die Anfrage (nicht die Anfragenachricht) eindeutig kennzeichnet.
      *
-     * @return string
+     * @return \Jms\Handler\GmlAnyTypeHandler
      */
     public function getReferenzAbfrage()
     {
@@ -34,10 +34,10 @@ class ReferenzAbfrageTypeType
      *
      * Maschinell erzeugter Identifier, der die Anfrage (nicht die Anfragenachricht) eindeutig kennzeichnet.
      *
-     * @param string $referenzAbfrage
+     * @param \Jms\Handler\GmlAnyTypeHandler $referenzAbfrage
      * @return self
      */
-    public function setReferenzAbfrage($referenzAbfrage)
+    public function setReferenzAbfrage(\Jms\Handler\GmlAnyTypeHandler $referenzAbfrage)
     {
         $this->referenzAbfrage = $referenzAbfrage;
         return $this;

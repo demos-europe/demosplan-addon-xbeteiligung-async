@@ -10,7 +10,7 @@ class LinieAnonymousPHPType
     /**
      * Das Element (globales Element gml:CurveType) enthält die GML-Darstellung einer Linie.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeTypeType $linie
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeType $linie
      */
     private $linie = null;
 
@@ -19,7 +19,7 @@ class LinieAnonymousPHPType
      *
      * Das Element (globales Element gml:CurveType) enthält die GML-Darstellung einer Linie.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeType
      */
     public function getLinie()
     {
@@ -31,10 +31,10 @@ class LinieAnonymousPHPType
      *
      * Das Element (globales Element gml:CurveType) enthält die GML-Darstellung einer Linie.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeTypeType $linie
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeType $linie
      * @return self
      */
-    public function setLinie(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeTypeType $linie)
+    public function setLinie(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeType $linie)
     {
         $this->linie = $linie;
         return $this;

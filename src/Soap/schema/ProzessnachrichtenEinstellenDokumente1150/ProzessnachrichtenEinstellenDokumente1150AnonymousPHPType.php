@@ -12,7 +12,7 @@ class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends Nachrich
     /**
      * Hier können Eintragungen vorgenommen werden, falls sich das Dokument einem vorhandenen Vorgang zuordnen lässt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType $bezug
      */
     private $bezug = null;
 
@@ -35,7 +35,7 @@ class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends Nachrich
      *
      * Hier können Eintragungen vorgenommen werden, falls sich das Dokument einem vorhandenen Vorgang zuordnen lässt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType
      */
     public function getBezug()
     {
@@ -47,10 +47,10 @@ class ProzessnachrichtenEinstellenDokumente1150AnonymousPHPType extends Nachrich
      *
      * Hier können Eintragungen vorgenommen werden, falls sich das Dokument einem vorhandenen Vorgang zuordnen lässt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType $bezug
      * @return self
      */
-    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug)
+    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType $bezug)
     {
         $this->bezug = $bezug;
         return $this;

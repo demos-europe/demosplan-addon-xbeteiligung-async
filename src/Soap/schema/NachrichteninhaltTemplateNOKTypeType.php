@@ -5,27 +5,27 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 /**
  * Class representing NachrichteninhaltTemplateNOKTypeType
  *
- *
+ * Vorlage für negative Quittungsnachrichten
  * XSD Type: Nachrichteninhalt.template.NOKType
  */
 class NachrichteninhaltTemplateNOKTypeType
 {
     /**
-     * Vorgangs-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Vorgangs-ID übermittelt, die in der Ursprungsnachricht übermittelt wurde.
      *
      * @var string $vorgangsID
      */
     private $vorgangsID = null;
 
     /**
-     * Plan-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Plan-ID übermittelt, die in der Ursprungsnachricht übermittelt wurde.
      *
      * @var string $planID
      */
     private $planID = null;
 
     /**
-     * Beschreibung der Fehler.
+     * Hier kann die Beschreibung des Fehlers übermittelt werden.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerTypeType[] $fehler
      */
@@ -45,7 +45,7 @@ class NachrichteninhaltTemplateNOKTypeType
     /**
      * Gets as vorgangsID
      *
-     * Vorgangs-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Vorgangs-ID übermittelt, die in der Ursprungsnachricht übermittelt wurde.
      *
      * @return string
      */
@@ -57,7 +57,7 @@ class NachrichteninhaltTemplateNOKTypeType
     /**
      * Sets a new vorgangsID
      *
-     * Vorgangs-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Vorgangs-ID übermittelt, die in der Ursprungsnachricht übermittelt wurde.
      *
      * @param string $vorgangsID
      * @return self
@@ -71,7 +71,7 @@ class NachrichteninhaltTemplateNOKTypeType
     /**
      * Gets as planID
      *
-     * Plan-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Plan-ID übermittelt, die in der Ursprungsnachricht übermittelt wurde.
      *
      * @return string
      */
@@ -83,7 +83,7 @@ class NachrichteninhaltTemplateNOKTypeType
     /**
      * Sets a new planID
      *
-     * Plan-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Plan-ID übermittelt, die in der Ursprungsnachricht übermittelt wurde.
      *
      * @param string $planID
      * @return self
@@ -97,7 +97,7 @@ class NachrichteninhaltTemplateNOKTypeType
     /**
      * Adds as fehler
      *
-     * Beschreibung der Fehler.
+     * Hier kann die Beschreibung des Fehlers übermittelt werden.
      *
      * @return self
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerTypeType $fehler
@@ -111,7 +111,7 @@ class NachrichteninhaltTemplateNOKTypeType
     /**
      * isset fehler
      *
-     * Beschreibung der Fehler.
+     * Hier kann die Beschreibung des Fehlers übermittelt werden.
      *
      * @param int|string $index
      * @return bool
@@ -124,7 +124,7 @@ class NachrichteninhaltTemplateNOKTypeType
     /**
      * unset fehler
      *
-     * Beschreibung der Fehler.
+     * Hier kann die Beschreibung des Fehlers übermittelt werden.
      *
      * @param int|string $index
      * @return void
@@ -137,7 +137,7 @@ class NachrichteninhaltTemplateNOKTypeType
     /**
      * Gets as fehler
      *
-     * Beschreibung der Fehler.
+     * Hier kann die Beschreibung des Fehlers übermittelt werden.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerTypeType[]
      */
@@ -149,7 +149,7 @@ class NachrichteninhaltTemplateNOKTypeType
     /**
      * Sets a new fehler
      *
-     * Beschreibung der Fehler.
+     * Hier kann die Beschreibung des Fehlers übermittelt werden.
      *
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerTypeType[] $fehler
      * @return self

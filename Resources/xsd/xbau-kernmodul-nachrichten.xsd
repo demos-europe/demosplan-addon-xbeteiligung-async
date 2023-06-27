@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/1"
-           xmlns:xink="http://www.osci.de/xinneres/basisnachricht/5"
+           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/2"
            xmlns:xoev-lc="http://xoev.de/latinchars/1_1/datatypes"
-           targetNamespace="http://www.xleitstelle.de/xbau/kernmodul/1/1"
-           version="1.1"
+           targetNamespace="http://www.xleitstelle.de/xbau/kernmodul/1/2"
+           version="1.2"
            elementFormDefault="unqualified"
            attributeFormDefault="unqualified">
    <xs:annotation>
@@ -17,8 +16,8 @@
             <beschreibung>Das XBau-Kernmodul umfasst die von den XBau-Fachmodulen gemeinsam verwendeten Daten- und Nachrichtentypen.</beschreibung>
          </standard>
          <versionStandard>
-            <version>1.1</version>
-            <beschreibung>Das XBau-Kernmodul wurde in dieser Version ergänzt um weitere generische Prozessnachrichten, beispielsweise zum Einstellen von Dokumenten in einen Projektraum des Antragsportals. Oder zur informellen Kommunikation der an einem Vorgang Beteiligten (was in der Praxis bisher als E-Mail-Kommunikation ablief). Die Datentypen zu Metadaten von Bauvorlagen (und sonstigen Anlagen zu XBau-Nachrichten) wurden konsolidiert. Jetzt muss ein Dokument entweder als Anhang (Attachment) mit einer XBau-Nachricht versendet werden oder per Link (z.B. auf eine Ressource in einem DMS) referenziert werden, der in der XBau-Nachricht enthalten ist (keine base64-Kodierung mehr innerhalb der XBau-Fachnachricht). Außerdem sind jetzt auch im XBau-Kernmodul Definitionen für DVDV-Dienste mit den passenden WSDL-Vorlagedateien enthalten.</beschreibung>
+            <version>1.2</version>
+            <beschreibung>Für diese Version wurden die Datentypen zu den am Bauvorhaben Beteiligten ergänzt und differenziert (Vertreter von Personengruppen). Es wurde eine eigene ID für jede Person im Rahmen der Bearbeitung des Vorgangs eingeführt. Es wurden erweiterte Möglichkeiten geschaffen, um Ansprechpartner für Organisationen zu benennen. Für die Anbindung der IT-Verfahren der Fachbehörden an OZG-Portale und Kollaborationsplattformen sind jetzt erweiterte Mechanismen definiert. Außerdem sind jetzt die Datentypen zur Übertragung von Primärdokumenten und zur Darstellung von formatiertem Text mit weiterer Funktionalität ausgestattet. - Alle Änderungen und Erweiterungen sind in der Versionshistorie des Spezifikationsdokuments dokumentiert.</beschreibung>
             <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.3</versionXOEVHandbuch>
             <versionXGenerator>3.0.1</versionXGenerator>
@@ -32,8 +31,6 @@
    <xs:include schemaLocation="xbau-kernmodul-datentypen.xsd"/>
    <xs:import schemaLocation="latinchars.xsd"
               namespace="http://xoev.de/latinchars/1_1/datatypes"/>
-   <xs:import schemaLocation="xinneres-basisnachricht.xsd"
-              namespace="http://www.osci.de/xinneres/basisnachricht/5"/>
    <xs:element name="prozessnachrichten.rueckweisung.G2G.1100">
       <xs:annotation>
          <xs:appinfo>
@@ -45,6 +42,13 @@
          <xs:complexContent>
             <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
+                  <xs:element name="anbindungFachverfahren"
+                              minOccurs="0"
+                              type="xbauk:AnbindungFachverfahrenType">
+                     <xs:annotation>
+                        <xs:documentation>Dieses Element kann verwendet werden, um die behördliche Fachanwendung an das Antragsportal oder die Kollaborationsplattform anzubinden.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
                   <xs:element name="rueckweisungDaten" type="xbauk:RueckweisungType">
                      <xs:annotation>
                         <xs:documentation>Mit diesem Element wird der Fehler einer gegebenenen Nachricht benannt, der zu der vorliegenden Rückweisung geführt hat.</xs:documentation>
@@ -66,7 +70,7 @@
          <xs:complexContent>
             <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:BezugType">
+                  <xs:element name="bezug" type="xbauk:BezugErweitertType">
                      <xs:annotation>
                         <xs:documentation>Dieses Element enthält, um Bezug zu nehmen, die Vorgangsnummer bzw. die Referenz des Antrags (Zeichen des Antragstellers). Außerdem enthält es - mandatorisch - eine Referenzierung auf die Nachricht, durch die der Antrag (modifizierter Antrag) bzw. die Anzeige eingereicht worden ist, deren Empfang bestätigt wird.</xs:documentation>
                      </xs:annotation>
@@ -90,9 +94,9 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xink:Nachricht.G2GType">
+            <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:BezugType">
+                  <xs:element name="bezug" type="xbauk:BezugErweitertType">
                      <xs:annotation>
                         <xs:documentation>Dieses Element enthält zur Information die Vorgangsnummer bzw. das Aktenzeichen, unter der die Behörde das Anliegen bearbeitet. Mit der Angabe der Referenz des Antragstellers wird der Bezug für diesen hergestellt. Eine Referenzierung auf eine Nachricht wird in diese Nachricht nicht eingetragen.</xs:documentation>
                      </xs:annotation>
@@ -113,7 +117,7 @@
          <xs:complexContent>
             <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:BezugType">
+                  <xs:element name="bezug" type="xbauk:BezugErweitertType">
                      <xs:annotation>
                         <xs:documentation>In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Eine Referenzierung auf eine Nachricht wird in diese Nachricht nicht eingetragen.</xs:documentation>
                      </xs:annotation>
@@ -144,7 +148,7 @@
          <xs:complexContent>
             <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:BezugType">
+                  <xs:element name="bezug" type="xbauk:BezugErweitertType">
                      <xs:annotation>
                         <xs:documentation>In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Es ist die Nachricht des Antragstellers zu referenzieren, mittels derer er über seine Absicht informiert hat, den Antrag zurückzunehmen.</xs:documentation>
                      </xs:annotation>
@@ -175,7 +179,7 @@
          <xs:complexContent>
             <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:BezugType">
+                  <xs:element name="bezug" type="xbauk:BezugErweitertType">
                      <xs:annotation>
                         <xs:documentation>Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen.</xs:documentation>
                      </xs:annotation>
@@ -206,7 +210,7 @@
          <xs:complexContent>
             <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:BezugType">
+                  <xs:element name="bezug" type="xbauk:BezugErweitertType">
                      <xs:annotation>
                         <xs:documentation>Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen. Oder Angabe einer Vorgangsnummer für zukünftige Bezugnahme auf diese Nachricht.</xs:documentation>
                      </xs:annotation>
@@ -244,7 +248,7 @@
          <xs:complexContent>
             <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:BezugType">
+                  <xs:element name="bezug" type="xbauk:BezugErweitertType">
                      <xs:annotation>
                         <xs:documentation>Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen.</xs:documentation>
                      </xs:annotation>
@@ -289,7 +293,7 @@
          <xs:complexContent>
             <xs:extension base="xbauk:Nachricht.G2GType">
                <xs:sequence>
-                  <xs:element name="bezug" type="xbauk:BezugType">
+                  <xs:element name="bezug" type="xbauk:BezugErweitertType">
                      <xs:annotation>
                         <xs:documentation>Hier können Eintragungen vorgenommen werden, falls sich das Dokument einem vorhandenen Vorgang zuordnen lässt.</xs:documentation>
                      </xs:annotation>

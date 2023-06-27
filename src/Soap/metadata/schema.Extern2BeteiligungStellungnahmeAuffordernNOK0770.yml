@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Extern2BeteiligungStellungnahmeAuffordernNOK0770:
+    xml_root_name: extern2Beteiligung.StellungnahmeAuffordernNOK.0770
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/1'

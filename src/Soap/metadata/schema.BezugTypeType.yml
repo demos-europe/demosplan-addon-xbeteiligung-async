@@ -7,7 +7,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType:
             accessor:
                 getter: getReferenz
                 setter: setReferenz
-            type: string
+            type: Jms\Handler\GmlAnyTypeHandler
         vorgang:
             expose: true
             access_type: public_method
@@ -23,4 +23,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType:
             accessor:
                 getter: getBezugNachricht
                 setter: setBezugNachricht
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType
+            type: Jms\Handler\GmlAnyTypeHandler

@@ -1,5 +1,13 @@
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AmBauBeteiligtePersonTypeType:
     properties:
+        id:
+            expose: true
+            access_type: public_method
+            serialized_name: id
+            accessor:
+                getter: getId
+                setter: setId
+            type: string
         name:
             expose: true
             access_type: public_method
@@ -27,3 +35,11 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AmBauBeteiligtePersonTypeTyp
                 inline: true
                 entry_name: kommunikation
             type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType>
+        istVertreter:
+            expose: true
+            access_type: public_method
+            serialized_name: istVertreter
+            accessor:
+                getter: getIstVertreter
+                setter: setIstVertreter
+            type: bool

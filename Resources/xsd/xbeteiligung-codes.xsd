@@ -418,6 +418,59 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
+   <xs:complexType name="Code.PlanartPlanfeststellungType">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Planart in der Planfeststellung</nameLang>
+               <nameKurz>Planart Planfeststellung</nameKurz>
+               <nameTechnisch>planartplanfeststellung</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:planartplanfeststellung</kennung>
+               <beschreibung>Art der Planung in der Planfeststellung</beschreibung>
+               <herausgebernameLang>XLeitstelle</herausgebernameLang>
+               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1.0</version>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </code>
+               <beschreibung>
+                  <spaltennameLang>Beschreibung</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </beschreibung>
+            </codelistenspalten>
+            <genutzteCodeSpalte>code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code"
+                           form="unqualified"
+                           type="xbeteiligung:planartplanfeststellung"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xleitstelle:codeliste:planartplanfeststellung"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="1.0"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
    <xs:complexType name="Code.PlanartRaumordnungType">
       <xs:annotation>
          <xs:appinfo>
@@ -441,33 +494,6 @@
                           type="xs:anyURI"
                           use="optional"
                           fixed="urn:xoev-de:xleitstelle:codeliste:planartraumordnung"/>
-            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
-         </xs:restriction>
-      </xs:complexContent>
-   </xs:complexType>
-   <xs:complexType name="Code.PlanartType">
-      <xs:annotation>
-         <xs:appinfo>
-            <codeliste>
-               <nameLang>Planart</nameLang>
-               <nameKurz>Planart</nameKurz>
-               <nameTechnisch>planart</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:planart</kennung>
-               <beschreibung>Art der Planung nach BauGB und ??</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
-            </codeliste>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:complexContent>
-         <xs:restriction base="xoev-code:Code">
-            <xs:sequence>
-               <xs:element name="code" type="xs:token" form="unqualified"/>
-            </xs:sequence>
-            <xs:attribute name="listURI"
-                          type="xs:anyURI"
-                          use="optional"
-                          fixed="urn:xoev-de:xleitstelle:codeliste:planart"/>
             <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
          </xs:restriction>
       </xs:complexContent>
@@ -631,7 +657,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.VerfahrensartType">
+   <xs:complexType name="Code.VerfahrensartKommuneType">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -677,6 +703,112 @@
                           type="xs:anyURI"
                           use="optional"
                           fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensartkommune"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="1.0"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.VerfahrensartPlanfeststellungType">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Verfahrensart Planfeststellung</nameLang>
+               <nameKurz>Verfahrensart Planfeststellung</nameKurz>
+               <nameTechnisch>verfahrensartplanfeststellung</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartplanfeststellung</kennung>
+               <beschreibung>Auswahl der Verfahrensart Planfeststellung</beschreibung>
+               <herausgebernameLang>XLeitstelle</herausgebernameLang>
+               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1.0</version>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </code>
+               <beschreibung>
+                  <spaltennameLang>Beschreibung</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </beschreibung>
+            </codelistenspalten>
+            <genutzteCodeSpalte>code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code"
+                           form="unqualified"
+                           type="xbeteiligung:verfahrensartplanfeststellung"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensartplanfeststellung"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="1.0"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.VerfahrensartRaumordnungType">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Verfahrensart Raumordnung</nameLang>
+               <nameKurz>Verfahrensart Raumordnung</nameKurz>
+               <nameTechnisch>verfahrensartraumordnung</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartraumordnung</kennung>
+               <beschreibung>Auswahl der Verfahrensart Raumordnung</beschreibung>
+               <herausgebernameLang>XLeitstelle</herausgebernameLang>
+               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1.0</version>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </code>
+               <beschreibung>
+                  <spaltennameLang>Beschreibung</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </beschreibung>
+            </codelistenspalten>
+            <genutzteCodeSpalte>code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code"
+                           form="unqualified"
+                           type="xbeteiligung:verfahrensartraumordnung"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensartraumordnung"/>
             <xs:attribute name="listVersionID"
                           type="xs:normalizedString"
                           use="optional"
@@ -1174,7 +1306,7 @@
          <xs:enumeration value="3000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>der Stellungnahme wird nicht gefolgt.</beschreibung>
+                  <beschreibung>Der Stellungnahme wird nicht gefolgt.</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
@@ -1535,6 +1667,50 @@
          </xs:enumeration>
       </xs:restriction>
    </xs:simpleType>
+   <xs:simpleType name="planartplanfeststellung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Planart in der Planfeststellung</nameLang>
+               <nameKurz>Planart Planfeststellung</nameKurz>
+               <nameTechnisch>planartplanfeststellung</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:planartplanfeststellung</kennung>
+               <beschreibung>Art der Planung in der Planfeststellung</beschreibung>
+               <herausgebernameLang>XLeitstelle</herausgebernameLang>
+               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1.0</version>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </code>
+               <beschreibung>
+                  <spaltennameLang>Beschreibung</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </beschreibung>
+            </codelistenspalten>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:restriction base="xs:token">
+         <xs:enumeration value="1000">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>Planfeststellung</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
    <xs:simpleType name="prioritaetderstellungnahme">
       <xs:annotation>
          <xs:appinfo>
@@ -1739,6 +1915,115 @@
                <nameTechnisch>verfahrensartkommune</nameTechnisch>
                <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartkommune</kennung>
                <beschreibung>Auswahl der Verfahrensart Kommune</beschreibung>
+               <herausgebernameLang>XLeitstelle</herausgebernameLang>
+               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1.0</version>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </code>
+               <beschreibung>
+                  <spaltennameLang>Beschreibung</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </beschreibung>
+            </codelistenspalten>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:restriction base="xs:token">
+         <xs:enumeration value="1000">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>normales Verfahren</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="1100">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>vereinfachtes Verfahren, § 13 BauGB</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="1200">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>Bebauungsplan der Innenentwicklung, § 13a BauGB</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="1300">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>Einbeziehung von Außenbereichsflächen in das beschleunigte Verfahren, § 13b BauGB</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="verfahrensartplanfeststellung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Verfahrensart Planfeststellung</nameLang>
+               <nameKurz>Verfahrensart Planfeststellung</nameKurz>
+               <nameTechnisch>verfahrensartplanfeststellung</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartplanfeststellung</kennung>
+               <beschreibung>Auswahl der Verfahrensart Planfeststellung</beschreibung>
+               <herausgebernameLang>XLeitstelle</herausgebernameLang>
+               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1.0</version>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </code>
+               <beschreibung>
+                  <spaltennameLang>Beschreibung</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </beschreibung>
+            </codelistenspalten>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:restriction base="xs:token">
+         <xs:enumeration value="1000">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>Planfeststellung</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="verfahrensartraumordnung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Verfahrensart Raumordnung</nameLang>
+               <nameKurz>Verfahrensart Raumordnung</nameKurz>
+               <nameTechnisch>verfahrensartraumordnung</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartraumordnung</kennung>
+               <beschreibung>Auswahl der Verfahrensart Raumordnung</beschreibung>
                <herausgebernameLang>XLeitstelle</herausgebernameLang>
                <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
             </codeliste>

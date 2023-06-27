@@ -1,0 +1,62 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\EnvelopeTypeType:
+    properties:
+        srsName:
+            expose: true
+            access_type: public_method
+            serialized_name: srsName
+            accessor:
+                getter: getSrsName
+                setter: setSrsName
+            xml_attribute: true
+            type: string
+        srsDimension:
+            expose: true
+            access_type: public_method
+            serialized_name: srsDimension
+            accessor:
+                getter: getSrsDimension
+                setter: setSrsDimension
+            xml_attribute: true
+            type: int
+        axisLabels:
+            expose: true
+            access_type: public_method
+            serialized_name: axisLabels
+            accessor:
+                getter: getAxisLabels
+                setter: setAxisLabels
+            xml_attribute: true
+            type: GoetasWebservices\Xsd\XsdToPhp\Jms\SimpleListOf<string>
+        uomLabels:
+            expose: true
+            access_type: public_method
+            serialized_name: uomLabels
+            accessor:
+                getter: getUomLabels
+                setter: setUomLabels
+            xml_attribute: true
+            type: GoetasWebservices\Xsd\XsdToPhp\Jms\SimpleListOf<string>
+        lowerCorner:
+            expose: true
+            access_type: public_method
+            serialized_name: lowerCorner
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getLowerCorner
+                setter: setLowerCorner
+            type: GoetasWebservices\Xsd\XsdToPhp\Jms\SimpleListOf<float>
+            xml_list:
+                namespace: 'http://www.opengis.net/gml/3.2'
+        upperCorner:
+            expose: true
+            access_type: public_method
+            serialized_name: upperCorner
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getUpperCorner
+                setter: setUpperCorner
+            type: GoetasWebservices\Xsd\XsdToPhp\Jms\SimpleListOf<float>
+            xml_list:
+                namespace: 'http://www.opengis.net/gml/3.2'

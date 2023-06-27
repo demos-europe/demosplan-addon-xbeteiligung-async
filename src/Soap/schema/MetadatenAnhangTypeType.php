@@ -11,6 +11,20 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 class MetadatenAnhangTypeType
 {
     /**
+     * Größe des Inhaltes der Datei in Bytes. Dieses Attribut kann verwendet werden, um die Dateigröße des Anhangs anzugeben. So kann bei der Übertragung überprüft werden, ob die Anlage komplett geladen wurde, hilfreich z.B. bei sehr großen Dateien.
+     *
+     * @var int $filesize
+     */
+    private $filesize = null;
+
+    /**
+     * Hashwert der Datei im Anhang. Anhand dieses Wertes kann bei der Übertragung die Integrität der Datei abgesichert werden. Der binäre Hashwert ist in Textform einzutragen als eine Sequenz hexadezimaler Werte (hexadecimal digits).
+     *
+     * @var string $hashValue
+     */
+    private $hashValue = null;
+
+    /**
      * Die innerhalb des Transportcontainers eindeutige Kennung des Dokuments.
      *
      * @var string $dokumentid
@@ -23,6 +37,58 @@ class MetadatenAnhangTypeType
      * @var string $dateiname
      */
     private $dateiname = null;
+
+    /**
+     * Gets as filesize
+     *
+     * Größe des Inhaltes der Datei in Bytes. Dieses Attribut kann verwendet werden, um die Dateigröße des Anhangs anzugeben. So kann bei der Übertragung überprüft werden, ob die Anlage komplett geladen wurde, hilfreich z.B. bei sehr großen Dateien.
+     *
+     * @return int
+     */
+    public function getFilesize()
+    {
+        return $this->filesize;
+    }
+
+    /**
+     * Sets a new filesize
+     *
+     * Größe des Inhaltes der Datei in Bytes. Dieses Attribut kann verwendet werden, um die Dateigröße des Anhangs anzugeben. So kann bei der Übertragung überprüft werden, ob die Anlage komplett geladen wurde, hilfreich z.B. bei sehr großen Dateien.
+     *
+     * @param int $filesize
+     * @return self
+     */
+    public function setFilesize($filesize)
+    {
+        $this->filesize = $filesize;
+        return $this;
+    }
+
+    /**
+     * Gets as hashValue
+     *
+     * Hashwert der Datei im Anhang. Anhand dieses Wertes kann bei der Übertragung die Integrität der Datei abgesichert werden. Der binäre Hashwert ist in Textform einzutragen als eine Sequenz hexadezimaler Werte (hexadecimal digits).
+     *
+     * @return string
+     */
+    public function getHashValue()
+    {
+        return $this->hashValue;
+    }
+
+    /**
+     * Sets a new hashValue
+     *
+     * Hashwert der Datei im Anhang. Anhand dieses Wertes kann bei der Übertragung die Integrität der Datei abgesichert werden. Der binäre Hashwert ist in Textform einzutragen als eine Sequenz hexadezimaler Werte (hexadecimal digits).
+     *
+     * @param string $hashValue
+     * @return self
+     */
+    public function setHashValue($hashValue)
+    {
+        $this->hashValue = $hashValue;
+        return $this;
+    }
 
     /**
      * Gets as dokumentid

@@ -7,4 +7,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ReferenzAbfrageTypeType:
             accessor:
                 getter: getReferenzAbfrage
                 setter: setReferenzAbfrage
-            type: string
+            type: Jms\Handler\GmlAnyTypeHandler

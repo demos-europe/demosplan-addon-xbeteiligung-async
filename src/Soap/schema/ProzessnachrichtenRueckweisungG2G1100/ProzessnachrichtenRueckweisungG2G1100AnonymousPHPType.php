@@ -10,11 +10,44 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 class ProzessnachrichtenRueckweisungG2G1100AnonymousPHPType extends NachrichtG2GTypeType
 {
     /**
+     * Dieses Element kann verwendet werden, um die behördliche Fachanwendung an das Antragsportal oder die Kollaborationsplattform anzubinden.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnbindungFachverfahrenTypeType $anbindungFachverfahren
+     */
+    private $anbindungFachverfahren = null;
+
+    /**
      * Mit diesem Element wird der Fehler einer gegebenenen Nachricht benannt, der zu der vorliegenden Rückweisung geführt hat.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RueckweisungTypeType $rueckweisungDaten
      */
     private $rueckweisungDaten = null;
+
+    /**
+     * Gets as anbindungFachverfahren
+     *
+     * Dieses Element kann verwendet werden, um die behördliche Fachanwendung an das Antragsportal oder die Kollaborationsplattform anzubinden.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnbindungFachverfahrenTypeType
+     */
+    public function getAnbindungFachverfahren()
+    {
+        return $this->anbindungFachverfahren;
+    }
+
+    /**
+     * Sets a new anbindungFachverfahren
+     *
+     * Dieses Element kann verwendet werden, um die behördliche Fachanwendung an das Antragsportal oder die Kollaborationsplattform anzubinden.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnbindungFachverfahrenTypeType $anbindungFachverfahren
+     * @return self
+     */
+    public function setAnbindungFachverfahren(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnbindungFachverfahrenTypeType $anbindungFachverfahren = null)
+    {
+        $this->anbindungFachverfahren = $anbindungFachverfahren;
+        return $this;
+    }
 
     /**
      * Gets as rueckweisungDaten

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/1"
-           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/1"
+           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/2"
            xmlns:xink="http://www.osci.de/xinneres/basisnachricht/5"
            targetNamespace="https://www.xleitstelle.de/xbeteiligung/1"
            version="1.0"
@@ -29,9 +29,32 @@
    </xs:annotation>
    <xs:include schemaLocation="xbeteiligung-baukasten.xsd"/>
    <xs:import schemaLocation="xbau-kernmodul-datentypen.xsd"
-              namespace="http://www.xleitstelle.de/xbau/kernmodul/1/1"/>
+              namespace="http://www.xleitstelle.de/xbau/kernmodul/1/2"/>
    <xs:import schemaLocation="xinneres-basisnachricht.xsd"
               namespace="http://www.osci.de/xinneres/basisnachricht/5"/>
+   <xs:element name="beteiligung2Planung.BeteiligungPlanfeststellungNeuOK.0211">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese negative Quittierungsnachricht wird nach einer erfolglosen Initiierung des Beteiligungsverfahrens von der Beteiligungskomponente an die Planungskomponente gesendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:complexContent>
+                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.OKType"/>
+                        </xs:complexContent>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
    <xs:element name="beteiligung2Planung.BeteiligungPlanfeststellungAktualisierenOK.0212">
       <xs:annotation>
          <xs:appinfo>
@@ -183,6 +206,29 @@
                                  </xs:element>
                               </xs:sequence>
                            </xs:extension>
+                        </xs:complexContent>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="beteiligung2Planung.BeteiligungRaumordnungNeuOK.0311">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese negative Quittierungsnachricht wird nach einer erfolglosen Initiierung des Beteiligungsverfahrens von der Beteiligungskomponente an die Planungskomponente gesendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:complexContent>
+                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.OKType"/>
                         </xs:complexContent>
                      </xs:complexType>
                   </xs:element>
@@ -378,7 +424,7 @@
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
          </xs:appinfo>
-         <xs:documentation>Quittierungsnachricht einer erfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente.</xs:documentation>
+         <xs:documentation>Quittierungsnachricht einer erfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente im Rahmen der kommunalen Bauleitplanung.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
@@ -475,7 +521,7 @@
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
          </xs:appinfo>
-         <xs:documentation>Negative Quittierungsnachricht einer misserfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente.</xs:documentation>
+         <xs:documentation>Negative Quittierungsnachricht einer misserfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente im Rahmen der kommunalen Bauleitplanung.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
@@ -502,68 +548,6 @@
       </xs:complexType>
    </xs:element>
    <xs:element name="beteiligung2Planung.BeteiligungKommuneLoeschenNOK.0429">
-      <xs:annotation>
-         <xs:appinfo>
-            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
-         </xs:appinfo>
-         <xs:documentation>Diese Quittierungsnachricht wird nach einem fehlgeschlagenem Löschversuch versendet.</xs:documentation>
-      </xs:annotation>
-      <xs:complexType>
-         <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
-               <xs:sequence>
-                  <xs:element name="nachrichteninhalt">
-                     <xs:complexType>
-                        <xs:complexContent>
-                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.NOKType">
-                              <xs:sequence>
-                                 <xs:element name="beteiligungsID" type="xink:UUIDType">
-                                    <xs:annotation>
-                                       <xs:documentation>Beteiligungs-ID, die in der Nachricht 409 übermittelt wurde.</xs:documentation>
-                                    </xs:annotation>
-                                 </xs:element>
-                              </xs:sequence>
-                           </xs:extension>
-                        </xs:complexContent>
-                     </xs:complexType>
-                  </xs:element>
-               </xs:sequence>
-            </xs:extension>
-         </xs:complexContent>
-      </xs:complexType>
-   </xs:element>
-   <xs:element name="beteiligung2Planung.BeteiligungKommuneLoeschenNOK.0430">
-      <xs:annotation>
-         <xs:appinfo>
-            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
-         </xs:appinfo>
-         <xs:documentation>Diese Quittierungsnachricht wird nach einem fehlgeschlagenem Löschversuch versendet.</xs:documentation>
-      </xs:annotation>
-      <xs:complexType>
-         <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
-               <xs:sequence>
-                  <xs:element name="nachrichteninhalt">
-                     <xs:complexType>
-                        <xs:complexContent>
-                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.NOKType">
-                              <xs:sequence>
-                                 <xs:element name="beteiligungsID" type="xink:UUIDType">
-                                    <xs:annotation>
-                                       <xs:documentation>Beteiligungs-ID, die in der Nachricht 409 übermittelt wurde.</xs:documentation>
-                                    </xs:annotation>
-                                 </xs:element>
-                              </xs:sequence>
-                           </xs:extension>
-                        </xs:complexContent>
-                     </xs:complexType>
-                  </xs:element>
-               </xs:sequence>
-            </xs:extension>
-         </xs:complexContent>
-      </xs:complexType>
-   </xs:element>
-   <xs:element name="beteiligung2Planung.BeteiligungKommuneLoeschenNOK.0431">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -687,6 +671,52 @@
                               </xs:annotation>
                            </xs:element>
                         </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="beteiligung2Planung.TerminBestaetigenOK.1011">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Quittierungsnachricht einer erfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:complexContent>
+                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.OKType"/>
+                        </xs:complexContent>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="beteiligung2Planung.TerminBestaetigenNOK.1021">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Negative Quittierungsnachricht einer misserfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:complexContent>
+                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.NOKType"/>
+                        </xs:complexContent>
                      </xs:complexType>
                   </xs:element>
                </xs:sequence>

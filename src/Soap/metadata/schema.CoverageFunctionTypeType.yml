@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CoverageFunctionTypeType:
+    properties:
+        coverageMappingRule:
+            expose: true
+            access_type: public_method
+            serialized_name: CoverageMappingRule
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getCoverageMappingRule
+                setter: setCoverageMappingRule
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CoverageMappingRule
+        gridFunction:
+            expose: true
+            access_type: public_method
+            serialized_name: GridFunction
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getGridFunction
+                setter: setGridFunction
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GridFunction

@@ -7,4 +7,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenAktenzeich
             accessor:
                 getter: getBezug
                 setter: setBezug
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType

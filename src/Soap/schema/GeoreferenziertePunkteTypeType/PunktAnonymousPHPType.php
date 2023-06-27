@@ -10,7 +10,7 @@ class PunktAnonymousPHPType
     /**
      * Das Element (globales Element gml:PointType) enthält die GML-Darstellung einer Grundfläche .
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PointTypeTypeType $punkt
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PointTypeType $punkt
      */
     private $punkt = null;
 
@@ -19,7 +19,7 @@ class PunktAnonymousPHPType
      *
      * Das Element (globales Element gml:PointType) enthält die GML-Darstellung einer Grundfläche .
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PointTypeTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PointTypeType
      */
     public function getPunkt()
     {
@@ -31,10 +31,10 @@ class PunktAnonymousPHPType
      *
      * Das Element (globales Element gml:PointType) enthält die GML-Darstellung einer Grundfläche .
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PointTypeTypeType $punkt
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PointTypeType $punkt
      * @return self
      */
-    public function setPunkt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PointTypeTypeType $punkt)
+    public function setPunkt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PointTypeType $punkt)
     {
         $this->punkt = $punkt;
         return $this;

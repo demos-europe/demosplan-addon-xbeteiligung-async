@@ -7,7 +7,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBetei
 /**
  * Class representing Beteiligung2PlanungBeteiligungKommuneAktualisierenOK0412
  *
- * Quittierungsnachricht einer erfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente.
+ * Quittierungsnachricht einer erfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente im Rahmen der kommunalen Bauleitplanung.
  */
 class Beteiligung2PlanungBeteiligungKommuneAktualisierenOK0412 extends Beteiligung2PlanungBeteiligungKommuneAktualisierenOK0412AnonymousPHPType
 {

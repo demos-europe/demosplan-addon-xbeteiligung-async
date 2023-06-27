@@ -13,7 +13,7 @@ class ReferenzAntragsserviceTypeType
     /**
      * Initial eingetragener, i.d.R. maschinell erzeugter Identifier, der für den Antragsvorgang steht (nicht für die Antragsnachricht). Dieser Identifier geht mit den Antragsnachrichten der Bauaufsichtsbehörde (bzw. Aufsichtsbehörde für den Breitbandausbau) zu und schafft dieser die Möglichkeit, in ihren Reaktionsnachrichten darauf zu referenzieren.
      *
-     * @var string $referenzAntragsservice
+     * @var \Jms\Handler\GmlAnyTypeHandler $referenzAntragsservice
      */
     private $referenzAntragsservice = null;
 
@@ -22,7 +22,7 @@ class ReferenzAntragsserviceTypeType
      *
      * Initial eingetragener, i.d.R. maschinell erzeugter Identifier, der für den Antragsvorgang steht (nicht für die Antragsnachricht). Dieser Identifier geht mit den Antragsnachrichten der Bauaufsichtsbehörde (bzw. Aufsichtsbehörde für den Breitbandausbau) zu und schafft dieser die Möglichkeit, in ihren Reaktionsnachrichten darauf zu referenzieren.
      *
-     * @return string
+     * @return \Jms\Handler\GmlAnyTypeHandler
      */
     public function getReferenzAntragsservice()
     {
@@ -34,10 +34,10 @@ class ReferenzAntragsserviceTypeType
      *
      * Initial eingetragener, i.d.R. maschinell erzeugter Identifier, der für den Antragsvorgang steht (nicht für die Antragsnachricht). Dieser Identifier geht mit den Antragsnachrichten der Bauaufsichtsbehörde (bzw. Aufsichtsbehörde für den Breitbandausbau) zu und schafft dieser die Möglichkeit, in ihren Reaktionsnachrichten darauf zu referenzieren.
      *
-     * @param string $referenzAntragsservice
+     * @param \Jms\Handler\GmlAnyTypeHandler $referenzAntragsservice
      * @return self
      */
-    public function setReferenzAntragsservice($referenzAntragsservice)
+    public function setReferenzAntragsservice(\Jms\Handler\GmlAnyTypeHandler $referenzAntragsservice)
     {
         $this->referenzAntragsservice = $referenzAntragsservice;
         return $this;

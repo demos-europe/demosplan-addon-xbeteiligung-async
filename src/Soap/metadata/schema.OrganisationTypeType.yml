@@ -1,5 +1,13 @@
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType:
     properties:
+        id:
+            expose: true
+            access_type: public_method
+            serialized_name: id
+            accessor:
+                getter: getId
+                setter: setId
+            type: string
         name:
             expose: true
             access_type: public_method
@@ -48,7 +56,10 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType:
             accessor:
                 getter: getAnsprechpartner
                 setter: setAnsprechpartner
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameNatuerlichePersonTypeType
+            xml_list:
+                inline: true
+                entry_name: ansprechpartner
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType\AnsprechpartnerAnonymousPHPType>
         registereintrag:
             expose: true
             access_type: public_method

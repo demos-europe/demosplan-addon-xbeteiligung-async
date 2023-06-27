@@ -18,7 +18,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RueckweisungTypeType:
             accessor:
                 getter: getIdNachricht
                 setter: setIdNachricht
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType
+            type: Jms\Handler\GmlAnyTypeHandler
         nachricht:
             expose: true
             access_type: public_method

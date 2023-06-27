@@ -7,4 +7,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteTypeTy
             accessor:
                 getter: getPunkt
                 setter: setPunkt
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PointTypeTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PointTypeType

@@ -5,27 +5,27 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 /**
  * Class representing NachrichteninhaltTemplateOKTypeType
  *
- *
+ * Vorlage für positive Quittungsnachrichten
  * XSD Type: Nachrichteninhalt.template.OKType
  */
 class NachrichteninhaltTemplateOKTypeType
 {
     /**
-     * Vorgangs-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird Vorgangs-ID übermittelt, die in der Ursprungsnachricht übermittelt wurde.
      *
      * @var string $vorgangsID
      */
     private $vorgangsID = null;
 
     /**
-     * Plan-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Plan-ID übermittelt, auf die sich die Ursprungsnachricht bezieht.
      *
      * @var string $planID
      */
     private $planID = null;
 
     /**
-     * Beteiligungs-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Beteiligungs-ID übermittelt, auf die sich die Ursprungsnachricht bezieht.
      *
      * @var string $beteiligungsID
      */
@@ -34,7 +34,7 @@ class NachrichteninhaltTemplateOKTypeType
     /**
      * Gets as vorgangsID
      *
-     * Vorgangs-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird Vorgangs-ID übermittelt, die in der Ursprungsnachricht übermittelt wurde.
      *
      * @return string
      */
@@ -46,7 +46,7 @@ class NachrichteninhaltTemplateOKTypeType
     /**
      * Sets a new vorgangsID
      *
-     * Vorgangs-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird Vorgangs-ID übermittelt, die in der Ursprungsnachricht übermittelt wurde.
      *
      * @param string $vorgangsID
      * @return self
@@ -60,7 +60,7 @@ class NachrichteninhaltTemplateOKTypeType
     /**
      * Gets as planID
      *
-     * Plan-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Plan-ID übermittelt, auf die sich die Ursprungsnachricht bezieht.
      *
      * @return string
      */
@@ -72,7 +72,7 @@ class NachrichteninhaltTemplateOKTypeType
     /**
      * Sets a new planID
      *
-     * Plan-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Plan-ID übermittelt, auf die sich die Ursprungsnachricht bezieht.
      *
      * @param string $planID
      * @return self
@@ -86,7 +86,7 @@ class NachrichteninhaltTemplateOKTypeType
     /**
      * Gets as beteiligungsID
      *
-     * Beteiligungs-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Beteiligungs-ID übermittelt, auf die sich die Ursprungsnachricht bezieht.
      *
      * @return string
      */
@@ -98,7 +98,7 @@ class NachrichteninhaltTemplateOKTypeType
     /**
      * Sets a new beteiligungsID
      *
-     * Beteiligungs-ID, die in der Nachricht 401 übermittelt wurde.
+     * Hier wird die Beteiligungs-ID übermittelt, auf die sich die Ursprungsnachricht bezieht.
      *
      * @param string $beteiligungsID
      * @return self

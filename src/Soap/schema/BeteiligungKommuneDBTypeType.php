@@ -35,12 +35,12 @@ class BeteiligungKommuneDBTypeType
     private $arbeitstitel = null;
 
     /**
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartTypeType $planart
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneTypeType $planart
      */
     private $planart = null;
 
     /**
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType $verfahrensart
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType $verfahrensart
      */
     private $verfahrensart = null;
 
@@ -209,7 +209,7 @@ class BeteiligungKommuneDBTypeType
     /**
      * Gets as planart
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneTypeType
      */
     public function getPlanart()
     {
@@ -219,10 +219,10 @@ class BeteiligungKommuneDBTypeType
     /**
      * Sets a new planart
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartTypeType $planart
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneTypeType $planart
      * @return self
      */
-    public function setPlanart(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartTypeType $planart = null)
+    public function setPlanart(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneTypeType $planart = null)
     {
         $this->planart = $planart;
         return $this;
@@ -231,7 +231,7 @@ class BeteiligungKommuneDBTypeType
     /**
      * Gets as verfahrensart
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType
      */
     public function getVerfahrensart()
     {
@@ -241,10 +241,10 @@ class BeteiligungKommuneDBTypeType
     /**
      * Sets a new verfahrensart
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType $verfahrensart
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType $verfahrensart
      * @return self
      */
-    public function setVerfahrensart(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType $verfahrensart = null)
+    public function setVerfahrensart(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType $verfahrensart = null)
     {
         $this->verfahrensart = $verfahrensart;
         return $this;
