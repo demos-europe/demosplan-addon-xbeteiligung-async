@@ -29,7 +29,7 @@ class ProcedureMessageController extends APIController
      * @Route(
      *        path="/api/procedure/{authToken}/{id}/",
      *        methods={"POST"},
-     *        name="dplan_api_procedure_messages_insert"
+     *        name="dplan_api_procedure_messages_insert",
      *        options={"expose": true})
      *     )
      *
