@@ -11,9 +11,9 @@ class Features extends AbstractPermissionMeta
     /**
      * needed to retrieve procedure-messages generated when updating creating or deleting a procedure
      */
-    public static function feature_read_procedureMessage(): self
+    public static function feature_read_procedure_message(): self
     {
-        return new self('feature_read_procedureMessage');
+        return new self('feature_read_procedure_message');
     }
 
     /**
