@@ -40,7 +40,7 @@ class BeteiligungRaumordnungTypeType
     private $planart = null;
 
     /**
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType $verfahrensart
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartRaumordnungTypeType $verfahrensart
      */
     private $verfahrensart = null;
 
@@ -231,7 +231,7 @@ class BeteiligungRaumordnungTypeType
     /**
      * Gets as verfahrensart
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartRaumordnungTypeType
      */
     public function getVerfahrensart()
     {
@@ -241,10 +241,10 @@ class BeteiligungRaumordnungTypeType
     /**
      * Sets a new verfahrensart
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType $verfahrensart
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartRaumordnungTypeType $verfahrensart
      * @return self
      */
-    public function setVerfahrensart(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType $verfahrensart = null)
+    public function setVerfahrensart(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartRaumordnungTypeType $verfahrensart = null)
     {
         $this->verfahrensart = $verfahrensart;
         return $this;

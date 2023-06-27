@@ -6,8 +6,10 @@
            attributeFormDefault="unqualified">
    <xs:include schemaLocation="xbeteiligung-baukasten.xsd"/>
    <xs:include schemaLocation="xbeteiligung-beteiligung2db.xsd"/>
+   <xs:include schemaLocation="xbeteiligung-beteiligung2extern.xsd"/>
    <xs:include schemaLocation="xbeteiligung-beteiligung2planung.xsd"/>
    <xs:include schemaLocation="xbeteiligung-codes.xsd"/>
    <xs:include schemaLocation="xbeteiligung-db2beteiligung.xsd"/>
+   <xs:include schemaLocation="xbeteiligung-extern2beteiligung.xsd"/>
    <xs:include schemaLocation="xbeteiligung-planung2beteiligung.xsd"/>
 </xs:schema>

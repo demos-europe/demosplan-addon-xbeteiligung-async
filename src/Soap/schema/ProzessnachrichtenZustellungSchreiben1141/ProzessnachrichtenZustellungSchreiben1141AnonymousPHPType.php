@@ -12,7 +12,7 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
     /**
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen. Oder Angabe einer Vorgangsnummer für zukünftige Bezugnahme auf diese Nachricht.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType $bezug
      */
     private $bezug = null;
 
@@ -42,7 +42,7 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
      *
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen. Oder Angabe einer Vorgangsnummer für zukünftige Bezugnahme auf diese Nachricht.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType
      */
     public function getBezug()
     {
@@ -54,10 +54,10 @@ class ProzessnachrichtenZustellungSchreiben1141AnonymousPHPType extends Nachrich
      *
      * Bezug auf Vorgang und Nachricht, auf die sich die Inhalte der vorliegenden Nachricht beziehen. Oder Angabe einer Vorgangsnummer für zukünftige Bezugnahme auf diese Nachricht.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType $bezug
      * @return self
      */
-    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug)
+    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType $bezug)
     {
         $this->bezug = $bezug;
         return $this;

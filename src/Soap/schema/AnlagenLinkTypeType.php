@@ -5,7 +5,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 /**
  * Class representing AnlagenLinkTypeType
  *
- * Dieser Typ dient dazu, die Metadaten zu Verfahrensunterlagen aufzunehmen, die einer XBeteiligungs-Kommunikation als Anlagen beigefügt sind.
+ * Dieser Typ dient dazu, die Metadaten zu Verfahrensunterlagen aufzunehmen, die einer XBeteiligungs-Kommunikation als Anlagen beigefügt sind. Die Übermittlung von Dokumenten ist nicht möglich.
  * XSD Type: AnlagenLinkType
  */
 class AnlagenLinkTypeType

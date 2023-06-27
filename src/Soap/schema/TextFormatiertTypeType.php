@@ -5,29 +5,29 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 /**
  * Class representing TextFormatiertTypeType
  *
- * Diese Typ nimmt Absätze eines Textes auf, so dass das Empfängersystem diesen Text formatierungstreu anzeigen und medienbruchfrei weiterverarbeiten kannn.
+ * Dieser Typ nimmt Absätze eines Textes in einer Form auf, so dass das Empfängersystem diesen Text formatierungstreu anzeigen und medienbruchfrei weiterverarbeiten kann.
  * XSD Type: TextFormatiertType
  */
 class TextFormatiertTypeType
 {
     /**
-     * Dieses Element steht für einen Textabschnitt, der ggf. einschließlich Formatierung und Abbildungen, auf Basis von HTML-5-Markup eingetragen ist.
+     * In dieses Element ist ein Textabschnitt in Form von HTML-5 Markup einzutragen. Das schließt die Möglichkeit von Formatierung und Integration von Abbildungen ein. Folgende Regeln sind beim Eintrag von HTML-5-Text zu beachten: Das Textfeld enthält nur den Inhalt des BODY-Elements (nicht dieses selber), also nur "Flow Content" im Sinne der HTML5-Spezifikation (https://html.spec.whatwg.org/multipage/dom.html#flow-content). Es ist zu beachten, dass XBau die Menge des erlaubten HTML5-Markups grundlegend einschränkt (vgl. ) und dass diese Einschränkungen Vorrang haben. Als Encoding wird stets "UTF-8" verwendet. Externe CSS-Referenzen dürfen nicht verwendet werden, sondern lediglich HTML Inline Styles.
      *
      * @var string $text
      */
     private $text = null;
 
     /**
-     * Dieses Element gestattet es, den Textabschnitt zusätzlich im XML-basierten Format ODF oder OOXML abzubilden.
+     * Unterhalb dieses Elements kann derselbe Inhalt wie im Element text in einem alternativen technischen Format angeboten werden.
      *
-     * @var string $textOffice
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertTypeType\TextOfficeAnonymousPHPType $textOffice
      */
     private $textOffice = null;
 
     /**
      * Gets as text
      *
-     * Dieses Element steht für einen Textabschnitt, der ggf. einschließlich Formatierung und Abbildungen, auf Basis von HTML-5-Markup eingetragen ist.
+     * In dieses Element ist ein Textabschnitt in Form von HTML-5 Markup einzutragen. Das schließt die Möglichkeit von Formatierung und Integration von Abbildungen ein. Folgende Regeln sind beim Eintrag von HTML-5-Text zu beachten: Das Textfeld enthält nur den Inhalt des BODY-Elements (nicht dieses selber), also nur "Flow Content" im Sinne der HTML5-Spezifikation (https://html.spec.whatwg.org/multipage/dom.html#flow-content). Es ist zu beachten, dass XBau die Menge des erlaubten HTML5-Markups grundlegend einschränkt (vgl. ) und dass diese Einschränkungen Vorrang haben. Als Encoding wird stets "UTF-8" verwendet. Externe CSS-Referenzen dürfen nicht verwendet werden, sondern lediglich HTML Inline Styles.
      *
      * @return string
      */
@@ -39,7 +39,7 @@ class TextFormatiertTypeType
     /**
      * Sets a new text
      *
-     * Dieses Element steht für einen Textabschnitt, der ggf. einschließlich Formatierung und Abbildungen, auf Basis von HTML-5-Markup eingetragen ist.
+     * In dieses Element ist ein Textabschnitt in Form von HTML-5 Markup einzutragen. Das schließt die Möglichkeit von Formatierung und Integration von Abbildungen ein. Folgende Regeln sind beim Eintrag von HTML-5-Text zu beachten: Das Textfeld enthält nur den Inhalt des BODY-Elements (nicht dieses selber), also nur "Flow Content" im Sinne der HTML5-Spezifikation (https://html.spec.whatwg.org/multipage/dom.html#flow-content). Es ist zu beachten, dass XBau die Menge des erlaubten HTML5-Markups grundlegend einschränkt (vgl. ) und dass diese Einschränkungen Vorrang haben. Als Encoding wird stets "UTF-8" verwendet. Externe CSS-Referenzen dürfen nicht verwendet werden, sondern lediglich HTML Inline Styles.
      *
      * @param string $text
      * @return self
@@ -53,9 +53,9 @@ class TextFormatiertTypeType
     /**
      * Gets as textOffice
      *
-     * Dieses Element gestattet es, den Textabschnitt zusätzlich im XML-basierten Format ODF oder OOXML abzubilden.
+     * Unterhalb dieses Elements kann derselbe Inhalt wie im Element text in einem alternativen technischen Format angeboten werden.
      *
-     * @return string
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertTypeType\TextOfficeAnonymousPHPType
      */
     public function getTextOffice()
     {
@@ -65,12 +65,12 @@ class TextFormatiertTypeType
     /**
      * Sets a new textOffice
      *
-     * Dieses Element gestattet es, den Textabschnitt zusätzlich im XML-basierten Format ODF oder OOXML abzubilden.
+     * Unterhalb dieses Elements kann derselbe Inhalt wie im Element text in einem alternativen technischen Format angeboten werden.
      *
-     * @param string $textOffice
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertTypeType\TextOfficeAnonymousPHPType $textOffice
      * @return self
      */
-    public function setTextOffice($textOffice)
+    public function setTextOffice(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\TextFormatiertTypeType\TextOfficeAnonymousPHPType $textOffice = null)
     {
         $this->textOffice = $textOffice;
         return $this;

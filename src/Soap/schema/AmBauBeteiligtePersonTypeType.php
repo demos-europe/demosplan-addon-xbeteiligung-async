@@ -11,6 +11,13 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 class AmBauBeteiligtePersonTypeType
 {
     /**
+     * Dieses Element kann genutzt werden, um die Person zu identifizieren. Es handelt es sich um eine technische ID, die es erlaubt einen Datensatz für Änderungen deskriptiver Eigenschaften herauszugreifen. Dem Element ist der W3C-Datentyp ID (https://www.w3.org/TR/xmlschema11-2/#ID) zugeordnet, ein String-Derivat. Scope des hiermit eingeführten Identifikationsmechanismus: Der Scope ist gemäß der hier festgelegten Semantik nur der gegebene Vorgang. Dies bedeutet beispielsweise im Rahmen eines Antragsvorgangs: Der Antrag wird initial vom Online-Service ("Baugenehmigung Online") an die zuständige Bauaufsichtsbehörde übermittelt. In der XBau-Nachrichteninstanz werden die beteiligten Personen und Firmen identifiziert mittels vom Online-Service vergebener Identifier. Ab dem Zeitpunkt werden diese Identifikationsmittel im Nachrichtenaustausch im Rahmen des gegebenen Vorgangs in beide Richtungen weiterverwendet, um in der Kommunikation intersubjektiv nachvollziehbar zu referenzieren. Ob über diesen Scope hinausgehend identifiziert werden soll, ist Angelegenheit des Umsetzungsprojekts, XBau macht dazu keine Aussage.
+     *
+     * @var string $id
+     */
+    private $id = null;
+
+    /**
      * In dieses Element sind die Angaben zu den Namen der Person einzutragen.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameNatuerlichePersonTypeType $name
@@ -32,6 +39,39 @@ class AmBauBeteiligtePersonTypeType
     private $kommunikation = [
         
     ];
+
+    /**
+     * Sofern mehrere natürliche Personen involviert sind, handelt es sich um eine Personengruppe, deren Vertreter mit diesem Element zu kennzeichnen ist.
+     *
+     * @var bool $istVertreter
+     */
+    private $istVertreter = null;
+
+    /**
+     * Gets as id
+     *
+     * Dieses Element kann genutzt werden, um die Person zu identifizieren. Es handelt es sich um eine technische ID, die es erlaubt einen Datensatz für Änderungen deskriptiver Eigenschaften herauszugreifen. Dem Element ist der W3C-Datentyp ID (https://www.w3.org/TR/xmlschema11-2/#ID) zugeordnet, ein String-Derivat. Scope des hiermit eingeführten Identifikationsmechanismus: Der Scope ist gemäß der hier festgelegten Semantik nur der gegebene Vorgang. Dies bedeutet beispielsweise im Rahmen eines Antragsvorgangs: Der Antrag wird initial vom Online-Service ("Baugenehmigung Online") an die zuständige Bauaufsichtsbehörde übermittelt. In der XBau-Nachrichteninstanz werden die beteiligten Personen und Firmen identifiziert mittels vom Online-Service vergebener Identifier. Ab dem Zeitpunkt werden diese Identifikationsmittel im Nachrichtenaustausch im Rahmen des gegebenen Vorgangs in beide Richtungen weiterverwendet, um in der Kommunikation intersubjektiv nachvollziehbar zu referenzieren. Ob über diesen Scope hinausgehend identifiziert werden soll, ist Angelegenheit des Umsetzungsprojekts, XBau macht dazu keine Aussage.
+     *
+     * @return string
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Sets a new id
+     *
+     * Dieses Element kann genutzt werden, um die Person zu identifizieren. Es handelt es sich um eine technische ID, die es erlaubt einen Datensatz für Änderungen deskriptiver Eigenschaften herauszugreifen. Dem Element ist der W3C-Datentyp ID (https://www.w3.org/TR/xmlschema11-2/#ID) zugeordnet, ein String-Derivat. Scope des hiermit eingeführten Identifikationsmechanismus: Der Scope ist gemäß der hier festgelegten Semantik nur der gegebene Vorgang. Dies bedeutet beispielsweise im Rahmen eines Antragsvorgangs: Der Antrag wird initial vom Online-Service ("Baugenehmigung Online") an die zuständige Bauaufsichtsbehörde übermittelt. In der XBau-Nachrichteninstanz werden die beteiligten Personen und Firmen identifiziert mittels vom Online-Service vergebener Identifier. Ab dem Zeitpunkt werden diese Identifikationsmittel im Nachrichtenaustausch im Rahmen des gegebenen Vorgangs in beide Richtungen weiterverwendet, um in der Kommunikation intersubjektiv nachvollziehbar zu referenzieren. Ob über diesen Scope hinausgehend identifiziert werden soll, ist Angelegenheit des Umsetzungsprojekts, XBau macht dazu keine Aussage.
+     *
+     * @param string $id
+     * @return self
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     /**
      * Gets as name
@@ -148,6 +188,32 @@ class AmBauBeteiligtePersonTypeType
     public function setKommunikation(array $kommunikation = null)
     {
         $this->kommunikation = $kommunikation;
+        return $this;
+    }
+
+    /**
+     * Gets as istVertreter
+     *
+     * Sofern mehrere natürliche Personen involviert sind, handelt es sich um eine Personengruppe, deren Vertreter mit diesem Element zu kennzeichnen ist.
+     *
+     * @return bool
+     */
+    public function getIstVertreter()
+    {
+        return $this->istVertreter;
+    }
+
+    /**
+     * Sets a new istVertreter
+     *
+     * Sofern mehrere natürliche Personen involviert sind, handelt es sich um eine Personengruppe, deren Vertreter mit diesem Element zu kennzeichnen ist.
+     *
+     * @param bool $istVertreter
+     * @return self
+     */
+    public function setIstVertreter($istVertreter)
+    {
+        $this->istVertreter = $istVertreter;
         return $this;
     }
 }

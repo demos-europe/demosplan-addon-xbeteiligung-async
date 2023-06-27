@@ -7,7 +7,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ProzessnachrichtenZustellung
             accessor:
                 getter: getBezug
                 setter: setBezug
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType
         anschreiben:
             expose: true
             access_type: public_method

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/1"
-           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/1"
+           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/2"
            xmlns:xink="http://www.osci.de/xinneres/basisnachricht/5"
            targetNamespace="https://www.xleitstelle.de/xbeteiligung/1"
            version="1.0"
@@ -29,9 +29,225 @@
    </xs:annotation>
    <xs:include schemaLocation="xbeteiligung-baukasten.xsd"/>
    <xs:import schemaLocation="xbau-kernmodul-datentypen.xsd"
-              namespace="http://www.xleitstelle.de/xbau/kernmodul/1/1"/>
+              namespace="http://www.xleitstelle.de/xbau/kernmodul/1/2"/>
    <xs:import schemaLocation="xinneres-basisnachricht.xsd"
               namespace="http://www.osci.de/xinneres/basisnachricht/5"/>
+   <xs:element name="beteiligung2db.BeteiligungPlanfeststellungNeu.0251">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligung"
+                                       minOccurs="0"
+                                       type="xbeteiligung:BeteiligungPlanfeststellungDBType">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="beteiligung2db.BeteiligungPlanfeststellungAktualisieren.0252">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligung"
+                                       minOccurs="0"
+                                       type="xbeteiligung:BeteiligungPlanfeststellungDBType">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enhält die aktualisierten Angaben für zu beteiligende Stelle.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="beteiligung2db.BeteiligungPlanfeststellungLoeschen.0259">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird von der Planungs- an die Beteiligungskomponente versendet und enthält die zum Löschen (z.B. bei irrtümlicher Anlage) notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID, die in der Nachricht 401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligungsID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Die Beteiligungs-ID, die in der Nachricht 401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="planID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Die Plan-ID, die in der Nachricht 401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="beteiligung2db.BeteiligungRaumordnungNeu.0351">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligung"
+                                       minOccurs="0"
+                                       type="xbeteiligung:BeteiligungRaumordnungDBType">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="beteiligung2db.BeteiligungRaumordnungAktualisieren.0352">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligung"
+                                       minOccurs="0"
+                                       type="xbeteiligung:BeteiligungRaumordnungDBType">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enhält die aktualisierten Angaben für zu beteiligende Stelle.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="beteiligung2db.BeteiligungRaumordnungLoeschen.0359">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird von der Planungs- an die Beteiligungskomponente versendet und enthält die zum Löschen (z.B. bei irrtümlicher Anlage) notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID, die in der Nachricht 401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligungsID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Die Beteiligungs-ID, die in der Nachricht 401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="planID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Die Plan-ID, die in der Nachricht 401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
    <xs:element name="beteiligung2db.BeteiligungKommuneNeu.0451">
       <xs:annotation>
          <xs:appinfo>

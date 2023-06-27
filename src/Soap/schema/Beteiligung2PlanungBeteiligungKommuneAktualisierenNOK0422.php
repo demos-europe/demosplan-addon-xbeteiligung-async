@@ -7,7 +7,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBetei
 /**
  * Class representing Beteiligung2PlanungBeteiligungKommuneAktualisierenNOK0422
  *
- * Negative Quittierungsnachricht einer misserfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente.
+ * Negative Quittierungsnachricht einer misserfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente im Rahmen der kommunalen Bauleitplanung.
  */
 class Beteiligung2PlanungBeteiligungKommuneAktualisierenNOK0422 extends Beteiligung2PlanungBeteiligungKommuneAktualisierenNOK0422AnonymousPHPType
 {

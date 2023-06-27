@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/1"
+           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/2"
+           xmlns:xink="http://www.osci.de/xinneres/basisnachricht/5"
+           targetNamespace="https://www.xleitstelle.de/xbeteiligung/1"
+           version="1.0"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XBeteiligung</nameLang>
+            <nameKurz>XBeteiligung</nameKurz>
+            <nameTechnisch>xbeteiligung</nameTechnisch>
+            <kennung>urn:xoev-de:xleitstelle:standard:xbeteiligung</kennung>
+            <beschreibung>Beteiligungsverfahren - OZG</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.0</version>
+            <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren im Kontext des OZG</beschreibung>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.4</versionXOEVHandbuch>
+            <versionXGenerator>3.1.0</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 3</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:include schemaLocation="xbeteiligung-baukasten.xsd"/>
+   <xs:import schemaLocation="xbau-kernmodul-datentypen.xsd"
+              namespace="http://www.xleitstelle.de/xbau/kernmodul/1/2"/>
+   <xs:import schemaLocation="xinneres-basisnachricht.xsd"
+              namespace="http://www.osci.de/xinneres/basisnachricht/5"/>
+   <xs:element name="extern2Beteiligung.StellungnahmeAuffordernOK.0760">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:complexContent>
+                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.OKType"/>
+                        </xs:complexContent>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="extern2Beteiligung.StellungnahmeAuffordernNOK.0770">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:complexContent>
+                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.NOKType"/>
+                        </xs:complexContent>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+</xs:schema>

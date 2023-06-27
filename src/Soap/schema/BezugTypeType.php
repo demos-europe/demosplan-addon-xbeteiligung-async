@@ -13,7 +13,7 @@ class BezugTypeType
     /**
      * Hier ist der Identifier des Antragsservice (der mit dem Antrag bzw. der Anzeige bei der Bauaufsichtsbehörde (bzw. Aufsichtsbehörde für den Breitbandausbau) eingegangen ist) oder der Abfrage (auf die die vorliegende Nachricht eine Antwort ist) anzugeben. Falls die vorliegende Nachricht an ein Online-Portal gerichtet ist, kann so der Projektraum bzw. Postkorb angesteuert werden.
      *
-     * @var string $referenz
+     * @var \Jms\Handler\GmlAnyTypeHandler $referenz
      */
     private $referenz = null;
 
@@ -27,7 +27,7 @@ class BezugTypeType
     /**
      * Falls ein solcher Zusammenhang vorliegt, sind hier die Kennungen der Nachricht einzutragen, auf die sich diese Nachricht bezieht.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType $bezugNachricht
+     * @var \Jms\Handler\GmlAnyTypeHandler $bezugNachricht
      */
     private $bezugNachricht = null;
 
@@ -36,7 +36,7 @@ class BezugTypeType
      *
      * Hier ist der Identifier des Antragsservice (der mit dem Antrag bzw. der Anzeige bei der Bauaufsichtsbehörde (bzw. Aufsichtsbehörde für den Breitbandausbau) eingegangen ist) oder der Abfrage (auf die die vorliegende Nachricht eine Antwort ist) anzugeben. Falls die vorliegende Nachricht an ein Online-Portal gerichtet ist, kann so der Projektraum bzw. Postkorb angesteuert werden.
      *
-     * @return string
+     * @return \Jms\Handler\GmlAnyTypeHandler
      */
     public function getReferenz()
     {
@@ -48,10 +48,10 @@ class BezugTypeType
      *
      * Hier ist der Identifier des Antragsservice (der mit dem Antrag bzw. der Anzeige bei der Bauaufsichtsbehörde (bzw. Aufsichtsbehörde für den Breitbandausbau) eingegangen ist) oder der Abfrage (auf die die vorliegende Nachricht eine Antwort ist) anzugeben. Falls die vorliegende Nachricht an ein Online-Portal gerichtet ist, kann so der Projektraum bzw. Postkorb angesteuert werden.
      *
-     * @param string $referenz
+     * @param \Jms\Handler\GmlAnyTypeHandler $referenz
      * @return self
      */
-    public function setReferenz($referenz)
+    public function setReferenz(?\Jms\Handler\GmlAnyTypeHandler $referenz = null)
     {
         $this->referenz = $referenz;
         return $this;
@@ -88,7 +88,7 @@ class BezugTypeType
      *
      * Falls ein solcher Zusammenhang vorliegt, sind hier die Kennungen der Nachricht einzutragen, auf die sich diese Nachricht bezieht.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType
+     * @return \Jms\Handler\GmlAnyTypeHandler
      */
     public function getBezugNachricht()
     {
@@ -100,10 +100,10 @@ class BezugTypeType
      *
      * Falls ein solcher Zusammenhang vorliegt, sind hier die Kennungen der Nachricht einzutragen, auf die sich diese Nachricht bezieht.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType $bezugNachricht
+     * @param \Jms\Handler\GmlAnyTypeHandler $bezugNachricht
      * @return self
      */
-    public function setBezugNachricht(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType $bezugNachricht = null)
+    public function setBezugNachricht(?\Jms\Handler\GmlAnyTypeHandler $bezugNachricht = null)
     {
         $this->bezugNachricht = $bezugNachricht;
         return $this;

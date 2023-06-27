@@ -12,7 +12,7 @@ class ProzessnachrichtenQuittierungRuecknahme1131AnonymousPHPType extends Nachri
     /**
      * In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Es ist die Nachricht des Antragstellers zu referenzieren, mittels derer er über seine Absicht informiert hat, den Antrag zurückzunehmen.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType $bezug
      */
     private $bezug = null;
 
@@ -35,7 +35,7 @@ class ProzessnachrichtenQuittierungRuecknahme1131AnonymousPHPType extends Nachri
      *
      * In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Es ist die Nachricht des Antragstellers zu referenzieren, mittels derer er über seine Absicht informiert hat, den Antrag zurückzunehmen.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType
      */
     public function getBezug()
     {
@@ -47,10 +47,10 @@ class ProzessnachrichtenQuittierungRuecknahme1131AnonymousPHPType extends Nachri
      *
      * In dieses Element sind die Referenzen von Antragsteller und ggf. Behörde einzutragen. Es ist die Nachricht des Antragstellers zu referenzieren, mittels derer er über seine Absicht informiert hat, den Antrag zurückzunehmen.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType $bezug
      * @return self
      */
-    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugTypeType $bezug)
+    public function setBezug(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BezugErweitertTypeType $bezug)
     {
         $this->bezug = $bezug;
         return $this;

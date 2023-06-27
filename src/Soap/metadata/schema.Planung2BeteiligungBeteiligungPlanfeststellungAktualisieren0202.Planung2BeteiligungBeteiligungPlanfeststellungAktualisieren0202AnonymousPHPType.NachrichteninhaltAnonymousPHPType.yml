@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202\Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202AnonymousPHPType\NachrichteninhaltAnonymousPHPType:
+    properties:
+        vorgangsID:
+            expose: true
+            access_type: public_method
+            serialized_name: vorgangsID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getVorgangsID
+                setter: setVorgangsID
+            type: string
+        beteiligung:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getBeteiligung
+                setter: setBeteiligung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungPlanfeststellungTypeType

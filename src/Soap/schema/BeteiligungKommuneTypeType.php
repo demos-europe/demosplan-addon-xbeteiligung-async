@@ -5,7 +5,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 /**
  * Class representing BeteiligungKommuneTypeType
  *
- * Komponente der Datentypen, die eine Aufforderung zur Beteiligung beschreiben.
+ * Dieser Datentyp enthält alle Informationen zu einem Beteiligungsverfahren im Rahmen der kommunalen Bauleitplanung.
  * XSD Type: BeteiligungKommuneType
  */
 class BeteiligungKommuneTypeType
@@ -40,7 +40,7 @@ class BeteiligungKommuneTypeType
     private $planart = null;
 
     /**
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType $verfahrensart
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType $verfahrensart
      */
     private $verfahrensart = null;
 
@@ -231,7 +231,7 @@ class BeteiligungKommuneTypeType
     /**
      * Gets as verfahrensart
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType
      */
     public function getVerfahrensart()
     {
@@ -241,10 +241,10 @@ class BeteiligungKommuneTypeType
     /**
      * Sets a new verfahrensart
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType $verfahrensart
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType $verfahrensart
      * @return self
      */
-    public function setVerfahrensart(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType $verfahrensart = null)
+    public function setVerfahrensart(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType $verfahrensart = null)
     {
         $this->verfahrensart = $verfahrensart;
         return $this;

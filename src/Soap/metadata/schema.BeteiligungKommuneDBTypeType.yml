@@ -49,7 +49,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneDBTypeType
             accessor:
                 getter: getPlanart
                 setter: setPlanart
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneTypeType
         verfahrensart:
             expose: true
             access_type: public_method
@@ -59,7 +59,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneDBTypeType
             accessor:
                 getter: getVerfahrensart
                 setter: setVerfahrensart
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType
         beschreibungPlanungsanlass:
             expose: true
             access_type: public_method

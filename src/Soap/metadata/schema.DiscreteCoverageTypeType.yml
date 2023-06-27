@@ -1,0 +1,12 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\DiscreteCoverageTypeType:
+    properties:
+        coverageFunction:
+            expose: true
+            access_type: public_method
+            serialized_name: coverageFunction
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getCoverageFunction
+                setter: setCoverageFunction
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CoverageFunction
