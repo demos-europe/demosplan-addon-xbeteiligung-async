@@ -10,9 +10,49 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
+use DateInterval;
+use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnschriftTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBehoerdenkennungTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneAktualisieren0402\Planung2BeteiligungBeteiligungKommuneAktualisieren0402AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneLoeschen0409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneLoeschen0409\Planung2BeteiligungBeteiligungKommuneLoeschen0409AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneNeu0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommuneNeu0401\Planung2BeteiligungBeteiligungKommuneNeu0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType\HausnummernBisAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftPostfachanschriftTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfahrenTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumTypeType;
+use Exception;
+use InvalidArgumentException;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Routing\RouterInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use Psr\Log\LoggerInterface;
@@ -20,23 +60,454 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class XBeteiligungService
 {
-    public const XBETEILIGUNG_VERSION = 'V11';
+    public const XBETEILIGUNG_VERSION = '1.0';
+    public const STANDARD = 'XBeteiligung';
     private \JMS\Serializer\Serializer $serializer;
 
     public function __construct(
+        private readonly GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository,
         private readonly GlobalConfigInterface  $globalConfig,
         private readonly LoggerInterface        $logger,
-        private readonly RouterInterface                         $router,
+        private readonly RouterInterface        $router,
         SerializerFactory                       $serializerFactory,
-        private readonly TranslatorInterface                     $translator,
-        private readonly UserHandlerInterface                    $userHandler,
+        private readonly TranslatorInterface    $translator,
+        private readonly UserHandlerInterface   $userHandler,
+
     ) {
-        $this->serializer                           = $serializerFactory->getSerializer();
+        $this->serializer = $serializerFactory->getSerializer();
     }
 
-    public function createProcedure401FromObject(ProcedureInterface $procedure): string
+    // todo information needs to be gathered
+    /**
+     * @throws Exception
+     */
+    public function createProcedureNew401FromObject(ProcedureInterface $procedure): string
     {
-        return '';
+        $procedureCreated401Object = new Planung2BeteiligungBeteiligungKommuneNeu0401();
+        $procedureCreated401Object = $this->setProdukctInfo($procedureCreated401Object); // required
+        $procedureCreated401Object->setNachrichtenkopf(
+            $this->createMessageHeadFor($procedureCreated401Object)
+        ); // required
+        $procedureCreated401Object->setNachrichteninhalt(
+            $this->generateMain401MessageContent($procedure)
+        ); // required
+
+        return $this->serializeData($procedureCreated401Object);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function createProcedureUpdate402FromObject(ProcedureInterface $procedure): string
+    {
+        $procedureUpdated402Object = new Planung2BeteiligungBeteiligungKommuneAktualisieren0402();
+        $procedureUpdated402Object = $this->setProdukctInfo($procedureUpdated402Object); // required
+        $procedureUpdated402Object->setNachrichtenkopf(
+            $this->createMessageHeadFor($procedureUpdated402Object)
+        ); // required
+        $procedureUpdated402Object->setNachrichteninhalt(
+            $this->generateMain402MessageContent($procedure)
+        ); // required
+
+        return $this->serializeData($procedureUpdated402Object);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function createProcedureDeleted409FromObject(ProcedureInterface $procedure): string
+    {
+        $procedureDeleted409Object = new Planung2BeteiligungBeteiligungKommuneLoeschen0409();
+        $procedureDeleted409Object = $this->setProdukctInfo($procedureDeleted409Object); // required
+        $procedureDeleted409Object->setNachrichtenkopf(
+            $this->createMessageHeadFor($procedureDeleted409Object)
+        ); // required
+        $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedure));
+
+        return $this->serializeData($procedureDeleted409Object);
+    }
+
+    private function serializeData($data): string
+    {
+        $xml = $this->serializer->serialize($data, 'xml');
+        $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+
+        return $xml->asXML() ?? '';
+    }
+
+    private function setProdukctInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
+    {
+        $messageObject->setProdukt('A1'); // required
+        $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
+        $messageObject->setProduktversion(self::XBETEILIGUNG_VERSION); // optional
+        $messageObject->setStandard(self::STANDARD); // required
+        // $messageObject->setTest(''); // optional
+        $messageObject->setVersion(self::XBETEILIGUNG_VERSION); // required
+
+        return $messageObject;
+    }
+
+    private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
+    {
+        $messageContent = new Nachrichteninhalt401();
+        $messageContent->setVorgangsID($this->uuid());  // required
+        $messageContent->setBeteiligung($this->generateParticipationContent($procedure)); // optional
+
+        return $messageContent;
+    }
+
+    private function generateMain402MessageContent(ProcedureInterface $procedure): Nachrichteninhalt402
+    {
+        $messageContent = new Nachrichteninhalt402();
+        $messageContent->setVorgangsID($this->uuid());
+        // todo the documentation says the return type of generateParticipationContent should be identical for 401,402
+        // it is not - email to stephan.conrad is sent.
+        $messageContent->setBeteiligung($this->generateParticipationContent($procedure)); // optional
+
+        return $messageContent;
+    }
+
+    private function generateMain409MessageContent(ProcedureInterface $procedure): Nachrichteninhalt409
+    {
+        $messageContent = new Nachrichteninhalt409();
+        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setPlanID($procedure->getXtaPlanId() ?? $procedure->getId());
+        $messageContent->setBeteiligungsID($procedure->getId());
+
+        return $messageContent;
+    }
+
+    private function generateParticipationContent(ProcedureInterface $procedure): BeteiligungKommuneTypeType
+    {
+        $participationType = new BeteiligungKommuneTypeType();
+
+        $procedureInitiatingOrganisation = new AkteurVorhabenTypeType();
+        // kteurVorhaben
+        $organisationType = new OrganisationTypeType();
+        $organisationName = new NameOrganisationTypeType();
+        $organisationName->setName($procedure->getOrga()?->getName() ?? '');
+        $organisationType->setName($organisationName);
+        $procedureInitiatingOrganisation->setVeranlasser($organisationType);
+        $participationType->setAkteurVorhaben($procedureInitiatingOrganisation); // required
+
+        $participationType->setPlanname($procedure->getName()); // required
+        // planart
+        $planType = new CodePlanartKommuneTypeType();
+        $planType->setCode('1000')
+            ->setName('Einfacher Bebauungsplan')
+            ->setListVersionID('1.0')
+            ->setListURI('urn:xoev-de:xleitstelle:codeliste:planart');
+        $participationType->setPlanart($planType); // optional - we want to use it
+
+        // Hier ist die ID des Planverfahrens zu übermitteln, innerhalb dessen das Beteiligungsverfahren durchgeführt wird
+        $participationType->setPlanID($procedure->getXtaPlanId() ?? $procedure->getId()); // required
+        $participationType->setBeschreibungPlanungsanlass($procedure->getDesc()); // optional - we want to use it
+        $participationType->setFlaechenabgrenzungUrl(''); // optional - we want to use it
+
+        // Hier ist die räumliche Beschreibung des Geltungsbereichs als Polygon im Format GeoJSON FG Notation zu über-
+        // mitteln. todo Format wird noch geprüft.
+        $participationType->setGeltungsbereich(''); // required - we dont want to use it
+        $participationType->setRaeumlicheBeschreibung(''); // required - we dont want it
+        // zeitraum
+        $timeSpan = new ZeitraumTypeType();
+        $timeSpan->setBeginn($procedure->getStartDate());
+        $timeSpan->setEnde($procedure->getEndDate());
+        $participationType->setZeitraum($timeSpan); // optional - we want to use it
+
+        // Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
+        $participationType->setBekanntmachung(
+            $procedure->getStartDate()->sub(new DateInterval('P7D'))
+        ); // required - we dont want it
+        // verfahren? wird hier an dieser Stelle in Excel-sheet gelistet
+        // todo email an Stefan Conrad ist raus - der MetadatenAnlageTypeType ist broken zur Zeit
+        // $participationType->setAnlagen([new MetadatenAnlageTypeType()]); // optional - we want to use it
+
+        // todo Code liste urn:xoev-de:xleitstelle:codeliste:verfahrensschritt existiert nicht
+        $participationType->setVerfahrensschritt(new CodeVerfahrensschrittTypeType()); // required - we want to use it
+        // $participationType->setVerfahrensart(new CodeVerfahrensartTypeType()); // optional
+        // todo die sind scheinbar nicht an der Procedure entity
+        $participationType->setAktuelleMitteilung(['', '']); // optional - we want to use it
+        // $participationType->setArbeitstitel(''); // optional
+        // $participationType->setPlanart(new CodePlanartKommuneTypeType()); // otional
+        $participationType->setDurchgang(1); // required not documented not wanted
+
+        return $participationType;
+    }
+
+
+
+    /**
+     * @throws Exception
+     */
+    private function createMessageHeadFor(NachrichtG2GTypeType $messageObject): NachrichtenkopfG2GTypeType
+    {
+        $messageHead = new NachrichtenkopfG2GTypeType();
+        $messageHead->setIdentifikationNachricht($this->createMessageIdentification($messageObject)); // required
+        $messageHead->setLeser($this->createReaderInformation()); // required
+        $messageHead->setAutor($this->createAuthorInformation()); // required
+
+        return $messageHead;
+    }
+
+    // todo information needs to be provided - check if optional or not
+    private function createReaderInformation(): BehoerdeTypeType
+    {
+        $reader = new BehoerdeTypeType();
+        $reader->setBehoerdenkennung($this->addReadingAuthorityIdentificationType()); // required
+//        $reader->setErreichbarkeit($this->addReaderCommunicationType()); // optional list
+//        $reader->setAnschrift($this->addReaderPostalInformation()); // optional
+        $reader->setBehoerdenname(''); // required
+
+        return $reader;
+    }
+
+    // todo fill in the correct information - is it demosplan here?
+    private function createAuthorInformation(): BehoerdeErreichbarTypeType
+    {
+        $author = new BehoerdeErreichbarTypeType();
+        $author->setBehoerdenkennung($this->addAuthorityIdentificationOfAuthor()); // required
+        $author->setErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
+        $author->setAnschrift($this->addAuthorPostalInformation()); // required
+        $author->setBehoerdenname(''); // required
+
+        return $author;
+    }
+
+    private function generateFaceBoundaryWMS_Url(ProcedureInterface $procedure): string
+    {
+        $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
+
+        if (null === $rootCategory) {
+            // Currently, all procedures have a root layer category
+            throw new InvalidArgumentException('Procedure has no root layer category, cannot add layers');
+        }
+
+        $gisLayers = $rootCategory->getGisLayers();
+        $basemapGisLayer = null;
+        /** @var GisLayerInterface $gisLayer */
+        foreach ($gisLayers as $gisLayer) {
+            if ('basemap' === $gisLayer->getName()) {
+                $basemapGisLayer = $gisLayer;
+            }
+        }
+        $bboxArray = explode(',', $procedure->getSettings()->getBoundingBox());
+
+        $west = (float)$bboxArray[0];
+        $east = (float)$bboxArray[2];
+        $south = (float)$bboxArray[1];
+        $north = (float)$bboxArray[3];
+        $absWidth = abs($west - $east);
+        $absHeight = abs($south - $north);
+
+        $url = $basemapGisLayer->getUrl();
+        $serviceType = '?SERVICE=WMS';
+        $version = '&VERSION=' . $basemapGisLayer->getLayerVersion();
+        $request = '&REQUEST=GetMap';
+        $format = '&FORMAT=image%2Fpng';
+        $transparent = '&TRANSPARENT=true';
+        $layers = '&LAYERS=' . str_replace(',', '%2C', $basemapGisLayer->getLayers());
+        $width = '&WIDTH=' . '512';
+        $height = '&HEIGHT=' . 512 * ($absHeight / $absWidth);
+        $crs = '&CRS=EPSG%3A3857';
+        $styles = '&STYLES=';
+        $bbox = '&BBOX=' . str_replace(',', '%2C', $procedure->getSettings()->getBoundingBox());
+
+
+        return $url . $serviceType . $version . $request . $format . $transparent . $layers . $width .
+            $height . $crs . $styles . $bbox;
+    }
+
+    // todo information needs to be provided
+    private function addReadingAuthorityIdentificationType(): BehoerdenkennungTypeType
+    {
+        $authorityIdentificationType = new BehoerdenkennungTypeType();
+
+        $prefixType = new CodePraefixTypeType();
+        $prefixType->setListVersionID('');
+        $prefixType->setListURI('');
+        $prefixType->setName('');
+        $prefixType->setCode('diplanfhh');
+        $authorityIdentificationType->setPraefix($prefixType); // required
+
+        $codeAuthorityIdentification = new CodeBehoerdenkennungTypeType();
+        $codeAuthorityIdentification->setListVersionID('');
+        $codeAuthorityIdentification->setListURI('');
+        $codeAuthorityIdentification->setName('');
+        $codeAuthorityIdentification->setCode('0400');
+        $authorityIdentificationType->setKennung($codeAuthorityIdentification); // required
+
+        return $authorityIdentificationType;
+    }
+
+    // todo information needs to be provided
+    private function addAuthorityIdentificationOfAuthor(): BehoerdenkennungTypeType
+    {
+        $authorityIdentificationType = new BehoerdenkennungTypeType();
+
+        $prefixType = new CodePraefixTypeType();
+        $prefixType->setListVersionID('');
+        $prefixType->setListURI('');
+        $prefixType->setName('');
+        $prefixType->setCode('diplanfhh');
+        $authorityIdentificationType->setPraefix($prefixType); // required
+
+        $codeAuthorityIdentification = new CodeBehoerdenkennungTypeType();
+        $codeAuthorityIdentification->setListVersionID('');
+        $codeAuthorityIdentification->setListURI('');
+        $codeAuthorityIdentification->setName('');
+        $codeAuthorityIdentification->setCode('0200');
+        $authorityIdentificationType->setKennung($codeAuthorityIdentification); // required
+
+        return $authorityIdentificationType;
+    }
+
+    /**
+     * @return array<int, KommunikationTypeType>
+     */
+    private function addReaderCommunicationType(): array
+    {
+        $communicationType = new KommunikationTypeType();
+        $comCode = new CodeErreichbarkeitTypeType();
+        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger, 06 -> Pager, 07 -> Sonstiges
+        $comCode->setCode('');
+        $comCode->setName('');
+        $comCode->setListURI('');
+        $comCode->setListVersionID('');
+        $communicationType->setKanal($comCode); // required
+        // kennung: In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
+        $communicationType->setKennung(''); // required
+        $communicationType->setZusatz(''); // optional
+
+        return [$communicationType];
+    }
+
+    // todo information needs to be provided
+    /**
+     * @return array<int, KommunikationTypeType>
+     */
+    private function addAuthorCommunicationType(): array
+    {
+        $communicationType = new KommunikationTypeType();
+        $comCode = new CodeErreichbarkeitTypeType();
+        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger, 06 -> Pager, 07 -> Sonstiges
+        $comCode->setCode('');
+        $comCode->setName('');
+        $comCode->setListURI('');
+        $comCode->setListVersionID('');
+        $communicationType->setKanal($comCode); // required
+        // kennung: In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
+        $communicationType->setKennung(''); // required
+        $communicationType->setZusatz(''); // optional
+
+        return [$communicationType];
+    }
+
+    private function addReaderPostalInformation(): PostalischeInlandsanschriftTypeType
+    {
+        $postAddress = new PostalischeInlandsanschriftTypeType();
+
+        $buildingAddress = new PostalischeInlandsanschriftGebaeudeanschriftTypeType();
+        $buildingNumber = new HausnummernBisAnonymousPHPType();
+        $buildingNumber->setHausnummerBis('');
+        $buildingNumber->setHausnummerbuchstabezusatzzifferBis('');
+        $buildingNumber->setTeilnummerderhausnummerBis('');
+        $buildingAddress->setHausnummernBis($buildingNumber); // optional
+        $buildingAddress->setWohnort(''); // required
+        $buildingAddress->setPostleitzahl(''); // required
+        $buildingAddress->setHausnummer(''); // optional
+        $buildingAddress->setHausnummerBuchstabeZusatzziffer(''); // optional
+        $buildingAddress->setStockwerkswohnungsnummer(''); // optional
+        $buildingAddress->setStrasse(''); // required
+        $postAddress->setGebaeude($buildingAddress); // required
+
+        $postMailBoxAddress = new PostalischeInlandsanschriftPostfachanschriftTypeType();
+        $postMailBoxAddress->setPostfach('') // optional
+            ->setPostleitzahl('') // required
+            ->setWohnort('') // required
+        ;
+        $postAddress->setPostfach($postMailBoxAddress);
+
+        return $postAddress;
+    }
+
+    // todo information needs to be provided
+    private function addAuthorPostalInformation(): PostalischeInlandsanschriftTypeType
+    {
+        $postAddress = new PostalischeInlandsanschriftTypeType();
+
+        $buildingAddress = new PostalischeInlandsanschriftGebaeudeanschriftTypeType();
+        $buildingNumber = new HausnummernBisAnonymousPHPType();
+        $buildingNumber->setHausnummerBis('');
+        $buildingNumber->setHausnummerbuchstabezusatzzifferBis('');
+        $buildingNumber->setTeilnummerderhausnummerBis('');
+        $buildingAddress->setHausnummernBis($buildingNumber); // optional
+        $buildingAddress->setWohnort(''); // required
+        $buildingAddress->setPostleitzahl(''); // required
+        $buildingAddress->setHausnummer(''); // optional
+        $buildingAddress->setHausnummerBuchstabeZusatzziffer(''); // optional
+        $buildingAddress->setStockwerkswohnungsnummer(''); // oprional
+        $buildingAddress->setStrasse(''); // required
+        $postAddress->setGebaeude($buildingAddress); // required
+
+        $postMailBoxAddress = new PostalischeInlandsanschriftPostfachanschriftTypeType();
+        $postMailBoxAddress->setPostfach('') // optional
+            ->setPostleitzahl('') // required
+            ->setWohnort('') // required
+        ;
+        $postAddress->setPostfach($postMailBoxAddress); // required
+
+        return $postAddress;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function createMessageIdentification(NachrichtG2GTypeType $messageObject): IdentifikationNachrichtTypeType
+    {
+        if ($messageObject instanceof Planung2BeteiligungBeteiligungKommuneNeu0401) {
+            $code = '0401';
+            $name = 'planung2Beteiligung.BeteiligungKommuneNeu.0401';
+        } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungKommuneAktualisieren0402) {
+            $code = '0402';
+            $name = 'planung2Beteiligung.BeteiligungKommuneAktualisieren.0402';
+        } elseif ($messageObject instanceof  Planung2BeteiligungBeteiligungKommuneLoeschen0409) {
+            $code = '0409';
+            $name = 'planung2Beteiligung.BeteiligungKommuneLoeschen.0409';
+        } else {
+            $this->logger->error('Class '.$messageObject::class.' not supported yet');
+            throw new Exception(
+                $messageObject::class . ' is not supported - unable to set messageIdentification code'
+            );
+        }
+
+        $identificationMessage = new IdentifikationNachrichtTypeType();
+
+        $messageTypeCode = new CodeType();
+        $messageTypeCode->setListURI('urn:de:xbeteiligung:codeliste:xbeteiligungnachrichtencodeliste');
+        $messageTypeCode->setListVersionID('1.0');
+        $messageTypeCode->setName($name);
+        $messageTypeCode->setCode($code);
+
+        // id has to match pattern: '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
+        $identificationMessage->setNachrichtenUUID($this->uuid()); // required
+        $identificationMessage->setErstellungszeitpunkt(new DateTime()); // required
+        $identificationMessage->setNachrichtentyp($messageTypeCode); // required
+
+        return $identificationMessage;
+    }
+
+    private function uuid(): string
+    {
+        $uuid = '';
+        $tryAgain = true;
+        while ($tryAgain) {
+            $uuid = Uuid::uuid4()->toString();
+            if (0 !== preg_match('/[A-Za-z]/', $uuid[0])) {
+                $tryAgain = false;
+            }
+        }
+
+        return $uuid;
     }
 
     /**
