@@ -17,12 +17,6 @@ class ProcedureMessageController extends APIController
      * Triggers a fetch for all given ProcedureMessage-urls to retrieve last update from Procedure
      * and saves them as new ProcedureMessage.
      *
-     * @Route(
-     *        path="/api/procedure/{procedure}/",
-     *        methods={"POST"},
-     *        name="dplan_api_procedure_messages_insert"
-     *     )
-     *
      * **PLEASE NOTE**: We technically want feature_import_ProcedureMessage as access
      * permission here. Due to current time constraints, this is not possible as we
      * do not want to give the guest user that permission. Authenticating from xbeteiligung
@@ -32,7 +26,7 @@ class ProcedureMessageController extends APIController
      *
      * @return ProcedureMessage|Response
      */
-
+    #[Route('/api/procedure/{authToken}/{id}/', name: 'dplan_api_procedure_messages_insert', methods: ['GET'])]
     public function importNewImportableProcedureMessage(ProcedureMessageRepository $procedureMessageRepository,string $authToken, string $id)
     {
         if ($authToken !== $this->getParameter('xbeteiligung_api_token')) {
