@@ -5,15 +5,16 @@ use DateTime;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UuidEntityInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Gedmo\Timestampable\Traits\Timestampable;
 
 /**
  * ProcedureMessage - Defines a specific message of Procedure
- * @ORM\Entity()
- * @ORM\Entity(repositoryClass="DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository")
  */
+#[ORM\Entity()]
+#[ORM\Entity(repositoryClass: ProcedureMessageRepository::class)]
 class ProcedureMessage implements UuidEntityInterface
 
 {
@@ -21,15 +22,11 @@ class ProcedureMessage implements UuidEntityInterface
 
     /**
      * @var string|null
-     *
-     * @ORM\Column(type="string", length=36, nullable=false, options={"fixed":true})
-     *
-     * @ORM\Id
-     *
-     * @ORM\GeneratedValue(strategy="CUSTOM")
-     *
-     * @ORM\CustomIdGenerator(class="\demosplan\DemosPlanCoreBundle\Doctrine\Generator\UuidV4Generator")
      */
+    #[ORM\Column(type: 'string', length: 36, nullable: false, options:['fixed' => true])]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: \demosplan\DemosPlanCoreBundle\Doctrine\Generator\UuidV4Generator::class)]
     private $id;
 
     /**
@@ -46,50 +43,42 @@ class ProcedureMessage implements UuidEntityInterface
 
     /**
      * @var string
-     *
-     * @ORM\Column(name="message", type="text", nullable=false)
      */
+    #[ORM\Column(name: 'message', type: 'text', nullable: false)]
     private $message = '';
 
     /**
      * @var DateTime
-     *
-     * @Gedmo\Timestampable(on="create")
-     *
-     * @ORM\Column(type="datetime", nullable=false, options={"default":"CURRENT_TIMESTAMP"})
      */
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private $createdDate;
 
     /**
      * @var DateTime
      *
-     * @Gedmo\Timestampable(on="update")
-     *
-     * @ORM\Column(type="datetime", nullable=false, options={"default":"CURRENT_TIMESTAMP"})
      */
+    #[Gedmo\Timestampable(on: "update")]
+    #[ORM\Column(type: "datetime", nullable: false, options: ["default" => "CURRENT_TIMESTAMP"])]
     private $modificationDate;
 
     /**
      * @var bool
-     *
-     *
-     * @ORM\Column(type="boolean", nullable=false, options={"default":"false"})
      */
+    #[ORM\Column(type: "boolean", nullable: false, options: ["default" => false] )]
     private $error;
 
     /**
      * @var bool
      *
-     *
-     * @ORM\Column(type="boolean", nullable=false, options={"default":"false"})
      */
+    #[ORM\Column(type: "boolean", nullable: false, options: ["default" => false])]
     private bool $deleted;
 
     /**
      * @var int
-     *
-     * @ORM\Column(type="integer", nullable=false, options={"default":"1"})
      */
+    #[ORM\Column(type: "integer", nullable: false, options: ["default" => 1])]
     private int $requestCount;
 
     public function __construct(
