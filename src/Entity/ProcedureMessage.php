@@ -39,9 +39,9 @@ class ProcedureMessage implements UuidEntityInterface
      *
      * @var ProcedureInterface
      *
-     * @ORM\OneToMany(targetEntity="demosplan\DemosPlanCoreBundle\Entity\Procedure\Procedure")
-     * @ORM\JoinColumn(nullable = false, referencedColumnName="_p_id", unique=true)
      */
+    #[ORM\ManyToOne(targetEntity: demosplan\DemosPlanCoreBundle\Entity\Procedure\Procedure::class)]
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: "_p_id", unique: true)]
     private $procedure;
 
     /**
