@@ -9,6 +9,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Request;
 
 class ProcedureMessageController extends APIController
 {
@@ -26,9 +27,10 @@ class ProcedureMessageController extends APIController
      *
      * @return ProcedureMessage|Response
      */
-    #[Route('/api/procedure/{authToken}/{id}/', name: 'dplan_api_procedure_messages_insert', methods: ['GET'])]
-    public function importNewImportableProcedureMessage(ProcedureMessageRepository $procedureMessageRepository,string $authToken, string $id)
+    #[Route('/api/procedure/{id}/', name: 'dplan_api_procedure_messages_insert', methods: ['GET'])]
+    public function importNewImportableProcedureMessage(ProcedureMessageRepository $procedureMessageRepository, Request $request,string $authToken, string $id)
     {
+        $request->headers->contains($authToken, $this->getParameter('xbeteiligung_api_token'));
         if ($authToken !== $this->getParameter('xbeteiligung_api_token')) {
             return new Response(null, Response::HTTP_NO_CONTENT, []);
         }
