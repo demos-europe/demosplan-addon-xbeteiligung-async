@@ -107,14 +107,14 @@ class XBeteiligungService
     /**
      * @throws Exception
      */
-    public function createProcedureDeleted409FromObject(ProcedureInterface $procedure): string
+    public function createProcedureDeleted409FromObject(string $procedureId): string
     {
         $procedureDeleted409Object = new Planung2BeteiligungBeteiligungKommuneLoeschen0409();
         $procedureDeleted409Object = $this->setProdukctInfo($procedureDeleted409Object); // required
         $procedureDeleted409Object->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureDeleted409Object)
         ); // required
-        $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedure));
+        $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedureId));
 
         return $this->serializeData($procedureDeleted409Object);
     }
