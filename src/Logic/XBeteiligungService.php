@@ -191,7 +191,7 @@ class XBeteiligungService
         $participationType->setPlanart($planType); // optional - we want to use it
 
         // Hier ist die ID des Planverfahrens zu übermitteln, innerhalb dessen das Beteiligungsverfahren durchgeführt wird
-        $participationType->setPlanID($procedure->getXtaPlanId() ?? $procedure->getId()); // required
+        $participationType->setPlanID($procedure->getId()); // required
         $participationType->setBeschreibungPlanungsanlass($procedure->getDesc()); // optional - we want to use it
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMS_Url($procedure)
