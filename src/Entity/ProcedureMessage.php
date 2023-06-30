@@ -13,7 +13,6 @@ use Gedmo\Timestampable\Traits\Timestampable;
 /**
  * ProcedureMessage - Defines a specific message of Procedure
  */
-#[ORM\Entity()]
 #[ORM\Entity(repositoryClass: ProcedureMessageRepository::class)]
 class ProcedureMessage implements UuidEntityInterface
 

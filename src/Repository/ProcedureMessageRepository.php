@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ProcedureMessageRepository extends ServiceEntityRepository
@@ -15,13 +16,17 @@ class ProcedureMessageRepository extends ServiceEntityRepository
 
     private ValidatorInterface $validator;
 
+    private LoggerInterface $logger;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         ManagerRegistry $registry,
+        LoggerInterface $logger,
         string $entityClass,
         ValidatorInterface $validator
     ){
         $this->entityManager = $entityManager;
+        $this->logger = $logger;
         $this->validator = $validator;
         parent::__construct($registry, $entityClass);
     }
