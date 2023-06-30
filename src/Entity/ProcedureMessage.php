@@ -156,7 +156,7 @@ class ProcedureMessage implements UuidEntityInterface
      */
     public function setRequestCount(): int
     {
-        return $this->requestCount ++;
+        return $this->requestCount++;
     }
 
     public function getProcedure(): ProcedureInterface

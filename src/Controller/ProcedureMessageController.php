@@ -43,8 +43,8 @@ class ProcedureMessageController extends APIController
      *
      * @return Response
      */
-    #[Route(path: '/api/procedure/{id}/', methods: ['GET'], name: 'dplan_api_procedure_messages_insert', options: ['expose' => true])]
-    public function importNewImportableProcedureMessage(Request $request, string $authToken, string $id)
+    #[Route(path: '/api/procedure_message/{id}/', methods: ['GET'], name: 'dplan_api_procedure_messages_show', options: ['expose' => true])]
+    public function showNewImportableProcedureMessage(Request $request, string $authToken, string $id)
     {
         if ($request->headers->get($authToken) !== $this->getParameter('xbeteiligung_api_token')) {
             return $this->createEmptyResponse();
@@ -60,6 +60,32 @@ class ProcedureMessageController extends APIController
         }
 
         return $this->createResponse([$message], 200);
+    }
+
+    /**
+     * @param Request $request
+     * @param string $authToken
+     * @param string $id
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     * @throws \Exception
+     */
+    #[Route(path: '/api/procedure_message/{id}/', methods: ['POST'], name: 'dplan_api_procedure_messages_insert', options: ['expose' => true])]
+    public function importNewImportableProcedureMessage(Request $request, string $authToken, string $id)
+    {
+        if ($request->headers->get($authToken) !== $this->getParameter('xbeteiligung_api_token')) {
+            return $this->createEmptyResponse();
+        }
+
+        // we have to check if a corresponding procedure exists and get it if so
+        try {
+            $update[] = $this->procedureMessageRepository->updateObject($id);
+        } catch (NoResultException|NonUniqueResultException $e) {
+            $this->logger->warning('No unique procedure message found for given ID', [
+                'exception' => $e->getMessage()
+            ]);
+        }
+
+        return $this->redirectToRoute('dplan_api_procedure_messages_show', $update, Response::HTTP_OK);
     }
 
 }

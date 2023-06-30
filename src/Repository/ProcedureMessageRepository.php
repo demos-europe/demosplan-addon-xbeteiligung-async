@@ -48,9 +48,8 @@ class ProcedureMessageRepository extends ServiceEntityRepository
     public function getProcedureMessage(string $procedureMessageID): string
     {
         /** @var ProcedureMessage $procedureMessage **/
-        $procedureMessage = $this->findBy(['id' => $procedureMessageID]);
+        $procedureMessage = $this->get($procedureMessageID);
         $procedureMessage->setRequestCount();
-        $this->updateObject($procedureMessage);
         return $procedureMessage->getMessage();
     }
 
@@ -59,11 +58,11 @@ class ProcedureMessageRepository extends ServiceEntityRepository
      * @return mixed
      * @throws Exception
      */
-    public function updateObject($entity)
+    public function updateObject($id)
     {
         try {
             $em = $this->getEntityManager();
-
+            $entity = $this->get($id);
             if (!is_null($entity->getPId())) {
                 $em->persist($entity);
                 $em->flush();
