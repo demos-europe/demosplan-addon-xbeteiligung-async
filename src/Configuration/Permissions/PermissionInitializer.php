@@ -10,19 +10,20 @@ use DemosEurope\DemosplanAddon\Permission\ResolvablePermissionCollectionInterfac
 class PermissionInitializer implements PermissionInitializerInterface
 {
     private bool $restrictedAccess;
-
     public function __construct(GlobalConfigInterface $globalConfig)
     {
         $this->restrictedAccess = $globalConfig->hasProcedureUserRestrictedAccess();
     }
 
+    /**
+     * @inheritDoc
+     */
     public function configurePermissions(ResolvablePermissionCollectionInterface $permissionCollection): void
     {
         $permissionCollection->configurePermissionInstance(
-            Features::feature_get_XBeteiligungMessage_from_procedure(),
+            Features::feature_read_procedure_message(),
             PermissionConditionBuilder::start()
                 ->enableAlways()
         );
-
     }
 }

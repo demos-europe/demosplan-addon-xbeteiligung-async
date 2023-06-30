@@ -33,60 +33,22 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ProcedureMessageResourceType extends AddonResourceType implements UpdatableDqlResourceTypeInterface
 {
-    public function __construct(
-        PermissionEvaluatorInterface    $permissionEvaluator,
-        TypeProviderInterface           $typeProvider,
-        CurrentContextProviderInterface $currentContextProvider,
-        GlobalConfigInterface           $globalConfig,
-        LoggerInterface                 $logger,
-        MessageBagInterface             $messageBag,
-        ResourceTypeServiceInterface    $resourceTypeService,
-        TranslatorInterface             $translator,
-        ConditionFactoryInterface       $conditionFactory,
-        WrapperObjectFactory            $wrapperFactory,
-        ContainerInterface              $container
-    ) {
-        parent::__construct(
-            $permissionEvaluator,
-            $typeProvider,
-            $currentContextProvider,
-            $globalConfig,
-            $logger,
-            $messageBag,
-            $resourceTypeService,
-            $translator,
-            $conditionFactory,
-            $wrapperFactory,
-            $container
-        );
-    }
-    /**
-     * @return string
-     */
+
     public static function getName(): string
     {
         return 'ProcedureMessage';
     }
 
-    /**
-     * @return string
-     */
     public function getEntityClass(): string
     {
         return ProcedureMessage::class;
     }
 
-    /**
-     * @return bool
-     */
     public function isAvailable(): bool
     {
-        return $this->permissionEvaluator->isPermissionEnabled(Features::feature_get_XBeteiligungMessage_from_procedure());
+        return true;
     }
 
-    /**
-     * @return bool
-     */
     public function isDirectlyAccessible(): bool
     {
         return $this->isAvailable();
@@ -97,9 +59,6 @@ class ProcedureMessageResourceType extends AddonResourceType implements Updatabl
         return $this->isAvailable();
     }
 
-    /**
-     * @return PathsBasedInterface
-     */
     public function getAccessCondition(): PathsBasedInterface
     {
         return $this->conditionFactory->true();

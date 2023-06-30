@@ -7,22 +7,18 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ProcedureMessageRepository extends ServiceEntityRepository
 {
-    private EntityManagerInterface $entityManager;
-
-    private ValidatorInterface $validator;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
+        private EntityManagerInterface $entityManager,
         ManagerRegistry $registry,
+        private LoggerInterface $logger,
         string $entityClass,
-        ValidatorInterface $validator
+        private ValidatorInterface $validator
     ){
-        $this->entityManager = $entityManager;
-        $this->validator = $validator;
         parent::__construct($registry, $entityClass);
     }
 
@@ -43,9 +39,8 @@ class ProcedureMessageRepository extends ServiceEntityRepository
     public function getProcedureMessage(string $procedureMessageID): string
     {
         /** @var ProcedureMessage $procedureMessage **/
-        $procedureMessage = $this->findBy(['id' => $procedureMessageID]);
+        $procedureMessage = $this->get($procedureMessageID);
         $procedureMessage->setRequestCount();
-        $this->updateObject($procedureMessage);
         return $procedureMessage->getMessage();
     }
 
@@ -54,11 +49,11 @@ class ProcedureMessageRepository extends ServiceEntityRepository
      * @return mixed
      * @throws Exception
      */
-    public function updateObject($entity)
+    public function updateObject($id): ProcedureMessage
     {
         try {
             $em = $this->getEntityManager();
-
+            $entity = $this->get($id);
             if (!is_null($entity->getPId())) {
                 $em->persist($entity);
                 $em->flush();

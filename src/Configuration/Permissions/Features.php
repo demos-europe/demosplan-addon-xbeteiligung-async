@@ -7,11 +7,18 @@ use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAddon;
 
 class Features extends AbstractPermissionMeta
 {
-    public static function feature_get_XBeteiligungMessage_from_procedure(): self
+
+    /**
+     * needed to retrieve procedure-messages generated when updating creating or deleting a procedure
+     */
+    public static function feature_read_procedure_message(): self
     {
-        return new self('feature_get_xbeteiligungMessage_from_procedure');
+        return new self('feature_read_procedure_message');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getAddonIdentifier(): ?string
     {
         return XBeteiligungAddon::ADDON_NAME;
