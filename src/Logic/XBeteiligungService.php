@@ -12,28 +12,27 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateInterval;
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Entities\FaqCategoryInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\FaqInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Handler\FaqHandlerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnschriftTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
@@ -48,30 +47,23 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschr
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType\HausnummernBisAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftPostfachanschriftTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfahrenTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumTypeType;
 use Exception;
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
-use Symfony\Component\Routing\RouterInterface;
-use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class XBeteiligungService
 {
-    public const XBETEILIGUNG_VERSION = '1.0';
+    public const XBETEILIGUNG_VERSION = '0.9';
     public const STANDARD = 'XBeteiligung';
     private \JMS\Serializer\Serializer $serializer;
 
     public function __construct(
         private readonly GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository,
-        private readonly GlobalConfigInterface  $globalConfig,
         private readonly LoggerInterface        $logger,
-        private readonly RouterInterface        $router,
         SerializerFactory                       $serializerFactory,
-        private readonly TranslatorInterface    $translator,
-        private readonly UserHandlerInterface   $userHandler,
+        private readonly FaqHandlerInterface    $faqHandler
 
     ) {
         $this->serializer = $serializerFactory->getSerializer();
@@ -131,7 +123,6 @@ class XBeteiligungService
     {
         $xml = $this->serializer->serialize($data, 'xml');
         $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-
         return $xml->asXML() ?? '';
     }
 
@@ -202,7 +193,9 @@ class XBeteiligungService
         // Hier ist die ID des Planverfahrens zu übermitteln, innerhalb dessen das Beteiligungsverfahren durchgeführt wird
         $participationType->setPlanID($procedure->getXtaPlanId() ?? $procedure->getId()); // required
         $participationType->setBeschreibungPlanungsanlass($procedure->getDesc()); // optional - we want to use it
-        $participationType->setFlaechenabgrenzungUrl(''); // optional - we want to use it
+        $participationType->setFlaechenabgrenzungUrl(
+            $this->generateFaceBoundaryWMS_Url($procedure)
+        ); // optional - we want to use it
 
         // Hier ist die räumliche Beschreibung des Geltungsbereichs als Polygon im Format GeoJSON FG Notation zu über-
         // mitteln. todo Format wird noch geprüft.
@@ -224,9 +217,20 @@ class XBeteiligungService
 
         // todo Code liste urn:xoev-de:xleitstelle:codeliste:verfahrensschritt existiert nicht
         $participationType->setVerfahrensschritt(new CodeVerfahrensschrittTypeType()); // required - we want to use it
-        // $participationType->setVerfahrensart(new CodeVerfahrensartTypeType()); // optional
-        // todo die sind scheinbar nicht an der Procedure entity
-        $participationType->setAktuelleMitteilung(['', '']); // optional - we want to use it
+        //  $participationType->setVerfahrensart(new CodeVerfahrensartKommuneTypeType); // optional
+        $aktuelles = [];
+        /** @var array<int, FaqCategoryInterface> $categories */
+        $categories = $this->faqHandler->getAllCategoriesOfCurrentCustomer();
+        foreach ($categories as $category){
+            /** @var array<int, FaqInterface> $faqOfCategory */
+            $faqOfCategory = $this->faqHandler->getAllEnabledFaqsRegardlessOfUserRoleRestrictions($category);
+            /** @var FaqInterface $faq */
+            foreach ($faqOfCategory as $faq){
+                $aktuelles[] = $faq->getTitle(). ' : ' .$faq->getText();
+            }
+        }
+
+        $participationType->setAktuelleMitteilung($aktuelles); // optional - we want to use it
         // $participationType->setArbeitstitel(''); // optional
         // $participationType->setPlanart(new CodePlanartKommuneTypeType()); // otional
         $participationType->setDurchgang(1); // required not documented not wanted
