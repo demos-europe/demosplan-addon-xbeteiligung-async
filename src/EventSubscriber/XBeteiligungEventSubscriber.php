@@ -18,7 +18,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly LoggerInterface        $logger,
-        private readonly XBeteiligungService $xBauleitplanungService
+        private readonly XBeteiligungService $XBeteiligungService
     ) {
     }
 
