@@ -39,7 +39,7 @@ class ProcedureMessageController extends APIController
     #[Route(path: '/api/procedure/{id}/', methods: ['GET'], name: 'dplan_api_procedure_messages_insert', options: ['expose' => true])]
     public function importNewImportableProcedureMessage(ProcedureMessageRepository $procedureMessageRepository, Request $request, string $authToken, string $id)
     {
-        $request->headers->contains($authToken, this->getParameter('xbeteiligung_api_token'));
+        $request->headers->contains($authToken, $this->getParameter('xbeteiligung_api_token'));
         if ($authToken !== $this->getParameter('xbeteiligung_api_token')) {
             return $this->createEmptyResponse();
         }
