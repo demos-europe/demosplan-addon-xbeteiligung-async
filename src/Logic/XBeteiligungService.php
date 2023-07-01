@@ -69,7 +69,6 @@ class XBeteiligungService
         $this->serializer = $serializerFactory->getSerializer();
     }
 
-    // todo information needs to be gathered
     /**
      * @throws Exception
      */
@@ -151,8 +150,6 @@ class XBeteiligungService
     {
         $messageContent = new Nachrichteninhalt402();
         $messageContent->setVorgangsID($this->uuid());
-        // todo the documentation says the return type of generateParticipationContent should be identical for 401,402
-        // it is not - email to stephan.conrad is sent.
         $messageContent->setBeteiligung($this->generateParticipationContent($procedure)); // optional
 
         return $messageContent;
@@ -162,8 +159,8 @@ class XBeteiligungService
     {
         $messageContent = new Nachrichteninhalt409();
         $messageContent->setVorgangsID($this->uuid());
-        $messageContent->setPlanID($procedure->getXtaPlanId() ?? $procedure->getId());
-        $messageContent->setBeteiligungsID($procedure->getId());
+        $messageContent->setPlanID($procedure->getId());
+        $messageContent->setBeteiligungsID($procedure->getId()); // why does only a 409 Message still has this property?
 
         return $messageContent;
     }
@@ -209,28 +206,31 @@ class XBeteiligungService
 
         // Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
         $participationType->setBekanntmachung(
-            $procedure->getStartDate()->sub(new DateInterval('P7D'))
+            DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
-        // verfahren? wird hier an dieser Stelle in Excel-sheet gelistet
+
         // todo email an Stefan Conrad ist raus - der MetadatenAnlageTypeType ist broken zur Zeit
+        // todo did not answer this question - need to ask again
         // $participationType->setAnlagen([new MetadatenAnlageTypeType()]); // optional - we want to use it
 
         // todo Code liste urn:xoev-de:xleitstelle:codeliste:verfahrensschritt existiert nicht
         $participationType->setVerfahrensschritt(new CodeVerfahrensschrittTypeType()); // required - we want to use it
         //  $participationType->setVerfahrensart(new CodeVerfahrensartKommuneTypeType); // optional
-        $aktuelles = [];
-        /** @var array<int, FaqCategoryInterface> $categories */
-        $categories = $this->faqHandler->getAllCategoriesOfCurrentCustomer();
-        foreach ($categories as $category){
-            /** @var array<int, FaqInterface> $faqOfCategory */
-            $faqOfCategory = $this->faqHandler->getAllEnabledFaqsRegardlessOfUserRoleRestrictions($category);
-            /** @var FaqInterface $faq */
-            foreach ($faqOfCategory as $faq){
-                $aktuelles[] = $faq->getTitle(). ' : ' .$faq->getText();
-            }
-        }
 
-        $participationType->setAktuelleMitteilung($aktuelles); // optional - we want to use it
+//        $aktuelles = [];
+//        /** @var array<int, FaqCategoryInterface> $categories */
+//        $categories = $this->faqHandler->getAllCategoriesOfCurrentCustomer();
+//        foreach ($categories as $category){
+//            /** @var array<int, FaqInterface> $faqOfCategory */
+//            $faqOfCategory = $this->faqHandler->getAllEnabledFaqsRegardlessOfUserRoleRestrictions($category);
+//            /** @var FaqInterface $faq */
+//            foreach ($faqOfCategory as $faq){
+//                $aktuelles[] = $faq->getTitle(). ' : ' .$faq->getText();
+//            }
+//        }
+//
+//        $participationType->setAktuelleMitteilung($aktuelles); // optional - we want to use it
+
         // $participationType->setArbeitstitel(''); // optional
         // $participationType->setPlanart(new CodePlanartKommuneTypeType()); // otional
         $participationType->setDurchgang(1); // required not documented not wanted
@@ -253,26 +253,24 @@ class XBeteiligungService
         return $messageHead;
     }
 
-    // todo information needs to be provided - check if optional or not
     private function createReaderInformation(): BehoerdeTypeType
     {
         $reader = new BehoerdeTypeType();
         $reader->setBehoerdenkennung($this->addReadingAuthorityIdentificationType()); // required
 //        $reader->setErreichbarkeit($this->addReaderCommunicationType()); // optional list
 //        $reader->setAnschrift($this->addReaderPostalInformation()); // optional
-        $reader->setBehoerdenname(''); // required
+        $reader->setBehoerdenname('K3'); // required
 
         return $reader;
     }
 
-    // todo fill in the correct information - is it demosplan here?
     private function createAuthorInformation(): BehoerdeErreichbarTypeType
     {
         $author = new BehoerdeErreichbarTypeType();
         $author->setBehoerdenkennung($this->addAuthorityIdentificationOfAuthor()); // required
         $author->setErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
         $author->setAnschrift($this->addAuthorPostalInformation()); // required
-        $author->setBehoerdenname(''); // required
+        $author->setBehoerdenname('DEMOS plan GmbH'); // required
 
         return $author;
     }
@@ -441,16 +439,16 @@ class XBeteiligungService
 
         $buildingAddress = new PostalischeInlandsanschriftGebaeudeanschriftTypeType();
         $buildingNumber = new HausnummernBisAnonymousPHPType();
-        $buildingNumber->setHausnummerBis('');
+        $buildingNumber->setHausnummerBis('1');
         $buildingNumber->setHausnummerbuchstabezusatzzifferBis('');
         $buildingNumber->setTeilnummerderhausnummerBis('');
         $buildingAddress->setHausnummernBis($buildingNumber); // optional
-        $buildingAddress->setWohnort(''); // required
-        $buildingAddress->setPostleitzahl(''); // required
-        $buildingAddress->setHausnummer(''); // optional
+        $buildingAddress->setWohnort('Berlin'); // required
+        $buildingAddress->setPostleitzahl('10178'); // required
+        $buildingAddress->setHausnummer('1'); // optional
         $buildingAddress->setHausnummerBuchstabeZusatzziffer(''); // optional
         $buildingAddress->setStockwerkswohnungsnummer(''); // oprional
-        $buildingAddress->setStrasse(''); // required
+        $buildingAddress->setStrasse('Panoramastraße'); // required
         $postAddress->setGebaeude($buildingAddress); // required
 
         $postMailBoxAddress = new PostalischeInlandsanschriftPostfachanschriftTypeType();

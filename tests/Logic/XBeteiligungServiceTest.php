@@ -4,37 +4,38 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic;
 
 use DateInterval;
 use DateTime;
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
+use DemosEurope\DemosplanAddon\Contracts\Handler\FaqHandlerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
-use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class XBeteiligungServiceTest extends TestCase
 {
-    private $repoMock;
+    private MockObject $repoMock;
+    private MockObject $faqHandlerMock;
 
      protected function setUp(): void
     {
         parent::setUp();
 
         $this->repoMock = $this->createMock(GisLayerCategoryRepositoryInterface::class);
+        $this->faqHandlerMock = $this->createMock(FaqHandlerInterface::class);
 
         $serializer = new SerializerFactory();
         $this->sut = new XBeteiligungService(
             $this->repoMock,
             $this->createMock(LoggerInterface::class),
             $serializer,
+            $this->faqHandlerMock
         );
     }
 
