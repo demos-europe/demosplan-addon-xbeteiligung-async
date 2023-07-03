@@ -77,7 +77,7 @@ class ProcedureMessage implements UuidEntityInterface
     /**
      * @var int
      */
-    #[ORM\Column(type: "integer", nullable: false, options: ["default" => 1])]
+    #[ORM\Column(type: "integer", nullable: false, options: ["default" => 0])]
     private int $requestCount;
 
     public function __construct(

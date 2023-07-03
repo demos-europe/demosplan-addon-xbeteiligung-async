@@ -54,7 +54,7 @@ class ProcedureMessageRepository extends ServiceEntityRepository
         try {
             $em = $this->getEntityManager();
             $entity = $this->get($id);
-            if (!is_null($entity->getPId())) {
+            if (!is_null($entity->getId())) {
                 $em->persist($entity);
                 $em->flush();
             }

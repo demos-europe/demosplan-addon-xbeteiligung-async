@@ -2,25 +2,43 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Controller;
 
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
-use DemosEurope\DemosplanAddon\Contracts\MessageBagInterface;
 use DemosEurope\DemosplanAddon\Controller\APIController;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
-use EDT\JsonApi\Validation\FieldsValidator;
-use EDT\Wrapping\TypeProviders\PrefilledTypeProvider;
-use EDT\Wrapping\Utilities\SchemaPathProcessor;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Exception;
 
 class ProcedureMessageController extends APIController
 {
+    /**
+     * @param Request $request
+     * @param string $authToken
+     * @param string $id
+     * @return RedirectResponse|Response
+     * @throws Exception
+     */
+    #[Route(path: '/api/procedure_message/{procedureMessageId}/', methods: ['POST'], name: 'dplan_api_procedure_messages_insert', options: ['expose' => true])]
+    public function importNewImportableProcedureMessage(ProcedureMessageRepository $procedureMessageRepository, Request $request, string $authToken, string $procedureMessageId)
+    {
+        if ($request->headers->get($authToken) !== $this->getParameter('xbeteiligung_api_token')) {
+            return $this->createEmptyResponse();
+        }
+
+        // we have to check if a corresponding procedure exists and get it if so
+        try {
+            $update[] = $procedureMessageRepository->updateObject($procedureMessageId);
+        } catch (NoResultException|NonUniqueResultException $e) {
+            $this->logger->warning('No unique procedure message found for given ID', [
+                'exception' => $e->getMessage()
+            ]);
+        }
+
+        return $this->redirectToRoute('dplan_api_procedure_messages_show', $update, Response::HTTP_OK);
+    }
     /**
      * Triggers a fetch for all given ProcedureMessage-urls to retrieve last update from Procedure
      * and saves them as new ProcedureMessage.
@@ -52,32 +70,6 @@ class ProcedureMessageController extends APIController
         }
 
         return $this->createResponse([$message], 200);
-    }
-
-    /**
-     * @param Request $request
-     * @param string $authToken
-     * @param string $id
-     * @return RedirectResponse|Response
-     * @throws Exception
-     */
-    #[Route(path: '/api/procedure_message/{procedureMessageId}/', methods: ['POST'], name: 'dplan_api_procedure_messages_insert', options: ['expose' => true])]
-    public function importNewImportableProcedureMessage(ProcedureMessageRepository $procedureMessageRepository, Request $request, string $authToken, string $procedureMessageId)
-    {
-        if ($request->headers->get($authToken) !== $this->getParameter('xbeteiligung_api_token')) {
-            return $this->createEmptyResponse();
-        }
-
-        // we have to check if a corresponding procedure exists and get it if so
-        try {
-            $update[] = $procedureMessageRepository->updateObject($procedureMessageId);
-        } catch (NoResultException|NonUniqueResultException $e) {
-            $this->logger->warning('No unique procedure message found for given ID', [
-                'exception' => $e->getMessage()
-            ]);
-        }
-
-        return $this->redirectToRoute('dplan_api_procedure_messages_show', $update, Response::HTTP_OK);
     }
 
 }
