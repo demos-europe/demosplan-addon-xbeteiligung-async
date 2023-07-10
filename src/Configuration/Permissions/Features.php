@@ -3,7 +3,7 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions;
 
 use DemosEurope\DemosplanAddon\Permission\AbstractPermissionMeta;
-use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAddon;
+use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 
 class Features extends AbstractPermissionMeta
 {
@@ -21,6 +21,6 @@ class Features extends AbstractPermissionMeta
      */
     public function getAddonIdentifier(): ?string
     {
-        return XBeteiligungAddon::ADDON_NAME;
+        return XBeteiligungAsyncAddon::ADDON_NAME;
     }
 }
