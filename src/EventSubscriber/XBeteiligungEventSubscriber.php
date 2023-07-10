@@ -10,6 +10,9 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber;
 
+use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInterface;
+use DemosEurope\DemosplanAddon\Contracts\Events\PostProcedureUpdatedEventInterface;
+use DemosEurope\DemosplanAddon\Contracts\Events\PostProcedureDeletedEventInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -18,7 +21,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly LoggerInterface        $logger,
-        private readonly XBeteiligungService $XBeteiligungService
+        private readonly XBeteiligungService $xBeteiligungService
     ) {
     }
 
@@ -27,7 +30,29 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
      */
     public static function getSubscribedEvents(): array
     {
-        return [];
+        return [
+            PostNewProcedureCreatedEventInterface::class => 'newProcedureCreated',
+            PostProcedureUpdatedEventInterface::class => 'procedureUpdated',
+            PostProcedureDeletedEventInterface::class => 'procedureDeleted',
+        ];
+    }
+
+    public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
+    {
+       $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
+        dd($xml);
+    }
+
+    public function procedureUpdated(PostProcedureUpdatedEventInterface $event): void
+    {
+       $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($event->getProcedure());
+       dd($xml);
+    }
+
+    public function procedureDeleted(PostProcedureDeletedEventInterface $event): void
+    {
+        $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($event->getProcedureId());
+        dd($xml);
     }
 
 }
