@@ -34,6 +34,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittTyp
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GXInneresTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
@@ -246,6 +247,7 @@ class XBeteiligungService
     private function createMessageHeadFor(NachrichtG2GTypeType $messageObject): NachrichtenkopfG2GTypeType
     {
         $messageHead = new NachrichtenkopfG2GTypeType();
+//        $messageHead = new NachrichtenkopfG2GXInneresTypeType();
         $messageHead->setIdentifikationNachricht($this->createMessageIdentification($messageObject)); // required
         $messageHead->setLeser($this->createReaderInformation()); // required
         $messageHead->setAutor($this->createAuthorInformation()); // required
