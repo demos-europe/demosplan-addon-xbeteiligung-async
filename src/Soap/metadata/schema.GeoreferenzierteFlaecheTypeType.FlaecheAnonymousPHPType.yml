@@ -7,4 +7,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheTypeT
             accessor:
                 getter: getPolygon
                 setter: setPolygon
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PolygonTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PolygonTypeTypeType

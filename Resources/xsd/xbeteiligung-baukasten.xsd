@@ -1086,51 +1086,6 @@
          </xs:element>
       </xs:sequence>
    </xs:complexType>
-   <xs:complexType name="UnterverfahrensteilschrittType">
-      <xs:sequence>
-         <xs:element name="uvtscode"
-                     minOccurs="0"
-                     type="xbeteiligung:Code.UnterverfahrensteilschrittType"/>
-         <xs:element name="mandatory" minOccurs="0" type="xs:boolean"/>
-      </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="VerfahrenType">
-      <xs:annotation>
-         <xs:documentation>Element zur Spezifizierung eines Verfahrens.</xs:documentation>
-      </xs:annotation>
-      <xs:sequence>
-         <xs:element name="verfahrenstypID" minOccurs="0" type="xs:ID"/>
-         <xs:element name="verfahrenstyp"
-                     minOccurs="0"
-                     type="xbeteiligung:Code.VerfahrenstypType"/>
-         <xs:element name="verfahrensteilschritt"
-                     minOccurs="0"
-                     maxOccurs="unbounded"
-                     type="xbeteiligung:VerfahrensteilschrittType"/>
-         <xs:element name="unterverfahrensteilschritt"
-                     minOccurs="0"
-                     maxOccurs="unbounded"
-                     type="xbeteiligung:Code.UnterverfahrensteilschrittType"/>
-         <xs:element name="zustaendigkeit" type="xbeteiligung:Code.ZustaendigkeitType"/>
-         <xs:element name="aktuelleMitteilung"
-                     minOccurs="0"
-                     maxOccurs="unbounded"
-                     type="xs:string"/>
-      </xs:sequence>
-   </xs:complexType>
-   <xs:complexType name="VerfahrensteilschrittType">
-      <xs:sequence>
-         <xs:element name="verfahrensteilschrittcode"
-                     minOccurs="0"
-                     type="xbeteiligung:Code.VerfahrensteilschrittType"/>
-         <xs:element name="mindestdauer" minOccurs="0" type="xs:int"/>
-         <xs:element name="maxdauer" minOccurs="0" type="xs:int"/>
-         <xs:element name="unterverfahrensteilschritte"
-                     minOccurs="0"
-                     maxOccurs="unbounded"
-                     type="xbeteiligung:UnterverfahrensteilschrittType"/>
-      </xs:sequence>
-   </xs:complexType>
    <xs:complexType name="ZeitraumType">
       <xs:annotation>
          <xs:documentation>Der Zeitraum kennzeichnet einen Abschnitt auf einem Zeitstrahl durch Angabe von Beginn und/oder Ende.</xs:documentation>
