@@ -13,7 +13,7 @@ services:
         exclude:
             - '../src/{Test}'
 
-    DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAddon:
+    DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon:
         lazy: true
 
     DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSubscriber:

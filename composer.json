@@ -3,6 +3,7 @@
     "description": "This plugin provides Handling of XBeteiligung messages",
     "version": "0.1.0",
     "type": "demosplan-addon",
+    "license": "proprietary",
     "autoload": {
         "psr-4": {
             "DemosEurope\\DemosplanAddon\\XBeteiligung\\": "src/"

@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LoggerInterface        $logger,
+        private readonly LoggerInterface $logger,
         private readonly XBeteiligungService $xBeteiligungService
     ) {
     }
