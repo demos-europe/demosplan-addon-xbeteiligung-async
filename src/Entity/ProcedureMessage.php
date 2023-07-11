@@ -3,7 +3,6 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Entity;
 use DateTime;
 
-use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UuidEntityInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,58 +18,32 @@ class ProcedureMessage implements UuidEntityInterface
 {
     use Timestampable;
 
-    /**
-     * @var string|null
-     */
     #[ORM\Column(type: 'string', length: 36, nullable: false, options:['fixed' => true])]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: \demosplan\DemosPlanCoreBundle\Doctrine\Generator\UuidV4Generator::class)]
-    private $id;
+    private ?string $id;
 
-    /**
-     * @var string
-     */
     #[ORM\Column(name: 'procedure_id', length: 36, type: 'string', nullable: false)]
-    private $procedure;
+    private string $procedureId;
 
-    /**
-     * @var string
-     */
     #[ORM\Column(name: 'message', type: 'text', nullable: false)]
-    private $message = '';
+    private string $message = '';
 
-    /**
-     * @var DateTime
-     */
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(type: 'datetime', nullable: false, options: ['default' => 'CURRENT_TIMESTAMP'])]
-    private $createdDate;
+    private DateTime $createdDate;
 
-    /**
-     * @var DateTime
-     *
-     */
     #[Gedmo\Timestampable(on: "update")]
     #[ORM\Column(type: "datetime", nullable: false, options: ["default" => "CURRENT_TIMESTAMP"])]
-    private $modificationDate;
+    private DateTime $modificationDate;
 
-    /**
-     * @var bool
-     */
     #[ORM\Column(type: "boolean", nullable: false, options: ["default" => false] )]
-    private $error;
+    private bool $error;
 
-    /**
-     * @var bool
-     *
-     */
     #[ORM\Column(type: "boolean", nullable: false, options: ["default" => false])]
     private bool $deleted;
 
-    /**
-     * @var int
-     */
     #[ORM\Column(type: "integer", nullable: false, options: ["default" => 0])]
     private int $requestCount;
 
@@ -79,13 +52,13 @@ class ProcedureMessage implements UuidEntityInterface
         bool $deleted,
         bool $error,
         bool $requestCount,
-        ProcedureInterface $procedure
+        string $procedureId
     ) {
         $this->message = $message;
         $this->deleted = $deleted;
         $this->error = $error;
         $this->requestCount = $requestCount;
-        $this->procedure = $procedure;
+        $this->procedureId = $procedureId;
     }
 
     public function getId(): ?string
@@ -128,8 +101,8 @@ class ProcedureMessage implements UuidEntityInterface
         return $this->requestCount++;
     }
 
-    public function getProcedure(): ProcedureInterface
+    public function getProcedureId(): string
     {
-        return $this->procedure;
+        return $this->procedureId;
     }
 }
