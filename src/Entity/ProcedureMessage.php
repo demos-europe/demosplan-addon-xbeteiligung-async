@@ -29,15 +29,9 @@ class ProcedureMessage implements UuidEntityInterface
     private $id;
 
     /**
-     * Every message belongs to an (actual, non-template) procedure. But every procedure can have many relation or doesn't have any
-     * with {@link ProcedureMessage}.
-     * It fully depends on permissions and availability of the external ProcedureMessage service.
-     *
-     * @var ProcedureInterface
-     *
+     * @var string
      */
-    #[ORM\ManyToOne(targetEntity: \demosplan\DemosPlanCoreBundle\Entity\Procedure\Procedure:: class)]
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: "_p_id", unique: true)]
+    #[ORM\Column(name: 'procedure_id', length: 36, type: 'string', nullable: false)]
     private $procedure;
 
     /**

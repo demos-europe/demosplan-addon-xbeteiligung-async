@@ -18,7 +18,10 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Handler\FaqHandlerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
@@ -64,10 +67,24 @@ class XBeteiligungService
         private readonly GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository,
         private readonly LoggerInterface        $logger,
         SerializerFactory                       $serializerFactory,
-        private readonly FaqHandlerInterface    $faqHandler
+        private readonly FaqHandlerInterface    $faqHandler,
+        private readonly ProcedureMessageRepository $procedureMessageRepository,
+
 
     ) {
         $this->serializer = $serializerFactory->getSerializer();
+    }
+
+    private function saveProcedureMessage(string $xml, string $procedureId): void
+    {
+        $procedureMessage = new ProcedureMessage(
+            $xml,
+            false,
+            false,
+            0,
+            $procedureId
+        );
+        $this->procedureMessageRepository->createNew($procedureMessage);
     }
 
     /**
@@ -84,7 +101,10 @@ class XBeteiligungService
             $this->generateMain401MessageContent($procedure)
         ); // required
 
-        return $this->serializeData($procedureCreated401Object);
+        $xml = $this->serializeData($procedureCreated401Object);
+        $this->saveProcedureMessage($xml, $procedure->getId());
+
+        return $xml;
     }
 
     /**
@@ -101,7 +121,10 @@ class XBeteiligungService
             $this->generateMain402MessageContent($procedure)
         ); // required
 
-        return $this->serializeData($procedureUpdated402Object);
+        $xml = $this->serializeData($procedureUpdated402Object);
+        $this->saveProcedureMessage($xml, $procedure->getId());
+
+        return $xml;
     }
 
     /**
@@ -116,7 +139,10 @@ class XBeteiligungService
         ); // required
         $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedureId));
 
-        return $this->serializeData($procedureDeleted409Object);
+        $xml = $this->serializeData($procedureDeleted409Object);
+        $this->saveProcedureMessage($xml, $procedureId);
+
+        return $xml;
     }
 
     private function serializeData($data): string
