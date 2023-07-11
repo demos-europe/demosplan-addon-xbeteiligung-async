@@ -56,6 +56,7 @@ use Exception;
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Psr\Log\LoggerInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 
 class XBeteiligungService
 {
@@ -64,13 +65,11 @@ class XBeteiligungService
     private \JMS\Serializer\Serializer $serializer;
 
     public function __construct(
-        private readonly GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository,
-        private readonly LoggerInterface        $logger,
-        SerializerFactory                       $serializerFactory,
-        private readonly FaqHandlerInterface    $faqHandler,
-        private readonly ProcedureMessageRepository $procedureMessageRepository,
-
-
+        private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
+        private readonly LoggerInterface                        $logger,
+        SerializerFactory                                       $serializerFactory,
+        private readonly ProcedureNewsServiceInterface          $procedureNewsService,
+        private readonly ProcedureMessageRepository             $procedureMessageRepository,
     ) {
         $this->serializer = $serializerFactory->getSerializer();
     }
@@ -232,6 +231,7 @@ class XBeteiligungService
         $participationType->setVerfahrensschritt(new CodeVerfahrensschrittTypeType()); // required - we want to use it
         //  $participationType->setVerfahrensart(new CodeVerfahrensartKommuneTypeType); // optional
 
+//        $aktuelles = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId());
 //        $aktuelles = [];
 //        /** @var array<int, FaqCategoryInterface> $categories */
 //        $categories = $this->faqHandler->getAllCategoriesOfCurrentCustomer();
