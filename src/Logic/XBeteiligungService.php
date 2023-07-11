@@ -75,18 +75,6 @@ class XBeteiligungService
         $this->serializer = $serializerFactory->getSerializer();
     }
 
-    private function saveProcedureMessage(string $xml, string $procedureId): void
-    {
-        $procedureMessage = new ProcedureMessage(
-            $xml,
-            false,
-            false,
-            0,
-            $procedureId
-        );
-        $this->procedureMessageRepository->createNew($procedureMessage);
-    }
-
     /**
      * @throws Exception
      */
@@ -585,6 +573,18 @@ class XBeteiligungService
     public function setSerializer($serializer)
     {
         $this->serializer = $serializer;
+    }
+
+    private function saveProcedureMessage(string $xml, string $procedureId): void
+    {
+        $procedureMessage = new ProcedureMessage(
+            $xml,
+            false,
+            false,
+            0,
+            $procedureId
+        );
+        $this->procedureMessageRepository->createNew($procedureMessage);
     }
 
 }

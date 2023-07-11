@@ -40,19 +40,16 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
        $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
-        dd($xml);
     }
 
     public function procedureUpdated(PostProcedureUpdatedEventInterface $event): void
     {
        $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($event->getProcedure());
-       dd($xml);
     }
 
     public function procedureDeleted(PostProcedureDeletedEventInterface $event): void
     {
         $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($event->getProcedureId());
-        dd($xml);
     }
 
 }
