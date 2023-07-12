@@ -18,11 +18,11 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-readonly class XBeteiligungEventSubscriber implements EventSubscriberInterface
+ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private LoggerInterface $logger,
-        private XBeteiligungService $xBeteiligungService
+        private readonly LoggerInterface $logger,
+        private readonly XBeteiligungService $xBeteiligungService
     ) {
     }
 
