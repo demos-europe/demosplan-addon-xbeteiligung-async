@@ -169,12 +169,12 @@ class XBeteiligungService
         return $messageContent;
     }
 
-    private function generateMain409MessageContent(ProcedureInterface $procedure): Nachrichteninhalt409
+    private function generateMain409MessageContent(string $procedureId): Nachrichteninhalt409
     {
         $messageContent = new Nachrichteninhalt409();
         $messageContent->setVorgangsID($this->uuid());
-        $messageContent->setPlanID($procedure->getId());
-        $messageContent->setBeteiligungsID($procedure->getId()); // why does only a 409 Message still has this property?
+        $messageContent->setPlanID($procedureId);
+        $messageContent->setBeteiligungsID($procedureId); // why does only a 409 Message still has this property?
 
         return $messageContent;
     }
