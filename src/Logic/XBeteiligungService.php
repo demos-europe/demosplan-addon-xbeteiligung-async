@@ -231,20 +231,14 @@ class XBeteiligungService
         $participationType->setVerfahrensschritt(new CodeVerfahrensschrittTypeType()); // required - we want to use it
         //  $participationType->setVerfahrensart(new CodeVerfahrensartKommuneTypeType); // optional
 
-//        $aktuelles = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId());
-//        $aktuelles = [];
-//        /** @var array<int, FaqCategoryInterface> $categories */
-//        $categories = $this->faqHandler->getAllCategoriesOfCurrentCustomer();
-//        foreach ($categories as $category){
-//            /** @var array<int, FaqInterface> $faqOfCategory */
-//            $faqOfCategory = $this->faqHandler->getAllEnabledFaqsRegardlessOfUserRoleRestrictions($category);
-//            /** @var FaqInterface $faq */
-//            foreach ($faqOfCategory as $faq){
-//                $aktuelles[] = $faq->getTitle(). ' : ' .$faq->getText();
-//            }
-//        }
-//
-//        $participationType->setAktuelleMitteilung($aktuelles); // optional - we want to use it
+        $procedureNewsList = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId());
+        $aktuelles = [];
+        foreach ($procedureNewsList['result'] as $procedureNews) {
+            if (isset($procedureNews['title'], $procedureNews['text'])) {
+                $aktuelles[] = strip_tags($procedureNews['title'].': '.$procedureNews['text']);
+            }
+        }
+        $participationType->setAktuelleMitteilung($aktuelles); // optional - we want to use it
 
         // $participationType->setArbeitstitel(''); // optional
         // $participationType->setPlanart(new CodePlanartKommuneTypeType()); // otional
