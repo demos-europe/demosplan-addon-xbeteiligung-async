@@ -12,13 +12,9 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateInterval;
 use DateTime;
-use DemosEurope\DemosplanAddon\Contracts\Entities\FaqCategoryInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\FaqInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\Contracts\Handler\FaqHandlerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
-use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
@@ -193,12 +189,19 @@ class XBeteiligungService
         $participationType->setAkteurVorhaben($procedureInitiatingOrganisation); // required
 
         $participationType->setPlanname($procedure->getName()); // required
-        // planart
+        // todo what do we want here - where is the difference - there are tons more
+        // Quelle AdoRepo: urn-xoev-de-xleitstelle-codeliste-planartkommune_1.0
+        // just wrote down the ones about "Bebauung"
+        // Code: 6_1_QualifizierterBPlan -> Qualifizierter Bebauungsplan
+        // Code: 6_2_VorhabenbezogenerBPlan -> Vorhabenbezogener Bebauungsplan
+        // Code: 6_3_EinfacherBPlan -> Einfacher Bebauungsplan
+        // Code: 6_6_BebauungsplanZurWohnraumversorgung -> Bebauungsplan zur Wohnraumversorgung
+        // Code: 6_Bebauungsplan -> Bebauungsplan
         $planType = new CodePlanartKommuneTypeType();
-        $planType->setCode('1000')
+        $planType->setCode('6_3_EinfacherBPlan') // easy has to be good right :)
             ->setName('Einfacher Bebauungsplan')
             ->setListVersionID('1.0')
-            ->setListURI('urn:xoev-de:xleitstelle:codeliste:planart');
+            ->setListURI('urn:xoev-de:xleitstelle:codeliste:planartkommune');
         $participationType->setPlanart($planType); // optional - we want to use it
 
         // Hier ist die ID des Planverfahrens zu übermitteln, innerhalb dessen das Beteiligungsverfahren durchgeführt wird
@@ -224,11 +227,31 @@ class XBeteiligungService
         ); // required - we dont want it
 
         // todo email an Stefan Conrad ist raus - der MetadatenAnlageTypeType ist broken zur Zeit
-        // todo did not answer this question - need to ask again
+        // was told by S.C that we get a base64 container at some moment in the future
         // $participationType->setAnlagen([new MetadatenAnlageTypeType()]); // optional - we want to use it
 
-        // todo Code liste urn:xoev-de:xleitstelle:codeliste:verfahrensschritt existiert nicht
-        $participationType->setVerfahrensschritt(new CodeVerfahrensschrittTypeType()); // required - we want to use it
+        // todo Code liste gefunden dank Stephan.C - still need to use them
+        // On the other hand - we discussed a completely new pattern for this in order to send
+        // public participations as well as institution participations together in one message.
+        // basically we need to rework this whole BeteiligungKommuneTypeType bs anyways - so do not bother right now
+        // Quelle AdoRepo: xoev-de-xplanverfahren-codeliste-verfahrensschritt_1.xml
+        // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
+        // code: 2000 -> Frühzeitige Behördenbeteiligung
+        // code: 3000 -> Aufstellungsbeschluss -- nicht beteiligungsrelevant
+        // code: 3600 -> Einleitungszustimmung -- nicht beteiligungsrelevant
+        // code: 4000 -> Frühzeitige Öffentlichkeitsbeteiligung
+        // code: 5000 -> Beteiligung Töb
+        // code: 6000 -> öffentliche Auslegung
+        // code: 7000 -> Feststellungsverfahren -- nicht beteiligungsrelevant
+        // code: 8000 -> Schlussphase -- nicht beteiligungsrelevant
+        // code: 9998 -> kein VS // no clue what that means - but it is beteiligungsrelevant
+        $procedurePhaseCode = new CodeVerfahrensschrittTypeType();
+        $procedurePhaseCode->setListVersionID('1.0');
+        $procedurePhaseCode->setListURI('');
+        $procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung');
+        $procedurePhaseCode->setCode('4000');
+        $participationType->setVerfahrensschritt($procedurePhaseCode); // required - we want to use it
+
         //  $participationType->setVerfahrensart(new CodeVerfahrensartKommuneTypeType); // optional
 
         $procedureNewsList = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId());
@@ -242,7 +265,8 @@ class XBeteiligungService
 
         // $participationType->setArbeitstitel(''); // optional
         // $participationType->setPlanart(new CodePlanartKommuneTypeType()); // otional
-        $participationType->setDurchgang(1); // required not documented not wanted
+        $participationType->setDurchgang(1); // required not documented not wanted --
+        // It is in discussion how to implement this into the standard - as of 07/2023
 
         return $participationType;
     }
@@ -302,6 +326,7 @@ class XBeteiligungService
                 $basemapGisLayer = $gisLayer;
             }
         }
+        // todo does BoundingBox now contains the mapExtent or the BoundingBox as they are switched within our db
         $bboxArray = explode(',', $procedure->getSettings()->getBoundingBox());
 
         $west = (float)$bboxArray[0];
@@ -337,15 +362,15 @@ class XBeteiligungService
         $prefixType = new CodePraefixTypeType();
         $prefixType->setListVersionID('');
         $prefixType->setListURI('');
-        $prefixType->setName('');
-        $prefixType->setCode('diplanfhh');
+        $prefixType->setName('die XLeitstelle muss im Rahmen der Eintragung von Diensten in das DVDV erstellt werden');
+        $prefixType->setCode('work probably in progress');
         $authorityIdentificationType->setPraefix($prefixType); // required
 
         $codeAuthorityIdentification = new CodeBehoerdenkennungTypeType();
         $codeAuthorityIdentification->setListVersionID('');
         $codeAuthorityIdentification->setListURI('');
-        $codeAuthorityIdentification->setName('');
-        $codeAuthorityIdentification->setCode('0400');
+        $codeAuthorityIdentification->setName('die XLeitstelle muss im Rahmen der Eintragung von Diensten in das DVDV erstellt werden');
+        $codeAuthorityIdentification->setCode('work probably in progress');
         $authorityIdentificationType->setKennung($codeAuthorityIdentification); // required
 
         return $authorityIdentificationType;
@@ -359,15 +384,15 @@ class XBeteiligungService
         $prefixType = new CodePraefixTypeType();
         $prefixType->setListVersionID('');
         $prefixType->setListURI('');
-        $prefixType->setName('');
-        $prefixType->setCode('diplanfhh');
+        $prefixType->setName('die XLeitstelle muss im Rahmen der Eintragung von Diensten in das DVDV erstellt werden');
+        $prefixType->setCode('work probably in progress');
         $authorityIdentificationType->setPraefix($prefixType); // required
 
         $codeAuthorityIdentification = new CodeBehoerdenkennungTypeType();
         $codeAuthorityIdentification->setListVersionID('');
         $codeAuthorityIdentification->setListURI('');
-        $codeAuthorityIdentification->setName('');
-        $codeAuthorityIdentification->setCode('0200');
+        $codeAuthorityIdentification->setName('die XLeitstelle muss im Rahmen der Eintragung von Diensten in das DVDV erstellt werden');
+        $codeAuthorityIdentification->setCode('work probably in progress');
         $authorityIdentificationType->setKennung($codeAuthorityIdentification); // required
 
         return $authorityIdentificationType;
@@ -380,7 +405,9 @@ class XBeteiligungService
     {
         $communicationType = new KommunikationTypeType();
         $comCode = new CodeErreichbarkeitTypeType();
-        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger, 06 -> Pager, 07 -> Sonstiges
+        // Quelle - AdoRepo: Erreichbarkeit-3.xml
+        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger,
+        // 06 -> Pager, 07 -> Sonstiges, 08 -> DE-Mail, 09 -> Web
         $comCode->setCode('');
         $comCode->setName('');
         $comCode->setListURI('');
@@ -401,14 +428,16 @@ class XBeteiligungService
     {
         $communicationType = new KommunikationTypeType();
         $comCode = new CodeErreichbarkeitTypeType();
-        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger, 06 -> Pager, 07 -> Sonstiges
-        $comCode->setCode('');
-        $comCode->setName('');
+        // Quelle - AdoRepo: Erreichbarkeit-3.xml
+        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger,
+        // 06 -> Pager, 07 -> Sonstiges, 08 -> DE-Mail, 09 -> Web
+        $comCode->setCode('09');
+        $comCode->setName('Web');
         $comCode->setListURI('');
         $comCode->setListVersionID('');
         $communicationType->setKanal($comCode); // required
         // kennung: In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
-        $communicationType->setKennung(''); // required
+        $communicationType->setKennung('https://demosplan.com/impressum.html'); // required
         $communicationType->setZusatz(''); // optional
 
         return [$communicationType];
@@ -442,7 +471,6 @@ class XBeteiligungService
         return $postAddress;
     }
 
-    // todo information needs to be provided
     private function addAuthorPostalInformation(): PostalischeInlandsanschriftTypeType
     {
         $postAddress = new PostalischeInlandsanschriftTypeType();

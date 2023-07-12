@@ -7,7 +7,6 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\UuidEntityInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
-use Gedmo\Timestampable\Traits\Timestampable;
 
 /**
  * ProcedureMessage - Defines a specific message of Procedure
@@ -16,8 +15,6 @@ use Gedmo\Timestampable\Traits\Timestampable;
 class ProcedureMessage implements UuidEntityInterface
 
 {
-    use Timestampable;
-
     #[ORM\Column(type: 'string', length: 36, nullable: false, options:['fixed' => true])]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]

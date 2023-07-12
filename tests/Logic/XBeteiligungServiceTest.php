@@ -9,10 +9,11 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
-use DemosEurope\DemosplanAddon\Contracts\Handler\FaqHandlerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -21,21 +22,24 @@ use Psr\Log\LoggerInterface;
 class XBeteiligungServiceTest extends TestCase
 {
     private MockObject $repoMock;
-    private MockObject $faqHandlerMock;
+    private MockObject $procedureNewsService;
+    private MockObject $procedureMessageRepository;
 
      protected function setUp(): void
     {
         parent::setUp();
 
         $this->repoMock = $this->createMock(GisLayerCategoryRepositoryInterface::class);
-        $this->faqHandlerMock = $this->createMock(FaqHandlerInterface::class);
+        $this->procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
+        $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
 
         $serializer = new SerializerFactory();
         $this->sut = new XBeteiligungService(
             $this->repoMock,
             $this->createMock(LoggerInterface::class),
             $serializer,
-            $this->faqHandlerMock
+            $this->procedureNewsService,
+            $this->procedureMessageRepository
         );
     }
 
@@ -168,6 +172,20 @@ class XBeteiligungServiceTest extends TestCase
         $procedure->method('getEndDate')->willReturn((new DateTime())->add(new DateInterval('P7D')));
         $procedure->method('getSettings')->willReturn($procedureSettingsMock);
 
+        $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(
+          [
+              'result' => [
+                  [
+                      'title' => 'Test Titel',
+                      'text'  => 'Test Inhalt',
+                  ],
+                  [
+                      'title' => 'noch ein <p>Test Titel</p>',
+                      'text'  => '<b>Test</b> These Tags will be removed via strip_tags()',
+                  ],
+              ]
+          ]
+        );
 
         $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
         echo (str_replace('&amp;', '&', $procedureXml));
