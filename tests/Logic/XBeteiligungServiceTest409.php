@@ -19,13 +19,13 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
-class XBeteiligungServiceTest extends TestCase
+class XBeteiligungServiceTest409 extends TestCase
 {
     private MockObject $repoMock;
     private MockObject $procedureNewsService;
     private MockObject $procedureMessageRepository;
 
-     protected function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -43,16 +43,16 @@ class XBeteiligungServiceTest extends TestCase
         );
     }
 
-    public function testPlanung2BeteiligungBeteiligungNeu0401()
+    public function testPlanung2BeteiligungBeteiligungNeu0409()
     {
-        $xml = '<ns6:planung2Beteiligung.BeteiligungNeu.0401 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        $xml = '<ns6:planung2Beteiligung.BeteiligungNeu.0409 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ns2="http://xbeteiligung.de/addendum" xmlns:ns3="http://www.osci.de/xinneres/rueckweisung/3" xmlns:ns4="http://www.osci.de/xinneres/weiterleitung/4" xmlns:ns5="http://www.osci.de/xinneres/quittung/1" xmlns:ns6="http://xbeteiligung.de/V0103" xmlns:ns7="http://www.opengis.net/gml/3.2" xmlns:ns8="http://www.w3.org/1999/xlink" xmlns:ns9="http://www.xleitstelle.de/xbau/2/2" xmlns:ns10="http://docs.oasis-open.org/codelist/ns/genericode/1.0/" produkt="K1" produkthersteller="]init[ AG" standard="XBeteiligung" version="1.2.0">
     <nachrichtenkopf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns6:Nachrichtenkopf.G2G">
         <identifikation.nachricht xsi:type="ns6:Identifikation.Nachricht">
             <nachrichtenUUID>1663ad58-cd71-42af-9b02-fd20c287a5b4</nachrichtenUUID>
             <nachrichtentyp xsi:type="ns6:Code.XBeteiligungsNachrichten" listURI="urn:de:xbeteiligung:codeliste:xbeteiligungnachrichtencodeliste" listVersionID="1.0">
-                <coade>0401</code>
-                <name>plnung2Beteiligung.BeteiligungNeu.0401 (XTA)</name>
+                <coade>0409</code>
+                <name>plnung2Beteiligung.BeteiligungNeu.0409 (XTA)</name>
             </nachrichtentyp>
             <erstellungszeitpunkt>2021-10-20T13:47:49.684+02:00</erstellungszeitpunkt>
         </identifikation.nachricht>
@@ -145,7 +145,7 @@ class XBeteiligungServiceTest extends TestCase
             <ns6:funktionspostfach>stadt-und-landschaftsplanung@bergedorf.hamburg.de</ns6:funktionspostfach>
         </ns6:beteiligung>
     </ns6:nachrichteninhalt>
-</ns6:planung2Beteiligung.BeteiligungNeu.0401>
+</ns6:planung2Beteiligung.BeteiligungNeu.0409>
 
 ';
         $gisLayerCategoryInterfaceMock = $this->createMock(GisLayerCategoryInterface::class);
@@ -156,7 +156,7 @@ class XBeteiligungServiceTest extends TestCase
         $gisMo->method('getLayers')->willReturn('de_basemapde_web_raster_farbe');
         $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn(new ArrayCollection([$gisMo]));
         $procedureSettingsMock = $this->createMock(ProcedureSettingsInterface::class);
-         $procedureSettingsMock->method('getBoundingBox')
+        $procedureSettingsMock->method('getBoundingBox')
             ->willReturn('904640.92309477,7067292.9633037,1195347.6354542,7350657.5148909');
         $this->repoMock->method('getRootLayerCategory')->willReturn($gisLayerCategoryInterfaceMock);
 
@@ -173,26 +173,24 @@ class XBeteiligungServiceTest extends TestCase
         $procedure->method('getSettings')->willReturn($procedureSettingsMock);
 
         $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(
-          [
-              'result' => [
-                  [
-                      'title' => 'Test Titel',
-                      'text'  => 'Test Inhalt',
-                  ],
-                  [
-                      'title' => 'noch ein <p>Test Titel</p>',
-                      'text'  => '<b>Test</b> These Tags will be removed via strip_tags()',
-                  ],
-              ]
-          ]
+            [
+                'result' => [
+                    [
+                        'title' => 'Test Titel',
+                        'text'  => 'Test Inhalt',
+                    ],
+                    [
+                        'title' => 'noch ein <p>Test Titel</p>',
+                        'text'  => '<b>Test</b> These Tags will be removed via strip_tags()',
+                    ],
+                ]
+            ]
         );
 
-        $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
+        $procedureXml = $this->sut->createProcedureDeleted409FromObject($procedure);
         echo (str_replace('&amp;', '&', $procedureXml));
 
         $isValid = $this->sut->isValidMessage($procedureXml, true, 'xbeteiligung-planung2beteiligung.xsd');
         self::assertTrue($isValid);
     }
-
-
 }
