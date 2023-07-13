@@ -51,12 +51,12 @@ class ProcedureMessageResourceType extends AddonResourceType implements Updatabl
 
     public function isDirectlyAccessible(): bool
     {
-        return $this->isAvailable();
+        return false;
     }
 
     public function isExposedAsPrimaryResource(): bool
     {
-        return $this->isAvailable();
+        return false;
     }
 
     public function getAccessCondition(): PathsBasedInterface

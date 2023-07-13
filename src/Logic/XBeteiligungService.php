@@ -22,7 +22,12 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalNeuType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneType;
@@ -31,6 +36,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GXInneresTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
@@ -150,7 +156,7 @@ class XBeteiligungService
     {
         $messageContent = new Nachrichteninhalt401();
         $messageContent->setVorgangsID($this->uuid());  // required
-        $messageContent->setBeteiligung($this->generateParticipationContent($procedure)); // optional
+        $messageContent->setBeteiligung($this->generateParticipationContentFor401Messages($procedure)); // optional
 
         return $messageContent;
     }
@@ -172,6 +178,164 @@ class XBeteiligungService
         $messageContent->setBeteiligungsID($procedureId); // why does only a 409 Message still has this property?
 
         return $messageContent;
+    }
+
+    private function generateParticipationContentFor401Messages(ProcedureInterface $procedure): BeteiligungKommunalNeuType
+    {
+        $participationType = new BeteiligungKommunalNeuType();
+
+        $procedureInitiatingOrganisation = new AkteurVorhabenType();
+        // kteurVorhaben
+        $organisationType = new OrganisationTypeType();
+        $organisationName = new NameOrganisationTypeType();
+        $organisationName->setName($procedure->getOrga()?->getName() ?? '');
+        $organisationType->setName($organisationName);
+        $procedureInitiatingOrganisation->setVeranlasser($organisationType);
+        $participationType->setAkteurVorhaben($procedureInitiatingOrganisation); // required
+        // Hier ist die ID des Planverfahrens zu übermitteln, innerhalb dessen das Beteiligungsverfahren durchgeführt wird
+        $participationType->setPlanID($procedure->getId()); // required
+        $participationType->setPlanname($procedure->getName()); // required
+
+        // $participationType->setArbeitstitel(''); // optional
+        // $participationType->setPlanartKommunal(new CodePlanartKommuneType()); // optional
+
+        // why is this code present in this layer - i dont get it - email to Stephan is on the way
+        // As far as I understood our meeting - this code should only be present within the institution/participation
+        // type thingies.
+        // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
+        // code: 2000 -> Frühzeitige Behördenbeteiligung
+        // code: 3000 -> Aufstellungsbeschluss -- nicht beteiligungsrelevant
+        // code: 3600 -> Einleitungszustimmung -- nicht beteiligungsrelevant
+        // code: 4000 -> Frühzeitige Öffentlichkeitsbeteiligung
+        // code: 5000 -> Beteiligung Töb
+        // code: 6000 -> öffentliche Auslegung
+        // code: 7000 -> Feststellungsverfahren -- nicht beteiligungsrelevant
+        // code: 8000 -> Schlussphase -- nicht beteiligungsrelevant
+        // code: 9998 -> kein VS // no clue what that means - but it is beteiligungsrelevant
+        $procedurePhaseCode = new CodeVerfahrensschrittType();
+        $procedurePhaseCode->setListVersionID('1.0');
+        $procedurePhaseCode->setListURI('');
+        $procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung');
+        $procedurePhaseCode->setCode('4000');
+        $participationType->setVerfahrensschrittKommunal($procedurePhaseCode); // required - we want to use it
+        //  $participationType->setVerfahrensartKommunal(new CodeVerfahrensartKommuneType); // optional
+        $participationType->setBeschreibungPlanungsanlass($procedure->getDesc()); // optional - we want to use it
+        $participationType->setFlaechenabgrenzungUrl(
+            $this->generateFaceBoundaryWMS_Url($procedure)
+        ); // optional - we want to use it
+        // Hier ist die räumliche Beschreibung des Geltungsbereichs als Polygon im Format GeoJSON FG Notation zu über-
+        // mitteln. todo Format wird noch geprüft.
+        $participationType->setGeltungsbereich(''); // required - we dont want to use it
+        $participationType->setRaeumlicheBeschreibung(''); // required - we dont want it
+        // Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren
+        // eingesehen werden können.
+        // $participationType->setBeteiligungURL(''); // optional
+
+        // now the new stuff
+        $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure));
+        $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure));
+
+        return $participationType;
+    }
+
+    private function generateInstitutionParticipationType(ProcedureInterface $procedure): BeteiligungKommunalTOEBType
+    {
+        $institutionParticipationType = new BeteiligungKommunalTOEBType();
+
+        // we as demos think this id is useless - did not win the discussion as it seems :(
+        $institutionParticipationType->setBeteiligungsID($this->uuid());
+        // this MetadatenAnlageType should support a base64 container to dump files into but it does not - S.C. is informed
+        // $publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
+        $timeSpan = new ZeitraumType();
+        $timeSpan->setBeginn($procedure->getStartDate());
+        $timeSpan->setEnde($procedure->getEndDate());
+        $institutionParticipationType->setZeitraum($timeSpan); // optional - we want to use it
+        // Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
+        $institutionParticipationType->setBekanntmachung(
+            DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
+        ); // required - we dont want it
+        // we kind of need to implement this feature
+        $institutionParticipationType->setDurchgang(1); // required not documented not wanted
+        $bkTOEBaaType = new BeteiligungKommunalTOEBArtAnonymousPHPType();
+        // todo Code liste gefunden dank Stephan.C - still need to use them
+        // On the other hand - we discussed a completely new pattern for this in order to send
+        // public participations as well as institution participations together in one message.
+        // basically we need to rework this whole BeteiligungKommuneTypeType bs anyways - so do not bother right now
+        // Quelle AdoRepo: xoev-de-xplanverfahren-codeliste-verfahrensschritt_1.xml out of date and non existant since 13.07.23
+        // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
+        // code: 2000 -> Frühzeitige Behördenbeteiligung
+        // code: 3000 -> Aufstellungsbeschluss -- nicht beteiligungsrelevant
+        // code: 3600 -> Einleitungszustimmung -- nicht beteiligungsrelevant
+        // code: 4000 -> Frühzeitige Öffentlichkeitsbeteiligung
+        // code: 5000 -> Beteiligung Töb
+        // code: 6000 -> öffentliche Auslegung
+        // code: 7000 -> Feststellungsverfahren -- nicht beteiligungsrelevant
+        // code: 8000 -> Schlussphase -- nicht beteiligungsrelevant
+        // code: 9998 -> kein VS // no clue what that means - but it is beteiligungsrelevant
+        $procedurePhaseCode = new CodeVerfahrensschrittType();
+        $procedurePhaseCode->setListVersionID('1.0');
+        $procedurePhaseCode->setListURI('');
+        $procedurePhaseCode->setName('Frühzeitige Behördenbeteiligung');
+        $procedurePhaseCode->setCode('2000');
+        $bkTOEBaaType->setBeteiligungKommunalFormalTOEB($procedurePhaseCode);
+        $institutionParticipationType->setBeteiligungKommunalTOEBArt($bkTOEBaaType);
+
+        $procedureNewsList = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId());
+        $aktuelles = [];
+        foreach ($procedureNewsList['result'] as $procedureNews) {
+            if (isset($procedureNews['title'], $procedureNews['text'])) {
+                $aktuelles[] = strip_tags($procedureNews['title'].': '.$procedureNews['text']);
+            }
+        }
+        $institutionParticipationType->setAktuelleMitteilung($aktuelles);
+
+        return $institutionParticipationType;
+    }
+
+    private function generatePublicParticipationType(ProcedureInterface $procedure): BeteiligungKommunalOeffentlichkeitType
+    {
+        $publicParticipationType = new BeteiligungKommunalOeffentlichkeitType();
+        // we as demos think this id is useless - did not win the discussion as it seems :(
+        $publicParticipationType->setBeteiligungsID($this->uuid());
+        // this MetadatenAnlageType should support a base64 container to dump files into but it does not - S.C. is informed
+        // $publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
+        $timeSpan = new ZeitraumType();
+        $timeSpan->setBeginn($procedure->getStartDate());
+        $timeSpan->setEnde($procedure->getEndDate());
+        $publicParticipationType->setZeitraum($timeSpan); // optional - we want to use it
+        // Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
+        $publicParticipationType->setBekanntmachung(
+            DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
+        ); // required - we dont want it
+        // we kind of need to implement this feature
+        $publicParticipationType->setDurchgang(1); // required not documented not wanted
+        $bkoeaaType = new BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType();
+        // todo Code liste gefunden dank Stephan.C - still need to use them
+        // On the other hand - we discussed a completely new pattern for this in order to send
+        // public participations as well as institution participations together in one message.
+        // basically we need to rework this whole BeteiligungKommuneTypeType bs anyways - so do not bother right now
+        // Quelle AdoRepo: xoev-de-xplanverfahren-codeliste-verfahrensschritt_1.xml out of date and non existant since 13.07.23
+        // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
+        // code: 2000 -> Frühzeitige Behördenbeteiligung
+        // code: 3000 -> Aufstellungsbeschluss -- nicht beteiligungsrelevant
+        // code: 3600 -> Einleitungszustimmung -- nicht beteiligungsrelevant
+        // code: 4000 -> Frühzeitige Öffentlichkeitsbeteiligung
+        // code: 5000 -> Beteiligung Töb
+        // code: 6000 -> öffentliche Auslegung
+        // code: 7000 -> Feststellungsverfahren -- nicht beteiligungsrelevant
+        // code: 8000 -> Schlussphase -- nicht beteiligungsrelevant
+        // code: 9998 -> kein VS // no clue what that means - but it is beteiligungsrelevant
+        $procedurePhaseCode = new CodeVerfahrensschrittType();
+        $procedurePhaseCode->setListVersionID('1.0');
+        $procedurePhaseCode->setListURI('');
+        $procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung');
+        $procedurePhaseCode->setCode('4000');
+        $bkoeaaType->setBeteiligungKommunalFormalOeffentlichkeit($procedurePhaseCode);
+        $publicParticipationType->setBeteiligungKommunalOeffentlichkeitArt($bkoeaaType);
+        // todo here the procedureNewsList for Guest/Privatperson need to be inserted I guess
+        $publicParticipationType->setAktuelleMitteilung([]);
+
+        return $publicParticipationType;
     }
 
     private function generateParticipationContent(ProcedureInterface $procedure): BeteiligungKommuneType
