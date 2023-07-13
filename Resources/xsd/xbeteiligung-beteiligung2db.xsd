@@ -42,7 +42,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
@@ -52,9 +52,7 @@
                                  <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung"
-                                       minOccurs="0"
-                                       type="xbeteiligung:BeteiligungPlanfeststellungDBType">
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungPlanfeststellungDB">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
                               </xs:annotation>
@@ -77,7 +75,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
@@ -87,9 +85,7 @@
                                  <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung"
-                                       minOccurs="0"
-                                       type="xbeteiligung:BeteiligungPlanfeststellungDBType">
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungPlanfeststellungDB">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält die aktualisierten Angaben für zu beteiligende Stelle.</xs:documentation>
                               </xs:annotation>
@@ -112,7 +108,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
@@ -150,7 +146,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
@@ -160,9 +156,7 @@
                                  <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung"
-                                       minOccurs="0"
-                                       type="xbeteiligung:BeteiligungRaumordnungDBType">
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungRaumordnungDB">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
                               </xs:annotation>
@@ -185,7 +179,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
@@ -195,9 +189,7 @@
                                  <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung"
-                                       minOccurs="0"
-                                       type="xbeteiligung:BeteiligungRaumordnungDBType">
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungRaumordnungDB">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält die aktualisierten Angaben für zu beteiligende Stelle.</xs:documentation>
                               </xs:annotation>
@@ -220,7 +212,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
@@ -258,7 +250,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
@@ -268,9 +260,7 @@
                                  <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung"
-                                       minOccurs="0"
-                                       type="xbeteiligung:BeteiligungKommuneDBType">
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungKommuneDB">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
                               </xs:annotation>
@@ -293,7 +283,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
@@ -303,9 +293,7 @@
                                  <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung"
-                                       minOccurs="0"
-                                       type="xbeteiligung:BeteiligungKommuneDBType">
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungKommuneDB">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält die aktualisierten Angaben für zu beteiligende Stelle.</xs:documentation>
                               </xs:annotation>
@@ -328,7 +316,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>

@@ -33,4 +33,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungStellungn
                 inline: true
                 entry_name: fehler
                 namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
-            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerTypeType>
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType>

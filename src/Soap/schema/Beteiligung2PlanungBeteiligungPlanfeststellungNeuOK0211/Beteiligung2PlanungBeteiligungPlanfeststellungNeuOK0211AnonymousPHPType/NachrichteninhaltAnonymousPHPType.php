@@ -2,12 +2,12 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211\Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211AnonymousPHPType;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateOKTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateOKType;
 
 /**
  * Class representing NachrichteninhaltAnonymousPHPType
  */
-class NachrichteninhaltAnonymousPHPType extends NachrichteninhaltTemplateOKTypeType
+class NachrichteninhaltAnonymousPHPType extends NachrichteninhaltTemplateOKType
 {
 }
 

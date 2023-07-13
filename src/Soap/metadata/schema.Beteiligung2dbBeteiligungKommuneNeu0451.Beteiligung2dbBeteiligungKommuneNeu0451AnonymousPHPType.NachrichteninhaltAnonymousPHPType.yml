@@ -19,4 +19,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2dbBeteiligungKom
             accessor:
                 getter: getBeteiligung
                 setter: setBeteiligung
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneDBTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneDBType
