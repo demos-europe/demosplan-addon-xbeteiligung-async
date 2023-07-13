@@ -18,18 +18,17 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommuneType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensartKommuneTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
@@ -47,7 +46,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschr
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType\HausnummernBisAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftPostfachanschriftTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType;
 use Exception;
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
@@ -175,11 +174,11 @@ class XBeteiligungService
         return $messageContent;
     }
 
-    private function generateParticipationContent(ProcedureInterface $procedure): BeteiligungKommuneTypeType
+    private function generateParticipationContent(ProcedureInterface $procedure): BeteiligungKommuneType
     {
-        $participationType = new BeteiligungKommuneTypeType();
+        $participationType = new BeteiligungKommuneType();
 
-        $procedureInitiatingOrganisation = new AkteurVorhabenTypeType();
+        $procedureInitiatingOrganisation = new AkteurVorhabenType();
         // kteurVorhaben
         $organisationType = new OrganisationTypeType();
         $organisationName = new NameOrganisationTypeType();
@@ -197,7 +196,7 @@ class XBeteiligungService
         // Code: 6_3_EinfacherBPlan -> Einfacher Bebauungsplan
         // Code: 6_6_BebauungsplanZurWohnraumversorgung -> Bebauungsplan zur Wohnraumversorgung
         // Code: 6_Bebauungsplan -> Bebauungsplan
-        $planType = new CodePlanartKommuneTypeType();
+        $planType = new CodePlanartKommuneType();
         $planType->setCode('6_3_EinfacherBPlan') // easy has to be good right :)
             ->setName('Einfacher Bebauungsplan')
             ->setListVersionID('1.0')
@@ -216,7 +215,7 @@ class XBeteiligungService
         $participationType->setGeltungsbereich(''); // required - we dont want to use it
         $participationType->setRaeumlicheBeschreibung(''); // required - we dont want it
         // zeitraum
-        $timeSpan = new ZeitraumTypeType();
+        $timeSpan = new ZeitraumType();
         $timeSpan->setBeginn($procedure->getStartDate());
         $timeSpan->setEnde($procedure->getEndDate());
         $participationType->setZeitraum($timeSpan); // optional - we want to use it
@@ -245,7 +244,7 @@ class XBeteiligungService
         // code: 7000 -> Feststellungsverfahren -- nicht beteiligungsrelevant
         // code: 8000 -> Schlussphase -- nicht beteiligungsrelevant
         // code: 9998 -> kein VS // no clue what that means - but it is beteiligungsrelevant
-        $procedurePhaseCode = new CodeVerfahrensschrittTypeType();
+        $procedurePhaseCode = new CodeVerfahrensschrittType();
         $procedurePhaseCode->setListVersionID('1.0');
         $procedurePhaseCode->setListURI('');
         $procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung');
