@@ -5,15 +5,15 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 /**
  * Class representing AnlagenTypeType
  *
- * Dieser Typ dient dazu, die Metadaten zu Verfahrensunterlagen aufzunehmen, die einer XBeteiligungs-Kommunikation als Anlagen beigefügt sind.
+ * Dieser Typ dient dazu, die Metadaten zu Dokumenten aufzunehmen, die einer XBau-Kommunikation (z.B. Antragstellung) als Anlagen beigefügt sind. Als Anlagen sind in erster Linie Bauvorlagen zu nennen, in vielen Fällen zusätzlich weitere Anlagen (wie Nachweise und ergänzende Dokumentationen) und sonstiges Schriftgut.
  * XSD Type: AnlagenType
  */
 class AnlagenTypeType
 {
     /**
-     * Jede Instanz dieses Elements steht für eine Anlage (Primärdokument) zur übermittelten Fachnachricht.
+     * Jede Instanz dieses Elements steht für eine Anlage (Bauvorlage, Primärdokument, sonstige Anlage) zum vorliegenden Antrag bzw. zur übermittelten XBau-Fachnachricht.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageTypeType[] $anlage
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[] $anlage
      */
     private $anlage = [
         
@@ -22,12 +22,12 @@ class AnlagenTypeType
     /**
      * Adds as anlage
      *
-     * Jede Instanz dieses Elements steht für eine Anlage (Primärdokument) zur übermittelten Fachnachricht.
+     * Jede Instanz dieses Elements steht für eine Anlage (Bauvorlage, Primärdokument, sonstige Anlage) zum vorliegenden Antrag bzw. zur übermittelten XBau-Fachnachricht.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageTypeType $anlage
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType $anlage
      */
-    public function addToAnlage(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageTypeType $anlage)
+    public function addToAnlage(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType $anlage)
     {
         $this->anlage[] = $anlage;
         return $this;
@@ -36,7 +36,7 @@ class AnlagenTypeType
     /**
      * isset anlage
      *
-     * Jede Instanz dieses Elements steht für eine Anlage (Primärdokument) zur übermittelten Fachnachricht.
+     * Jede Instanz dieses Elements steht für eine Anlage (Bauvorlage, Primärdokument, sonstige Anlage) zum vorliegenden Antrag bzw. zur übermittelten XBau-Fachnachricht.
      *
      * @param int|string $index
      * @return bool
@@ -49,7 +49,7 @@ class AnlagenTypeType
     /**
      * unset anlage
      *
-     * Jede Instanz dieses Elements steht für eine Anlage (Primärdokument) zur übermittelten Fachnachricht.
+     * Jede Instanz dieses Elements steht für eine Anlage (Bauvorlage, Primärdokument, sonstige Anlage) zum vorliegenden Antrag bzw. zur übermittelten XBau-Fachnachricht.
      *
      * @param int|string $index
      * @return void
@@ -62,9 +62,9 @@ class AnlagenTypeType
     /**
      * Gets as anlage
      *
-     * Jede Instanz dieses Elements steht für eine Anlage (Primärdokument) zur übermittelten Fachnachricht.
+     * Jede Instanz dieses Elements steht für eine Anlage (Bauvorlage, Primärdokument, sonstige Anlage) zum vorliegenden Antrag bzw. zur übermittelten XBau-Fachnachricht.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageTypeType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[]
      */
     public function getAnlage()
     {
@@ -74,9 +74,9 @@ class AnlagenTypeType
     /**
      * Sets a new anlage
      *
-     * Jede Instanz dieses Elements steht für eine Anlage (Primärdokument) zur übermittelten Fachnachricht.
+     * Jede Instanz dieses Elements steht für eine Anlage (Bauvorlage, Primärdokument, sonstige Anlage) zum vorliegenden Antrag bzw. zur übermittelten XBau-Fachnachricht.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageTypeType[] $anlage
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageDirektTypeType[] $anlage
      * @return self
      */
     public function setAnlage(array $anlage)

@@ -17,7 +17,7 @@ class NachrichteninhaltAnonymousPHPType
     /**
      * Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneTypeType $beteiligung
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalNeuType $beteiligung
      */
     private $beteiligung = null;
 
@@ -52,7 +52,7 @@ class NachrichteninhaltAnonymousPHPType
      *
      * Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalNeuType
      */
     public function getBeteiligung()
     {
@@ -64,10 +64,10 @@ class NachrichteninhaltAnonymousPHPType
      *
      * Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneTypeType $beteiligung
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalNeuType $beteiligung
      * @return self
      */
-    public function setBeteiligung(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneTypeType $beteiligung = null)
+    public function setBeteiligung(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalNeuType $beteiligung)
     {
         $this->beteiligung = $beteiligung;
         return $this;

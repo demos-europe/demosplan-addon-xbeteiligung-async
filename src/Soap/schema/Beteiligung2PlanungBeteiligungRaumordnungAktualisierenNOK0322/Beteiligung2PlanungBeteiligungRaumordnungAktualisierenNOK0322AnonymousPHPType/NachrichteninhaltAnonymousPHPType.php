@@ -2,12 +2,12 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungAktualisierenNOK0322\Beteiligung2PlanungBeteiligungRaumordnungAktualisierenNOK0322AnonymousPHPType;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOKTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOKType;
 
 /**
  * Class representing NachrichteninhaltAnonymousPHPType
  */
-class NachrichteninhaltAnonymousPHPType extends NachrichteninhaltTemplateNOKTypeType
+class NachrichteninhaltAnonymousPHPType extends NachrichteninhaltTemplateNOKType
 {
     /**
      * Beteiligungs-ID, die in der Nachricht 402 übermittelt wurde.

@@ -19,4 +19,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2dbBeteiligungRau
             accessor:
                 getter: getBeteiligung
                 setter: setBeteiligung
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungRaumordnungDBTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungRaumordnungDBType
