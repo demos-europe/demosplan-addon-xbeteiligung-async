@@ -354,7 +354,6 @@ class XBeteiligungService
             $height . $crs . $styles . $bbox;
     }
 
-    // todo information needs to be provided
     private function addReadingAuthorityIdentificationType(): BehoerdenkennungTypeType
     {
         $authorityIdentificationType = new BehoerdenkennungTypeType();
@@ -376,7 +375,6 @@ class XBeteiligungService
         return $authorityIdentificationType;
     }
 
-    // todo information needs to be provided
     private function addAuthorityIdentificationOfAuthor(): BehoerdenkennungTypeType
     {
         $authorityIdentificationType = new BehoerdenkennungTypeType();
@@ -420,7 +418,6 @@ class XBeteiligungService
         return [$communicationType];
     }
 
-    // todo information needs to be provided
     /**
      * @return array<int, KommunikationTypeType>
      */
