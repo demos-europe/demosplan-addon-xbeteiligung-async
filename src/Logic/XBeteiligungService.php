@@ -234,7 +234,7 @@ class XBeteiligungService
         // On the other hand - we discussed a completely new pattern for this in order to send
         // public participations as well as institution participations together in one message.
         // basically we need to rework this whole BeteiligungKommuneTypeType bs anyways - so do not bother right now
-        // Quelle AdoRepo: xoev-de-xplanverfahren-codeliste-verfahrensschritt_1.xml
+        // Quelle AdoRepo: xoev-de-xplanverfahren-codeliste-verfahrensschritt_1.xml out of date and non existant since 13.07.23
         // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
         // code: 2000 -> Frühzeitige Behördenbeteiligung
         // code: 3000 -> Aufstellungsbeschluss -- nicht beteiligungsrelevant
@@ -408,8 +408,8 @@ class XBeteiligungService
         // 06 -> Pager, 07 -> Sonstiges, 08 -> DE-Mail, 09 -> Web
         $comCode->setCode('');
         $comCode->setName('');
-        $comCode->setListURI('');
-        $comCode->setListVersionID('');
+        $comCode->setListURI('urn:de:xoev:codeliste:erreichbarkeit');
+        $comCode->setListVersionID('3');
         $communicationType->setKanal($comCode); // required
         // kennung: In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
         $communicationType->setKennung(''); // required
@@ -430,8 +430,8 @@ class XBeteiligungService
         // 06 -> Pager, 07 -> Sonstiges, 08 -> DE-Mail, 09 -> Web
         $comCode->setCode('09');
         $comCode->setName('Web');
-        $comCode->setListURI('');
-        $comCode->setListVersionID('');
+        $comCode->setListURI('urn:de:xoev:codeliste:erreichbarkeit');
+        $comCode->setListVersionID('3');
         $communicationType->setKanal($comCode); // required
         // kennung: In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
         $communicationType->setKennung('https://demosplan.com/impressum.html'); // required
