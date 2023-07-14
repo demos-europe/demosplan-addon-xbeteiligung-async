@@ -14,6 +14,7 @@ use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
@@ -280,13 +281,7 @@ class XBeteiligungService
         $bkTOEBaaType->setBeteiligungKommunalFormalTOEB($procedurePhaseCode);
         $institutionParticipationType->setBeteiligungKommunalTOEBArt($bkTOEBaaType);
 
-        $procedureNewsList = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId());
-        $aktuelles = [];
-        foreach ($procedureNewsList['result'] as $procedureNews) {
-            if (isset($procedureNews['title'], $procedureNews['text'])) {
-                $aktuelles[] = strip_tags($procedureNews['title'].': '.$procedureNews['text']);
-            }
-        }
+        $aktuelles = $this->getInstitutionNewsList($procedure);
         $institutionParticipationType->setAktuelleMitteilung($aktuelles);
 
         return $institutionParticipationType;
@@ -333,6 +328,7 @@ class XBeteiligungService
         $bkoeaaType->setBeteiligungKommunalFormalOeffentlichkeit($procedurePhaseCode);
         $publicParticipationType->setBeteiligungKommunalOeffentlichkeitArt($bkoeaaType);
         // todo here the procedureNewsList for Guest/Privatperson need to be inserted I guess
+//        $aktuelles = $this->getPublicNewsList($procedure);
         $publicParticipationType->setAktuelleMitteilung([]);
 
         return $publicParticipationType;
@@ -433,8 +429,6 @@ class XBeteiligungService
 
         return $participationType;
     }
-
-
 
     /**
      * @throws Exception
@@ -767,6 +761,29 @@ class XBeteiligungService
             $procedureId
         );
         $this->procedureMessageRepository->createNew($procedureMessage);
+    }
+
+    private function getInstitutionNewsList(ProcedureInterface $procedure): array
+    {
+        $procedureNewsList = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId())['result'];
+        $roleList = $procedureNewsList['roles'];
+        return [];
+    }
+
+    private function getProcedureNewsList(ProcedureInterface $procedure, bool $public): array
+    {
+        $procedureNewsList = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId());
+        $aktuelles = [];
+
+
+
+        foreach ($procedureNewsList['result'] as $procedureNews) {
+            if (isset($procedureNews['title'], $procedureNews['text'])) {
+                $aktuelles[] = strip_tags($procedureNews['title'].': '.$procedureNews['text']);
+            }
+        }
+
+        return $aktuelles;
     }
 
 }
