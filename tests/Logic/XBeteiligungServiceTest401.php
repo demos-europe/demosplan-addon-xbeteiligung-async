@@ -9,6 +9,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
@@ -171,6 +172,8 @@ class XBeteiligungServiceTest401 extends TestCase
         $procedure->method('getStartDate')->willReturn(new DateTime());
         $procedure->method('getEndDate')->willReturn((new DateTime())->add(new DateInterval('P7D')));
         $procedure->method('getSettings')->willReturn($procedureSettingsMock);
+        $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
+        $procedure->method('getPhase')->willReturn('earlyparticipation');
 
         $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(
           [
@@ -178,10 +181,12 @@ class XBeteiligungServiceTest401 extends TestCase
                   [
                       'title' => 'Test Titel',
                       'text'  => 'Test Inhalt',
+                      'roles' => [['groupCode' => 'GPSORG', 'code' => RoleInterface::PLANNING_AGENCY_WORKER]]
                   ],
                   [
                       'title' => 'noch ein <p>Test Titel</p>',
                       'text'  => '<b>Test</b> These Tags will be removed via strip_tags()',
+                      'roles' => [['groupCode' => 'GPSORG', 'code' => RoleInterface::CITIZEN]]
                   ],
               ]
           ]

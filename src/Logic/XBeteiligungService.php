@@ -66,6 +66,69 @@ class XBeteiligungService
     public const STANDARD = 'XBeteiligung';
     private \JMS\Serializer\Serializer $serializer;
 
+    // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
+    // code: 2000 -> Frühzeitige Behördenbeteiligung
+    // code: 3000 -> Aufstellungsbeschluss -- nicht beteiligungsrelevant
+    // code: 3600 -> Einleitungszustimmung -- nicht beteiligungsrelevant
+    // code: 4000 -> Frühzeitige Öffentlichkeitsbeteiligung
+    // code: 5000 -> Beteiligung Töb
+    // code: 6000 -> öffentliche Auslegung
+    // code: 7000 -> Feststellungsverfahren -- nicht beteiligungsrelevant
+    // code: 8000 -> Schlussphase -- nicht beteiligungsrelevant
+    // code: 9998 -> kein VS // no clue what that means - but it is beteiligungsrelevant
+    private const PUBLICPARTICIPATIONPHASEMAP = [
+        'configuration' => [
+            'code' => '1000',
+            'name' => 'Einleitungsphase',
+        ],
+        'earlyparticipation' => [
+            'code' => '4000',
+            'name' => 'Frühzeitige Öffentlichkeitsbeteiligung',
+        ],
+        'participation' => [
+            'code' => '6000',
+            'name' => 'öffentliche Auslegung',
+        ],
+        'anotherparticipation' => [
+            'code' => '6000',
+            'name' => 'öffentliche Auslegung',
+        ],
+        'evaluating' => [ // todo not sure about this one - pls check
+            'code' => '7000',
+            'name' => 'Feststellungsverfahren',
+        ],
+        'closed' => [
+            'code' => '8000',
+            'name' => 'Schlussphase',
+        ]
+    ];
+    private const INSTITUTIONPARTICIPATIONPHASEMAP = [
+        'configuration' => [
+            'code' => '1000',
+            'name' => 'Einleitungsphase',
+        ],
+        'earlyparticipation' => [
+            'code' => '2000',
+            'name' => 'Frühzeitige Behördenbeteiligung',
+        ],
+        'participation' => [
+            'code' => '5000',
+            'name' => 'Beteiligung Töb',
+        ],
+        'anotherparticipation' => [
+            'code' => '5000',
+            'name' => 'Beteiligung Töb',
+        ],
+        'evaluating' => [ // todo not sure about this one - pls check
+            'code' => '7000',
+            'name' => 'Feststellungsverfahren',
+        ],
+        'closed' => [
+            'code' => '8000',
+            'name' => 'Schlussphase',
+        ]
+    ];
+
     public function __construct(
         private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
         private readonly LoggerInterface                        $logger,
@@ -258,31 +321,10 @@ class XBeteiligungService
         // we kind of need to implement this feature
         $institutionParticipationType->setDurchgang(1); // required not documented not wanted
         $bkTOEBaaType = new BeteiligungKommunalTOEBArtAnonymousPHPType();
-        // todo Code liste gefunden dank Stephan.C - still need to use them
-        // On the other hand - we discussed a completely new pattern for this in order to send
-        // public participations as well as institution participations together in one message.
-        // basically we need to rework this whole BeteiligungKommuneTypeType bs anyways - so do not bother right now
-        // Quelle AdoRepo: xoev-de-xplanverfahren-codeliste-verfahrensschritt_1.xml out of date and non existant since 13.07.23
-        // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
-        // code: 2000 -> Frühzeitige Behördenbeteiligung
-        // code: 3000 -> Aufstellungsbeschluss -- nicht beteiligungsrelevant
-        // code: 3600 -> Einleitungszustimmung -- nicht beteiligungsrelevant
-        // code: 4000 -> Frühzeitige Öffentlichkeitsbeteiligung
-        // code: 5000 -> Beteiligung Töb
-        // code: 6000 -> öffentliche Auslegung
-        // code: 7000 -> Feststellungsverfahren -- nicht beteiligungsrelevant
-        // code: 8000 -> Schlussphase -- nicht beteiligungsrelevant
-        // code: 9998 -> kein VS // no clue what that means - but it is beteiligungsrelevant
-        $procedurePhaseCode = new CodeVerfahrensschrittType();
-        $procedurePhaseCode->setListVersionID('1.0');
-        $procedurePhaseCode->setListURI('');
-        $procedurePhaseCode->setName('Frühzeitige Behördenbeteiligung');
-        $procedurePhaseCode->setCode('2000');
-        $bkTOEBaaType->setBeteiligungKommunalFormalTOEB($procedurePhaseCode);
+        $bkTOEBaaType->setBeteiligungKommunalFormalTOEB($this->getInstitutionProcedurePhaseCodeType($procedure));
         $institutionParticipationType->setBeteiligungKommunalTOEBArt($bkTOEBaaType);
-
-        $aktuelles = $this->getInstitutionNewsList($procedure);
-        $institutionParticipationType->setAktuelleMitteilung($aktuelles);
+        // aktuelleMitteilungen optional - we want to use it
+        $institutionParticipationType->setAktuelleMitteilung($this->getInstitutionNewsList($procedure));
 
         return $institutionParticipationType;
     }
@@ -305,31 +347,11 @@ class XBeteiligungService
         // we kind of need to implement this feature
         $publicParticipationType->setDurchgang(1); // required not documented not wanted
         $bkoeaaType = new BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType();
-        // todo Code liste gefunden dank Stephan.C - still need to use them
-        // On the other hand - we discussed a completely new pattern for this in order to send
-        // public participations as well as institution participations together in one message.
-        // basically we need to rework this whole BeteiligungKommuneTypeType bs anyways - so do not bother right now
-        // Quelle AdoRepo: xoev-de-xplanverfahren-codeliste-verfahrensschritt_1.xml out of date and non existant since 13.07.23
-        // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
-        // code: 2000 -> Frühzeitige Behördenbeteiligung
-        // code: 3000 -> Aufstellungsbeschluss -- nicht beteiligungsrelevant
-        // code: 3600 -> Einleitungszustimmung -- nicht beteiligungsrelevant
-        // code: 4000 -> Frühzeitige Öffentlichkeitsbeteiligung
-        // code: 5000 -> Beteiligung Töb
-        // code: 6000 -> öffentliche Auslegung
-        // code: 7000 -> Feststellungsverfahren -- nicht beteiligungsrelevant
-        // code: 8000 -> Schlussphase -- nicht beteiligungsrelevant
-        // code: 9998 -> kein VS // no clue what that means - but it is beteiligungsrelevant
-        $procedurePhaseCode = new CodeVerfahrensschrittType();
-        $procedurePhaseCode->setListVersionID('1.0');
-        $procedurePhaseCode->setListURI('');
-        $procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung');
-        $procedurePhaseCode->setCode('4000');
-        $bkoeaaType->setBeteiligungKommunalFormalOeffentlichkeit($procedurePhaseCode);
+        $bkoeaaType->setBeteiligungKommunalFormalOeffentlichkeit(
+            $this->getPublicProcedurePhaseCodeType($procedure)
+        );
         $publicParticipationType->setBeteiligungKommunalOeffentlichkeitArt($bkoeaaType);
-        // todo here the procedureNewsList for Guest/Privatperson need to be inserted I guess
-//        $aktuelles = $this->getPublicNewsList($procedure);
-        $publicParticipationType->setAktuelleMitteilung([]);
+        $publicParticipationType->setAktuelleMitteilung($this->getPublicNewsList($procedure));
 
         return $publicParticipationType;
     }
@@ -763,27 +785,75 @@ class XBeteiligungService
         $this->procedureMessageRepository->createNew($procedureMessage);
     }
 
+    private function getInstitutionProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittType
+    {
+        $codeProcedurePhase = new CodeVerfahrensschrittType();
+        $codeProcedurePhase->setListVersionID('');
+        $codeProcedurePhase->setListVersionID('1.0');
+        $codeProcedurePhase->setCode(
+            self::INSTITUTIONPARTICIPATIONPHASEMAP[$procedure->getPhase()]['code']
+        );
+        $codeProcedurePhase->setName(
+            self::INSTITUTIONPARTICIPATIONPHASEMAP[$procedure->getPhase()]['name']
+        );
+
+        return $codeProcedurePhase;
+    }
+
+    private function getPublicProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittType
+    {
+        $codeProcedurePhase = new CodeVerfahrensschrittType();
+        $codeProcedurePhase->setListVersionID('');
+        $codeProcedurePhase->setListVersionID('1.0');
+        $codeProcedurePhase->setCode(
+            self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code']
+        );
+        $codeProcedurePhase->setName(
+            self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['name']
+        );
+
+        return $codeProcedurePhase;
+    }
+
     private function getInstitutionNewsList(ProcedureInterface $procedure): array
     {
         $procedureNewsList = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId())['result'];
-        $roleList = $procedureNewsList['roles'];
-        return [];
-    }
+        $institutionNewsList = [];
+        foreach ($procedureNewsList as $news) {
+            foreach ($news['roles'] as $role) {
+                if ($role['groupCode'] === 'GPSORG'
+                ) {
+                    if (isset($news['title'], $news['text'])) {
+                        $institutionNewsList[] = strip_tags($news['title'].': '.$news['text']);
 
-    private function getProcedureNewsList(ProcedureInterface $procedure, bool $public): array
-    {
-        $procedureNewsList = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId());
-        $aktuelles = [];
-
-
-
-        foreach ($procedureNewsList['result'] as $procedureNews) {
-            if (isset($procedureNews['title'], $procedureNews['text'])) {
-                $aktuelles[] = strip_tags($procedureNews['title'].': '.$procedureNews['text']);
+                        break;
+                    }
+                }
             }
         }
 
-        return $aktuelles;
+        return $institutionNewsList;
+    }
+
+    private function getPublicNewsList(ProcedureInterface $procedure): array
+    {
+        $procedureNewsList = $this->procedureNewsService->getProcedureNewsAdminList($procedure->getId())['result'];
+        $institutionNewsList = [];
+        foreach ($procedureNewsList as $news) {
+            foreach ($news['roles'] as $role) {
+                if ($role['code'] === RoleInterface::CITIZEN
+                    || $role['code'] === RoleInterface::GUEST
+                ) {
+                    if (isset($news['title'], $news['text'])) {
+                        $institutionNewsList[] = strip_tags($news['title'].': '.$news['text']);
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $institutionNewsList;
     }
 
 }
