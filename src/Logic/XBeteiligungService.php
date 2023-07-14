@@ -337,8 +337,8 @@ class XBeteiligungService
         // this MetadatenAnlageType should support a base64 container to dump files into but it does not - S.C. is informed
         // $publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
         $timeSpan = new ZeitraumType();
-        $timeSpan->setBeginn($procedure->getStartDate());
-        $timeSpan->setEnde($procedure->getEndDate());
+        $timeSpan->setBeginn($procedure->getPublicParticipationStartDate());
+        $timeSpan->setEnde($procedure->getPublicParticipationEndDate());
         $publicParticipationType->setZeitraum($timeSpan); // optional - we want to use it
         // Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
         $publicParticipationType->setBekanntmachung(

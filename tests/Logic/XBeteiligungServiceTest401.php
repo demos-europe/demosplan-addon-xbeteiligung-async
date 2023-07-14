@@ -174,7 +174,10 @@ class XBeteiligungServiceTest401 extends TestCase
         $procedure->method('getSettings')->willReturn($procedureSettingsMock);
         $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
         $procedure->method('getPhase')->willReturn('earlyparticipation');
-
+        $procedure->method('getPublicParticipationStartDate')->willReturn(new DateTime());
+        $procedure->method('getPublicParticipationEndDate')->willReturn(
+            (new DateTime())->add(new DateInterval('P7D'))
+        );
         $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(
           [
               'result' => [
