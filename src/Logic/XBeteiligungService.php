@@ -165,7 +165,7 @@ class XBeteiligungService
     {
         $messageContent = new Nachrichteninhalt402();
         $messageContent->setVorgangsID($this->uuid());
-        $messageContent->setBeteiligung($this->generateParticipationContent($procedure)); // optional
+        $messageContent->setBeteiligung($this->generateOldParticipationContent($procedure)); // optional
 
         return $messageContent;
     }
@@ -338,7 +338,7 @@ class XBeteiligungService
         return $publicParticipationType;
     }
 
-    private function generateParticipationContent(ProcedureInterface $procedure): BeteiligungKommuneType
+    private function generateOldParticipationContent(ProcedureInterface $procedure): BeteiligungKommuneType
     {
         $participationType = new BeteiligungKommuneType();
 
