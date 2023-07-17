@@ -13,7 +13,9 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\PostProcedureUpdatedEventInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\RelevantPropertiesForUpdatedProcedure;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -22,7 +24,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 {
     public function __construct(
         private readonly LoggerInterface $logger,
-        private readonly XBeteiligungService $xBeteiligungService
+        private readonly XBeteiligungService $xBeteiligungService,
+        private readonly EntityManagerInterface $entityManager,
     ) {
     }
 
@@ -51,8 +54,8 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
      */
     public function procedureChanged(PostProcedureUpdatedEventInterface $event): void
     {
-       $procedure = $event->getProcedure();
-       $procedure->getDeleted() ? $this->procedureDeleted($procedure) : $this->procedureUpdated($procedure);
+        $procedure = $event->getProcedure();
+        $procedure->getDeleted() ? $this->procedureDeleted($procedure) : $this->procedureUpdated($procedure);
     }
 
     /**
@@ -69,6 +72,22 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
      */
     private function procedureUpdated(ProcedureInterface $procedure): void
     {
+        $unitOfWork = $this->entityManager->getUnitOfWork();
+        $unitOfWork->computeChangeSet(
+            $this->entityManager->getClassMetadata(get_class($procedure)),
+            $procedure
+        );
+        $procedureChanges = [];
+        if ($unitOfWork->isEntityScheduled($procedure)) {
+            $procedureChanges = $unitOfWork->getEntityChangeSet($procedure);
+        }
+
+        foreach (RelevantPropertiesForUpdatedProcedure::cases() as $case) {
+            if (in_array($case, $procedureChanges, true)) {
+
+            }
+        }
+
         $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($procedure);
         $this->createDebugMessageForCreatedXML($procedure, $xml, 'updated');
     }

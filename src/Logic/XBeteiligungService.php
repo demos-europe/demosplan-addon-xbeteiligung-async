@@ -263,6 +263,7 @@ class XBeteiligungService
         // $participationType->setArbeitstitel(''); // optional
         // $participationType->setPlanartKommunal(new CodePlanartKommuneType()); // optional
 
+        //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
         // why is this code present in this layer - i dont get it - email to Stephan is on the way
         // As far as I understood our meeting - this code should only be present within the institution/participation
         // type thingies.
@@ -282,6 +283,8 @@ class XBeteiligungService
         $procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung');
         $procedurePhaseCode->setCode('4000');
         $participationType->setVerfahrensschrittKommunal($procedurePhaseCode); // required - we want to use it
+        //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
+
         //  $participationType->setVerfahrensartKommunal(new CodeVerfahrensartKommuneType); // optional
         $participationType->setBeschreibungPlanungsanlass($procedure->getDesc()); // optional - we want to use it
         $participationType->setFlaechenabgrenzungUrl(
