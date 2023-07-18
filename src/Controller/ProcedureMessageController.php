@@ -6,6 +6,7 @@ use DemosEurope\DemosplanAddon\Controller\APIController;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,10 +24,8 @@ class ProcedureMessageController extends APIController
         Request $request,
         string $procedureMessageId
     ): Response {
-        // todo: remove set authToken
-        $request->headers->set('authToken', '');
-        if ($request->headers->get('authToken') !== $this->getParameter('xbeteiligung_api_token')) {
-            return $this->createEmptyResponse();
+        if ($this->hasNoValidAuthToken($request->headers->get('authToken'))) {
+            return $this->renderEmpty();
         }
 
         try {
@@ -37,6 +36,8 @@ class ProcedureMessageController extends APIController
             $this->logger->warning('No unique procedure message found for given ID', [
                 'exception' => $e->getMessage()
             ]);
+            $response = $this->handleApiError($e);
+        } catch (Exception $e) {
             $response = $this->handleApiError($e);
         }
 
@@ -60,12 +61,63 @@ class ProcedureMessageController extends APIController
         ProcedureMessageRepository $procedureMessageRepository,
         Request $request
     ): Response {
-        // todo: remove set authToken
-        $request->headers->set('authToken', '');
+        if ($this->hasNoValidAuthToken($request->headers->get('authToken'))) {
+            return $this->renderEmpty();
+        }
         if ($request->headers->get('authToken') !== $this->getParameter('xbeteiligung_api_token')) {
             return $this->createEmptyResponse();
         }
 
         return $this->createResponse($procedureMessageRepository->findIdsBy(['requestCount' => 0]), 200);
+    }
+
+    /**
+     * @throws Exception
+     */
+    #[Route(
+        path: 'api/procedure_message/delete/{procedureMessageId}',
+        name: 'dplan_api_procedure_message_delete',
+        methods: ['GET']
+    )]
+    public function markProcedureMessageAsDeleted(
+        ProcedureMessageRepository $procedureMessageRepository,
+        Request $request,
+        string $procedureMessageId
+    ): Response {
+        if ($this->hasNoValidAuthToken($request->headers->get('authToken'))) {
+            return $this->renderEmpty();
+        }
+
+        $procedureMessageToMarkAsDeleted = $procedureMessageRepository->get($procedureMessageId);
+        $procedureMessageToMarkAsDeleted->setDeleted();
+        $procedureMessageRepository->updateObject($procedureMessageToMarkAsDeleted->getId());
+        return  $this->createResponse([true], 200);
+    }
+
+    #[Route(
+        path: 'api/procedure_message/error/{procedureMessageId}',
+        name: 'dplan_api_procedure_message_error',
+        methods: ['GET']
+    )]
+    public function markProcedureMessageAsError(
+        ProcedureMessageRepository $procedureMessageRepository,
+        Request $request,
+        string $procedureMessageId
+    ): Response {
+        if ($this->hasNoValidAuthToken($request->headers->get('authToken'))) {
+            return $this->renderEmpty();
+        }
+
+        $procedureMessageToMarkAsDeleted = $procedureMessageRepository->get($procedureMessageId);
+        $procedureMessageToMarkAsDeleted->setError(true);
+        $procedureMessageRepository->updateObject($procedureMessageToMarkAsDeleted->getId());
+        return  $this->createResponse([true], 200);
+    }
+
+    //todo: remove seting the parameter authToken with '', this is only temporary to test the routes locally
+    private function hasNoValidAuthToken(string|null $authToken): bool
+    {
+        $authToken = '';
+        return $authToken !== $this->getParameter('xbeteiligung_api_token');
     }
 }
