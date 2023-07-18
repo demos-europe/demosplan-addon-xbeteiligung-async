@@ -604,59 +604,6 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.UnterverfahrensteilschrittType">
-      <xs:annotation>
-         <xs:appinfo>
-            <codeliste>
-               <nameLang>Unterverfahrensteilschritt</nameLang>
-               <nameKurz>Unterverfahrensteilschritt</nameKurz>
-               <nameTechnisch>unterverfahrensteilschritt</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:unterverfahrensteilschritt</kennung>
-               <beschreibung>Teilschritte eines Unterverfahrens</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
-            </codeliste>
-            <versionCodeliste>
-               <version>1.0</version>
-               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
-            </versionCodeliste>
-            <codelistenspalten>
-               <code>
-                  <spaltennameLang>Code</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>true</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
-               </code>
-               <beschreibung>
-                  <spaltennameLang>Beschreibung</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>false</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
-               </beschreibung>
-            </codelistenspalten>
-            <genutzteCodeSpalte>code</genutzteCodeSpalte>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:complexContent>
-         <xs:restriction base="xoev-code:Code">
-            <xs:sequence>
-               <xs:element name="code"
-                           form="unqualified"
-                           type="xbeteiligung:unterverfahrensteilschritt"/>
-            </xs:sequence>
-            <xs:attribute name="listURI"
-                          type="xs:anyURI"
-                          use="optional"
-                          fixed="urn:xoev-de:xleitstelle:codeliste:unterverfahrensteilschritt"/>
-            <xs:attribute name="listVersionID"
-                          type="xs:normalizedString"
-                          use="optional"
-                          fixed="1.0"/>
-         </xs:restriction>
-      </xs:complexContent>
-   </xs:complexType>
    <xs:complexType name="Code.VerfahrensartKommuneType">
       <xs:annotation>
          <xs:appinfo>
@@ -840,59 +787,6 @@
                           use="optional"
                           fixed="urn:xoev-de:xplanverfahren:codeliste:verfahrensschritt"/>
             <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
-         </xs:restriction>
-      </xs:complexContent>
-   </xs:complexType>
-   <xs:complexType name="Code.VerfahrensteilschrittType">
-      <xs:annotation>
-         <xs:appinfo>
-            <codeliste>
-               <nameLang>Verfahrensteilschritt</nameLang>
-               <nameKurz>Verfahrensteilschritt</nameKurz>
-               <nameTechnisch>verfahrensteilschritt</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensteilschritt</kennung>
-               <beschreibung>Auswahl des Verfahrensteischritts</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
-            </codeliste>
-            <versionCodeliste>
-               <version>1.0</version>
-               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
-            </versionCodeliste>
-            <codelistenspalten>
-               <code>
-                  <spaltennameLang>Code</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>true</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
-               </code>
-               <beschreibung>
-                  <spaltennameLang>Beschreibung</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>false</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
-               </beschreibung>
-            </codelistenspalten>
-            <genutzteCodeSpalte>code</genutzteCodeSpalte>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:complexContent>
-         <xs:restriction base="xoev-code:Code">
-            <xs:sequence>
-               <xs:element name="code"
-                           form="unqualified"
-                           type="xbeteiligung:verfahrensteilschritt"/>
-            </xs:sequence>
-            <xs:attribute name="listURI"
-                          type="xs:anyURI"
-                          use="optional"
-                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensteilschritt"/>
-            <xs:attribute name="listVersionID"
-                          type="xs:normalizedString"
-                          use="optional"
-                          fixed="1.0"/>
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
@@ -1834,78 +1728,6 @@
          </xs:enumeration>
       </xs:restriction>
    </xs:simpleType>
-   <xs:simpleType name="unterverfahrensteilschritt">
-      <xs:annotation>
-         <xs:appinfo>
-            <codeliste>
-               <nameLang>Unterverfahrensteilschritt</nameLang>
-               <nameKurz>Unterverfahrensteilschritt</nameKurz>
-               <nameTechnisch>unterverfahrensteilschritt</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:unterverfahrensteilschritt</kennung>
-               <beschreibung>Teilschritte eines Unterverfahrens</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
-            </codeliste>
-            <versionCodeliste>
-               <version>1.0</version>
-               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
-            </versionCodeliste>
-            <codelistenspalten>
-               <code>
-                  <spaltennameLang>Code</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>true</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
-               </code>
-               <beschreibung>
-                  <spaltennameLang>Beschreibung</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>false</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
-               </beschreibung>
-            </codelistenspalten>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:restriction base="xs:token">
-         <xs:enumeration value="1000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>CODELISTENWERTE ERSTELLEN ???</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="2000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Der Stellungnahme wurde bereits gefolgt.</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="3000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>der Stellungnahme wird nicht gefolgt.</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="4000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Die Stellungnahme wird im Arbeitskreis behandelt.</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="5000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Die Stellungnahme wird zur Kenntnis genommen.</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-      </xs:restriction>
-   </xs:simpleType>
    <xs:simpleType name="verfahrensartkommune">
       <xs:annotation>
          <xs:appinfo>
@@ -1944,28 +1766,42 @@
          <xs:enumeration value="1000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>normales Verfahren</beschreibung>
+                  <beschreibung>Änderung</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-         <xs:enumeration value="1100">
+         <xs:enumeration value="2000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>vereinfachtes Verfahren, § 13 BauGB</beschreibung>
+                  <beschreibung>Teilfortschreibung</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-         <xs:enumeration value="1200">
+         <xs:enumeration value="3000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>Bebauungsplan der Innenentwicklung, § 13a BauGB</beschreibung>
+                  <beschreibung>Neuaufstellung</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-         <xs:enumeration value="1300">
+         <xs:enumeration value="4000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>Einbeziehung von Außenbereichsflächen in das beschleunigte Verfahren, § 13b BauGB</beschreibung>
+                  <beschreibung>Gesamtfortschreibung</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="5000">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>Aktualisierung</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="6000">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>Neubekanntmachung</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
@@ -2154,78 +1990,6 @@
             <xs:annotation>
                <xs:appinfo>
                   <beschreibung>LaPro (mit Parallelverfahren)</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-      </xs:restriction>
-   </xs:simpleType>
-   <xs:simpleType name="verfahrensteilschritt">
-      <xs:annotation>
-         <xs:appinfo>
-            <codeliste>
-               <nameLang>Verfahrensteilschritt</nameLang>
-               <nameKurz>Verfahrensteilschritt</nameKurz>
-               <nameTechnisch>verfahrensteilschritt</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensteilschritt</kennung>
-               <beschreibung>Auswahl des Verfahrensteischritts</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
-            </codeliste>
-            <versionCodeliste>
-               <version>1.0</version>
-               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
-            </versionCodeliste>
-            <codelistenspalten>
-               <code>
-                  <spaltennameLang>Code</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>true</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
-               </code>
-               <beschreibung>
-                  <spaltennameLang>Beschreibung</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>false</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
-               </beschreibung>
-            </codelistenspalten>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:restriction base="xs:token">
-         <xs:enumeration value="1000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>CODELISTENWERTE ??</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="2000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Der Stellungnahme wurde bereits gefolgt.</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="3000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>der Stellungnahme wird nicht gefolgt.</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="4000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Die Stellungnahme wird im Arbeitskreis behandelt.</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="5000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Die Stellungnahme wird zur Kenntnis genommen.</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>

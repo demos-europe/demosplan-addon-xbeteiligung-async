@@ -352,7 +352,7 @@
             </xs:annotation>
             <xs:complexType>
                <xs:sequence>
-                  <xs:element name="polygon" type="gml:PolygonType">
+                  <xs:element name="polygon" type="gml:PolygonTypeType">
                      <xs:annotation>
                         <xs:documentation>Das Element (globales Element gml:Polygon) enthält die GML-Darstellung einer Grundfläche (es können Außenkanten und Innenkanten dargestellt werden). Aus der GML-Dokumentation: "A Polygon is a special surface that is defined by a single surface patch. The boundary of this patch is coplanar and the polygon uses planar interpolation in its interior. The elements exterior and interior describe the surface boundary of the polygon." Quelle: http://www.datypic.com/sc/niem21/e-gml32_Polygon.html</xs:documentation>
                      </xs:annotation>
@@ -378,7 +378,7 @@
             </xs:annotation>
             <xs:complexType>
                <xs:sequence>
-                  <xs:element name="linie" type="gml:CurveType">
+                  <xs:element name="linie" type="gml:CurveTypeType">
                      <xs:annotation>
                         <xs:documentation>Das Element (globales Element gml:CurveType) enthält die GML-Darstellung einer Linie.</xs:documentation>
                      </xs:annotation>
@@ -404,7 +404,7 @@
             </xs:annotation>
             <xs:complexType>
                <xs:sequence>
-                  <xs:element name="punkt" type="gml:PointType">
+                  <xs:element name="punkt" type="gml:PointTypeType">
                      <xs:annotation>
                         <xs:documentation>Das Element (globales Element gml:PointType) enthält die GML-Darstellung einer Grundfläche .</xs:documentation>
                      </xs:annotation>
