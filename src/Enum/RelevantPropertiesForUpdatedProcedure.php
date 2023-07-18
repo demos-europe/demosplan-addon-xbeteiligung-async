@@ -7,10 +7,14 @@
  * All rights reserved
  */
 
-namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Enum;
 
 enum RelevantPropertiesForUpdatedProcedure: string
 {
     case Name = 'name';
     case Orga = 'orga';
+    case Desc = 'desc';
+    case StartDate = 'startDate';
+    case EndDate = 'endDate';
+    case BoundingBox = 'boundingBox';
 }
