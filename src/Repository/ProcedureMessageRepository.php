@@ -31,6 +31,16 @@ class ProcedureMessageRepository extends ServiceEntityRepository
         return $this->find($ProcedureMessageId);
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     * @return array<ProcedureMessage>
+     */
+    public function findIdsBy(array $criteria): array
+    {
+        return array_map(
+            static fn (ProcedureMessage $procedureMessage) => $procedureMessage->getId(), $this->findBy($criteria));
+    }
+
     public function createNew(ProcedureMessage $procedureMessage): void
     {
         $this->getEntityManager()->persist($procedureMessage);
