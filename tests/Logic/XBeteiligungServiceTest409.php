@@ -187,7 +187,7 @@ class XBeteiligungServiceTest409 extends TestCase
             ]
         );
 
-        $procedureXml = $this->sut->createProcedureDeleted409FromObject($procedure);
+        $procedureXml = $this->sut->createProcedureDeleted409FromObject($procedure->getId());
         echo (str_replace('&amp;', '&', $procedureXml));
 
         $isValid = $this->sut->isValidMessage($procedureXml, true, 'xbeteiligung-planung2beteiligung.xsd');

@@ -7,3 +7,4 @@ parameters:
   # Auth token used for verifying the import request originated from
   # the expected Xbeteiligung instance
   xbeteiligung_api_token: ""
+
