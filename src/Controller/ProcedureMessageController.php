@@ -114,10 +114,8 @@ class ProcedureMessageController extends APIController
         return  $this->createResponse([true], 200);
     }
 
-    //todo: remove seting the parameter authToken with '', this is only temporary to test the routes locally
     private function hasNoValidAuthToken(string|null $authToken): bool
     {
-        $authToken = '';
         return $authToken !== $this->getParameter('xbeteiligung_api_token');
     }
 }
