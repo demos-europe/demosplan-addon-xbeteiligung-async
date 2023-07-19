@@ -28,7 +28,7 @@
    </xs:annotation>
    <xs:import schemaLocation="xoev-code.xsd"
               namespace="http://xoev.de/schemata/code/1_0"/>
-   <xs:complexType name="Code.AbwaegungsvorschlagType">
+   <xs:complexType name="Code.Abwaegungsvorschlag">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -81,7 +81,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.AkteurRolleType">
+   <xs:complexType name="Code.AkteurRolle">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -132,7 +132,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.ArtDerRueckmeldungType">
+   <xs:complexType name="Code.ArtDerRueckmeldung">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -185,7 +185,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.ArtDerStellungnahmeType">
+   <xs:complexType name="Code.ArtDerStellungnahme">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -238,7 +238,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.DatumsartType">
+   <xs:complexType name="Code.Datumsart">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -289,7 +289,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.DatumsstatusType">
+   <xs:complexType name="Code.Datumsstatus">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -340,7 +340,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.FehlerartType">
+   <xs:complexType name="Code.Fehlerart">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -391,7 +391,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.PlanartKommuneType">
+   <xs:complexType name="Code.PlanartKommune">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -418,7 +418,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.PlanartPlanfeststellungType">
+   <xs:complexType name="Code.PlanartPlanfeststellung">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -471,7 +471,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.PlanartRaumordnungType">
+   <xs:complexType name="Code.PlanartRaumordnung">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -498,7 +498,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.PrioritaetDerStellungnahmeType">
+   <xs:complexType name="Code.PrioritaetDerStellungnahme">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -551,7 +551,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.StatusDerStellungnahmeType">
+   <xs:complexType name="Code.StatusDerStellungnahme">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -604,7 +604,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.VerfahrensartKommuneType">
+   <xs:complexType name="Code.VerfahrensartKommune">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -657,7 +657,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.VerfahrensartPlanfeststellungType">
+   <xs:complexType name="Code.VerfahrensartPlanfeststellung">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -710,7 +710,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.VerfahrensartRaumordnungType">
+   <xs:complexType name="Code.VerfahrensartRaumordnung">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -763,7 +763,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.VerfahrensschrittType">
+   <xs:complexType name="Code.Verfahrensschritt">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -790,7 +790,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.VerfahrenstypType">
+   <xs:complexType name="Code.Verfahrenstyp">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -843,7 +843,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.VerfahrensunterlagetypType">
+   <xs:complexType name="Code.Verfahrensunterlagetyp">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -870,7 +870,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.VormerkungType">
+   <xs:complexType name="Code.Vormerkung">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -921,7 +921,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.XBeteiligungNachrichtenType">
+   <xs:complexType name="Code.XBeteiligungNachrichten">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -974,7 +974,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.ZuordnungType">
+   <xs:complexType name="Code.Zuordnung">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
@@ -1025,7 +1025,7 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.ZustaendigkeitType">
+   <xs:complexType name="Code.Zustaendigkeit">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>

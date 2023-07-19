@@ -42,7 +42,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
@@ -52,7 +52,7 @@
                                  <xs:documentation>Hier muss eine Vorgangs-ID übermittelt werden, auf die sich die beteiligte Stelle in ihrer Antwort bezieht. Die Vorgangs-ID wird dabei unverändert in die Antwortnachricht übernommen.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungType">
+                           <xs:element name="beteiligung" type="xbeteiligung:Beteiligung">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
                               </xs:annotation>

@@ -19,4 +19,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungStellungn
             accessor:
                 getter: getStellungnahme
                 setter: setStellungnahme
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType

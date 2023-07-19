@@ -2,12 +2,12 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungTerminBestaetigen1001;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
 
 /**
  * Class representing Planung2BeteiligungTerminBestaetigen1001AnonymousPHPType
  */
-class Planung2BeteiligungTerminBestaetigen1001AnonymousPHPType extends NachrichtG2GTypeType
+class Planung2BeteiligungTerminBestaetigen1001AnonymousPHPType extends NachrichtG2GType
 {
     /**
      * Nachricht bestätigt, den Beginn des Auslegungszeitraums und der entsprechenden Veröffentlichung eine Woche vorher.

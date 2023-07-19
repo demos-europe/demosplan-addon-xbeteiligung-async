@@ -42,12 +42,12 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
                         <xs:complexContent>
-                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.OKType"/>
+                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.OK"/>
                         </xs:complexContent>
                      </xs:complexType>
                   </xs:element>
@@ -66,12 +66,12 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2GType">
+            <xs:extension base="xbeteiligung:Nachricht.G2G">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
                         <xs:complexContent>
-                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.NOKType"/>
+                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.NOK"/>
                         </xs:complexContent>
                      </xs:complexType>
                   </xs:element>
