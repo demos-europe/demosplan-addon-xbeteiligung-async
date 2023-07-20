@@ -145,7 +145,7 @@ class XBeteiligungService
     public function createProcedureNew401FromObject(ProcedureInterface $procedure): string
     {
         $procedureCreated401Object = new Planung2BeteiligungBeteiligungKommuneNeu0401();
-        $procedureCreated401Object = $this->setProdukctInfo($procedureCreated401Object); // required
+        $procedureCreated401Object = $this->setProduktInfo($procedureCreated401Object); // required
         $procedureCreated401Object->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureCreated401Object)
         ); // required
@@ -165,7 +165,7 @@ class XBeteiligungService
     public function createProcedureUpdate402FromObject(ProcedureInterface $procedure): string
     {
         $procedureUpdated402Object = new Planung2BeteiligungBeteiligungKommuneAktualisieren0402();
-        $procedureUpdated402Object = $this->setProdukctInfo($procedureUpdated402Object); // required
+        $procedureUpdated402Object = $this->setProduktInfo($procedureUpdated402Object); // required
         $procedureUpdated402Object->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureUpdated402Object)
         ); // required
@@ -185,7 +185,7 @@ class XBeteiligungService
     public function createProcedureDeleted409FromObject(string $procedureId): string
     {
         $procedureDeleted409Object = new Planung2BeteiligungBeteiligungKommuneLoeschen0409();
-        $procedureDeleted409Object = $this->setProdukctInfo($procedureDeleted409Object); // required
+        $procedureDeleted409Object = $this->setProduktInfo($procedureDeleted409Object); // required
         $procedureDeleted409Object->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureDeleted409Object)
         ); // required
@@ -204,7 +204,7 @@ class XBeteiligungService
         return $xml->asXML() ?? '';
     }
 
-    private function setProdukctInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
+    private function setProduktInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
     {
         $messageObject->setProdukt('A1'); // required
         $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
