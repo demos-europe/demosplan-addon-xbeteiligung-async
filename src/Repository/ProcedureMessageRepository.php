@@ -56,7 +56,7 @@ class ProcedureMessageRepository extends ServiceEntityRepository
     {
         /** @var ProcedureMessage $procedureMessage **/
         $procedureMessage = $this->get($procedureMessageID);
-        $procedureMessage->setRequestCount();
+        $procedureMessage->increaseRequestCountByOne();
         return $procedureMessage->getMessage();
     }
 
