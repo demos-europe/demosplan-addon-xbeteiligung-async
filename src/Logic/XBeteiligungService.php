@@ -288,7 +288,7 @@ class XBeteiligungService
         //  $participationType->setVerfahrensartKommunal(new CodeVerfahrensartKommuneType); // optional
         $participationType->setBeschreibungPlanungsanlass($procedure->getDesc()); // optional - we want to use it
         $participationType->setFlaechenabgrenzungUrl(
-            $this->generateFaceBoundaryWMS_Url($procedure)
+            $this->generateFaceBoundaryWMSUrl($procedure)
         ); // optional - we want to use it
         // Hier ist die räumliche Beschreibung des Geltungsbereichs als Polygon im Format GeoJSON FG Notation zu über-
         // mitteln. todo Format wird noch geprüft.
@@ -392,7 +392,7 @@ class XBeteiligungService
         $participationType->setPlanID($procedure->getId()); // required
         $participationType->setBeschreibungPlanungsanlass($procedure->getDesc()); // optional - we want to use it
         $participationType->setFlaechenabgrenzungUrl(
-            $this->generateFaceBoundaryWMS_Url($procedure)
+            $this->generateFaceBoundaryWMSUrl($procedure)
         ); // optional - we want to use it
 
         // Hier ist die räumliche Beschreibung des Geltungsbereichs als Polygon im Format GeoJSON FG Notation zu über-
@@ -491,7 +491,7 @@ class XBeteiligungService
         return $author;
     }
 
-    private function generateFaceBoundaryWMS_Url(ProcedureInterface $procedure): string
+    private function generateFaceBoundaryWMSUrl(ProcedureInterface $procedure): string
     {
         $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
 
