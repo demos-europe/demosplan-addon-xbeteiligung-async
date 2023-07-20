@@ -91,6 +91,7 @@ class ProcedureMessageController extends APIController
         $procedureMessageToMarkAsDeleted = $procedureMessageRepository->get($procedureMessageId);
         $procedureMessageToMarkAsDeleted->setDeleted();
         $procedureMessageRepository->updateObject($procedureMessageToMarkAsDeleted->getId());
+
         return  $this->createResponse([true], 200);
     }
 
@@ -111,6 +112,7 @@ class ProcedureMessageController extends APIController
         $procedureMessageToMarkAsDeleted = $procedureMessageRepository->get($procedureMessageId);
         $procedureMessageToMarkAsDeleted->setError(true);
         $procedureMessageRepository->updateObject($procedureMessageToMarkAsDeleted->getId());
+
         return  $this->createResponse([true], 200);
     }
 
