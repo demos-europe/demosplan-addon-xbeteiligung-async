@@ -80,17 +80,15 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 
     private static function relevantPropertyHasChanged(array $modifiedValues): bool
     {
-        foreach (RelevantPropertiesForUpdatedProcedure::cases() as $case) {
-            if (array_key_exists($case->value, $modifiedValues)) {
+        foreach ($modifiedValues as $propertyName => $propertyValue) {
+            if (null !== RelevantPropertiesForUpdatedProcedure::tryFrom($propertyName)) {
                 return true;
             }
-            foreach ($modifiedValues as $modifiedValue) {
-                if (is_array($modifiedValue)
-                    && !array_key_exists('new', $modifiedValue)
-                    && !array_key_exists('old', $modifiedValue)
-                ) {
-                    return self::relevantPropertyHasChanged($modifiedValue);
-                }
+            if (is_array($propertyValue)
+                && !array_key_exists('new', $propertyValue)
+                && !array_key_exists('old', $propertyValue)
+            ) {
+                return self::relevantPropertyHasChanged($propertyValue);
             }
         }
 
