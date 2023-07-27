@@ -33,12 +33,12 @@ class ProcedureMessageController extends APIController
             $procedureMessageRepository->updateObject($procedureMessageId);
             $response = $this->createResponse([$message], 200);
         } catch (NoResultException|NonUniqueResultException $e) {
-            $this->logger->warning('No unique procedure message found for given ID', [
+            $this->logger->warning('No unique procedure message found for given ID.', [
                 'exception' => $e->getMessage()
             ]);
             $response = $this->handleApiError($e);
         } catch (Exception $e) {
-            $this->logger->warning('No unique procedure message found for given ID', [
+            $this->logger->warning('An exception occurred during procedure message processing for given ID.', [
                 'exception' => $e->getMessage()
             ]);
             $response = $this->handleApiError($e);
