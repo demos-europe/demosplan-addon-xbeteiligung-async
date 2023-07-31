@@ -2,45 +2,57 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic;
 
+use DateInterval;
 use DateTime;
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
+use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
-class XBeteiligungServiceTest extends TestCase
+class XBeteiligungServiceTest402 extends TestCase
 {
+    private MockObject $repoMock;
+    private MockObject $procedureNewsService;
+    private MockObject $procedureMessageRepository;
 
-     protected function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
+        $this->repoMock = $this->createMock(GisLayerCategoryRepositoryInterface::class);
+        $this->procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
+        $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
+
         $serializer = new SerializerFactory();
         $this->sut = new XBeteiligungService(
-            $this->createMock(GlobalConfigInterface::class),
+            $this->repoMock,
             $this->createMock(LoggerInterface::class),
-            $this->createMock(RouterInterface::class),
             $serializer,
-            $this->createMock(TranslatorInterface::class),
-            $this->createMock(UserHandlerInterface::class)
+            $this->procedureNewsService,
+            $this->procedureMessageRepository
         );
     }
 
-    public function testPlanung2BeteiligungBeteiligungNeu0401()
+    public function testPlanung2BeteiligungBeteiligungNeu0402()
     {
-        $xml = '<ns6:planung2Beteiligung.BeteiligungNeu.0401 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        $xml = '<ns6:planung2Beteiligung.BeteiligungNeu.0402 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ns2="http://xbeteiligung.de/addendum" xmlns:ns3="http://www.osci.de/xinneres/rueckweisung/3" xmlns:ns4="http://www.osci.de/xinneres/weiterleitung/4" xmlns:ns5="http://www.osci.de/xinneres/quittung/1" xmlns:ns6="http://xbeteiligung.de/V0103" xmlns:ns7="http://www.opengis.net/gml/3.2" xmlns:ns8="http://www.w3.org/1999/xlink" xmlns:ns9="http://www.xleitstelle.de/xbau/2/2" xmlns:ns10="http://docs.oasis-open.org/codelist/ns/genericode/1.0/" produkt="K1" produkthersteller="]init[ AG" standard="XBeteiligung" version="1.2.0">
     <nachrichtenkopf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns6:Nachrichtenkopf.G2G">
         <identifikation.nachricht xsi:type="ns6:Identifikation.Nachricht">
             <nachrichtenUUID>1663ad58-cd71-42af-9b02-fd20c287a5b4</nachrichtenUUID>
             <nachrichtentyp xsi:type="ns6:Code.XBeteiligungsNachrichten" listURI="urn:de:xbeteiligung:codeliste:xbeteiligungnachrichtencodeliste" listVersionID="1.0">
-                <code>0401</code>
-                <name>planung2Beteiligung.BeteiligungNeu.0401 (XTA)</name>
+                <coade>0402</code>
+                <name>plnung2Beteiligung.BeteiligungNeu.0402 (XTA)</name>
             </nachrichtentyp>
             <erstellungszeitpunkt>2021-10-20T13:47:49.684+02:00</erstellungszeitpunkt>
         </identifikation.nachricht>
@@ -133,18 +145,52 @@ class XBeteiligungServiceTest extends TestCase
             <ns6:funktionspostfach>stadt-und-landschaftsplanung@bergedorf.hamburg.de</ns6:funktionspostfach>
         </ns6:beteiligung>
     </ns6:nachrichteninhalt>
-</ns6:planung2Beteiligung.BeteiligungNeu.0401>
+</ns6:planung2Beteiligung.BeteiligungNeu.0402>
 
 ';
+        $gisLayerCategoryInterfaceMock = $this->createMock(GisLayerCategoryInterface::class);
+        $gisMo = $this->createMock(GisLayerInterface::class);
+        $gisMo->method('getName')->willReturn('basemap');
+        $gisMo->method('getUrl')->willReturn('https://sgx.geodatenzentrum.de/wms_basemapde');
+        $gisMo->method('getLayerVersion')->willReturn('1.3.0');
+        $gisMo->method('getLayers')->willReturn('de_basemapde_web_raster_farbe');
+        $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn(new ArrayCollection([$gisMo]));
+        $procedureSettingsMock = $this->createMock(ProcedureSettingsInterface::class);
+        $procedureSettingsMock->method('getBoundingBox')
+            ->willReturn('904640.92309477,7067292.9633037,1195347.6354542,7350657.5148909');
+        $this->repoMock->method('getRootLayerCategory')->willReturn($gisLayerCategoryInterfaceMock);
+
         $procedure = $this->createMock(ProcedureInterface::class);
         $procedure->method('getId')->willReturn('ID_7606f622-439b-4929-8625-0856c161409e');
-        $event = new PostProcedureCreatedEvent($procedure);
+        $procedure->method('getXtaPlanId')->willReturn('ID_7606f622-439b-4929-8625-0856c161409e');
+        $orga = $this->createMock(OrgaInterface::class);
+        $orga->method('getName')->willReturn('SoFreshAndSoClean');
+        $procedure->method('getOrga')->willReturn($orga);
+        $procedure->method('getName')->willReturn('Mars 2050');
+        $procedure->method('getDesc')->willReturn('return will be planned on the fly :)');
+        $procedure->method('getStartDate')->willReturn(new DateTime());
+        $procedure->method('getEndDate')->willReturn((new DateTime())->add(new DateInterval('P7D')));
+        $procedure->method('getSettings')->willReturn($procedureSettingsMock);
 
-        $procedureXml = $this->sut->createProcedure401FromObject($procedure);
+        $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(
+            [
+                'result' => [
+                    [
+                        'title' => 'Test Titel',
+                        'text'  => 'Test Inhalt',
+                    ],
+                    [
+                        'title' => 'noch ein <p>Test Titel</p>',
+                        'text'  => '<b>Test</b> These Tags will be removed via strip_tags()',
+                    ],
+                ]
+            ]
+        );
 
-        $isValid = $this->sut->isValidMessage($xml, true, 'xbeteiligung-planung2beteiligung.xsd');
+        $procedureXml = $this->sut->createProcedureUpdate402FromObject($procedure);
+        echo (str_replace('&amp;', '&', $procedureXml));
+
+        $isValid = $this->sut->isValidMessage($procedureXml, true, 'xbeteiligung-planung2beteiligung.xsd');
         self::assertTrue($isValid);
     }
-
-
 }

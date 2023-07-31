@@ -15,7 +15,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
-class XBeteiligungAddonExtension extends AbstractAddonExtension
+class XBeteiligungAsyncAddonExtension extends AbstractAddonExtension
 {
     /**
      * Loads a specific configuration.
@@ -33,5 +33,6 @@ class XBeteiligungAddonExtension extends AbstractAddonExtension
             new FileLocator(__DIR__.'/../../config')
         );
         $loader->load('services.yml');
+        $loader->load('parameters_default.yml');
     }
 }

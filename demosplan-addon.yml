@@ -3,7 +3,7 @@ demosplan_addon:
   vendor: DEMOS plan GmbH
   description: |
     This plugin provides Handling of XBeteiligung messages.
-  entry: DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAddon
+  entry: DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon
   permissionInitializer: DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\PermissionInitializer
 
 

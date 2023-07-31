@@ -8,7 +8,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
  * Dieser Kernmodul-Basistyp bildet die Metadaten zu einer Bauvorlage bzw. sonstigen Anlage ab, die gemäß der Architektur der Übertragung von Primärdokumenten im Zusammenhang mit einer XBau-Fachnachricht benötigt werden. XBau-Fachmodule können nach ihrem Bedarf vom vorliegenden Basistyp ableiten.
  * XSD Type: MetadatenAnlageType
  */
-class MetadatenAnlageTypeType extends MetadatenAnlageTypeType
+class MetadatenAnlageTypeType
 {
     /**
      * Hier ist eine deskriptive Bezeichnung der Bauvorlage bzw. sonstigen Anlage einzutragen, z. B. "Grundriss 3. OG".

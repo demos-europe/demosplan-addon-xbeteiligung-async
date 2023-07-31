@@ -3,6 +3,7 @@
     "description": "This plugin provides Handling of XBeteiligung messages",
     "version": "0.1.0",
     "type": "demosplan-addon",
+    "license": "proprietary",
     "autoload": {
         "psr-4": {
             "DemosEurope\\DemosplanAddon\\XBeteiligung\\": "src/"
@@ -19,12 +20,18 @@
         "ext-fileinfo": "*",
         "ext-simplexml": "*",
         "php": ">=8.1 || < 8.3",
-        "demos-europe/demosplan-addon": "^0.1",
+        "demos-europe/demosplan-addon": "^0",
         "demos-europe/demosplan-addon-installer": "dev-main",
-        "goetas-webservices/xsd2php-runtime": "^0.2.16",
+        "doctrine/doctrine-bundle": "^2",
+        "gedmo/doctrine-extensions": "^3",
         "goetas-webservices/xsd-reader": "^0.3.7",
+        "goetas-webservices/xsd2php-runtime": "^0.2.16",
         "jms/serializer": "^3.23",
-        "proj4php/proj4php": "^2.0"
+        "proj4php/proj4php": "^2.0",
+        "ext-libxml": "*",
+        "symfony/http-client": "^6.2",
+        "symfony/http-kernel": "^6.0",
+        "symfony/security-core": "^5.4"
     },
     "config": {
         "allow-plugins": {
