@@ -67,7 +67,7 @@ class BeteiligungPlanfeststellungDBType
     private $verfahrensschritt = null;
 
     /**
-     * Hier wird die Durchgangsnummer übermittelt.
+     * Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.
      *
      * @var int $durchgang
      */
@@ -116,6 +116,13 @@ class BeteiligungPlanfeststellungDBType
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $zeitraum
      */
     private $zeitraum = null;
+
+    /**
+     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum
+     */
+    private $veroeffentlichungszeitraum = null;
 
     /**
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert. Für die Übermittlung an die Beteiligungs-DB ist nur die Übermittlung von Links auf Unterlagen zulässig.
@@ -335,7 +342,7 @@ class BeteiligungPlanfeststellungDBType
     /**
      * Gets as durchgang
      *
-     * Hier wird die Durchgangsnummer übermittelt.
+     * Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.
      *
      * @return int
      */
@@ -347,7 +354,7 @@ class BeteiligungPlanfeststellungDBType
     /**
      * Sets a new durchgang
      *
-     * Hier wird die Durchgangsnummer übermittelt.
+     * Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.
      *
      * @param int $durchgang
      * @return self
@@ -551,6 +558,32 @@ class BeteiligungPlanfeststellungDBType
     public function setZeitraum(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $zeitraum = null)
     {
         $this->zeitraum = $zeitraum;
+        return $this;
+    }
+
+    /**
+     * Gets as veroeffentlichungszeitraum
+     *
+     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType
+     */
+    public function getVeroeffentlichungszeitraum()
+    {
+        return $this->veroeffentlichungszeitraum;
+    }
+
+    /**
+     * Sets a new veroeffentlichungszeitraum
+     *
+     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum
+     * @return self
+     */
+    public function setVeroeffentlichungszeitraum(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum = null)
+    {
+        $this->veroeffentlichungszeitraum = $veroeffentlichungszeitraum;
         return $this;
     }
 

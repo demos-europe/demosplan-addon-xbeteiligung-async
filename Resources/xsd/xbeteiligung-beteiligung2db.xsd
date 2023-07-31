@@ -240,7 +240,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="beteiligung2db.BeteiligungKommuneNeu.0451">
+   <xs:element name="beteiligung2db.BeteiligungKommunalNeu.0451">
       <xs:annotation>
          <xs:appinfo>
             <autor>Beteiligungsverfahren</autor>
@@ -260,7 +260,7 @@
                                  <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungKommuneDB">
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungKommunalDB">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
                               </xs:annotation>
@@ -273,7 +273,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="beteiligung2db.BeteiligungKommuneAktualisieren.0452">
+   <xs:element name="beteiligung2db.BeteiligungKommunalAktualisieren.0452">
       <xs:annotation>
          <xs:appinfo>
             <autor>Beteiligungsverfahren</autor>
@@ -293,7 +293,7 @@
                                  <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungKommuneDB">
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungKommunalDB">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält die aktualisierten Angaben für zu beteiligende Stelle.</xs:documentation>
                               </xs:annotation>
@@ -306,7 +306,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="beteiligung2db.BeteiligungKommuneLoeschen.0459">
+   <xs:element name="beteiligung2db.BeteiligungKommunalLoeschen.0459">
       <xs:annotation>
          <xs:appinfo>
             <autor>Beteiligungsverfahren</autor>

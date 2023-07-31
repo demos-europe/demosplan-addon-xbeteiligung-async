@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/1"
+           xmlns:dinspec91379="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"
            xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/2"
            xmlns:xink="http://www.osci.de/xinneres/basisnachricht/5"
            targetNamespace="https://www.xleitstelle.de/xbeteiligung/1"
@@ -28,6 +29,8 @@
       </xs:appinfo>
    </xs:annotation>
    <xs:include schemaLocation="xbeteiligung-baukasten.xsd"/>
+   <xs:import schemaLocation="din-91379-datatypes.xsd"
+              namespace="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"/>
    <xs:import schemaLocation="xbau-kernmodul-datentypen.xsd"
               namespace="http://www.xleitstelle.de/xbau/kernmodul/1/2"/>
    <xs:import schemaLocation="xinneres-basisnachricht.xsd"
@@ -54,7 +57,12 @@
                            </xs:element>
                            <xs:element name="beteiligung" type="xbeteiligung:Beteiligung">
                               <xs:annotation>
-                                 <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
+                                 <xs:documentation>Dieses Element enhält alle Angaben zur dem Beteiligungsverfahren für das zu einer Stellungnahme aufgefordert wird.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="rechtsfolgen" minOccurs="0" type="dinspec91379:datatypeC">
+                              <xs:annotation>
+                                 <xs:documentation>Hier können Rechtsfolgen übermittelt werden, die sich aus dem Verzicht auf Abgabe einer Stellungnahme ergeben.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
                         </xs:sequence>

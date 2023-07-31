@@ -79,3 +79,13 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentli
                 getter: getBeteiligungKommunalOeffentlichkeitArt
                 setter: setBeteiligungKommunalOeffentlichkeitArt
             type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType
+        veroeffentlichungszeitraum:
+            expose: true
+            access_type: public_method
+            serialized_name: veroeffentlichungszeitraum
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getVeroeffentlichungszeitraum
+                setter: setVeroeffentlichungszeitraum
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType

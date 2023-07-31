@@ -396,7 +396,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="beteiligung2Planung.BeteiligungKommuneNeuOK.0411">
+   <xs:element name="beteiligung2Planung.BeteiligungKommunalNeuOK.0411">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -419,7 +419,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="beteiligung2Planung.BeteiligungKommuneAktualisierenOK.0412">
+   <xs:element name="beteiligung2Planung.BeteiligungKommunalAktualisierenOK.0412">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -456,7 +456,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="beteiligung2Planung.BeteiligungKommuneLoeschenOK.0419">
+   <xs:element name="beteiligung2Planung.BeteiligungKommunalLoeschenOK.0419">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -493,7 +493,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="beteiligung2Planung.BeteiligungKommuneNeuNOK.0421">
+   <xs:element name="beteiligung2Planung.BeteiligungKommunalNeuNOK.0421">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -516,7 +516,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="beteiligung2Planung.BeteiligungKommuneAktualisierenNOK.0422">
+   <xs:element name="beteiligung2Planung.BeteiligungKommunalAktualisierenNOK.0422">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -547,7 +547,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="beteiligung2Planung.BeteiligungKommuneLoeschenNOK.0429">
+   <xs:element name="beteiligung2Planung.BeteiligungKommunalLoeschenNOK.0429">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -631,9 +631,7 @@
                                  <xs:documentation>Vorgangs-ID, die in der Nachricht 401 übermittelt wurde.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="stellungnahme"
-                                       minOccurs="0"
-                                       type="xbeteiligung:Stellungnahme">
+                           <xs:element name="stellungnahme" type="xbeteiligung:Stellungnahme">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enthält die aktualisierte Stellungnahme der beteiligten Stelle.</xs:documentation>
                               </xs:annotation>
@@ -670,53 +668,12 @@
                                  <xs:documentation>Stellungnahme-ID, die in der Nachricht 701/702 übermittelt wurde.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
+                           <xs:element name="planID" type="xink:UUIDType">
+                              <xs:annotation>
+                                 <xs:documentation>Die Plan-ID, die in der Nachricht 401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
                         </xs:sequence>
-                     </xs:complexType>
-                  </xs:element>
-               </xs:sequence>
-            </xs:extension>
-         </xs:complexContent>
-      </xs:complexType>
-   </xs:element>
-   <xs:element name="beteiligung2Planung.TerminBestaetigenOK.1011">
-      <xs:annotation>
-         <xs:appinfo>
-            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
-         </xs:appinfo>
-         <xs:documentation>Quittierungsnachricht einer erfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente.</xs:documentation>
-      </xs:annotation>
-      <xs:complexType>
-         <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2G">
-               <xs:sequence>
-                  <xs:element name="nachrichteninhalt">
-                     <xs:complexType>
-                        <xs:complexContent>
-                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.OK"/>
-                        </xs:complexContent>
-                     </xs:complexType>
-                  </xs:element>
-               </xs:sequence>
-            </xs:extension>
-         </xs:complexContent>
-      </xs:complexType>
-   </xs:element>
-   <xs:element name="beteiligung2Planung.TerminBestaetigenNOK.1021">
-      <xs:annotation>
-         <xs:appinfo>
-            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
-         </xs:appinfo>
-         <xs:documentation>Negative Quittierungsnachricht einer misserfolgten Aktualisierung des Beteiligungsverfahrens in der Beteiligungskomponente.</xs:documentation>
-      </xs:annotation>
-      <xs:complexType>
-         <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2G">
-               <xs:sequence>
-                  <xs:element name="nachrichteninhalt">
-                     <xs:complexType>
-                        <xs:complexContent>
-                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.NOK"/>
-                        </xs:complexContent>
                      </xs:complexType>
                   </xs:element>
                </xs:sequence>

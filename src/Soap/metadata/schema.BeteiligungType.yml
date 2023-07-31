@@ -1,15 +1,15 @@
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungType:
     properties:
-        kommune:
+        kommunal:
             expose: true
             access_type: public_method
-            serialized_name: kommune
+            serialized_name: kommunal
             xml_element:
                 namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
             accessor:
-                getter: getKommune
-                setter: setKommune
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneType
+                getter: getKommunal
+                setter: setKommunal
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType
         raumordnung:
             expose: true
             access_type: public_method

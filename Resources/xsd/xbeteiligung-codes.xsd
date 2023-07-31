@@ -238,57 +238,6 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Datumsart">
-      <xs:annotation>
-         <xs:appinfo>
-            <codeliste>
-               <nameLang>Datumsart</nameLang>
-               <nameKurz>Datumsart</nameKurz>
-               <nameTechnisch>datumsart</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:datumsart</kennung>
-               <beschreibung>Auswahl der Datumsart.</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
-            </codeliste>
-            <versionCodeliste>
-               <version>1.0</version>
-               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
-            </versionCodeliste>
-            <codelistenspalten>
-               <code>
-                  <spaltennameLang>Code</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>true</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
-               </code>
-               <beschreibung>
-                  <spaltennameLang>Beschreibung</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>false</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
-               </beschreibung>
-            </codelistenspalten>
-            <genutzteCodeSpalte>code</genutzteCodeSpalte>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:complexContent>
-         <xs:restriction base="xoev-code:Code">
-            <xs:sequence>
-               <xs:element name="code" form="unqualified" type="xbeteiligung:datumsart"/>
-            </xs:sequence>
-            <xs:attribute name="listURI"
-                          type="xs:anyURI"
-                          use="optional"
-                          fixed="urn:xoev-de:xleitstelle:codeliste:datumsart"/>
-            <xs:attribute name="listVersionID"
-                          type="xs:normalizedString"
-                          use="optional"
-                          fixed="1.0"/>
-         </xs:restriction>
-      </xs:complexContent>
-   </xs:complexType>
    <xs:complexType name="Code.Datumsstatus">
       <xs:annotation>
          <xs:appinfo>
@@ -391,14 +340,14 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.PlanartKommune">
+   <xs:complexType name="Code.PlanartKommunal">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
                <nameLang>Planart in der kommunalen Bauplanung</nameLang>
-               <nameKurz>Planart Kommune</nameKurz>
-               <nameTechnisch>planartkommune</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:planartkommune</kennung>
+               <nameKurz>Planart Kommunal</nameKurz>
+               <nameTechnisch>planartkommunal</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:planartkommunal</kennung>
                <beschreibung>Art der Planung nach BauGB</beschreibung>
                <herausgebernameLang>XLeitstelle</herausgebernameLang>
                <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
@@ -413,7 +362,7 @@
             <xs:attribute name="listURI"
                           type="xs:anyURI"
                           use="optional"
-                          fixed="urn:xoev-de:xleitstelle:codeliste:planartkommune"/>
+                          fixed="urn:xoev-de:xleitstelle:codeliste:planartkommunal"/>
             <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
          </xs:restriction>
       </xs:complexContent>
@@ -604,15 +553,15 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.VerfahrensartKommune">
+   <xs:complexType name="Code.VerfahrensartKommunal">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
-               <nameLang>Verfahrensart Kommune</nameLang>
-               <nameKurz>Verfahrensart Kommune</nameKurz>
-               <nameTechnisch>verfahrensartkommune</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartkommune</kennung>
-               <beschreibung>Auswahl der Verfahrensart Kommune</beschreibung>
+               <nameLang>Verfahrensart Kommunale Bauleitplanung</nameLang>
+               <nameKurz>Verfahrensart Kommunal</nameKurz>
+               <nameTechnisch>verfahrensartkommunal</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartkommunal</kennung>
+               <beschreibung>Auswahl der Verfahrensart Kommunale Bauleitplanung</beschreibung>
                <herausgebernameLang>XLeitstelle</herausgebernameLang>
                <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
             </codeliste>
@@ -644,12 +593,12 @@
             <xs:sequence>
                <xs:element name="code"
                            form="unqualified"
-                           type="xbeteiligung:verfahrensartkommune"/>
+                           type="xbeteiligung:verfahrensartkommunal"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
                           use="optional"
-                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensartkommune"/>
+                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensartkommunal"/>
             <xs:attribute name="listVersionID"
                           type="xs:normalizedString"
                           use="optional"
@@ -1373,57 +1322,6 @@
          </xs:enumeration>
       </xs:restriction>
    </xs:simpleType>
-   <xs:simpleType name="datumsart">
-      <xs:annotation>
-         <xs:appinfo>
-            <codeliste>
-               <nameLang>Datumsart</nameLang>
-               <nameKurz>Datumsart</nameKurz>
-               <nameTechnisch>datumsart</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:datumsart</kennung>
-               <beschreibung>Auswahl der Datumsart.</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
-            </codeliste>
-            <versionCodeliste>
-               <version>1.0</version>
-               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
-            </versionCodeliste>
-            <codelistenspalten>
-               <code>
-                  <spaltennameLang>Code</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>true</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
-               </code>
-               <beschreibung>
-                  <spaltennameLang>Beschreibung</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>false</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
-               </beschreibung>
-            </codelistenspalten>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:restriction base="xs:token">
-         <xs:enumeration value="1000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Versanddatum</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="2000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Sitzungsdatum</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-      </xs:restriction>
-   </xs:simpleType>
    <xs:simpleType name="datumsstatus">
       <xs:annotation>
          <xs:appinfo>
@@ -1728,15 +1626,15 @@
          </xs:enumeration>
       </xs:restriction>
    </xs:simpleType>
-   <xs:simpleType name="verfahrensartkommune">
+   <xs:simpleType name="verfahrensartkommunal">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
-               <nameLang>Verfahrensart Kommune</nameLang>
-               <nameKurz>Verfahrensart Kommune</nameKurz>
-               <nameTechnisch>verfahrensartkommune</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartkommune</kennung>
-               <beschreibung>Auswahl der Verfahrensart Kommune</beschreibung>
+               <nameLang>Verfahrensart Kommunale Bauleitplanung</nameLang>
+               <nameKurz>Verfahrensart Kommunal</nameKurz>
+               <nameTechnisch>verfahrensartkommunal</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartkommunal</kennung>
+               <beschreibung>Auswahl der Verfahrensart Kommunale Bauleitplanung</beschreibung>
                <herausgebernameLang>XLeitstelle</herausgebernameLang>
                <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
             </codeliste>

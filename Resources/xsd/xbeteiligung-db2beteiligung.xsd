@@ -361,7 +361,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="db2Beteiligung.BeteiligungKommuneNeuOK.0461">
+   <xs:element name="db2Beteiligung.BeteiligungKommunalNeuOK.0461">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -384,7 +384,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="db2Beteiligung.BeteiligungKommuneAktualisierenOK.0462">
+   <xs:element name="db2Beteiligung.BeteiligungKommunalAktualisierenOK.0462">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -421,7 +421,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="db2Beteiligung.BeteiligungKommuneLoeschenOK.0469">
+   <xs:element name="db2Beteiligung.BeteiligungKommunalLoeschenOK.0469">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -458,7 +458,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="db2Beteiligung.BeteiligungKommuneNeuNOK.0471">
+   <xs:element name="db2Beteiligung.BeteiligungKommunalNeuNOK.0471">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -481,7 +481,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="db2Beteiligung.BeteiligungKommuneAktualisierenNOK.0472">
+   <xs:element name="db2Beteiligung.BeteiligungKommunalAktualisierenNOK.0472">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -504,7 +504,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="db2Beteiligung.BeteiligungKommuneLoeschenNOK.0479">
+   <xs:element name="db2Beteiligung.BeteiligungKommunalLoeschenNOK.0479">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>

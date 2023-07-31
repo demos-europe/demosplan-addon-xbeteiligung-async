@@ -154,6 +154,16 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungPlanfeststellungT
                 getter: getZeitraum
                 setter: setZeitraum
             type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType
+        veroeffentlichungszeitraum:
+            expose: true
+            access_type: public_method
+            serialized_name: veroeffentlichungszeitraum
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getVeroeffentlichungszeitraum
+                setter: setVeroeffentlichungszeitraum
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType
         anlagen:
             expose: true
             access_type: public_method

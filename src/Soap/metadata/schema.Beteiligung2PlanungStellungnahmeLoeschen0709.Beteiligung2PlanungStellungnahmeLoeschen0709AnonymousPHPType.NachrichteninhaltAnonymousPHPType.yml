@@ -20,3 +20,13 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungStellungn
                 getter: getStellungnahmeID
                 setter: setStellungnahmeID
             type: string
+        planID:
+            expose: true
+            access_type: public_method
+            serialized_name: planID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getPlanID
+                setter: setPlanID
+            type: string

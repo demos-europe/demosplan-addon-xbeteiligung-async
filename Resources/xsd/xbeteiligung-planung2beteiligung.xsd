@@ -234,7 +234,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="planung2Beteiligung.BeteiligungKommuneNeu.0401">
+   <xs:element name="planung2Beteiligung.BeteiligungKommunalNeu.0401">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -253,7 +253,7 @@
                                  <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungKommunalNeu">
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungKommunal">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
                               </xs:annotation>
@@ -266,7 +266,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="planung2Beteiligung.BeteiligungKommuneAktualisieren.0402">
+   <xs:element name="planung2Beteiligung.BeteiligungKommunalAktualisieren.0402">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -285,7 +285,7 @@
                                  <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungKommune">
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungKommunal">
                               <xs:annotation>
                                  <xs:documentation>Dieses Element enhält die aktualisierten Angaben für zu beteiligende Stelle.</xs:documentation>
                               </xs:annotation>
@@ -298,7 +298,7 @@
          </xs:complexContent>
       </xs:complexType>
    </xs:element>
-   <xs:element name="planung2Beteiligung.BeteiligungKommuneLoeschen.0409">
+   <xs:element name="planung2Beteiligung.BeteiligungKommunalLoeschen.0409">
       <xs:annotation>
          <xs:appinfo>
             <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
@@ -543,44 +543,6 @@
                                  <xs:documentation>Beschreibung der Fehler.</xs:documentation>
                               </xs:annotation>
                            </xs:element>
-                        </xs:sequence>
-                     </xs:complexType>
-                  </xs:element>
-               </xs:sequence>
-            </xs:extension>
-         </xs:complexContent>
-      </xs:complexType>
-   </xs:element>
-   <xs:element name="planung2Beteiligung.TerminBestaetigen.1001">
-      <xs:annotation>
-         <xs:appinfo>
-            <title>Mitteilung über die Bestätigung eines Termins</title>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:complexType>
-         <xs:complexContent>
-            <xs:extension base="xbeteiligung:Nachricht.G2G">
-               <xs:sequence>
-                  <xs:element name="nachrichteninhalt">
-                     <xs:annotation>
-                        <xs:documentation>Nachricht bestätigt, den Beginn des Auslegungszeitraums und der entsprechenden Veröffentlichung eine Woche vorher.</xs:documentation>
-                     </xs:annotation>
-                     <xs:complexType>
-                        <xs:sequence>
-                           <xs:element name="beteiligungsID" type="xink:UUIDType">
-                              <xs:annotation>
-                                 <xs:documentation>ID des Beteiligungsverfahrens, die mit der Nachricht 0401 als "vorgangsID" übermittelt wurde.</xs:documentation>
-                              </xs:annotation>
-                           </xs:element>
-                           <xs:element name="planID" minOccurs="0" type="xink:UUIDType">
-                              <xs:annotation>
-                                 <xs:documentation>Hier kann die ID des Planverfahrens</xs:documentation>
-                              </xs:annotation>
-                           </xs:element>
-                           <xs:element name="datumStartBeteiligung" type="xs:date"/>
-                           <xs:element name="datumVeroeffentlichungBeteiligung"
-                                       minOccurs="0"
-                                       type="xs:date"/>
                         </xs:sequence>
                      </xs:complexType>
                   </xs:element>
