@@ -6,6 +6,11 @@ generate php classes from the xsd files from the XBeteiligung specification.
 # Usage
 How to use it is documented in tests like testReadBeteiligung2PlanungBeteiligungNeuOK0410()
 
+# Generate from Standard
+
+When you want to generate the php classes from the standard you need to copy 
+the xsd files from the standard build/xsd/ folder to the Resources/xsd folder 
+within this repository.
 
 # Create php classes manually
 
