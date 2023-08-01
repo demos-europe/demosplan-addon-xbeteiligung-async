@@ -19,6 +19,13 @@ services:
     DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSubscriber:
         tags: [ kernel.event_subscriber ]
 
+    DemosEurope\DemosplanAddon\XBeteiligung\EventListener\ProcedureUpdated:
+      tags:
+        - # these are the options required to define the entity listener
+          name: 'doctrine.orm.entity_listener'
+          event: 'postUpdate'
+          entity: 'DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface'
+
     DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAnySimpleTypeHandler:
         lazy: true
 
