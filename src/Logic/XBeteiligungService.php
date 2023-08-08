@@ -682,10 +682,19 @@ class XBeteiligungService
 
     private function saveProcedureMessage(string $xml, string $procedureId): void
     {
+        $error = false;
+        if (false === $this->isValidMessage($xml))
+        {
+            $this->logger->warning('The generated XML is not valid.', [
+                'procedureId' => $procedureId,
+                'generatedXML' => $xml
+            ]);
+            $error = true;
+        }
         $procedureMessage = new ProcedureMessage(
             $xml,
             false,
-            false,
+            $error,
             0,
             $procedureId
         );
