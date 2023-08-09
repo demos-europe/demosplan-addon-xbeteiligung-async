@@ -644,8 +644,10 @@ class XBeteiligungService
         string $xsdFile = 'xbeteiligung-planung2beteiligung.xsd'): bool
     {
         if ('' === $path) {
-            $path = AddonPath::getRootPath('Resources/xsd/' . $xsdFile);
+            $path = AddonPath::getRootPath('Resources/xsd/');
         }
+
+        $path .= $xsdFile;
 
         $document = new \DOMDocument();
         $document->loadXML($message);
