@@ -24,3 +24,22 @@ following steps
 XML messages could automatically be casted to php objects by using the
 JMS-Serializer-Bundle http://jmsyst.com/bundles/JMSSerializerBundle. It is
 also easily possible to cast php classes back to xml!
+
+# Necessary adjustments after standard update
+
+In order for generated XML messages to be successfully validated,
+the following adjustments must be made after generating the classes and
+Yml files:
+
+add `xbeteiligung:` as prefix to xml_root_name in 
+`schema.Planung2BeteiligungBeteiligungKommunalNeu0401.yml`,
+`schema.Planung2BeteiligungBeteiligungKommunalAktualisieren0402.yml`,
+`schema.Planung2BeteiligungBeteiligungKommunalLoeschen0409.yml`
+
+Example - xml_root_name: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
+
+comment out `namespace: ...` in `schema.CodeType.yml` for
+`code` and `name`
+
+Run the unit tests XBeteiligungServiceTest- (401, 402, 409) and fix any bugs that appear.
+Update what is documented here if there are any changes to be aware of.
