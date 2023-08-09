@@ -28,9 +28,3 @@ services:
     DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository:
         arguments:
             $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage'
-
-    DemosEurope\DemosplanAddon\XBeteiligung\ResourceTypes\ProcedureMessageResourceType:
-        autowire: true
-        arguments:
-            $conditionFactory: '@EDT\DqlQuerying\ConditionFactories\DqlConditionFactory'
-        tags: [ 'dplan.resourceType' ]
