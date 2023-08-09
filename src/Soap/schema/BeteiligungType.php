@@ -13,9 +13,9 @@ class BeteiligungType
     /**
      * Hier können die Informationen zu einem Beteiligungsverfahren im Rahmen der kommunalen Bauleitplanung übermittelt werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneType $kommune
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType $kommunal
      */
-    private $kommune = null;
+    private $kommunal = null;
 
     /**
      * Hier können die Informationen zu einem Beteiligungsverfahren im Rahmen der Raumordnung übermittelt werden.
@@ -32,28 +32,28 @@ class BeteiligungType
     private $planfeststellung = null;
 
     /**
-     * Gets as kommune
+     * Gets as kommunal
      *
      * Hier können die Informationen zu einem Beteiligungsverfahren im Rahmen der kommunalen Bauleitplanung übermittelt werden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType
      */
-    public function getKommune()
+    public function getKommunal()
     {
-        return $this->kommune;
+        return $this->kommunal;
     }
 
     /**
-     * Sets a new kommune
+     * Sets a new kommunal
      *
      * Hier können die Informationen zu einem Beteiligungsverfahren im Rahmen der kommunalen Bauleitplanung übermittelt werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneType $kommune
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType $kommunal
      * @return self
      */
-    public function setKommune(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneType $kommune = null)
+    public function setKommunal(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType $kommunal = null)
     {
-        $this->kommune = $kommune;
+        $this->kommunal = $kommunal;
         return $this;
     }
 

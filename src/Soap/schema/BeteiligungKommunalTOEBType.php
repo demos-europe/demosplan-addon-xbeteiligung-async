@@ -18,13 +18,6 @@ class BeteiligungKommunalTOEBType
     private $beteiligungsID = null;
 
     /**
-     * Hier ist zu übermitteln, um welche Art der Beteiligung der Träger öffentlicher Belange es sich handelt.
-     *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType $beteiligungKommunalTOEBArt
-     */
-    private $beteiligungKommunalTOEBArt = null;
-
-    /**
      * Hier ist die Durchgangsnummer des Verfahrens zu übermitteln.
      *
      * @var int $durchgang
@@ -62,6 +55,20 @@ class BeteiligungKommunalTOEBType
     private $anlagen = null;
 
     /**
+     * Hier ist zu übermitteln, um welche Art der Beteiligung der Träger öffentlicher Belange es sich handelt.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType $beteiligungKommunalTOEBArt
+     */
+    private $beteiligungKommunalTOEBArt = null;
+
+    /**
+     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum
+     */
+    private $veroeffentlichungszeitraum = null;
+
+    /**
      * Gets as beteiligungsID
      *
      * Hier muss eine Zeichenkette übermittelt werden, die zur Zuordnung von Stellungnahmen zu einzelnen Beteiligungsverfahren genutzt werden kann.
@@ -84,32 +91,6 @@ class BeteiligungKommunalTOEBType
     public function setBeteiligungsID($beteiligungsID)
     {
         $this->beteiligungsID = $beteiligungsID;
-        return $this;
-    }
-
-    /**
-     * Gets as beteiligungKommunalTOEBArt
-     *
-     * Hier ist zu übermitteln, um welche Art der Beteiligung der Träger öffentlicher Belange es sich handelt.
-     *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType
-     */
-    public function getBeteiligungKommunalTOEBArt()
-    {
-        return $this->beteiligungKommunalTOEBArt;
-    }
-
-    /**
-     * Sets a new beteiligungKommunalTOEBArt
-     *
-     * Hier ist zu übermitteln, um welche Art der Beteiligung der Träger öffentlicher Belange es sich handelt.
-     *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType $beteiligungKommunalTOEBArt
-     * @return self
-     */
-    public function setBeteiligungKommunalTOEBArt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType $beteiligungKommunalTOEBArt)
-    {
-        $this->beteiligungKommunalTOEBArt = $beteiligungKommunalTOEBArt;
         return $this;
     }
 
@@ -320,6 +301,58 @@ class BeteiligungKommunalTOEBType
     public function setAnlagen(array $anlagen = null)
     {
         $this->anlagen = $anlagen;
+        return $this;
+    }
+
+    /**
+     * Gets as beteiligungKommunalTOEBArt
+     *
+     * Hier ist zu übermitteln, um welche Art der Beteiligung der Träger öffentlicher Belange es sich handelt.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType
+     */
+    public function getBeteiligungKommunalTOEBArt()
+    {
+        return $this->beteiligungKommunalTOEBArt;
+    }
+
+    /**
+     * Sets a new beteiligungKommunalTOEBArt
+     *
+     * Hier ist zu übermitteln, um welche Art der Beteiligung der Träger öffentlicher Belange es sich handelt.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType $beteiligungKommunalTOEBArt
+     * @return self
+     */
+    public function setBeteiligungKommunalTOEBArt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType $beteiligungKommunalTOEBArt)
+    {
+        $this->beteiligungKommunalTOEBArt = $beteiligungKommunalTOEBArt;
+        return $this;
+    }
+
+    /**
+     * Gets as veroeffentlichungszeitraum
+     *
+     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType
+     */
+    public function getVeroeffentlichungszeitraum()
+    {
+        return $this->veroeffentlichungszeitraum;
+    }
+
+    /**
+     * Sets a new veroeffentlichungszeitraum
+     *
+     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum
+     * @return self
+     */
+    public function setVeroeffentlichungszeitraum(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum = null)
+    {
+        $this->veroeffentlichungszeitraum = $veroeffentlichungszeitraum;
         return $this;
     }
 }

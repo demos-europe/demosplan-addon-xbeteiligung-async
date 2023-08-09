@@ -15,11 +15,18 @@ class NachrichteninhaltAnonymousPHPType
     private $vorgangsID = null;
 
     /**
-     * Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.
+     * Dieses Element enhält alle Angaben zur dem Beteiligungsverfahren für das zu einer Stellungnahme aufgefordert wird.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungType $beteiligung
      */
     private $beteiligung = null;
+
+    /**
+     * Hier können Rechtsfolgen übermittelt werden, die sich aus dem Verzicht auf Abgabe einer Stellungnahme ergeben.
+     *
+     * @var string $rechtsfolgen
+     */
+    private $rechtsfolgen = null;
 
     /**
      * Gets as vorgangsID
@@ -50,7 +57,7 @@ class NachrichteninhaltAnonymousPHPType
     /**
      * Gets as beteiligung
      *
-     * Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.
+     * Dieses Element enhält alle Angaben zur dem Beteiligungsverfahren für das zu einer Stellungnahme aufgefordert wird.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungType
      */
@@ -62,7 +69,7 @@ class NachrichteninhaltAnonymousPHPType
     /**
      * Sets a new beteiligung
      *
-     * Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.
+     * Dieses Element enhält alle Angaben zur dem Beteiligungsverfahren für das zu einer Stellungnahme aufgefordert wird.
      *
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungType $beteiligung
      * @return self
@@ -70,6 +77,32 @@ class NachrichteninhaltAnonymousPHPType
     public function setBeteiligung(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungType $beteiligung)
     {
         $this->beteiligung = $beteiligung;
+        return $this;
+    }
+
+    /**
+     * Gets as rechtsfolgen
+     *
+     * Hier können Rechtsfolgen übermittelt werden, die sich aus dem Verzicht auf Abgabe einer Stellungnahme ergeben.
+     *
+     * @return string
+     */
+    public function getRechtsfolgen()
+    {
+        return $this->rechtsfolgen;
+    }
+
+    /**
+     * Sets a new rechtsfolgen
+     *
+     * Hier können Rechtsfolgen übermittelt werden, die sich aus dem Verzicht auf Abgabe einer Stellungnahme ergeben.
+     *
+     * @param string $rechtsfolgen
+     * @return self
+     */
+    public function setRechtsfolgen($rechtsfolgen)
+    {
+        $this->rechtsfolgen = $rechtsfolgen;
         return $this;
     }
 }

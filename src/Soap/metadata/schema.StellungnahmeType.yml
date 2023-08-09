@@ -10,15 +10,15 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
                 getter: getStellungnahmeID
                 setter: setStellungnahmeID
             type: string
-        stellungnahmeVerfahrenID:
+        planID:
             expose: true
             access_type: public_method
-            serialized_name: stellungnahmeVerfahrenID
+            serialized_name: planID
             xml_element:
                 namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
             accessor:
-                getter: getStellungnahmeVerfahrenID
-                setter: setStellungnahmeVerfahrenID
+                getter: getPlanID
+                setter: setPlanID
             type: string
         beteiligungsID:
             expose: true
@@ -29,16 +29,6 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
             accessor:
                 getter: getBeteiligungsID
                 setter: setBeteiligungsID
-            type: string
-        planID:
-            expose: true
-            access_type: public_method
-            serialized_name: planID
-            xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
-            accessor:
-                getter: getPlanID
-                setter: setPlanID
             type: string
         status:
             expose: true

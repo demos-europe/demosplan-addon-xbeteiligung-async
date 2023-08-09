@@ -18,11 +18,11 @@ class StellungnahmeType
     private $stellungnahmeID = null;
 
     /**
-     * Hier ist die ID des Verfahrens zu übermitteln.
+     * Hier ist die ID des Planverfahrens zu übermittleln.
      *
-     * @var string $stellungnahmeVerfahrenID
+     * @var string $planID
      */
-    private $stellungnahmeVerfahrenID = null;
+    private $planID = null;
 
     /**
      * Hier ist die ID der Beteiligung zu übermitteln.
@@ -30,13 +30,6 @@ class StellungnahmeType
      * @var string $beteiligungsID
      */
     private $beteiligungsID = null;
-
-    /**
-     * Hier ist die ID des Planverfahrens zu übermittleln.
-     *
-     * @var string $planID
-     */
-    private $planID = null;
 
     /**
      * Hier ist der Status der Stellungsnahme zu übermitteln.
@@ -83,7 +76,7 @@ class StellungnahmeType
     ];
 
     /**
-     * Hier kann die Zurodnung der Stellungnahme übermittelt werden.
+     * Hier kann die Zuordnung zum Gegenstand der Stellungnahme erfolgen.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZuordnungType[] $zuordnung
      */
@@ -164,28 +157,28 @@ class StellungnahmeType
     }
 
     /**
-     * Gets as stellungnahmeVerfahrenID
+     * Gets as planID
      *
-     * Hier ist die ID des Verfahrens zu übermitteln.
+     * Hier ist die ID des Planverfahrens zu übermittleln.
      *
      * @return string
      */
-    public function getStellungnahmeVerfahrenID()
+    public function getPlanID()
     {
-        return $this->stellungnahmeVerfahrenID;
+        return $this->planID;
     }
 
     /**
-     * Sets a new stellungnahmeVerfahrenID
+     * Sets a new planID
      *
-     * Hier ist die ID des Verfahrens zu übermitteln.
+     * Hier ist die ID des Planverfahrens zu übermittleln.
      *
-     * @param string $stellungnahmeVerfahrenID
+     * @param string $planID
      * @return self
      */
-    public function setStellungnahmeVerfahrenID($stellungnahmeVerfahrenID)
+    public function setPlanID($planID)
     {
-        $this->stellungnahmeVerfahrenID = $stellungnahmeVerfahrenID;
+        $this->planID = $planID;
         return $this;
     }
 
@@ -212,32 +205,6 @@ class StellungnahmeType
     public function setBeteiligungsID($beteiligungsID)
     {
         $this->beteiligungsID = $beteiligungsID;
-        return $this;
-    }
-
-    /**
-     * Gets as planID
-     *
-     * Hier ist die ID des Planverfahrens zu übermittleln.
-     *
-     * @return string
-     */
-    public function getPlanID()
-    {
-        return $this->planID;
-    }
-
-    /**
-     * Sets a new planID
-     *
-     * Hier ist die ID des Planverfahrens zu übermittleln.
-     *
-     * @param string $planID
-     * @return self
-     */
-    public function setPlanID($planID)
-    {
-        $this->planID = $planID;
         return $this;
     }
 
@@ -440,7 +407,7 @@ class StellungnahmeType
     /**
      * Adds as zuordnung
      *
-     * Hier kann die Zurodnung der Stellungnahme übermittelt werden.
+     * Hier kann die Zuordnung zum Gegenstand der Stellungnahme erfolgen.
      *
      * @return self
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZuordnungType $zuordnung
@@ -454,7 +421,7 @@ class StellungnahmeType
     /**
      * isset zuordnung
      *
-     * Hier kann die Zurodnung der Stellungnahme übermittelt werden.
+     * Hier kann die Zuordnung zum Gegenstand der Stellungnahme erfolgen.
      *
      * @param int|string $index
      * @return bool
@@ -467,7 +434,7 @@ class StellungnahmeType
     /**
      * unset zuordnung
      *
-     * Hier kann die Zurodnung der Stellungnahme übermittelt werden.
+     * Hier kann die Zuordnung zum Gegenstand der Stellungnahme erfolgen.
      *
      * @param int|string $index
      * @return void
@@ -480,7 +447,7 @@ class StellungnahmeType
     /**
      * Gets as zuordnung
      *
-     * Hier kann die Zurodnung der Stellungnahme übermittelt werden.
+     * Hier kann die Zuordnung zum Gegenstand der Stellungnahme erfolgen.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZuordnungType[]
      */
@@ -492,7 +459,7 @@ class StellungnahmeType
     /**
      * Sets a new zuordnung
      *
-     * Hier kann die Zurodnung der Stellungnahme übermittelt werden.
+     * Hier kann die Zuordnung zum Gegenstand der Stellungnahme erfolgen.
      *
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZuordnungType[] $zuordnung
      * @return self

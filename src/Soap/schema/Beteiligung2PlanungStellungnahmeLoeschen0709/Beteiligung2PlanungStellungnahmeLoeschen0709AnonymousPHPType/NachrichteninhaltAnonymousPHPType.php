@@ -22,6 +22,13 @@ class NachrichteninhaltAnonymousPHPType
     private $stellungnahmeID = null;
 
     /**
+     * Die Plan-ID, die in der Nachricht 401 übermittelt wurde.
+     *
+     * @var string $planID
+     */
+    private $planID = null;
+
+    /**
      * Gets as vorgangsID
      *
      * Vorgangs-ID, die in der Nachricht 401 übermittelt wurde.
@@ -70,6 +77,32 @@ class NachrichteninhaltAnonymousPHPType
     public function setStellungnahmeID($stellungnahmeID)
     {
         $this->stellungnahmeID = $stellungnahmeID;
+        return $this;
+    }
+
+    /**
+     * Gets as planID
+     *
+     * Die Plan-ID, die in der Nachricht 401 übermittelt wurde.
+     *
+     * @return string
+     */
+    public function getPlanID()
+    {
+        return $this->planID;
+    }
+
+    /**
+     * Sets a new planID
+     *
+     * Die Plan-ID, die in der Nachricht 401 übermittelt wurde.
+     *
+     * @param string $planID
+     * @return self
+     */
+    public function setPlanID($planID)
+    {
+        $this->planID = $planID;
         return $this;
     }
 }

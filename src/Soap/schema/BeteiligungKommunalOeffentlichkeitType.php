@@ -62,6 +62,13 @@ class BeteiligungKommunalOeffentlichkeitType
     private $beteiligungKommunalOeffentlichkeitArt = null;
 
     /**
+     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum
+     */
+    private $veroeffentlichungszeitraum = null;
+
+    /**
      * Gets as beteiligungsID
      *
      * Hier muss eine Zeichenkette übermittelt werden, die zur Zuordnung von Stellungnahmen zu einzelnen Beteiligungsverfahren genutzt werden kann.
@@ -320,6 +327,32 @@ class BeteiligungKommunalOeffentlichkeitType
     public function setBeteiligungKommunalOeffentlichkeitArt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType $beteiligungKommunalOeffentlichkeitArt)
     {
         $this->beteiligungKommunalOeffentlichkeitArt = $beteiligungKommunalOeffentlichkeitArt;
+        return $this;
+    }
+
+    /**
+     * Gets as veroeffentlichungszeitraum
+     *
+     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType
+     */
+    public function getVeroeffentlichungszeitraum()
+    {
+        return $this->veroeffentlichungszeitraum;
+    }
+
+    /**
+     * Sets a new veroeffentlichungszeitraum
+     *
+     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum
+     * @return self
+     */
+    public function setVeroeffentlichungszeitraum(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum = null)
+    {
+        $this->veroeffentlichungszeitraum = $veroeffentlichungszeitraum;
         return $this;
     }
 }

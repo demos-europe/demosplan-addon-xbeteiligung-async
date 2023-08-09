@@ -67,7 +67,7 @@ class NachrichteninhaltAnonymousPHPType
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType $stellungnahme
      * @return self
      */
-    public function setStellungnahme(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType $stellungnahme = null)
+    public function setStellungnahme(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType $stellungnahme)
     {
         $this->stellungnahme = $stellungnahme;
         return $this;
