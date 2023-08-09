@@ -95,7 +95,7 @@ class XBeteiligungServiceTest409 extends TestCase
 
         $procedureXml = $this->sut->createProcedureDeleted409FromObject($procedure->getId());
 
-        $isValid = $this->sut->isValidMessage($procedureXml, true, 'xbeteiligung-planung2beteiligung.xsd');
+        $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);
     }
 }

@@ -94,7 +94,7 @@ class XBeteiligungServiceTest401 extends TestCase
 
         $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
 
-        $isValid = $this->sut->isValidMessage($procedureXml, true, 'xbeteiligung-planung2beteiligung.xsd');
+        $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);
     }
 }
