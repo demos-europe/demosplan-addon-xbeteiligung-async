@@ -53,6 +53,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschr
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftPostfachanschriftTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType;
+use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
@@ -636,9 +637,16 @@ class XBeteiligungService
     /**
      * Validates a message against a given xsd file located in plugin xsd folder.
      */
-    public function isValidMessage(string $message, bool $verboseDebug = false, string $xsdFile = 'xbeteiligung-planung2beteiligung.xsd'): bool
+    public function isValidMessage(
+        string $message,
+        bool $verboseDebug = false,
+        string $path = '',
+        string $xsdFile = 'xbeteiligung-planung2beteiligung.xsd'): bool
     {
-        $path = AddonPath::getRootPath('Resources/xsd/' . $xsdFile);
+        if ('' === $path) {
+            $path = AddonPath::getRootPath('Resources/xsd/' . $xsdFile);
+        }
+
         $document = new \DOMDocument();
         $document->loadXML($message);
         $isValid = $document->schemaValidate($path);
@@ -683,7 +691,9 @@ class XBeteiligungService
     private function saveProcedureMessage(string $xml, string $procedureId): void
     {
         $error = false;
-        if (false === $this->isValidMessage($xml))
+        $path = AddonPath::getRootPath('addons/vendor/' .
+            XBeteiligungAsyncAddon::ADDON_NAME . '/Resources/xsd/');
+        if (false === $this->isValidMessage($xml, path: $path))
         {
             $this->logger->warning('The generated XML is not valid.', [
                 'procedureId' => $procedureId,
