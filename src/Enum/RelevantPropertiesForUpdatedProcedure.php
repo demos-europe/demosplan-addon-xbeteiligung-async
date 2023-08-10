@@ -16,5 +16,5 @@ enum RelevantPropertiesForUpdatedProcedure: string
     case Desc = 'desc';
     case StartDate = 'startDate';
     case EndDate = 'endDate';
-    case BoundingBox = 'boundingBox';
+    case BoundingBox = 'mapExtent'; // why mapExtend? see here: T32377
 }

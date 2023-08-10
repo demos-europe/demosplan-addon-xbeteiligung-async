@@ -414,8 +414,8 @@ class XBeteiligungService
                 $basemapGisLayer = $gisLayer;
             }
         }
-        // todo does BoundingBox now contains the mapExtent or the BoundingBox as they are switched within our db
-        $bboxArray = explode(',', $procedure->getSettings()->getBoundingBox());
+        // why mapExtend? see here: T32377
+        $bboxArray = explode(',', $procedure->getSettings()->getMapExtent());
 
         $west = (float)$bboxArray[0];
         $east = (float)$bboxArray[2];
@@ -435,7 +435,8 @@ class XBeteiligungService
         $height = '&HEIGHT=' . 512 * ($absHeight / $absWidth);
         $crs = '&CRS=EPSG%3A3857';
         $styles = '&STYLES=';
-        $bbox = '&BBOX=' . str_replace(',', '%2C', $procedure->getSettings()->getBoundingBox());
+        // why mapExtend? see here: T32377
+        $bbox = '&BBOX=' . str_replace(',', '%2C', $procedure->getSettings()->getMapExtent());
 
 
         return $url . $serviceType . $version . $request . $format . $transparent . $layers . $width .
