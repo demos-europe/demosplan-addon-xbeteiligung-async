@@ -158,7 +158,7 @@ class XBeteiligungService
         ); // required
 
         $xml = $this->serializeData($procedureCreated401Object);
-        $this->saveProcedureMessage($xml, $procedure->getId());
+
 
         return $xml;
     }
@@ -178,7 +178,7 @@ class XBeteiligungService
         ); // required
 
         $xml = $this->serializeData($procedureUpdated402Object);
-        $this->saveProcedureMessage($xml, $procedure->getId());
+
 
         return $xml;
     }
@@ -196,7 +196,7 @@ class XBeteiligungService
         $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedureId));
 
         $xml = $this->serializeData($procedureDeleted409Object);
-        $this->saveProcedureMessage($xml, $procedureId);
+
 
         return $xml;
     }
@@ -691,7 +691,7 @@ class XBeteiligungService
         $this->serializer = $serializer;
     }
 
-    private function saveProcedureMessage(string $xml, string $procedureId): void
+    public function saveProcedureMessage(string $xml, string $procedureId): void
     {
         $error = false;
         $path = AddonPath::getRootPath('addons/vendor/' .
