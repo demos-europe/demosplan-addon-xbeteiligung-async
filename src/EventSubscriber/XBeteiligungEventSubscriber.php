@@ -44,6 +44,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
         $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
+        $this->xBeteiligungService->saveProcedureMessage($xml, $event->getProcedure()->getId());
         $this->createDebugMessageForCreatedXML($event->getProcedure(), $xml, 'created');
     }
 
@@ -64,6 +65,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     private function procedureDeleted(ProcedureInterface $procedure): void
     {
         $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
+        $this->xBeteiligungService->saveProcedureMessage($xml, $procedure->getId());
         $this->createDebugMessageForCreatedXML($procedure, $xml, 'soft deleted');
     }
 
@@ -74,6 +76,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     {
         if (self::relevantPropertyHasChanged($modifiedValues)) {
             $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($procedureAfterUpdate);
+            $this->xBeteiligungService->saveProcedureMessage($xml, $procedureAfterUpdate->getId());
             $this->createDebugMessageForCreatedXML($procedureAfterUpdate, $xml, 'updated');
         }
     }
