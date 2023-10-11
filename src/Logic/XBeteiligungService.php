@@ -59,6 +59,7 @@ use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Psr\Log\LoggerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class XBeteiligungService
 {
@@ -139,6 +140,7 @@ class XBeteiligungService
         SerializerFactory                                       $serializerFactory,
         private readonly ProcedureNewsServiceInterface          $procedureNewsService,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
+        private readonly RouterInterface                        $router,
     ) {
         $this->serializer = $serializerFactory->getSerializer();
     }
@@ -272,20 +274,32 @@ class XBeteiligungService
         $procedurePhaseCode->setListVersionID('1.0');
         $procedurePhaseCode->setListURI('urn:xoev-de:xplanverfahren:codeliste:verfahrensschritt');
         //$procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung'); // not expected in validation
-        $procedurePhaseCode->setCode('4000');
+        // find code in self::PUBLICPARTICIPATIONPHASEMAP
+
+        $procedurePhaseCodeCode = '4000';
+        if (array_key_exists($procedure->getPublicParticipationPhase(), self::PUBLICPARTICIPATIONPHASEMAP)) {
+            $procedurePhaseCodeCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
+        }
+        $procedurePhaseCode->setCode($procedurePhaseCodeCode);
         $participationType->setVerfahrensschrittKommunal($procedurePhaseCode); // required - we want to use it
         //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
 
         //$participationType->setVerfahrensartKommunal(new CodeVerfahrensartKommunalType); // optional
-        $participationType->setBeschreibungPlanungsanlass($procedure->getDesc()); // optional - we want to use it
+        $participationType->setBeschreibungPlanungsanlass(str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc()))); // optional - we want to use it
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
         ); // optional - we want to use it
+        if (in_array($procedure->getPublicParticipationPhasePermissionset(),
+            [ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_READ, ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_WRITE])) {
+
+            $participationType->setBeteiligungURL(
+                $this->router->generate('DemosPlan_procedure_public_detail', ['procedure' => $procedure->getId()], RouterInterface::ABSOLUTE_URL)
+            );
+        }
 
         // todo Format wird noch geprüft.
         $participationType->setGeltungsbereich(''); // required - we dont want to use it
         $participationType->setRaeumlicheBeschreibung(''); // required - we dont want it
-        //$participationType->setBeteiligungURL(''); // optional
 
         $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure));
         $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure));
