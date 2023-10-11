@@ -12,14 +12,17 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateInterval;
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
+use DemosEurope\DemosplanAddon\Contracts\ValueObject\FileInfo;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
@@ -34,6 +37,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeTy
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBeteiligungNachrichtenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
@@ -137,6 +141,7 @@ class XBeteiligungService
     public function __construct(
         private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
         private readonly LoggerInterface                        $logger,
+        private readonly FileService                            $fileService,
         SerializerFactory                                       $serializerFactory,
         private readonly ProcedureNewsServiceInterface          $procedureNewsService,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
@@ -373,6 +378,43 @@ class XBeteiligungService
         );
         $publicParticipationType->setBeteiligungKommunalOeffentlichkeitArt($bkoeaaType);
         $publicParticipationType->setAktuelleMitteilung($this->getPublicNewsList($procedure));
+        if($procedure->getElements()->count() > 0) {
+            foreach($procedure->getElements() as $element) {
+                $title = '';
+                $fileInfo = null;
+                if (ElementsInterface::ELEMENTS_CATEGORY_FILE === $element->getCategory()) {
+                    if (0 === count($element->getDocuments())) {
+                        continue;
+                    }
+                    foreach($element->getDocuments() as $singleDocument) {
+                        if ('' === $singleDocument->getDocument()) {
+                            continue;
+                        }
+                        $title = $singleDocument->getTitle();
+                        $fileInfo = $this->fileService->getFileInfoFromFileString($singleDocument->getDocument());
+                    }
+                } else if (ElementsInterface::ELEMENTS_CATEGORY_PARAGRAPH === $element->getCategory()) {
+                    if ('' === $element->getFile()) {
+                        continue;
+                    }
+                    $title = $element->getTitle();
+                    $fileInfo = $this->fileService->getFileInfoFromFileString($element->getFile());
+                }
+
+                if ($fileInfo instanceof FileInfo) {
+                    $metadatenAnlageType = new MetadatenAnlageType();
+                    $metadatenAnlageType->setBezeichnung($title);
+                    $contentType = new CodeXBauMimeTypeTypeType();
+                    $contentType->setCode($fileInfo->getContentType());
+                    $metadatenAnlageType->setMimeType($contentType);
+
+                    $link = new AnhangOderVerlinkungTypeType();
+                    $fileUrl = $this->router->generate('core_file_procedure', ['procedureId' => $procedure->getId(), 'hash' => $fileInfo->getHash()], RouterInterface::ABSOLUTE_URL);
+                    $link->setUriVerlinkung($fileUrl);
+                    $publicParticipationType->addToAnlagen($metadatenAnlageType);
+                }
+            }
+        }
 
         return $publicParticipationType;
     }
