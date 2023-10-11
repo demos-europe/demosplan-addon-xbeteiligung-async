@@ -19,7 +19,6 @@
         "demos-europe/demosplan-addon": "^0.7",
         "demos-europe/demosplan-addon-installer": "dev-main",
         "doctrine/doctrine-bundle": "^2",
-        "doctrine/doctrine-migrations-bundle": "^3.2",
         "ext-dom": "*",
         "ext-fileinfo": "*",
         "ext-libxml": "*",
