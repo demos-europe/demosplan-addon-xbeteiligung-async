@@ -59,6 +59,7 @@ use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Psr\Log\LoggerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class XBeteiligungService
 {
@@ -139,6 +140,7 @@ class XBeteiligungService
         SerializerFactory                                       $serializerFactory,
         private readonly ProcedureNewsServiceInterface          $procedureNewsService,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
+        private readonly RouterInterface                        $router,
     ) {
         $this->serializer = $serializerFactory->getSerializer();
     }
@@ -287,6 +289,13 @@ class XBeteiligungService
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
         ); // optional - we want to use it
+        if (in_array($procedure->getPublicParticipationPhasePermissionset(),
+            [ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_READ, ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_WRITE])) {
+
+            $participationType->setBeteiligungURL(
+                $this->router->generate('DemosPlan_procedure_public_detail', ['procedure' => $procedure->getId()], RouterInterface::ABSOLUTE_URL)
+            );
+        }
 
         // todo Format wird noch geprüft.
         $participationType->setGeltungsbereich(''); // required - we dont want to use it
