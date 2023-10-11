@@ -272,7 +272,13 @@ class XBeteiligungService
         $procedurePhaseCode->setListVersionID('1.0');
         $procedurePhaseCode->setListURI('urn:xoev-de:xplanverfahren:codeliste:verfahrensschritt');
         //$procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung'); // not expected in validation
-        $procedurePhaseCode->setCode('4000');
+        // find code in self::PUBLICPARTICIPATIONPHASEMAP
+
+        $procedurePhaseCodeCode = '4000';
+        if (array_key_exists($procedure->getPublicParticipationPhase(), self::PUBLICPARTICIPATIONPHASEMAP)) {
+            $procedurePhaseCodeCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
+        }
+        $procedurePhaseCode->setCode($procedurePhaseCodeCode);
         $participationType->setVerfahrensschrittKommunal($procedurePhaseCode); // required - we want to use it
         //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
 
