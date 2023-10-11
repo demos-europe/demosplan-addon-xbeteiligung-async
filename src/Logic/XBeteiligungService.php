@@ -300,7 +300,6 @@ class XBeteiligungService
         // todo Format wird noch geprüft.
         $participationType->setGeltungsbereich(''); // required - we dont want to use it
         $participationType->setRaeumlicheBeschreibung(''); // required - we dont want it
-        //$participationType->setBeteiligungURL(''); // optional
 
         $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure));
         $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure));
