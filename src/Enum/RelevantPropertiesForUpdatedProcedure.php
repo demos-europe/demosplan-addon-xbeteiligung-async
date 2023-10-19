@@ -14,7 +14,12 @@ enum RelevantPropertiesForUpdatedProcedure: string
     case Name = 'name';
     case Orga = 'orga';
     case Desc = 'desc';
+    case ExternalDesc = 'externalDesc';
     case StartDate = 'startDate';
     case EndDate = 'endDate';
+    case PublicParticipationStartDate = 'publicParticipationStartDate';
+    case PublicParticipationEndDate = 'publicParticipationEndDate';
+    case PublicParticipationPhase = 'publicParticipationPhase';
+    case Phase = 'phase';
     case BoundingBox = 'mapExtent'; // why mapExtend? see here: T32377
 }
