@@ -7,7 +7,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2ExternStellu
 /**
  * Class representing Beteiligung2ExternStellungnahmeAuffordern0750
  *
- * Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.
+ * Diese Nachricht wird von der Beteiligungskomponente versendet und enthält die Aufforderung zur Stellungnahme in einem Beteiligungsverfahren.
  */
 class Beteiligung2ExternStellungnahmeAuffordern0750 extends Beteiligung2ExternStellungnahmeAuffordern0750AnonymousPHPType
 {

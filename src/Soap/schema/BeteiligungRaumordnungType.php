@@ -62,12 +62,12 @@ class BeteiligungRaumordnungType
     /**
      * Hier ist der Verfahrensschritt zur übermitteln.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $verfahrensschritt
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType $verfahrensschritt
      */
     private $verfahrensschritt = null;
 
     /**
-     * Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.
+     * Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.
      *
      * @var int $durchgang
      */
@@ -123,6 +123,13 @@ class BeteiligungRaumordnungType
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum
      */
     private $veroeffentlichungszeitraum = null;
+
+    /**
+     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
+     *
+     * @var string $beteiligungURL
+     */
+    private $beteiligungURL = null;
 
     /**
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
@@ -318,7 +325,7 @@ class BeteiligungRaumordnungType
      *
      * Hier ist der Verfahrensschritt zur übermitteln.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType
      */
     public function getVerfahrensschritt()
     {
@@ -330,10 +337,10 @@ class BeteiligungRaumordnungType
      *
      * Hier ist der Verfahrensschritt zur übermitteln.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $verfahrensschritt
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType $verfahrensschritt
      * @return self
      */
-    public function setVerfahrensschritt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $verfahrensschritt)
+    public function setVerfahrensschritt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType $verfahrensschritt)
     {
         $this->verfahrensschritt = $verfahrensschritt;
         return $this;
@@ -342,7 +349,7 @@ class BeteiligungRaumordnungType
     /**
      * Gets as durchgang
      *
-     * Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.
+     * Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.
      *
      * @return int
      */
@@ -354,7 +361,7 @@ class BeteiligungRaumordnungType
     /**
      * Sets a new durchgang
      *
-     * Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.
+     * Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.
      *
      * @param int $durchgang
      * @return self
@@ -584,6 +591,32 @@ class BeteiligungRaumordnungType
     public function setVeroeffentlichungszeitraum(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType $veroeffentlichungszeitraum = null)
     {
         $this->veroeffentlichungszeitraum = $veroeffentlichungszeitraum;
+        return $this;
+    }
+
+    /**
+     * Gets as beteiligungURL
+     *
+     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
+     *
+     * @return string
+     */
+    public function getBeteiligungURL()
+    {
+        return $this->beteiligungURL;
+    }
+
+    /**
+     * Sets a new beteiligungURL
+     *
+     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
+     *
+     * @param string $beteiligungURL
+     * @return self
+     */
+    public function setBeteiligungURL($beteiligungURL)
+    {
+        $this->beteiligungURL = $beteiligungURL;
         return $this;
     }
 

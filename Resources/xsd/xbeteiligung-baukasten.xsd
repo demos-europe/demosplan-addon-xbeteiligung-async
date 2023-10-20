@@ -92,6 +92,28 @@
          </xs:element>
       </xs:sequence>
    </xs:complexType>
+   <xs:complexType name="AnhangOderVerlinkung">
+      <xs:annotation>
+         <xs:documentation>Dieser Typ beschreibt die Mechanismen, mit denen Anhänge mit einer Fachnachricht übermittelt werden können. Das Dokument wird entweder als Anhang (Attachment) zur Fachnachricht übermittelt (Metadaten dokumentid und dateiname). Sieht die Transportinfrastruktur keine Anhänge an Fachnachrichten vor, so kann das Element "dokument" zur Übermittlung innerhalb der Fachnachricht verwendet werden. Die Fachnachricht darf dann die Größe von 128 MB nicht überschreiten. Alternativ kann das Dokument dem Adressaten per Verlinkung zur Verfügung gestellt, also über ein Quellsystem, das sich in seiner Kontrolle befindet (Element uriVerlinkung).</xs:documentation>
+      </xs:annotation>
+      <xs:choice>
+         <xs:element name="anhang" type="xbauk:MetadatenAnhangType">
+            <xs:annotation>
+               <xs:documentation>Das Dokument wird als Anhang mit dieser Fachnachricht übertragen. Dazu stehen unterhalb dieses Elements die passenden Metadaten.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="dokument" type="xs:base64Binary">
+            <xs:annotation>
+               <xs:documentation>Hier kann das anzuhängende Dokument base64-codiert direkt innerhalb der Fachnachricht übermittelt werden, solange die Größe der Nachricht 128 MB nicht übersteigt,</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="uriVerlinkung" type="xs:anyURI">
+            <xs:annotation>
+               <xs:documentation>Falls das Dokument über einen Link zugänglich gemacht werden soll, ist der Link in dieses Element einzutragen. Der Link identifiziert die Anlage (Primärdokument) in einem Quellsystem (das sich in Kontrolle der Behörde befindet) eindeutig.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:choice>
+   </xs:complexType>
    <xs:complexType name="Anlagen">
       <xs:annotation>
          <xs:documentation>Dieser Typ dient dazu, die Metadaten zu Verfahrensunterlagen aufzunehmen, die einer XBeteiligungs-Kommunikation als Anlagen beigefügt sind.</xs:documentation>
@@ -177,7 +199,7 @@
             </xs:annotation>
          </xs:element>
          <xs:element name="verfahrensschrittKommunal"
-                     type="xbeteiligung:Code.Verfahrensschritt">
+                     type="xbeteiligung:Code.VerfahrensschrittKommunal">
             <xs:annotation>
                <xs:documentation>Hier ist der Verfahrensschritt zu übermitteln.</xs:documentation>
             </xs:annotation>
@@ -213,7 +235,7 @@
          </xs:element>
          <xs:element name="beteiligungURL" minOccurs="0" type="xs:anyURI">
             <xs:annotation>
-               <xs:documentation>Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können.</xs:documentation>
+               <xs:documentation>Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="beteiligungOeffentlichkeit"
@@ -278,14 +300,15 @@
                <xs:documentation>Hier kann die fachliche Beschreibung des Planverfahrens übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="verfahrensschritt" type="xbeteiligung:Code.Verfahrensschritt">
+         <xs:element name="verfahrensschritt"
+                     type="xbeteiligung:Code.VerfahrensschrittKommunal">
             <xs:annotation>
                <xs:documentation>Hier ist der Verfahrensschritt zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="durchgang" type="xs:positiveInteger">
             <xs:annotation>
-               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.</xs:documentation>
+               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="flaechenabgrenzungUrl" minOccurs="0" type="xs:anyURI">
@@ -326,6 +349,11 @@
                      type="xbeteiligung:Zeitraum">
             <xs:annotation>
                <xs:documentation>Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beteiligungURL" minOccurs="0" type="xs:anyURI">
+            <xs:annotation>
+               <xs:documentation>Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="anlagen"
@@ -386,9 +414,9 @@
             <xs:complexType>
                <xs:choice>
                   <xs:element name="beteiligungKommunalFormalOeffentlichkeit"
-                              type="xbeteiligung:Code.Verfahrensschritt">
+                              type="xbeteiligung:Code.VerfahrensschrittKommunal">
                      <xs:annotation>
-                        <xs:documentation>Hier ist zu übermitteln, ob es sich um eine frühzeitige Öffentlichkeitsbeteiligung (4000) oder eine öffentliche Auslegung (6000) handelt.</xs:documentation>
+                        <xs:documentation>Hier ist zu übermitteln, ob es sich um eine frühzeitige Öffentlichkeitsbeteiligung (4000) oder eine digitale Veröffentlichung (6000) handelt.</xs:documentation>
                      </xs:annotation>
                   </xs:element>
                   <xs:element name="beteiligungKommunalInformellOeffentlichkeit">
@@ -468,7 +496,7 @@
             <xs:complexType>
                <xs:choice>
                   <xs:element name="beteiligungKommunalFormalTOEB"
-                              type="xbeteiligung:Code.Verfahrensschritt">
+                              type="xbeteiligung:Code.VerfahrensschrittKommunal">
                      <xs:annotation>
                         <xs:documentation>Hier ist zu übermitteln, ob es sich um eine frühzeitige Behördenbeteiligung (2000) oder eine Beteiligung der Träger öffentlicher Belange (5000) handelt.</xs:documentation>
                      </xs:annotation>
@@ -548,14 +576,15 @@
                <xs:documentation>Hier kann die fachliche Beschreibung des Planverfahrens übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="verfahrensschritt" type="xbeteiligung:Code.Verfahrensschritt">
+         <xs:element name="verfahrensschritt"
+                     type="xbeteiligung:Code.VerfahrensschrittPlanfeststellung">
             <xs:annotation>
                <xs:documentation>Hier ist der Verfahrensschritt zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="durchgang" type="xs:positiveInteger">
             <xs:annotation>
-               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.</xs:documentation>
+               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="flaechenabgrenzungUrl" minOccurs="0" type="xs:anyURI">
@@ -596,6 +625,11 @@
                      type="xbeteiligung:Zeitraum">
             <xs:annotation>
                <xs:documentation>Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beteiligungURL" minOccurs="0" type="xs:anyURI">
+            <xs:annotation>
+               <xs:documentation>Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="anlagen"
@@ -654,14 +688,15 @@
                <xs:documentation>Hier kann die fachliche Beschreibung des Planverfahrens übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="verfahrensschritt" type="xbeteiligung:Code.Verfahrensschritt">
+         <xs:element name="verfahrensschritt"
+                     type="xbeteiligung:Code.VerfahrensschrittPlanfeststellung">
             <xs:annotation>
                <xs:documentation>Hier wrd der Verfahrensschritt übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="durchgang" type="xs:positiveInteger">
             <xs:annotation>
-               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.</xs:documentation>
+               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="flaechenabgrenzungUrl" minOccurs="0" type="xs:anyURI">
@@ -702,6 +737,11 @@
                      type="xbeteiligung:Zeitraum">
             <xs:annotation>
                <xs:documentation>Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beteiligungURL" minOccurs="0" type="xs:anyURI">
+            <xs:annotation>
+               <xs:documentation>Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="anlagen"
@@ -760,14 +800,15 @@
                <xs:documentation>Hier kann die fachliche Beschreibung des Planverfahrens übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="verfahrensschritt" type="xbeteiligung:Code.Verfahrensschritt">
+         <xs:element name="verfahrensschritt"
+                     type="xbeteiligung:Code.VerfahrensschrittRaumordnung">
             <xs:annotation>
                <xs:documentation>Hier ist der Verfahrensschritt zur übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="durchgang" type="xs:positiveInteger">
             <xs:annotation>
-               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.</xs:documentation>
+               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="flaechenabgrenzungUrl" minOccurs="0" type="xs:anyURI">
@@ -808,6 +849,11 @@
                      type="xbeteiligung:Zeitraum">
             <xs:annotation>
                <xs:documentation>Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beteiligungURL" minOccurs="0" type="xs:anyURI">
+            <xs:annotation>
+               <xs:documentation>Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="anlagen"
@@ -866,14 +912,15 @@
                <xs:documentation>Hier kann die fachliche Beschreibung des Planverfahrens übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="verfahrensschritt" type="xbeteiligung:Code.Verfahrensschritt">
+         <xs:element name="verfahrensschritt"
+                     type="xbeteiligung:Code.VerfahrensschrittRaumordnung">
             <xs:annotation>
                <xs:documentation>Hier ist der Verfahrensschritt uzu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="durchgang" type="xs:positiveInteger">
             <xs:annotation>
-               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahren zu übermitteln.</xs:documentation>
+               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="flaechenabgrenzungUrl" minOccurs="0" type="xs:anyURI">
@@ -914,6 +961,11 @@
                      type="xbeteiligung:Zeitraum">
             <xs:annotation>
                <xs:documentation>Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beteiligungURL" minOccurs="0" type="xs:anyURI">
+            <xs:annotation>
+               <xs:documentation>Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="anlagen"
@@ -1026,58 +1078,54 @@
    </xs:complexType>
    <xs:complexType name="MetadatenAnlage">
       <xs:annotation>
-         <xs:documentation>Dieser Kernmodul-Basistyp bildet die Metadaten zu einer Anlage ab, die gemäß der Architektur der Übertragung von Primärdokumenten im Zusammenhang mit einer Fachnachricht benötigt werden.</xs:documentation>
+         <xs:documentation>Dieser Datentyp bildet die Metadaten zu einer Anlage ab. Er basiert auf der Modellierung des XBau-Kernmoduls 1.2, erlaubt aber im Gegensatz zu diesem auch die Übermittlung von Anhängen innerhalb der Fachnachricht als base64-codiertem Binary. Bei der Übermittlung innerhalb der Fachnachricht ist darauf zu achten, dass die Größe der Fachnachricht inkl. Dokument 128 MB nicht überschreitet.</xs:documentation>
       </xs:annotation>
-      <xs:complexContent>
-         <xs:restriction base="xbauk:MetadatenAnlageType">
-            <xs:sequence>
-               <xs:element name="bezeichnung"
-                           minOccurs="0"
-                           type="dinspec91379:datatypeC"
-                           form="unqualified">
-                  <xs:annotation>
-                     <xs:documentation>Hier ist eine deskriptive Bezeichnung der Anlage einzutragen.</xs:documentation>
-                  </xs:annotation>
-               </xs:element>
-               <xs:element name="versionsnummer"
-                           minOccurs="0"
-                           type="xs:positiveInteger"
-                           form="unqualified">
-                  <xs:annotation>
-                     <xs:documentation>Hier ist eine Versionsnummer einzutragen. Sie dient dazu, Anlagen zu unterscheiden, die dieselbe Bezeichnung tragen.</xs:documentation>
-                  </xs:annotation>
-               </xs:element>
-               <xs:element name="datum" minOccurs="0" type="xs:date" form="unqualified">
-                  <xs:annotation>
-                     <xs:documentation>Hier ist das Datum der Erstellung bzw. der letzten Bearbeitung dieser Anlage einzutragen.</xs:documentation>
-                  </xs:annotation>
-               </xs:element>
-               <xs:element name="anlageart"
-                           minOccurs="0"
-                           type="xbeteiligung:Code.Verfahrensunterlagetyp"
-                           form="unqualified">
-                  <xs:annotation>
-                     <xs:documentation>Hier ist, falls möglich die Dokumentenkategorie anzugeben.</xs:documentation>
-                  </xs:annotation>
-               </xs:element>
-               <xs:element name="mimeType"
-                           type="xbauk:Code.XBau-MimeTypeType"
-                           form="unqualified">
-                  <xs:annotation>
-                     <xs:documentation>Dieses Element nennt - analog zur Übermittlung von E-Mail-Anlagen - den MIME-Typ der angehängten oder verlinkten Anlage (z.B. text/xml, text/plain, application/gzip oder application/pdf). Die Angabe ist mandatorisch, weil eine für den Empfänger zur Verarbeitung der Daten notwendige Information.</xs:documentation>
-                  </xs:annotation>
-               </xs:element>
-               <xs:element name="anhangOderVerlinkung"
-                           minOccurs="0"
-                           type="xbauk:AnhangOderVerlinkungType"
-                           form="unqualified">
-                  <xs:annotation>
-                     <xs:documentation>Dieses Elements enthält die Angabe, ob die Anlage (i) als Anhang mit dieser XBau-Nachricht übermittelt wird oder ob sie (ii) über einen Link zugänglich gemacht wird, der in diese XBau-Nachricht eingetragen ist.</xs:documentation>
-                  </xs:annotation>
-               </xs:element>
-            </xs:sequence>
-         </xs:restriction>
-      </xs:complexContent>
+      <xs:sequence>
+         <xs:element name="bezeichnung"
+                     minOccurs="0"
+                     type="dinspec91379:datatypeC"
+                     form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Hier ist eine deskriptive Bezeichnung der Anlage einzutragen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="versionsnummer"
+                     minOccurs="0"
+                     type="xs:positiveInteger"
+                     form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Hier ist eine Versionsnummer einzutragen. Sie dient dazu, Anlagen zu unterscheiden, die dieselbe Bezeichnung tragen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="datum" minOccurs="0" type="xs:date" form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Hier ist das Datum der Erstellung bzw. der letzten Bearbeitung dieser Anlage einzutragen.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="anlageart"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Verfahrensunterlagetyp"
+                     form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Hier ist, falls möglich die Dokumentenkategorie anzugeben.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="mimeType"
+                     type="xbauk:Code.XBau-MimeTypeType"
+                     form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Dieses Element nennt - analog zur Übermittlung von E-Mail-Anlagen - den MIME-Typ der angehängten oder verlinkten Anlage (z.B. text/xml, text/plain, application/gzip oder application/pdf). Die Angabe ist mandatorisch, weil eine für den Empfänger zur Verarbeitung der Daten notwendige Information.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="anhangOderVerlinkung"
+                     minOccurs="0"
+                     type="xbeteiligung:AnhangOderVerlinkung"
+                     form="unqualified">
+            <xs:annotation>
+               <xs:documentation>Dieses Elements enthält die Angabe, ob die Anlage (i) als Anhang mit dieser XBeteiligungs-Nachricht übermittelt wird, (ii) über einen Link zugänglich gemacht wird, der in diese XBeteiligungs-Nachricht eingetragen ist oder ob sie (iii) base64-codiert innerhalb dieser XBeteiligungs-Nachricht übermittelt wird.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
    </xs:complexType>
    <xs:complexType name="MetadatenAnlageLink">
       <xs:annotation>

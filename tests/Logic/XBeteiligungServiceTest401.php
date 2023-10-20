@@ -19,6 +19,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class XBeteiligungServiceTest401 extends TestCase
 {
@@ -40,7 +41,8 @@ class XBeteiligungServiceTest401 extends TestCase
             $this->createMock(LoggerInterface::class),
             $serializer,
             $this->procedureNewsService,
-            $this->procedureMessageRepository
+            $this->procedureMessageRepository,
+            $this->createMock(RouterInterface::class)
         );
     }
 

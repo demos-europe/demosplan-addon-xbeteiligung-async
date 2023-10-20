@@ -8,9 +8,9 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuna
 class BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType
 {
     /**
-     * Hier ist zu übermitteln, ob es sich um eine frühzeitige Öffentlichkeitsbeteiligung (4000) oder eine öffentliche Auslegung (6000) handelt.
+     * Hier ist zu übermitteln, ob es sich um eine frühzeitige Öffentlichkeitsbeteiligung (4000) oder eine digitale Veröffentlichung (6000) handelt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $beteiligungKommunalFormalOeffentlichkeit
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $beteiligungKommunalFormalOeffentlichkeit
      */
     private $beteiligungKommunalFormalOeffentlichkeit = null;
 
@@ -24,9 +24,9 @@ class BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType
     /**
      * Gets as beteiligungKommunalFormalOeffentlichkeit
      *
-     * Hier ist zu übermitteln, ob es sich um eine frühzeitige Öffentlichkeitsbeteiligung (4000) oder eine öffentliche Auslegung (6000) handelt.
+     * Hier ist zu übermitteln, ob es sich um eine frühzeitige Öffentlichkeitsbeteiligung (4000) oder eine digitale Veröffentlichung (6000) handelt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType
      */
     public function getBeteiligungKommunalFormalOeffentlichkeit()
     {
@@ -36,12 +36,12 @@ class BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType
     /**
      * Sets a new beteiligungKommunalFormalOeffentlichkeit
      *
-     * Hier ist zu übermitteln, ob es sich um eine frühzeitige Öffentlichkeitsbeteiligung (4000) oder eine öffentliche Auslegung (6000) handelt.
+     * Hier ist zu übermitteln, ob es sich um eine frühzeitige Öffentlichkeitsbeteiligung (4000) oder eine digitale Veröffentlichung (6000) handelt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $beteiligungKommunalFormalOeffentlichkeit
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $beteiligungKommunalFormalOeffentlichkeit
      * @return self
      */
-    public function setBeteiligungKommunalFormalOeffentlichkeit(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $beteiligungKommunalFormalOeffentlichkeit = null)
+    public function setBeteiligungKommunalFormalOeffentlichkeit(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $beteiligungKommunalFormalOeffentlichkeit = null)
     {
         $this->beteiligungKommunalFormalOeffentlichkeit = $beteiligungKommunalFormalOeffentlichkeit;
         return $this;

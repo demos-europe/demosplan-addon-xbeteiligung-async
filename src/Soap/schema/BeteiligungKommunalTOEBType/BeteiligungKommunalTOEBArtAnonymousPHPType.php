@@ -10,7 +10,7 @@ class BeteiligungKommunalTOEBArtAnonymousPHPType
     /**
      * Hier ist zu übermitteln, ob es sich um eine frühzeitige Behördenbeteiligung (2000) oder eine Beteiligung der Träger öffentlicher Belange (5000) handelt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $beteiligungKommunalFormalTOEB
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $beteiligungKommunalFormalTOEB
      */
     private $beteiligungKommunalFormalTOEB = null;
 
@@ -26,7 +26,7 @@ class BeteiligungKommunalTOEBArtAnonymousPHPType
      *
      * Hier ist zu übermitteln, ob es sich um eine frühzeitige Behördenbeteiligung (2000) oder eine Beteiligung der Träger öffentlicher Belange (5000) handelt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType
      */
     public function getBeteiligungKommunalFormalTOEB()
     {
@@ -38,10 +38,10 @@ class BeteiligungKommunalTOEBArtAnonymousPHPType
      *
      * Hier ist zu übermitteln, ob es sich um eine frühzeitige Behördenbeteiligung (2000) oder eine Beteiligung der Träger öffentlicher Belange (5000) handelt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $beteiligungKommunalFormalTOEB
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $beteiligungKommunalFormalTOEB
      * @return self
      */
-    public function setBeteiligungKommunalFormalTOEB(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $beteiligungKommunalFormalTOEB = null)
+    public function setBeteiligungKommunalFormalTOEB(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $beteiligungKommunalFormalTOEB = null)
     {
         $this->beteiligungKommunalFormalTOEB = $beteiligungKommunalFormalTOEB;
         return $this;

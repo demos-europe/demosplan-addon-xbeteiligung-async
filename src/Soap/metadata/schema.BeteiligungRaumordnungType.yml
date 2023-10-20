@@ -79,7 +79,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungRaumordnungType:
             accessor:
                 getter: getVerfahrensschritt
                 setter: setVerfahrensschritt
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType
         durchgang:
             expose: true
             access_type: public_method
@@ -164,6 +164,16 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungRaumordnungType:
                 getter: getVeroeffentlichungszeitraum
                 setter: setVeroeffentlichungszeitraum
             type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType
+        beteiligungURL:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungURL
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+            accessor:
+                getter: getBeteiligungURL
+                setter: setBeteiligungURL
+            type: string
         anlagen:
             expose: true
             access_type: public_method
