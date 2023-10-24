@@ -27,6 +27,8 @@ class XBeteiligungService409Test extends TestCase
     private MockObject $procedureNewsService;
     private MockObject $procedureMessageRepository;
 
+    private XBeteiligungService $sut;
+
     protected function setUp(): void
     {
         parent::setUp();

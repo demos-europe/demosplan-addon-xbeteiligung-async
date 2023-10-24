@@ -274,7 +274,7 @@ class XBeteiligungService
         //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
 
         //$participationType->setVerfahrensartKommunal(new CodeVerfahrensartKommunalType); // optional
-        $participationType->setBeschreibungPlanungsanlass(str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc()))); // optional - we want to use it
+        $participationType->setBeschreibungPlanungsanlass(str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''))); // optional - we want to use it
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
         ); // optional - we want to use it
