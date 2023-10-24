@@ -261,7 +261,7 @@ class XBeteiligungService
         // type thingies.
         $procedurePhaseCode = new CodeVerfahrensschrittKommunalType();
         $procedurePhaseCode->setListVersionID('1.0');
-        $procedurePhaseCode->setListURI('urn:xoev-de:xplanverfahren:codeliste:verfahrensschritt');
+        $procedurePhaseCode->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
         //$procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung'); // not expected in validation
         // find code in self::PUBLICPARTICIPATIONPHASEMAP
 

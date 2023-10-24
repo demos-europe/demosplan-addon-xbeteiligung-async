@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-class XBeteiligungServiceTest409 extends TestCase
+class XBeteiligungService402Test extends TestCase
 {
     private MockObject $repoMock;
     private MockObject $procedureNewsService;
@@ -46,7 +46,7 @@ class XBeteiligungServiceTest409 extends TestCase
         );
     }
 
-    public function testPlanung2BeteiligungBeteiligungNeu0409()
+    public function testPlanung2BeteiligungBeteiligungNeu0402(): void
     {
         $gisLayerCategoryInterfaceMock = $this->createMock(GisLayerCategoryInterface::class);
         $gisMo = $this->createMock(GisLayerInterface::class);
@@ -95,7 +95,7 @@ class XBeteiligungServiceTest409 extends TestCase
             ]
         );
 
-        $procedureXml = $this->sut->createProcedureDeleted409FromObject($procedure->getId());
+        $procedureXml = $this->sut->createProcedureUpdate402FromObject($procedure);
 
         $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);
