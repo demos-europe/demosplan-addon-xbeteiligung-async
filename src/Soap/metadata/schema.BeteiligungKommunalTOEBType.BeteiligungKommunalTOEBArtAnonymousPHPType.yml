@@ -9,7 +9,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\
             accessor:
                 getter: getBeteiligungKommunalFormalTOEB
                 setter: setBeteiligungKommunalFormalTOEB
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType
         beteiligungKommunalInformellTOEB:
             expose: true
             access_type: public_method

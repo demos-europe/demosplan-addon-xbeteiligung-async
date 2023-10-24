@@ -7,7 +7,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2dbBeteiligun
 /**
  * Class representing Beteiligung2dbBeteiligungRaumordnungNeu0351
  *
- * Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.
+ * Diese Nachricht wird an die Beteiligungsdatenbank versendet und enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.
  */
 class Beteiligung2dbBeteiligungRaumordnungNeu0351 extends Beteiligung2dbBeteiligungRaumordnungNeu0351AnonymousPHPType
 {

@@ -7,7 +7,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBetei
 /**
  * Class representing Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202
  *
- * Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.
+ * Diese Nachricht wird an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.
  */
 class Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202 extends Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202AnonymousPHPType
 {

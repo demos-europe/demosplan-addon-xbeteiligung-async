@@ -38,7 +38,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird an die Beteiligungsdatenbank versendet und enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
@@ -71,7 +71,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
@@ -142,7 +142,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird an die Beteiligungsdatenbank versendet und enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
@@ -175,7 +175,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird an die Beteiligungsdatenbank versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
@@ -208,7 +208,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird von der Planungs- an die Beteiligungskomponente versendet und enthält die zum Löschen (z.B. bei irrtümlicher Anlage) notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird von der Planungs- an die Beteiligungskomponente versendet und enthält die zum Löschen (z. B. bei irrtümlicher Anlage) notwendigen Metadaten.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
@@ -246,7 +246,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird an die Beteiligungsdatenbank versendet und enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
@@ -279,7 +279,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird an die Beteiligungsdatenbank versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
@@ -312,7 +312,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird von der Planungs- an die Beteiligungskomponente versendet und enthält die zum Löschen (z.B. bei irrtümlicher Anlage) notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird von der Beteiligungskomponente an die Beteiligungsdatenbank versendet und enthält die zum Löschen (z. B. bei irrtümlicher Anlage) notwendigen Metadaten.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>

@@ -69,6 +69,10 @@
                <xs:element name="code"
                            form="unqualified"
                            type="xbeteiligung:abwaegungsvorschlag"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -120,6 +124,10 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" form="unqualified" type="xbeteiligung:akteurrolle"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -173,6 +181,10 @@
                <xs:element name="code"
                            form="unqualified"
                            type="xbeteiligung:artderrueckmeldung"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -226,6 +238,10 @@
                <xs:element name="code"
                            form="unqualified"
                            type="xbeteiligung:artderstellungnahme"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -277,6 +293,10 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" form="unqualified" type="xbeteiligung:datumsstatus"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -328,6 +348,10 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" form="unqualified" type="xbeteiligung:fehlerart"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -358,6 +382,10 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" type="xs:token" form="unqualified"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -408,6 +436,10 @@
                <xs:element name="code"
                            form="unqualified"
                            type="xbeteiligung:planartplanfeststellung"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -438,6 +470,10 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" type="xs:token" form="unqualified"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -488,6 +524,10 @@
                <xs:element name="code"
                            form="unqualified"
                            type="xbeteiligung:prioritaetderstellungnahme"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -541,6 +581,10 @@
                <xs:element name="code"
                            form="unqualified"
                            type="xbeteiligung:statusderstellungnahme"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -557,11 +601,11 @@
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
-               <nameLang>Verfahrensart Kommunale Bauleitplanung</nameLang>
-               <nameKurz>Verfahrensart Kommunal</nameKurz>
-               <nameTechnisch>verfahrensartkommunal</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartkommunal</kennung>
-               <beschreibung>Auswahl der Verfahrensart Kommunale Bauleitplanung</beschreibung>
+               <nameLang>Verfahrensart Raumordnung</nameLang>
+               <nameKurz>Verfahrensart Raumordnung</nameKurz>
+               <nameTechnisch>verfahrensartraumordnung</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartraumordnung</kennung>
+               <beschreibung>Auswahl der Verfahrensart Raumordnung</beschreibung>
                <herausgebernameLang>XLeitstelle</herausgebernameLang>
                <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
             </codeliste>
@@ -593,12 +637,16 @@
             <xs:sequence>
                <xs:element name="code"
                            form="unqualified"
-                           type="xbeteiligung:verfahrensartkommunal"/>
+                           type="xbeteiligung:verfahrensartraumordnung"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
                           use="optional"
-                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensartkommunal"/>
+                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensartraumordnung"/>
             <xs:attribute name="listVersionID"
                           type="xs:normalizedString"
                           use="optional"
@@ -647,6 +695,10 @@
                <xs:element name="code"
                            form="unqualified"
                            type="xbeteiligung:verfahrensartplanfeststellung"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -663,11 +715,11 @@
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
-               <nameLang>Verfahrensart Raumordnung</nameLang>
-               <nameKurz>Verfahrensart Raumordnung</nameKurz>
-               <nameTechnisch>verfahrensartraumordnung</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartraumordnung</kennung>
-               <beschreibung>Auswahl der Verfahrensart Raumordnung</beschreibung>
+               <nameLang>Verfahrensart Kommunale Bauleitplanung</nameLang>
+               <nameKurz>Verfahrensart Kommunal</nameKurz>
+               <nameTechnisch>verfahrensartkommunal</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensartkommunal</kennung>
+               <beschreibung>Auswahl der Verfahrensart Kommunale Bauleitplanung</beschreibung>
                <herausgebernameLang>XLeitstelle</herausgebernameLang>
                <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
             </codeliste>
@@ -699,12 +751,16 @@
             <xs:sequence>
                <xs:element name="code"
                            form="unqualified"
-                           type="xbeteiligung:verfahrensartraumordnung"/>
+                           type="xbeteiligung:verfahrensartkommunal"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
                           use="optional"
-                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensartraumordnung"/>
+                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensartkommunal"/>
             <xs:attribute name="listVersionID"
                           type="xs:normalizedString"
                           use="optional"
@@ -712,15 +768,15 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Verfahrensschritt">
+   <xs:complexType name="Code.VerfahrensschrittKommunal">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
-               <nameLang>Verfahrensschritt</nameLang>
-               <nameKurz>Verfahrensschritt</nameKurz>
-               <nameTechnisch>verfahrensschritt</nameTechnisch>
-               <kennung>urn:xoev-de:xplanverfahren:codeliste:verfahrensschritt</kennung>
-               <beschreibung>Codeliste für Verfahrensschritte</beschreibung>
+               <nameLang>Verfahrensschritt in der kommunalen Bauleitplanung</nameLang>
+               <nameKurz>Verfahrensschritt kommunal</nameKurz>
+               <nameTechnisch>verfahrensschrittkommunal</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal</kennung>
+               <beschreibung>Codeliste für Verfahrensschritte in der kommunalen Bauleitplanung</beschreibung>
                <herausgebernameLang>BSW</herausgebernameLang>
                <herausgebernameKurz>BSW</herausgebernameKurz>
             </codeliste>
@@ -730,65 +786,78 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" type="xs:token" form="unqualified"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
                           use="optional"
-                          fixed="urn:xoev-de:xplanverfahren:codeliste:verfahrensschritt"/>
+                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal"/>
             <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
-   <xs:complexType name="Code.Verfahrenstyp">
+   <xs:complexType name="Code.VerfahrensschrittPlanfeststellung">
       <xs:annotation>
          <xs:appinfo>
             <codeliste>
-               <nameLang>Verfahrenssteuerung</nameLang>
-               <nameKurz>Verfahrenssteuerung</nameKurz>
-               <nameTechnisch>verfahrenssteuerung</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrenssteuerung</kennung>
-               <beschreibung>Codeliste zur Verfahrenssteuerung</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
+               <nameLang>Verfahrensschritt Planfeststellung</nameLang>
+               <nameKurz>Verfahrensschritt Planfeststellung</nameKurz>
+               <nameTechnisch>verfahrensschrittplanfeststellung</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung</kennung>
+               <beschreibung>Codeliste für Verfahrensschritte in der Planfeststellung</beschreibung>
+               <herausgebernameLang>BSW</herausgebernameLang>
+               <herausgebernameKurz>BSW</herausgebernameKurz>
             </codeliste>
-            <versionCodeliste>
-               <version>1.0</version>
-               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
-            </versionCodeliste>
-            <codelistenspalten>
-               <code>
-                  <spaltennameLang>Code</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>true</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
-               </code>
-               <beschreibung>
-                  <spaltennameLang>Beschreibung</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>false</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
-               </beschreibung>
-            </codelistenspalten>
-            <genutzteCodeSpalte>code</genutzteCodeSpalte>
          </xs:appinfo>
       </xs:annotation>
       <xs:complexContent>
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
-               <xs:element name="code"
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
                            form="unqualified"
-                           type="xbeteiligung:verfahrenssteuerung"/>
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
                           use="optional"
-                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrenssteuerung"/>
-            <xs:attribute name="listVersionID"
-                          type="xs:normalizedString"
+                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:complexType name="Code.VerfahrensschrittRaumordnung">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Verfahrensschritt Raumordnung</nameLang>
+               <nameKurz>Verfahrensschritt Raumordnung</nameKurz>
+               <nameTechnisch>verfahrensschrittraumordnung</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung</kennung>
+               <beschreibung>Codeliste für Verfahrensschritte in der Raumordnung</beschreibung>
+               <herausgebernameLang>BSW</herausgebernameLang>
+               <herausgebernameKurz>BSW</herausgebernameKurz>
+            </codeliste>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" type="xs:token" form="unqualified"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
                           use="optional"
-                          fixed="1.0"/>
+                          fixed="urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung"/>
+            <xs:attribute name="listVersionID" type="xs:normalizedString" use="required"/>
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
@@ -810,6 +879,10 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" type="xs:token" form="unqualified"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -858,6 +931,10 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" form="unqualified" type="xbeteiligung:Vormerkung"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -911,6 +988,10 @@
                <xs:element name="code"
                            form="unqualified"
                            type="xbeteiligung:xbeteiligung-nachrichten"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -962,62 +1043,15 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" form="unqualified" type="xbeteiligung:zuordnung"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
                           use="optional"
                           fixed="urn:xoev-de:xleitstelle:codeliste:zuordnung"/>
-            <xs:attribute name="listVersionID"
-                          type="xs:normalizedString"
-                          use="optional"
-                          fixed="1.0"/>
-         </xs:restriction>
-      </xs:complexContent>
-   </xs:complexType>
-   <xs:complexType name="Code.Zustaendigkeit">
-      <xs:annotation>
-         <xs:appinfo>
-            <codeliste>
-               <nameLang>Zustaendigkeit</nameLang>
-               <nameKurz>Zustaendigkeit</nameKurz>
-               <nameTechnisch>zustaendigkeit</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:zustaendigkeit</kennung>
-               <beschreibung>Liste der Zuständigkeiten</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
-            </codeliste>
-            <versionCodeliste>
-               <version>1.0</version>
-               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
-            </versionCodeliste>
-            <codelistenspalten>
-               <code>
-                  <spaltennameLang>Code</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>true</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
-               </code>
-               <beschreibung>
-                  <spaltennameLang>Beschreibung</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>false</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
-               </beschreibung>
-            </codelistenspalten>
-            <genutzteCodeSpalte>code</genutzteCodeSpalte>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:complexContent>
-         <xs:restriction base="xoev-code:Code">
-            <xs:sequence>
-               <xs:element name="code" form="unqualified" type="xbeteiligung:zustaendigkeit"/>
-            </xs:sequence>
-            <xs:attribute name="listURI"
-                          type="xs:anyURI"
-                          use="optional"
-                          fixed="urn:xoev-de:xleitstelle:codeliste:zustaendigkeit"/>
             <xs:attribute name="listVersionID"
                           type="xs:normalizedString"
                           use="optional"
@@ -1664,42 +1698,28 @@
          <xs:enumeration value="1000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>Änderung</beschreibung>
+                  <beschreibung>normales Verfahren</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-         <xs:enumeration value="2000">
+         <xs:enumeration value="1100">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>Teilfortschreibung</beschreibung>
+                  <beschreibung>vereinfachtes Verfahren, § 13 BauGB</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-         <xs:enumeration value="3000">
+         <xs:enumeration value="1200">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>Neuaufstellung</beschreibung>
+                  <beschreibung>Bebauungsplan der Innenentwicklung, § 13a BauGB</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-         <xs:enumeration value="4000">
+         <xs:enumeration value="1300">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>Gesamtfortschreibung</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="5000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Aktualisierung</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="6000">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Neubekanntmachung</beschreibung>
+                  <beschreibung>Einbeziehung von Außenbereichsflächen in das beschleunigte Verfahren, § 13b BauGB</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
@@ -1787,107 +1807,42 @@
          <xs:enumeration value="1000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>normales Verfahren</beschreibung>
+                  <beschreibung>Änderung</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-         <xs:enumeration value="1100">
+         <xs:enumeration value="2000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>vereinfachtes Verfahren, § 13 BauGB</beschreibung>
+                  <beschreibung>Teilfortschreibung</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-         <xs:enumeration value="1200">
+         <xs:enumeration value="3000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>Bebauungsplan der Innenentwicklung, § 13a BauGB</beschreibung>
+                  <beschreibung>Neuaufstellung</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-         <xs:enumeration value="1300">
+         <xs:enumeration value="4000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>Einbeziehung von Außenbereichsflächen in das beschleunigte Verfahren, § 13b BauGB</beschreibung>
+                  <beschreibung>Gesamtfortschreibung</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-      </xs:restriction>
-   </xs:simpleType>
-   <xs:simpleType name="verfahrenssteuerung">
-      <xs:annotation>
-         <xs:appinfo>
-            <codeliste>
-               <nameLang>Verfahrenssteuerung</nameLang>
-               <nameKurz>Verfahrenssteuerung</nameKurz>
-               <nameTechnisch>verfahrenssteuerung</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:verfahrenssteuerung</kennung>
-               <beschreibung>Codeliste zur Verfahrenssteuerung</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
-            </codeliste>
-            <versionCodeliste>
-               <version>1.0</version>
-               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
-            </versionCodeliste>
-            <codelistenspalten>
-               <code>
-                  <spaltennameLang>Code</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>true</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
-               </code>
-               <beschreibung>
-                  <spaltennameLang>Beschreibung</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>false</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
-               </beschreibung>
-            </codelistenspalten>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:restriction base="xs:token">
-         <xs:enumeration value="0100">
+         <xs:enumeration value="5000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>Bezirksplan</beschreibung>
+                  <beschreibung>Aktualisierung</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
-         <xs:enumeration value="0200">
+         <xs:enumeration value="6000">
             <xs:annotation>
                <xs:appinfo>
-                  <beschreibung>Senatsplan</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0301">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>FNP (eigenständig)</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0302">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>FNP (mit Parallelverfahren)</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0401">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>LaPro (eigenständig)</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0402">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>LaPro (mit Parallelverfahren)</beschreibung>
+                  <beschreibung>Neubekanntmachung</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
@@ -2065,253 +2020,6 @@
                <nameTechnisch>zuordnung</nameTechnisch>
                <kennung>urn:xoev-de:xleitstelle:codeliste:zuordnung</kennung>
                <beschreibung>Liste von der fachlichen Zuordnungen von Stellungnahmen</beschreibung>
-               <herausgebernameLang>XLeitstelle</herausgebernameLang>
-               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
-            </codeliste>
-            <versionCodeliste>
-               <version>1.0</version>
-               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
-            </versionCodeliste>
-            <codelistenspalten>
-               <code>
-                  <spaltennameLang>Code</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>true</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
-               </code>
-               <beschreibung>
-                  <spaltennameLang>Beschreibung</spaltennameLang>
-                  <datentyp>string</datentyp>
-                  <codeSpalte>false</codeSpalte>
-                  <verwendung>required</verwendung>
-                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
-               </beschreibung>
-            </codelistenspalten>
-         </xs:appinfo>
-      </xs:annotation>
-      <xs:restriction base="xs:token">
-         <xs:enumeration value="0100">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Grundlagen und Verfahrensablauf</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0200">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Anlass und Ziel der Planung</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0300">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Planerische Rahmenbedingung</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0310">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Raumordnung und Landesplanung</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0311">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Flächennutzungsplan</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0320">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Andere rechtlich beachtliche Tatbestände</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0321">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Bestehende Bebauungspläne</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0322">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Baumschutz</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0323">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Denkmalschutz</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0324">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Gesetzlich geschützte Biotope</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0325">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Kampfmittelverdachtsflächen</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0326">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Landschaftsschutzgebiet</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0330">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Angaben zum Bestand</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0400">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Umweltbericht</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0500">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Planinhalt und Abwägung</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0510">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Straßenverkehrsflächen</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0520">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Öffentliche Grünfläche - Spielplatz</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0530">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Wasserflächen</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0540">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Immisionsschutz</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0550">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Oberflächenentwässerung</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0560">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Schmutzwasserentsorgung</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0570">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Maßnahmen des Naturschutzes und der Landschaftspflege</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0571">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Erhaltungsgebot</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0572">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Anpflanzungsgebot und Art der Begrünung</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0600">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Maßnahmen zur Verwirklichung</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0700">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Aufhebung bestehender Pläne</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0800">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Flächen- und Kostenangaben</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0810">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Flächenangaben</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="0820">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Kostenangaben</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-         <xs:enumeration value="312">
-            <xs:annotation>
-               <xs:appinfo>
-                  <beschreibung>Landesschaftsprogramm</beschreibung>
-               </xs:appinfo>
-            </xs:annotation>
-         </xs:enumeration>
-      </xs:restriction>
-   </xs:simpleType>
-   <xs:simpleType name="zustaendigkeit">
-      <xs:annotation>
-         <xs:appinfo>
-            <codeliste>
-               <nameLang>Zustaendigkeit</nameLang>
-               <nameKurz>Zustaendigkeit</nameKurz>
-               <nameTechnisch>zustaendigkeit</nameTechnisch>
-               <kennung>urn:xoev-de:xleitstelle:codeliste:zustaendigkeit</kennung>
-               <beschreibung>Liste der Zuständigkeiten</beschreibung>
                <herausgebernameLang>XLeitstelle</herausgebernameLang>
                <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
             </codeliste>

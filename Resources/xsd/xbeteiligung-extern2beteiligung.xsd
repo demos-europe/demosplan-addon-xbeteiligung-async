@@ -38,7 +38,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird als Quittungsnachricht an die Beteiligungskomponente versendet, wenn die Verarbeitung der Nachricht zur Aufforderung zur Stellungnahme erfolgreich verarbeitet wurde.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
@@ -62,7 +62,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird als negative Quittungsnachricht an die Beteiligungskomponente versendet, wenn die Verarbeitung der Nachricht zur Aufforderung zur Stellungnahme nicht verarbeitet werden konnte.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>

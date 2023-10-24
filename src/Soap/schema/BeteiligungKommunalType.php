@@ -48,7 +48,7 @@ class BeteiligungKommunalType
     /**
      * Hier ist der Verfahrensschritt zu übermitteln.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $verfahrensschrittKommunal
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $verfahrensschrittKommunal
      */
     private $verfahrensschrittKommunal = null;
 
@@ -88,7 +88,7 @@ class BeteiligungKommunalType
     private $raeumlicheBeschreibung = null;
 
     /**
-     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können.
+     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
      *
      * @var string $beteiligungURL
      */
@@ -243,7 +243,7 @@ class BeteiligungKommunalType
      *
      * Hier ist der Verfahrensschritt zu übermitteln.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType
      */
     public function getVerfahrensschrittKommunal()
     {
@@ -255,10 +255,10 @@ class BeteiligungKommunalType
      *
      * Hier ist der Verfahrensschritt zu übermitteln.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $verfahrensschrittKommunal
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $verfahrensschrittKommunal
      * @return self
      */
-    public function setVerfahrensschrittKommunal(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType $verfahrensschrittKommunal)
+    public function setVerfahrensschrittKommunal(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $verfahrensschrittKommunal)
     {
         $this->verfahrensschrittKommunal = $verfahrensschrittKommunal;
         return $this;
@@ -397,7 +397,7 @@ class BeteiligungKommunalType
     /**
      * Gets as beteiligungURL
      *
-     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können.
+     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
      *
      * @return string
      */
@@ -409,7 +409,7 @@ class BeteiligungKommunalType
     /**
      * Sets a new beteiligungURL
      *
-     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können.
+     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
      *
      * @param string $beteiligungURL
      * @return self
