@@ -7,7 +7,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2dbBeteiligun
 /**
  * Class representing Beteiligung2dbBeteiligungKommunalAktualisieren0452
  *
- * Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.
+ * Diese Nachricht wird an die Beteiligungsdatenbank versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.
  */
 class Beteiligung2dbBeteiligungKommunalAktualisieren0452 extends Beteiligung2dbBeteiligungKommunalAktualisieren0452AnonymousPHPType
 {

@@ -19,12 +19,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\RouterInterface;
 
-class XBeteiligungServiceTest409 extends TestCase
+class XBeteiligungService402Test extends TestCase
 {
     private MockObject $repoMock;
     private MockObject $procedureNewsService;
     private MockObject $procedureMessageRepository;
+
+    private XBeteiligungService $sut;
 
     protected function setUp(): void
     {
@@ -40,11 +43,12 @@ class XBeteiligungServiceTest409 extends TestCase
             $this->createMock(LoggerInterface::class),
             $serializer,
             $this->procedureNewsService,
-            $this->procedureMessageRepository
+            $this->procedureMessageRepository,
+            $this->createMock(RouterInterface::class)
         );
     }
 
-    public function testPlanung2BeteiligungBeteiligungNeu0409()
+    public function testPlanung2BeteiligungBeteiligungNeu0402(): void
     {
         $gisLayerCategoryInterfaceMock = $this->createMock(GisLayerCategoryInterface::class);
         $gisMo = $this->createMock(GisLayerInterface::class);
@@ -93,7 +97,7 @@ class XBeteiligungServiceTest409 extends TestCase
             ]
         );
 
-        $procedureXml = $this->sut->createProcedureDeleted409FromObject($procedure->getId());
+        $procedureXml = $this->sut->createProcedureUpdate402FromObject($procedure);
 
         $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);

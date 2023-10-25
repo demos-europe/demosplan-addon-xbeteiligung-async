@@ -7,7 +7,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Extern2BeteiligungStellu
 /**
  * Class representing Extern2BeteiligungStellungnahmeAuffordernOK0760
  *
- * Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.
+ * Diese Nachricht wird als Quittungsnachricht an die Beteiligungskomponente versendet, wenn die Verarbeitung der Nachricht zur Aufforderung zur Stellungnahme erfolgreich verarbeitet wurde.
  */
 class Extern2BeteiligungStellungnahmeAuffordernOK0760 extends Extern2BeteiligungStellungnahmeAuffordernOK0760AnonymousPHPType
 {

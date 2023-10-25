@@ -41,7 +41,7 @@
             <autor>Beteiligungsverfahren</autor>
             <leser>Beteiligungsdatenbank</leser>
          </xs:appinfo>
-         <xs:documentation>Diese Nachricht wird im Rahmen des Use Case 2: Beteiligung iniitieren an die Beteiligungskomponente versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+         <xs:documentation>Diese Nachricht wird von der Beteiligungskomponente versendet und enthält die Aufforderung zur Stellungnahme in einem Beteiligungsverfahren.</xs:documentation>
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>

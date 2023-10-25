@@ -30,18 +30,16 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffe
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommuneType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBeteiligungNachrichtenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
@@ -164,10 +162,7 @@ class XBeteiligungService
             $this->generateMain401MessageContent($procedure)
         ); // required
 
-        $xml = $this->serializeData($procedureCreated401Object);
-
-
-        return $xml;
+        return $this->serializeData($procedureCreated401Object);
     }
 
     /**
@@ -184,10 +179,7 @@ class XBeteiligungService
             $this->generateMain402MessageContent($procedure)
         ); // required
 
-        $xml = $this->serializeData($procedureUpdated402Object);
-
-
-        return $xml;
+        return $this->serializeData($procedureUpdated402Object);
     }
 
     /**
@@ -202,10 +194,7 @@ class XBeteiligungService
         ); // required
         $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedureId));
 
-        $xml = $this->serializeData($procedureDeleted409Object);
-
-
-        return $xml;
+        return $this->serializeData($procedureDeleted409Object);
     }
 
     private function serializeData($data): string
@@ -275,9 +264,9 @@ class XBeteiligungService
         // why is this code present in this layer - i dont get it - email to Stephan is on the way
         // As far as I understood our meeting - this code should only be present within the institution/participation
         // type thingies.
-        $procedurePhaseCode = new CodeVerfahrensschrittType();
+        $procedurePhaseCode = new CodeVerfahrensschrittKommunalType();
         $procedurePhaseCode->setListVersionID('1.0');
-        $procedurePhaseCode->setListURI('urn:xoev-de:xplanverfahren:codeliste:verfahrensschritt');
+        $procedurePhaseCode->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
         //$procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung'); // not expected in validation
         // find code in self::PUBLICPARTICIPATIONPHASEMAP
 
@@ -290,7 +279,7 @@ class XBeteiligungService
         //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
 
         //$participationType->setVerfahrensartKommunal(new CodeVerfahrensartKommunalType); // optional
-        $participationType->setBeschreibungPlanungsanlass(str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc()))); // optional - we want to use it
+        $participationType->setBeschreibungPlanungsanlass(str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''))); // optional - we want to use it
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
         ); // optional - we want to use it
@@ -770,9 +759,9 @@ class XBeteiligungService
         $this->procedureMessageRepository->createNew($procedureMessage);
     }
 
-    private function getInstitutionProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittType
+    private function getInstitutionProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittKommunalType
     {
-        $codeProcedurePhase = new CodeVerfahrensschrittType();
+        $codeProcedurePhase = new CodeVerfahrensschrittKommunalType();
         $codeProcedurePhase->setListVersionID('');
         $codeProcedurePhase->setListVersionID('1.0');
         $codeProcedurePhase->setCode(
@@ -786,9 +775,9 @@ class XBeteiligungService
         return $codeProcedurePhase;
     }
 
-    private function getPublicProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittType
+    private function getPublicProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittKommunalType
     {
-        $codeProcedurePhase = new CodeVerfahrensschrittType();
+        $codeProcedurePhase = new CodeVerfahrensschrittKommunalType();
         $codeProcedurePhase->setListVersionID('');
         $codeProcedurePhase->setListVersionID('1.0');
         $codeProcedurePhase->setCode(
