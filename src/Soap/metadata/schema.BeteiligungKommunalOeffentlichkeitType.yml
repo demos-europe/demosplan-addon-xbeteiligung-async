@@ -68,7 +68,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentli
                 inline: false
                 entry_name: anlage
                 skip_when_empty: true
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
         beteiligungKommunalOeffentlichkeitArt:
             expose: true
             access_type: public_method

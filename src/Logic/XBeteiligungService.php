@@ -397,6 +397,8 @@ class XBeteiligungService
                     $metadatenAnlageType->setBezeichnung($title);
                     $contentType = new CodeXBauMimeTypeTypeType();
                     $contentType->setCode($fileInfo->getContentType());
+                    $contentType->setListURI('');
+                    $contentType->setListVersionID('');
                     $metadatenAnlageType->setMimeType($contentType);
 
                     $link = new AnhangOderVerlinkungType();
