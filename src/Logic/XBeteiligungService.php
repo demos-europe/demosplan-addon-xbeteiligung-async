@@ -16,12 +16,14 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
+use DemosEurope\DemosplanAddon\Contracts\FileServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
-use DemosEurope\DemosplanAddon\Contracts\ValueObject\FileInfo;
+use DemosEurope\DemosplanAddon\Contracts\ValueObject\FileInfoInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
@@ -40,6 +42,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBeteiligungNachrichtenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
@@ -139,7 +142,7 @@ class XBeteiligungService
     public function __construct(
         private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
         private readonly LoggerInterface                        $logger,
-        private readonly FileService                            $fileService,
+        private readonly FileServiceInterface                   $fileService,
         SerializerFactory                                       $serializerFactory,
         private readonly ProcedureNewsServiceInterface          $procedureNewsService,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
@@ -381,7 +384,7 @@ class XBeteiligungService
                         $title = $singleDocument->getTitle();
                         $fileInfo = $this->fileService->getFileInfoFromFileString($singleDocument->getDocument());
                     }
-                } else if (ElementsInterface::ELEMENTS_CATEGORY_PARAGRAPH === $element->getCategory()) {
+                } elseif (ElementsInterface::ELEMENTS_CATEGORY_PARAGRAPH === $element->getCategory()) {
                     if ('' === $element->getFile()) {
                         continue;
                     }
@@ -389,16 +392,17 @@ class XBeteiligungService
                     $fileInfo = $this->fileService->getFileInfoFromFileString($element->getFile());
                 }
 
-                if ($fileInfo instanceof FileInfo) {
+                if ($fileInfo instanceof FileInfoInterface) {
                     $metadatenAnlageType = new MetadatenAnlageType();
                     $metadatenAnlageType->setBezeichnung($title);
                     $contentType = new CodeXBauMimeTypeTypeType();
                     $contentType->setCode($fileInfo->getContentType());
                     $metadatenAnlageType->setMimeType($contentType);
 
-                    $link = new AnhangOderVerlinkungTypeType();
+                    $link = new AnhangOderVerlinkungType();
                     $fileUrl = $this->router->generate('core_file_procedure', ['procedureId' => $procedure->getId(), 'hash' => $fileInfo->getHash()], RouterInterface::ABSOLUTE_URL);
                     $link->setUriVerlinkung($fileUrl);
+                    $metadatenAnlageType->setAnhangOderVerlinkung($link);
                     $publicParticipationType->addToAnlagen($metadatenAnlageType);
                 }
             }
