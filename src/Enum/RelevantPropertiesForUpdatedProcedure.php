@@ -22,4 +22,22 @@ enum RelevantPropertiesForUpdatedProcedure: string
     case PublicParticipationPhase = 'publicParticipationPhase';
     case Phase = 'phase';
     case BoundingBox = 'mapExtent'; // why mapExtend? see here: T32377
+    case File = 'file';
+
+    public static function propertyHasChanged(array $changeSet): bool
+    {
+        foreach ($changeSet as $propertyName => $propertyValue) {
+            if (null !== self::tryFrom($propertyName)) {
+                return true;
+            }
+            if (is_array($propertyValue)
+                && !array_key_exists('new', $propertyValue)
+                && !array_key_exists('old', $propertyValue)
+            ) {
+                return self::propertyHasChanged($propertyValue);
+            }
+        }
+
+        return false;
+    }
 }
