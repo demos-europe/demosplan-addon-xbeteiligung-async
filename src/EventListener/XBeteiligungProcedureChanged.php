@@ -36,8 +36,6 @@ class XBeteiligungProcedureChanged
     {
         $this->unitOfWork = $eventArgs->getObjectManager()->getUnitOfWork();
 
-        // we have to check if the procedure is a master template or not
-
         /** @var array<int, ProcedureInterface> $proceduresToUpdate */
         $proceduresToUpdate = $this->getUpdated(ProcedureInterface::class);
         /** @var array<int, ProcedureSettingsInterface> $procedureSettingsToUpdate */
@@ -97,7 +95,8 @@ class XBeteiligungProcedureChanged
     private function procedureDeleted(ProcedureInterface $procedure): void
     {
         $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
-        $this->xBeteiligungService->saveProcedureMessage($xml, $procedure->getId());
+        $procedureMessage = $this->xBeteiligungService->createProcedureMessage($xml, $procedure->getId());
+        $this->xBeteiligungService->saveProcedureMessageOnFlush($procedureMessage);
         $this->xBeteiligungLogger->createDebugMessageForCreatedXML($procedure, $xml, 'soft deleted');
     }
 
@@ -108,7 +107,11 @@ class XBeteiligungProcedureChanged
     {
         if (RelevantPropertiesForUpdatedProcedure::propertyHasChanged($changeSet)) {
             $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($procedureAfterUpdate);
-            $this->xBeteiligungService->saveProcedureMessage($xml, $procedureAfterUpdate->getId());
+            $procedureMessage = $this->xBeteiligungService->createProcedureMessage(
+                $xml,
+                $procedureAfterUpdate->getId()
+            );
+            $this->xBeteiligungService->saveProcedureMessageOnFlush($procedureMessage);
             $this->xBeteiligungLogger->createDebugMessageForCreatedXML(
                 $procedureAfterUpdate,
                 $xml,

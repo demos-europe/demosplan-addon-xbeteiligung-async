@@ -742,7 +742,7 @@ class XBeteiligungService
         $this->serializer = $serializer;
     }
 
-    public function saveProcedureMessage(string $xml, string $procedureId): void
+    public function createProcedureMessage(string $xml, string $procedureId): ProcedureMessage
     {
         $error = false;
         $path = AddonPath::getRootPath('addons/vendor/' .
@@ -755,14 +755,23 @@ class XBeteiligungService
             ]);
             $error = true;
         }
-        $procedureMessage = new ProcedureMessage(
+        return new ProcedureMessage(
             $xml,
             false,
             $error,
             0,
             $procedureId
         );
-        $this->procedureMessageRepository->createNew($procedureMessage);
+    }
+
+    public function saveProcedureMessage(ProcedureMessage $procedureMessage): void
+    {
+        $this->procedureMessageRepository->save($procedureMessage);
+    }
+
+    public function saveProcedureMessageOnFlush(ProcedureMessage $procedureMessage): void
+    {
+        $this->procedureMessageRepository->saveOnFlush($procedureMessage);
     }
 
     private function getInstitutionProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittKommunalType

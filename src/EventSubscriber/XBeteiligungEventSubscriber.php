@@ -40,7 +40,8 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
         $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
-        $this->xBeteiligungService->saveProcedureMessage($xml, $event->getProcedure()->getId());
+        $procedureMessage = $this->xBeteiligungService->createProcedureMessage($xml, $event->getProcedure()->getId());
+        $this->xBeteiligungService->saveProcedureMessage($procedureMessage);
         $this->xBeteiligungLogger->createDebugMessageForCreatedXML(
             $event->getProcedure(),
             $xml,
