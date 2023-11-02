@@ -30,7 +30,7 @@ class PlanningDocumentsLinkCreator
     public function getPlanningDocuments(ProcedureInterface $procedure): ?array
     {
         $planningDocuments = [];
-        $elements = $this->elementsService->getEnabledFileAndParagraphElements($procedure->getId());
+        $elements = $this->elementsService->getEnabledFileAndParagraphElements($procedure->getId(), null);
         if(count($elements) > 0) {
             foreach($elements as $element) {
                 $this->handleCategoryFile($element, $procedure->getId(), $planningDocuments);
@@ -49,12 +49,12 @@ class PlanningDocumentsLinkCreator
         }
 
         foreach($element['documents'] as $singleDocument) {
-            if ('' === $singleDocument->getDocument()) {
+            if ('' === $singleDocument['document']) {
                 continue;
             }
             $planningDocuments[] = $this->createLinkForSingleDoc(
-                $singleDocument->getTitle(),
-                $this->fileService->getFileInfoFromFileString($singleDocument->getDocument()),
+                $singleDocument['title'],
+                $this->fileService->getFileInfoFromFileString($singleDocument['document']),
                 $procedureId
             );
         }
