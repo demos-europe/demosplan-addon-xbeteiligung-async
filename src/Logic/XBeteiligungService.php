@@ -12,19 +12,15 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateInterval;
 use DateTime;
-use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\FileServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
-use DemosEurope\DemosplanAddon\Contracts\ValueObject\FileInfoInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
@@ -38,11 +34,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeTy
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBeteiligungNachrichtenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
@@ -142,10 +136,10 @@ class XBeteiligungService
     public function __construct(
         private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
         private readonly LoggerInterface                        $logger,
-        private readonly FileServiceInterface                   $fileService,
         SerializerFactory                                       $serializerFactory,
         private readonly ProcedureNewsServiceInterface          $procedureNewsService,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
+        private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
         private readonly RouterInterface                        $router,
     ) {
         $this->serializer = $serializerFactory->getSerializer();
@@ -290,7 +284,11 @@ class XBeteiligungService
             [ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_READ, ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_WRITE])) {
 
             $participationType->setBeteiligungURL(
-                $this->router->generate('DemosPlan_procedure_public_detail', ['procedure' => $procedure->getId()], RouterInterface::ABSOLUTE_URL)
+                $this->router->generate(
+                    'DemosPlan_procedure_public_detail',
+                    ['procedure' => $procedure->getCurrentSlug()->getName()],
+                    RouterInterface::ABSOLUTE_URL
+                )
             );
         }
 
@@ -369,46 +367,8 @@ class XBeteiligungService
         );
         $publicParticipationType->setBeteiligungKommunalOeffentlichkeitArt($bkoeaaType);
         $publicParticipationType->setAktuelleMitteilung($this->getPublicNewsList($procedure));
-        if($procedure->getElements()->count() > 0) {
-            foreach($procedure->getElements() as $element) {
-                $title = '';
-                $fileInfo = null;
-                if (ElementsInterface::ELEMENTS_CATEGORY_FILE === $element->getCategory()) {
-                    if (0 === count($element->getDocuments())) {
-                        continue;
-                    }
-                    foreach($element->getDocuments() as $singleDocument) {
-                        if ('' === $singleDocument->getDocument()) {
-                            continue;
-                        }
-                        $title = $singleDocument->getTitle();
-                        $fileInfo = $this->fileService->getFileInfoFromFileString($singleDocument->getDocument());
-                    }
-                } elseif (ElementsInterface::ELEMENTS_CATEGORY_PARAGRAPH === $element->getCategory()) {
-                    if ('' === $element->getFile()) {
-                        continue;
-                    }
-                    $title = $element->getTitle();
-                    $fileInfo = $this->fileService->getFileInfoFromFileString($element->getFile());
-                }
+        $publicParticipationType->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
 
-                if ($fileInfo instanceof FileInfoInterface) {
-                    $metadatenAnlageType = new MetadatenAnlageType();
-                    $metadatenAnlageType->setBezeichnung($title);
-                    $contentType = new CodeXBauMimeTypeTypeType();
-                    $contentType->setCode($fileInfo->getContentType());
-                    $contentType->setListURI('');
-                    $contentType->setListVersionID('');
-                    $metadatenAnlageType->setMimeType($contentType);
-
-                    $link = new AnhangOderVerlinkungType();
-                    $fileUrl = $this->router->generate('core_file_procedure', ['procedureId' => $procedure->getId(), 'hash' => $fileInfo->getHash()], RouterInterface::ABSOLUTE_URL);
-                    $link->setUriVerlinkung($fileUrl);
-                    $metadatenAnlageType->setAnhangOderVerlinkung($link);
-                    $publicParticipationType->addToAnlagen($metadatenAnlageType);
-                }
-            }
-        }
 
         return $publicParticipationType;
     }
