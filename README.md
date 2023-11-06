@@ -41,5 +41,11 @@ Example - xml_root_name: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNe
 comment out `namespace: ...` in `schema.CodeType.yml` for
 `code` and `name`
 
+comment out `namespace: ...` in `src/Soap/metadata/schema.BeteiligungKommunalOeffentlichkeitType.yml`
+for `anlagen`->`xml_list`
+
+comment out `namespace: ...` in `src/Soap/metadata/schema.MetadatenAnlageType.yml`
+for `bezeichnung` and `anlageart` and `mimeType` and `anhangOderVerlinkung`.
+
 Run the unit tests XBeteiligungServiceTest- (401, 402, 409) and fix any bugs that appear.
 Update what is documented here if there are any changes to be aware of.
