@@ -6,6 +6,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\EventListener;
 
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ParagraphInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\RelevantPropertiesForUpdatedProcedure;
@@ -42,6 +43,10 @@ class XBeteiligungProcedureChanged
         $procedureSettingsToUpdate = $this->getUpdated(ProcedureSettingsInterface::class);
         /** @var array<int, ElementsInterface> $elementsToUpdate */
         $elementsToUpdate = $this->getUpdated(ElementsInterface::class);
+//        /** @var array<int, ParagraphInterface> $paragraphsToUpdate */
+//        $paragraphsToDelete = $this->getDeleted(ParagraphInterface::class);
+//        /** @var array<int, ParagraphInterface> $paragraphsToInsert */
+//        $paragraphsToInsert = $this->getInsertions(ParagraphInterface::class);
 
         foreach ($procedureSettingsToUpdate as $procedureSettings) {
             if ($procedureSettings->getProcedure()->getMaster()) {
@@ -66,6 +71,13 @@ class XBeteiligungProcedureChanged
             $changeSet = $this->unitOfWork->getEntityChangeSet($elements);
             $this->procedureChanged($elements->getProcedure(), $changeSet);
         }
+
+//        if (0 < count($paragraphsToInsert)) {
+//            // when first paragraph then update relevant
+//        }
+//          if (0 < count($paragraphsToDelete)) {
+//              // when procedure has no more paragraphs then update relevant
+//          }
     }
 
     /**
@@ -75,6 +87,21 @@ class XBeteiligungProcedureChanged
     {
         return array_filter(
             $this->unitOfWork->getScheduledEntityUpdates(),
+            static fn ($entity): bool => $entity instanceof $type
+        );
+    }
+    private function getInsertions(mixed $type): array
+    {
+        return array_filter(
+            $this->unitOfWork->getScheduledEntityInsertions(),
+            static fn ($entity): bool => $entity instanceof $type
+        );
+    }
+
+    private function getDeleted(mixed $type): array
+    {
+        return array_filter(
+            $this->unitOfWork->getScheduledEntityDeletions(),
             static fn ($entity): bool => $entity instanceof $type
         );
     }

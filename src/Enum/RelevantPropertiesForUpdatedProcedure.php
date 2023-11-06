@@ -23,18 +23,15 @@ enum RelevantPropertiesForUpdatedProcedure: string
     case Phase = 'phase';
     case BoundingBox = 'mapExtent'; // why mapExtend? see here: T32377
     case File = 'file';
+    case CurrentSlug = 'currentSlug'; // public procedure url
+    case Enabled = 'enabled'; // category (element) is enabled in procedure
+    //case NewParagraph = 'NewParagraph'; work in progress
 
     public static function propertyHasChanged(array $changeSet): bool
     {
         foreach ($changeSet as $propertyName => $propertyValue) {
             if (null !== self::tryFrom($propertyName)) {
                 return true;
-            }
-            if (is_array($propertyValue)
-                && !array_key_exists('new', $propertyValue)
-                && !array_key_exists('old', $propertyValue)
-            ) {
-                return self::propertyHasChanged($propertyValue);
             }
         }
 

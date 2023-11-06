@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 
+use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\FileServiceInterface;
-use DemosEurope\DemosplanAddon\Contracts\Services\ElementsServiceInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\ParagraphServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\ValueObject\FileInfoInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensunterlagetypType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageType;
 use Symfony\Component\Routing\RouterInterface;
@@ -19,7 +21,7 @@ class PlanningDocumentsLinkCreator
     public function __construct(
         private readonly FileServiceInterface $fileService,
         private readonly RouterInterface $router,
-        private readonly ElementsServiceInterface $elementsService
+        private readonly ParagraphServiceInterface $paragraphService
     )
     {
     }
@@ -30,11 +32,15 @@ class PlanningDocumentsLinkCreator
     public function getPlanningDocuments(ProcedureInterface $procedure): ?array
     {
         $planningDocuments = [];
-        $elements = $this->elementsService->getEnabledFileAndParagraphElements($procedure->getId(), null);
-        if(count($elements) > 0) {
-            foreach($elements as $element) {
+        $elements = $procedure->getElements();
+        foreach ($elements as $element) {
+            if (!$element->getEnabled()) {
+                continue;
+            }
+            if ($element->getCategory() === ElementsInterface::ELEMENTS_CATEGORY_FILE) {
                 $this->handleCategoryFile($element, $procedure->getId(), $planningDocuments);
-
+            }
+            if ($element->getCategory() === ElementsInterface::ELEMENTS_CATEGORY_PARAGRAPH) {
                 $this->handleCategoryParagraph($element, $procedure->getId(), $planningDocuments);
             }
         }
@@ -42,41 +48,45 @@ class PlanningDocumentsLinkCreator
         return 0 < count($planningDocuments) ? $planningDocuments : null;
     }
 
-    private function handleCategoryFile(array $element, string $procedureId, array &$planningDocuments): void
+    private function handleCategoryFile(ElementsInterface $element, string $procedureId, array &$planningDocuments): void
     {
-        if (0 === count($element['documents'])) {
+        if (0 === count($element->getDocuments())) {
             return;
         }
 
-        foreach($element['documents'] as $singleDocument) {
-            if ('' === $singleDocument['document']) {
+        foreach($element->getDocuments() as $singleDocument) {
+            if ('' === $singleDocument->getDocument()) {
                 continue;
             }
+
             $planningDocuments[] = $this->createLinkForSingleDoc(
-                $singleDocument['title'],
-                $this->fileService->getFileInfoFromFileString($singleDocument['document']),
+                $element->getTitle(),
+                $this->fileService->getFileInfoFromFileString($singleDocument->getDocument()),
                 $procedureId
             );
         }
     }
 
-    private function handleCategoryParagraph(array $element, string $procedureId, array &$planningDocuments): void
+    private function handleCategoryParagraph(ElementsInterface $element, string $procedureId, array &$planningDocuments): void
     {
-        if ('' === $element['file']) {
-            return;
-        }
-        $planningDocuments[] = $this->createLinkForSingleDoc(
-            $element['title'],
-            $this->fileService->getFileInfoFromFileString($element['file']),
-            $procedureId
-        );
-        if ($element['hasParagraphs']) {
+        if (0 < $this->paragraphService->getParaDocumentObjectList($procedureId, $element->getId())) {
             $planningDocuments[] = $this->createLinkToParaDoc(
-                $element['title'],
+                $element->getTitle(),
+                $element->getTitle(),
                 $procedureId,
-                $element['id']
+                $element->getId()
             );
         }
+
+        if ('' === $element->getFile()) {
+            return;
+        }
+
+        $planningDocuments[] = $this->createLinkForSingleDoc(
+            $element->getTitle(),
+            $this->fileService->getFileInfoFromFileString($element->getFile()),
+            $procedureId
+        );
     }
 
     private function createLinkForSingleDoc(
@@ -86,6 +96,7 @@ class PlanningDocumentsLinkCreator
     ): MetadatenAnlageType {
         return $this->createMetadatenAnlageType(
             $categoryName,
+            $fileInfo->getFileName(),
             $fileInfo->getContentType(),
             $this->router->generate(
                 'core_file_procedure',
@@ -97,11 +108,13 @@ class PlanningDocumentsLinkCreator
 
     private function createLinkToParaDoc(
         string $categoryName,
+        string $fileName,
         string $procedureId,
         string $elementId
     ): MetadatenAnlageType {
         return $this->createMetadatenAnlageType(
             $categoryName,
+            $fileName,
             'text/html',
             $this->router->generate(
                 'DemosPlan_public_plandocument_paragraph',
@@ -113,6 +126,7 @@ class PlanningDocumentsLinkCreator
 
     private function createMetadatenAnlageType(
         string $categoryName,
+        string $fileName,
         string $contentType,
         string $fileUrl
     ): MetadatenAnlageType {
@@ -124,10 +138,16 @@ class PlanningDocumentsLinkCreator
         $link = new AnhangOderVerlinkungType();
         $link->setUriVerlinkung($fileUrl);
 
+        $codeVerfahrensUnterlageType = new CodeVerfahrensunterlagetypType();
+        $codeVerfahrensUnterlageType->setName($categoryName);
+        $codeVerfahrensUnterlageType->setListVersionID('');
+        $codeVerfahrensUnterlageType->setCode('');
+
         $metadatenAnlageType = new MetadatenAnlageType();
-        $metadatenAnlageType->setBezeichnung($categoryName);
+        $metadatenAnlageType->setBezeichnung($fileName);
         $metadatenAnlageType->setMimeType($codeXBauMimeContentType);
         $metadatenAnlageType->setAnhangOderVerlinkung($link);
+        $metadatenAnlageType->setAnlageart($codeVerfahrensUnterlageType);
 
         return $metadatenAnlageType;
     }
