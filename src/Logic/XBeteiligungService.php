@@ -286,7 +286,7 @@ class XBeteiligungService
             $participationType->setBeteiligungURL(
                 $this->router->generate(
                     'DemosPlan_procedure_public_detail',
-                    ['procedure' => $procedure->getCurrentSlug()->getName()],
+                    ['procedure' => $procedure->getId()],
                     RouterInterface::ABSOLUTE_URL
                 )
             );
