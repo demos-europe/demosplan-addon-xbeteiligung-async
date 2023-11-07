@@ -162,14 +162,14 @@ class XBeteiligungProcedureChanged
     public function procedureChanged(ProcedureInterface $procedure, array $changeSet): void
     {
         $procedure->getDeleted()
-            ? $this->procedureDeleted($procedure)
+            ? $this->procedureSoftDeleted($procedure)
             : $this->procedureUpdated($changeSet, $procedure);
     }
 
-    /**
+    /** The procedure still exists, only a delte flag is set.
      * @throws Exception
      */
-    private function procedureDeleted(ProcedureInterface $procedure): void
+    private function procedureSoftDeleted(ProcedureInterface $procedure): void
     {
         $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
         $procedureMessage = $this->xBeteiligungService->createProcedureMessage($xml, $procedure->getId());
