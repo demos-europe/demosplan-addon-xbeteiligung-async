@@ -58,24 +58,29 @@ class PlanningDocumentsLinkCreator
     public function getPlanningDocuments(ProcedureInterface $procedure): ?array
     {
         $planningDocuments = [];
+        $planningDocumentsFromFiles = [];
+        $planningDocumentsFromParagraphs = [];
         $elements = $procedure->getElements();
         foreach ($elements as $element) {
             if (!$element->getEnabled()) {
                 continue;
             }
             if ($element->getCategory() === ElementsInterface::ELEMENTS_CATEGORY_FILE) {
-                $this->handleCategoryFile($element, $procedure->getId(), $planningDocuments);
+                $planningDocumentsFromFiles = $this->handleCategoryFile($element, $procedure->getId());
             }
             if ($element->getCategory() === ElementsInterface::ELEMENTS_CATEGORY_PARAGRAPH) {
-                $this->handleCategoryParagraph($element, $procedure->getId(), $planningDocuments);
+                $planningDocumentsFromParagraphs = $this->handleCategoryParagraph($element, $procedure->getId());
             }
         }
+
+        $planningDocuments = array_merge($planningDocumentsFromFiles, $planningDocumentsFromParagraphs);
 
         return 0 < count($planningDocuments) ? $planningDocuments : null;
     }
 
-    private function handleCategoryFile(ElementsInterface $element, string $procedureId, array &$planningDocuments): void
+    private function handleCategoryFile(ElementsInterface $element, string $procedureId): array
     {
+        $planningDocuments = [];
         // a new single doc was added
         if (null !== $this->newSingleDocument && '' !== $this->newSingleDocument->getDocument()) {
             $planningDocuments[] = $this->createLinkForSingleDoc(
@@ -85,7 +90,7 @@ class PlanningDocumentsLinkCreator
             );
         }
         if (0 === count($element->getDocuments())) {
-            return;
+            return $planningDocuments;
         }
 
         foreach($element->getDocuments() as $singleDocument) {
@@ -119,6 +124,9 @@ class PlanningDocumentsLinkCreator
                 $procedureId
             );
         }
+
+
+        return $planningDocuments;
     }
 
     private function isDocumentScheduledForDeletion(SingleDocumentInterface $singleDocument): bool
@@ -132,8 +140,10 @@ class PlanningDocumentsLinkCreator
         return false;
     }
 
-    private function handleCategoryParagraph(ElementsInterface $element, string $procedureId, array &$planningDocuments): void
+    private function handleCategoryParagraph(ElementsInterface $element, string $procedureId): array
     {
+        $planningDocuments = [];
+
         if (0 < $this->paragraphService->getParaDocumentObjectList($procedureId, $element->getId())) {
             $planningDocuments[] = $this->createLinkToParaDoc(
                 $element->getTitle(),
@@ -144,7 +154,7 @@ class PlanningDocumentsLinkCreator
         }
 
         if ('' === $element->getFile()) {
-            return;
+            return $planningDocuments;
         }
 
         $planningDocuments[] = $this->createLinkForSingleDoc(
@@ -152,6 +162,9 @@ class PlanningDocumentsLinkCreator
             $this->fileService->getFileInfoFromFileString($element->getFile()),
             $procedureId
         );
+
+
+        return $planningDocuments;
     }
 
     private function createLinkForSingleDoc(
