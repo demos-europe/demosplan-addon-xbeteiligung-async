@@ -25,6 +25,9 @@ enum RelevantPropertiesForUpdatedProcedure: string
     case File = 'file';
     case CurrentSlug = 'currentSlug'; // public procedure url
     case Enabled = 'enabled'; // category (element) is enabled in procedure
+    case NewSingleDocument = 'new_single_document';
+    case DeleteSingleDocument = 'delete_single_document';
+    case UpdateSingleDocument = 'update_single_document';
     //case NewParagraph = 'NewParagraph'; work in progress
 
     public static function propertyHasChanged(array $changeSet): bool

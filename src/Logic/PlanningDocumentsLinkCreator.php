@@ -7,6 +7,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\SingleDocumentInterface;
 use DemosEurope\DemosplanAddon\Contracts\FileServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ParagraphServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\ValueObject\FileInfoInterface;
@@ -18,12 +19,37 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PlanningDocumentsLinkCreator
 {
+    private ?SingleDocumentInterface $newSingleDocument = null;
+    private ?SingleDocumentInterface $updatedSingleDocument = null;
+    /** @var string[]|null $deletedSingleDocumentIds */
+    private ?array $deletedSingleDocumentIds = null;
+
     public function __construct(
         private readonly FileServiceInterface $fileService,
         private readonly RouterInterface $router,
         private readonly ParagraphServiceInterface $paragraphService
     )
     {
+    }
+
+    public function setNewSingleDocument(SingleDocumentInterface $newSingleDocument): void
+    {
+        $this->newSingleDocument = $newSingleDocument;
+    }
+
+    public function setUpdatedSingleDocument(SingleDocumentInterface $updatedSingleDocument): void
+    {
+        $this->updatedSingleDocument = $updatedSingleDocument;
+    }
+
+    public function addDeletedSingleDocument(string $deletedSingleDocumentId): void
+    {
+        if (null === $this->deletedSingleDocumentIds) {
+            $this->deletedSingleDocumentIds = [$deletedSingleDocumentId];
+            return;
+        }
+
+        $this->deletedSingleDocumentIds = array_merge($this->deletedSingleDocumentIds, [$deletedSingleDocumentId]);
     }
 
     /**
@@ -50,12 +76,40 @@ class PlanningDocumentsLinkCreator
 
     private function handleCategoryFile(ElementsInterface $element, string $procedureId, array &$planningDocuments): void
     {
+        // a new single doc was added
+        if (null !== $this->newSingleDocument && '' !== $this->newSingleDocument->getDocument()) {
+            $planningDocuments[] = $this->createLinkForSingleDoc(
+                $element->getTitle(),
+                $this->fileService->getFileInfoFromFileString($this->newSingleDocument->getDocument()),
+                $procedureId
+            );
+        }
         if (0 === count($element->getDocuments())) {
             return;
         }
 
         foreach($element->getDocuments() as $singleDocument) {
-            if ('' === $singleDocument->getDocument()) {
+            // a single doc was updated
+            if (null !== $this->updatedSingleDocument
+                && $this->updatedSingleDocument->getVisible()
+                && '' !== $this->updatedSingleDocument->getDocument()
+                && $this->updatedSingleDocument->getId() === $singleDocument->getId()
+            ) {
+                $planningDocuments[] = $this->createLinkForSingleDoc(
+                    $element->getTitle(),
+                    $this->fileService->getFileInfoFromFileString($this->updatedSingleDocument->getDocument()),
+                    $procedureId
+                );
+                continue;
+            }
+
+            // a single doc or more than one was deleted
+            if (null !== $this->deletedSingleDocumentIds && $this->isDocumentScheduledForDeletion($singleDocument)) {
+                continue;
+            }
+
+            // all not changed single docs
+            if ('' === $singleDocument->getDocument() || !$singleDocument->getVisible()) {
                 continue;
             }
 
@@ -65,6 +119,17 @@ class PlanningDocumentsLinkCreator
                 $procedureId
             );
         }
+    }
+
+    private function isDocumentScheduledForDeletion(SingleDocumentInterface $singleDocument): bool
+    {
+        foreach ($this->deletedSingleDocumentIds as $singleDocumentToDelete) {
+            if ($singleDocumentToDelete === $singleDocument->getId()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function handleCategoryParagraph(ElementsInterface $element, string $procedureId, array &$planningDocuments): void
