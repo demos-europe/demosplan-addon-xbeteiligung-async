@@ -173,9 +173,7 @@ class XBeteiligungProcedureChanged
     {
         $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
         $procedureMessage = $this->xBeteiligungService->createProcedureMessage($xml, $procedure->getId());
-        $this->deleteCurrentProcedureMessageIfExist();
         $this->xBeteiligungService->saveProcedureMessageOnFlush($procedureMessage);
-        $this->currentProcedureMessage = $procedureMessage->getId();
         $this->xBeteiligungLogger->createDebugMessageForCreatedXML($procedure, $xml, 'soft deleted');
     }
 
