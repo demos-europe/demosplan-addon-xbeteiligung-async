@@ -2,13 +2,13 @@
 declare(strict_types=1);
 
 
-namespace DemosEurope\DemosplanAddon\XBeteiligung\Logging;
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Debugger;
 
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use Psr\Log\LoggerInterface;
 
-class XBeteiligungLogger
+class XBeteiligungDebugger
 {
     public function __construct(
         private readonly LoggerInterface $logger,

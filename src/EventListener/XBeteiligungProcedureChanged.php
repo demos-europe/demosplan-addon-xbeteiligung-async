@@ -6,15 +6,13 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\EventListener;
 
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\ParagraphInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\SingleDocumentInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\RelevantPropertiesForUpdatedProcedure;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logging\XBeteiligungLogger;
+use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
@@ -28,7 +26,7 @@ class XBeteiligungProcedureChanged
 
     public function __construct(
         private readonly XBeteiligungService $xBeteiligungService,
-        private readonly XBeteiligungLogger $xBeteiligungLogger
+        private readonly XBeteiligungDebugger $xBeteiligungDebugger
     )
     {
     }
@@ -163,7 +161,7 @@ class XBeteiligungProcedureChanged
         $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
         $procedureMessage = $this->xBeteiligungService->createProcedureMessage($xml, $procedure->getId());
         $this->xBeteiligungService->saveProcedureMessageOnFlush($procedureMessage);
-        $this->xBeteiligungLogger->createDebugMessageForCreatedXML($procedure, $xml, 'soft deleted');
+        $this->xBeteiligungDebugger->createDebugMessageForCreatedXML($procedure, $xml, 'soft deleted');
     }
 
     /**
@@ -180,7 +178,7 @@ class XBeteiligungProcedureChanged
             $this->deleteCurrentProcedureMessageIfExist();
             $this->xBeteiligungService->saveProcedureMessageOnFlush($procedureMessage);
             $this->currentProcedureMessage = $procedureMessage->getId();
-            $this->xBeteiligungLogger->createDebugMessageForCreatedXML(
+            $this->xBeteiligungDebugger->createDebugMessageForCreatedXML(
                 $procedureAfterUpdate,
                 $xml,
                 'updated'

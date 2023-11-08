@@ -11,7 +11,7 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber;
 
 use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logging\XBeteiligungLogger;
+use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Exception;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,7 +20,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly XBeteiligungService $xBeteiligungService,
-        private readonly XBeteiligungLogger $xBeteiligungLogger
+        private readonly XBeteiligungDebugger $xBeteiligungDebugger
     ) {
     }
 
@@ -42,7 +42,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
         $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
         $procedureMessage = $this->xBeteiligungService->createProcedureMessage($xml, $event->getProcedure()->getId());
         $this->xBeteiligungService->saveProcedureMessage($procedureMessage);
-        $this->xBeteiligungLogger->createDebugMessageForCreatedXML(
+        $this->xBeteiligungDebugger->createDebugMessageForCreatedXML(
             $event->getProcedure(),
             $xml,
             'created'

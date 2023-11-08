@@ -57,7 +57,6 @@ class PlanningDocumentsLinkCreator
      */
     public function getPlanningDocuments(ProcedureInterface $procedure): ?array
     {
-        $planningDocuments = [];
         $planningDocumentsFromFiles = [];
         $planningDocumentsFromParagraphs = [];
         $elements = $procedure->getElements();
