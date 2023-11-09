@@ -427,13 +427,17 @@ class XBeteiligungService
         }
         // why mapExtend? see here: T32377
         $bboxArray = explode(',', $procedure->getSettings()->getMapExtent());
+        $absWidth = 1;
+        $absHeight = 1;
 
-        $west = (float)$bboxArray[0];
-        $east = (float)$bboxArray[2];
-        $south = (float)$bboxArray[1];
-        $north = (float)$bboxArray[3];
-        $absWidth = abs($west - $east);
-        $absHeight = abs($south - $north);
+        if (4 === count($bboxArray)) {
+            $west = (float)$bboxArray[0];
+            $east = (float)$bboxArray[2];
+            $south = (float)$bboxArray[1];
+            $north = (float)$bboxArray[3];
+            $absWidth = abs($west - $east);
+            $absHeight = abs($south - $north);
+        }
 
         $url = $basemapGisLayer->getUrl();
         $serviceType = '?SERVICE=WMS';

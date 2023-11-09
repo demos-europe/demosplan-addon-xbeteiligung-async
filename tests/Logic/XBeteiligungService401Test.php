@@ -53,16 +53,46 @@ class XBeteiligungService401Test extends TestCase
 
     public function testPlanung2BeteiligungBeteiligungNeu0401(): void
     {
-        $gisLayerCategoryInterfaceMock = $this->createMock(GisLayerCategoryInterface::class);
+        $procedure = $this->getBaseProcedure();
+        $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
+
+        $isValid = $this->sut->isValidMessage($procedureXml, true);
+        self::assertTrue($isValid);
+    }
+
+    public function testPlanung2BeteiligungBeteiligungNeu0401NoBBox(): void
+    {
+        $procedureSettingsMock = $this->createMock(
+            ProcedureSettingsInterface::class
+        );
+        $procedureSettingsMock->method('getMapExtent')
+            ->willReturn('');
+        $procedure = $this->getBaseProcedure(procedureSettingsMock: $procedureSettingsMock);
+
+        $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
+
+        $isValid = $this->sut->isValidMessage($procedureXml, true);
+        self::assertTrue($isValid);
+    }
+
+    private function getBaseProcedure($procedureSettingsMock = null)
+    {
+        $gisLayerCategoryInterfaceMock = $this->createMock(
+            GisLayerCategoryInterface::class
+        );
         $gisMo = $this->createMock(GisLayerInterface::class);
         $gisMo->method('getName')->willReturn('basemap');
         $gisMo->method('getUrl')->willReturn('https://sgx.geodatenzentrum.de/wms_basemapde');
         $gisMo->method('getLayerVersion')->willReturn('1.3.0');
         $gisMo->method('getLayers')->willReturn('de_basemapde_web_raster_farbe');
         $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn(new ArrayCollection([$gisMo]));
-        $procedureSettingsMock = $this->createMock(ProcedureSettingsInterface::class);
-         $procedureSettingsMock->method('getMapExtent')
-            ->willReturn('904640.92309477,7067292.9633037,1195347.6354542,7350657.5148909');
+        if ($procedureSettingsMock === null) {
+            $procedureSettingsMock = $this->createMock(ProcedureSettingsInterface::class);
+            $procedureSettingsMock->method('getMapExtent')
+                ->willReturn(
+                    '904640.92309477,7067292.9633037,1195347.6354542,7350657.5148909'
+                );
+        }
         $this->repoMock->method('getRootLayerCategory')->willReturn($gisLayerCategoryInterfaceMock);
 
         $procedure = $this->createMock(ProcedureInterface::class);
@@ -83,25 +113,31 @@ class XBeteiligungService401Test extends TestCase
             (new DateTime())->add(new DateInterval('P7D'))
         );
         $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(
-          [
-              'result' => [
-                  [
-                      'title' => 'Test Titel',
-                      'text'  => 'Test Inhalt',
-                      'roles' => [['groupCode' => 'GPSORG', 'code' => RoleInterface::PLANNING_AGENCY_WORKER]]
-                  ],
-                  [
-                      'title' => 'noch ein <p>Test Titel</p>',
-                      'text'  => '<b>Test</b> These Tags will be removed via strip_tags()',
-                      'roles' => [['groupCode' => 'GPSORG', 'code' => RoleInterface::CITIZEN]]
-                  ],
-              ]
-          ]
-        );
-
-        $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
-
-        $isValid = $this->sut->isValidMessage($procedureXml, true);
-        self::assertTrue($isValid);
+                [
+                    'result' => [
+                        [
+                            'title' => 'Test Titel',
+                            'text' => 'Test Inhalt',
+                            'roles' => [
+                                [
+                                    'groupCode' => 'GPSORG',
+                                    'code' => RoleInterface::PLANNING_AGENCY_WORKER
+                                ]
+                            ]
+                        ],
+                        [
+                            'title' => 'noch ein <p>Test Titel</p>',
+                            'text' => '<b>Test</b> These Tags will be removed via strip_tags()',
+                            'roles' => [
+                                [
+                                    'groupCode' => 'GPSORG',
+                                    'code' => RoleInterface::CITIZEN
+                                ]
+                            ]
+                        ],
+                    ]
+                ]
+            );
+        return $procedure;
     }
 }
