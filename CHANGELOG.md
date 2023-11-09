@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 
+### Fixed
+- BBox might be empty during procedure update or creation
+
 ## v0.3.0 (2023-11-09)
 
 ### Added
