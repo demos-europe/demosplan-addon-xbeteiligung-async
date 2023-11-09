@@ -41,10 +41,24 @@ class ProcedureMessageRepository extends ServiceEntityRepository
             static fn (ProcedureMessage $procedureMessage) => $procedureMessage->getId(), $this->findBy($criteria));
     }
 
-    public function createNew(ProcedureMessage $procedureMessage): void
+    public function save(ProcedureMessage $procedureMessage): void
     {
         $this->getEntityManager()->persist($procedureMessage);
         $this->getEntityManager()->flush($procedureMessage);
+    }
+
+    public function saveOnFlush(ProcedureMessage $procedureMessage): void
+    {
+        $classMeta = $this->getEntityManager()->getClassMetadata(ProcedureMessage::class);
+        $this->entityManager->persist($procedureMessage);
+        $this->entityManager->getUnitOfWork()->computeChangeSet($classMeta, $procedureMessage);
+    }
+
+    public function deleteOnFlush(string $procedureMessageId):void {
+        $classMeta = $this->getEntityManager()->getClassMetadata(ProcedureMessage::class);
+        $procedureMessage = $this->get($procedureMessageId);
+        $this->entityManager->remove($procedureMessage);
+        $this->entityManager->getUnitOfWork()->computeChangeSet($classMeta, $procedureMessage);
     }
 
     /**

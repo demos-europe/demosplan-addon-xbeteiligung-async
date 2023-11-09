@@ -16,7 +16,7 @@
     },
     "minimum-stability": "stable",
     "require": {
-        "demos-europe/demosplan-addon": "^0.7",
+        "demos-europe/demosplan-addon": "^0.11",
         "demos-europe/demosplan-addon-installer": "dev-main",
         "doctrine/doctrine-bundle": "^2",
         "ext-dom": "*",

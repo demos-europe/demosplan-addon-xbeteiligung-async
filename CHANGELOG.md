@@ -2,6 +2,14 @@
 
 ## UNRELEASED
 
+### Added
+- feature (refs T35051): add files to procedure message
+- feature add doctrine EventListener for onFlush event
+for detecting procedure changes
+
+### Removed
+- feature remove PostProcedureUpdatedEvent for detecting procedure changes
+
 ## v0.2.0 (2023-10-11)
 
 ### Added

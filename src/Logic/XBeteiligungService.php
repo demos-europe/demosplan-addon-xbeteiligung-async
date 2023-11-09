@@ -15,6 +15,7 @@ use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
+use DemosEurope\DemosplanAddon\Contracts\FileServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
@@ -138,6 +139,7 @@ class XBeteiligungService
         SerializerFactory                                       $serializerFactory,
         private readonly ProcedureNewsServiceInterface          $procedureNewsService,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
+        private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
         private readonly RouterInterface                        $router,
     ) {
         $this->serializer = $serializerFactory->getSerializer();
@@ -282,7 +284,11 @@ class XBeteiligungService
             [ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_READ, ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_WRITE])) {
 
             $participationType->setBeteiligungURL(
-                $this->router->generate('DemosPlan_procedure_public_detail', ['procedure' => $procedure->getId()], RouterInterface::ABSOLUTE_URL)
+                $this->router->generate(
+                    'DemosPlan_procedure_public_detail',
+                    ['procedure' => $procedure->getId()],
+                    RouterInterface::ABSOLUTE_URL
+                )
             );
         }
 
@@ -361,6 +367,8 @@ class XBeteiligungService
         );
         $publicParticipationType->setBeteiligungKommunalOeffentlichkeitArt($bkoeaaType);
         $publicParticipationType->setAktuelleMitteilung($this->getPublicNewsList($procedure));
+        $publicParticipationType->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
+
 
         return $publicParticipationType;
     }
@@ -694,7 +702,7 @@ class XBeteiligungService
         $this->serializer = $serializer;
     }
 
-    public function saveProcedureMessage(string $xml, string $procedureId): void
+    public function createProcedureMessage(string $xml, string $procedureId): ProcedureMessage
     {
         $error = false;
         $path = AddonPath::getRootPath('addons/vendor/' .
@@ -707,14 +715,23 @@ class XBeteiligungService
             ]);
             $error = true;
         }
-        $procedureMessage = new ProcedureMessage(
+        return new ProcedureMessage(
             $xml,
             false,
             $error,
             0,
             $procedureId
         );
-        $this->procedureMessageRepository->createNew($procedureMessage);
+    }
+
+    public function saveProcedureMessage(ProcedureMessage $procedureMessage): void
+    {
+        $this->procedureMessageRepository->save($procedureMessage);
+    }
+
+    public function saveProcedureMessageOnFlush(ProcedureMessage $procedureMessage): void
+    {
+        $this->procedureMessageRepository->saveOnFlush($procedureMessage);
     }
 
     private function getInstitutionProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittKommunalType
@@ -790,4 +807,16 @@ class XBeteiligungService
         return $institutionNewsList;
     }
 
+    public function getPlanningDocumentsLinkCreator(): PlanningDocumentsLinkCreator
+    {
+        return $this->planningDocumentsLinkCreator;
+    }
+
+    public function getProcedureMessage(string $procedureMessageId): ProcedureMessage {
+        return $this->procedureMessageRepository->get($procedureMessageId);
+    }
+
+    public function deleteProcedureMessageOnFlush(string $procedureMessageId): void {
+        $this->procedureMessageRepository->deleteOnFlush($procedureMessageId);
+    }
 }

@@ -10,20 +10,17 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber;
 
-use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInterface;
-use DemosEurope\DemosplanAddon\Contracts\Events\PostProcedureUpdatedEventInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\RelevantPropertiesForUpdatedProcedure;
+use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Exception;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly LoggerInterface $logger,
         private readonly XBeteiligungService $xBeteiligungService,
+        private readonly XBeteiligungDebugger $xBeteiligungDebugger
     ) {
     }
 
@@ -34,7 +31,6 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     {
         return [
             PostNewProcedureCreatedEventInterface::class => 'newProcedureCreated',
-            PostProcedureUpdatedEventInterface::class => 'procedureChanged',
         ];
     }
 
@@ -44,70 +40,12 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
         $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
-        $this->xBeteiligungService->saveProcedureMessage($xml, $event->getProcedure()->getId());
-        $this->createDebugMessageForCreatedXML($event->getProcedure(), $xml, 'created');
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function procedureChanged(PostProcedureUpdatedEventInterface $event): void
-    {
-        $procedureAfterUpdate = $event->getProcedureAfterUpdate();
-        $procedureAfterUpdate->getDeleted()
-            ? $this->procedureDeleted($procedureAfterUpdate)
-            : $this->procedureUpdated($event->getModifiedValues(), $procedureAfterUpdate);
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function procedureDeleted(ProcedureInterface $procedure): void
-    {
-        $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
-        $this->xBeteiligungService->saveProcedureMessage($xml, $procedure->getId());
-        $this->createDebugMessageForCreatedXML($procedure, $xml, 'soft deleted');
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function procedureUpdated(array $modifiedValues, ProcedureInterface $procedureAfterUpdate): void
-    {
-        if (self::relevantPropertyHasChanged($modifiedValues)) {
-            $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($procedureAfterUpdate);
-            $this->xBeteiligungService->saveProcedureMessage($xml, $procedureAfterUpdate->getId());
-            $this->createDebugMessageForCreatedXML($procedureAfterUpdate, $xml, 'updated');
-        }
-    }
-
-    private static function relevantPropertyHasChanged(array $modifiedValues): bool
-    {
-        foreach ($modifiedValues as $propertyName => $propertyValue) {
-            if (null !== RelevantPropertiesForUpdatedProcedure::tryFrom($propertyName)) {
-                return true;
-            }
-            if (is_array($propertyValue)
-                && !array_key_exists('new', $propertyValue)
-                && !array_key_exists('old', $propertyValue)
-            ) {
-                return self::relevantPropertyHasChanged($propertyValue);
-            }
-        }
-
-        return false;
-    }
-
-    private function createDebugMessageForCreatedXML(
-        ProcedureInterface $procedure,
-        string $xml,
-        string $procedureState): void {
-        $this->logger->debug(
-            'XML created for a ' . $procedureState . ' procedure.',
-            [
-                'procedure' => $procedure,
-                'xml'       => $xml,
-            ]
+        $procedureMessage = $this->xBeteiligungService->createProcedureMessage($xml, $event->getProcedure()->getId());
+        $this->xBeteiligungService->saveProcedureMessage($procedureMessage);
+        $this->xBeteiligungDebugger->createDebugMessageForCreatedXML(
+            $event->getProcedure(),
+            $xml,
+            'created'
         );
     }
 }
