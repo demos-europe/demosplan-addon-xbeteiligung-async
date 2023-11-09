@@ -2,6 +2,8 @@
 
 ## UNRELEASED
 
+## v0.3.0 (2023-11-09)
+
 ### Added
 - feature (refs T35051): add files to procedure message
 - feature add doctrine EventListener for onFlush event
