@@ -2,7 +2,7 @@
 
 ## UNRELEASED
 
-## v0.4 (2023-11-27)
+## v0.4.0 (2023-11-27)
 
 - adjust usages of constants of ElementsInterface.php
 
