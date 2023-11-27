@@ -64,10 +64,10 @@ class PlanningDocumentsLinkCreator
             if (!$element->getEnabled()) {
                 continue;
             }
-            if ($element->getCategory() === ElementsInterface::ELEMENTS_CATEGORY_FILE) {
+            if ($element->getCategory() === ElementsInterface::ELEMENT_CATEGORIES['file']) {
                 $planningDocumentsFromFiles = $this->handleCategoryFile($element, $procedure->getId());
             }
-            if ($element->getCategory() === ElementsInterface::ELEMENTS_CATEGORY_PARAGRAPH) {
+            if ($element->getCategory() === ElementsInterface::ELEMENT_CATEGORIES['paragraph']) {
                 $planningDocumentsFromParagraphs = $this->handleCategoryParagraph($element, $procedure->getId());
             }
         }
