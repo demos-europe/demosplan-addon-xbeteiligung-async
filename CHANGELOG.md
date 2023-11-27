@@ -2,6 +2,8 @@
 
 ## UNRELEASED
 
+- rename constants in ElementsInterface.php(breaking change)
+
 ## v0.3.1 (2023-11-09)
 
 ### Fixed
