@@ -49,3 +49,15 @@ for `bezeichnung` and `anlageart` and `mimeType` and `anhangOderVerlinkung`.
 
 Run the unit tests XBeteiligungServiceTest- (401, 402, 409) and fix any bugs that appear.
 Update what is documented here if there are any changes to be aware of.
+
+# Release
+
+To release a new version of this library you need to perform the script `release.sh` 
+in the root folder of this repository.:
+    
+    ./release.sh <version>
+    
+It updates the Tag in the changelog, sets the new version in composer.json and package.json if applicable, 
+creates a tag and pushes it to the remote repository.
+You may do this at main or release branch if you have the rights to do so, otherwise you may create 
+a pull request and merge it directly after the release.

@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 
+- add release script
 - adjust usages of constants of ElementsInterface.php
 
 ## v0.3.1 (2023-11-09)
