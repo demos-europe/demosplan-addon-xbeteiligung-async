@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- use stable addon installer version
 - add release script
 
 ## v0.4.0 (2023-11-27)

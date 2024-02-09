@@ -17,7 +17,7 @@
     "minimum-stability": "stable",
     "require": {
         "demos-europe/demosplan-addon": "^0.12",
-        "demos-europe/demosplan-addon-installer": "dev-main",
+        "demos-europe/demosplan-addon-installer": "^0",
         "doctrine/doctrine-bundle": "^2",
         "ext-dom": "*",
         "ext-fileinfo": "*",
