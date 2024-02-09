@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.5 (2024-02-09)
 - use stable addon installer version
 - add release script
 
