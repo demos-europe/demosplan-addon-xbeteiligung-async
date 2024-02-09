@@ -1,9 +1,9 @@
 # Changelog
 
 ## UNRELEASED
+- add release script
 
 ## v0.4.0 (2023-11-27)
-
 - adjust usages of constants of ElementsInterface.php
 
 ## v0.3.1 (2023-11-09)
