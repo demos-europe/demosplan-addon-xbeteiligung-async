@@ -26,6 +26,9 @@ use Symfony\Component\Routing\RouterInterface;
 class XBeteiligungService401Test extends TestCase
 {
     private MockObject $repoMock;
+
+    private MockObject $testProcedure;
+    private MockObject $testProcedureWithoutBBox;
     private MockObject $procedureNewsService;
     private MockObject $procedureMessageRepository;
 
@@ -37,6 +40,8 @@ class XBeteiligungService401Test extends TestCase
 
         $this->repoMock = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
+        $this->testProcedure = $this->getTestProcedure($this->getTestProcedureSettings());
+        $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false));
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
 
         $serializer = new SerializerFactory();
@@ -53,8 +58,7 @@ class XBeteiligungService401Test extends TestCase
 
     public function testPlanung2BeteiligungBeteiligungNeu0401(): void
     {
-        $procedure = $this->getBaseProcedure();
-        $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
+        $procedureXml = $this->sut->createProcedureNew401FromObject($this->testProcedure);
 
         $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);
@@ -62,20 +66,13 @@ class XBeteiligungService401Test extends TestCase
 
     public function testPlanung2BeteiligungBeteiligungNeu0401NoBBox(): void
     {
-        $procedureSettingsMock = $this->createMock(
-            ProcedureSettingsInterface::class
-        );
-        $procedureSettingsMock->method('getMapExtent')
-            ->willReturn('');
-        $procedure = $this->getBaseProcedure(procedureSettingsMock: $procedureSettingsMock);
-
-        $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
+        $procedureXml = $this->sut->createProcedureNew401FromObject($this->testProcedureWithoutBBox);
 
         $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);
     }
 
-    private function getBaseProcedure($procedureSettingsMock = null)
+    private function getTestProcedure(MockObject $procedureSettingsMock)
     {
         $gisLayerCategoryInterfaceMock = $this->createMock(
             GisLayerCategoryInterface::class
@@ -86,13 +83,6 @@ class XBeteiligungService401Test extends TestCase
         $gisMo->method('getLayerVersion')->willReturn('1.3.0');
         $gisMo->method('getLayers')->willReturn('de_basemapde_web_raster_farbe');
         $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn(new ArrayCollection([$gisMo]));
-        if ($procedureSettingsMock === null) {
-            $procedureSettingsMock = $this->createMock(ProcedureSettingsInterface::class);
-            $procedureSettingsMock->method('getMapExtent')
-                ->willReturn(
-                    '904640.92309477,7067292.9633037,1195347.6354542,7350657.5148909'
-                );
-        }
         $this->repoMock->method('getRootLayerCategory')->willReturn($gisLayerCategoryInterfaceMock);
 
         $procedure = $this->createMock(ProcedureInterface::class);
@@ -139,5 +129,24 @@ class XBeteiligungService401Test extends TestCase
                 ]
             );
         return $procedure;
+    }
+
+    private function getTestProcedureSettings(bool $withBBox = true)
+    {
+        $procedureSettingsMock = $this->createMock(
+            ProcedureSettingsInterface::class
+        );
+        if ($withBBox) {
+            $procedureSettingsMock->method('getMapExtent')
+                ->willReturn(
+                    '904640.92309477,7067292.9633037,1195347.6354542,7350657.5148909'
+                );
+        }
+        if (!$withBBox) {
+            $procedureSettingsMock->method('getMapExtent')
+                ->willReturn('');
+        }
+
+        return $procedureSettingsMock;
     }
 }
