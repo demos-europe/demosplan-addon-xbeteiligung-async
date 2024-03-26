@@ -26,6 +26,7 @@ use Symfony\Component\Routing\RouterInterface;
 class XBeteiligungService402Test extends TestCase
 {
     private MockObject $repoMock;
+    private MockObject $testProcedure;
     private MockObject $procedureNewsService;
     private MockObject $procedureMessageRepository;
 
@@ -37,6 +38,7 @@ class XBeteiligungService402Test extends TestCase
 
         $this->repoMock = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
+        $this->testProcedure = $this->getTestProcedure();
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
 
         $serializer = new SerializerFactory();
@@ -52,6 +54,14 @@ class XBeteiligungService402Test extends TestCase
     }
 
     public function testPlanung2BeteiligungBeteiligungNeu0402(): void
+    {
+        $procedureXml = $this->sut->createProcedureUpdate402FromObject($this->testProcedure);
+
+        $isValid = $this->sut->isValidMessage($procedureXml, true);
+        self::assertTrue($isValid);
+    }
+
+    private function getTestProcedure()
     {
         $gisLayerCategoryInterfaceMock = $this->createMock(GisLayerCategoryInterface::class);
         $gisMo = $this->createMock(GisLayerInterface::class);
@@ -100,9 +110,6 @@ class XBeteiligungService402Test extends TestCase
             ]
         );
 
-        $procedureXml = $this->sut->createProcedureUpdate402FromObject($procedure);
-
-        $isValid = $this->sut->isValidMessage($procedureXml, true);
-        self::assertTrue($isValid);
+        return $procedure;
     }
 }
