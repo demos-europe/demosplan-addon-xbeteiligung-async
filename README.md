@@ -34,9 +34,19 @@ Yml files:
 add `xbeteiligung:` as prefix to xml_root_name in 
 `schema.Planung2BeteiligungBeteiligungKommunalNeu0401.yml`,
 `schema.Planung2BeteiligungBeteiligungKommunalAktualisieren0402.yml`,
-`schema.Planung2BeteiligungBeteiligungKommunalLoeschen0409.yml`
+`schema.Planung2BeteiligungBeteiligungKommunalLoeschen0409.yml`,
+`schema.Planung2BeteiligungBeteiligungRaumordnungNeu0301.yml`
 
 Example - xml_root_name: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
+
+Add the following to enum in xbeteiligung-codes.xsd (search for "0401" then you should find it)
+`<xs:enumeration value="0301">
+    <xs:annotation>
+        <xs:appinfo>
+            <beschreibung>planung2Beteiligung.RaumordnungNeu.0301</beschreibung>
+        </xs:appinfo>
+    </xs:annotation>
+</xs:enumeration>`
 
 comment out `namespace: ...` in `schema.CodeType.yml` for
 `code` and `name`
