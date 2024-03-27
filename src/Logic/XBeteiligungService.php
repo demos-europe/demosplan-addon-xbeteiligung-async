@@ -46,10 +46,12 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalAktualisieren0402\Planung2BeteiligungBeteiligungKommunalAktualisieren0402AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409\Planung2BeteiligungBeteiligungKommunalLoeschen0409AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401\Planung2BeteiligungBeteiligungKommunalNeu0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungNeu0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungNeu0301\Planung2BeteiligungBeteiligungRaumordnungNeu0301AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType;
@@ -197,6 +199,20 @@ class XBeteiligungService
         return $this->serializeData($procedureUpdated402Object);
     }
 
+    public function createXMLFor302(ProcedureInterface $procedure): string
+    {
+        $procedureUpdated302 = new Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302();
+        $procedureUpdated302 = $this->setProductInfo($procedureUpdated302);
+        $procedureUpdated302->setNachrichtenkopf(
+            $this->createMessageHeadFor($procedureUpdated302)
+        );
+        $procedureUpdated302->setNachrichteninhalt(
+            $this->generateMain302MessageContent($procedure)
+        );
+
+        return $this->serializeData($procedureUpdated302);
+    }
+
     /**
      * @throws Exception
      */
@@ -254,6 +270,15 @@ class XBeteiligungService
         $messageContent = new Nachrichteninhalt402();
         $messageContent->setVorgangsID($this->uuid());
         $messageContent->setBeteiligung($this->generateParticipationContentFor401OR402Message($procedure)); // optional
+
+        return $messageContent;
+    }
+
+    private function generateMain302MessageContent(ProcedureInterface $procedure): Nachrichteninhalt302
+    {
+        $messageContent = new Nachrichteninhalt302();
+        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setBeteiligung($this->generateParticipationContentFor301OR302Message($procedure));
 
         return $messageContent;
     }
@@ -722,6 +747,9 @@ class XBeteiligungService
         } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungRaumordnungNeu0301 ) {
             $code = '0301'; // 0301
             //$name = 'planung2Beteiligung.BeteiligungRaumordnungNeu.0301';
+        } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 ) {
+            $code = '0302'; // 0302
+            //$name = 'planung2Beteiligung.RaumordnungAktualisieren.0302';
         } else {
             $this->logger->error('Class '.$messageObject::class.' not supported yet');
             throw new Exception(

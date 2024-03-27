@@ -60,6 +60,13 @@ class XBeteiligungService402Test extends TestCase
         self::assertTrue($isValid);
     }
 
+    public function testPlanung2BeteiligungRaumordnungNeu0302(): void
+    {
+        $procedureXml = $this->sut->createXMLFor302($this->testProcedure);
+        $isValid = $this->sut->isValidMessage($procedureXml, true);
+        self::assertTrue($isValid);
+    }
+
     private function getTestProcedure()
     {
         $gisLayerCategoryInterfaceMock = $this->createMock(GisLayerCategoryInterface::class);

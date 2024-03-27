@@ -1890,6 +1890,13 @@
               </xs:appinfo>
           </xs:annotation>
          </xs:enumeration>
+          <xs:enumeration value="0302">
+              <xs:annotation>
+                  <xs:appinfo>
+                      <beschreibung>planung2Beteiligung.RaumordnungAktualisieren.0302</beschreibung>
+                  </xs:appinfo>
+              </xs:annotation>
+          </xs:enumeration>
          <xs:enumeration value="0401">
             <xs:annotation>
                <xs:appinfo>
