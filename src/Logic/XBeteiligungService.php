@@ -49,9 +49,11 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBetei
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409\Planung2BeteiligungBeteiligungKommunalLoeschen0409AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401\Planung2BeteiligungBeteiligungKommunalNeu0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungNeu0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungNeu0301\Planung2BeteiligungBeteiligungRaumordnungNeu0301AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType;
@@ -228,6 +230,20 @@ class XBeteiligungService
         return $this->serializeData($procedureDeleted409Object);
     }
 
+    public function createXMLFor309(string $procedureId): string
+    {
+        $procedureDeleted409 = new Planung2BeteiligungBeteiligungRaumordnungLoeschen0309();
+        $procedureDeleted409 = $this->setProductInfo($procedureDeleted409);
+        $procedureDeleted409->setNachrichtenkopf(
+            $this->createMessageHeadFor($procedureDeleted409)
+        );
+        $procedureDeleted409->setNachrichteninhalt(
+            $this->generateMain309MessageContent($procedureId)
+        );
+
+        return $this->serializeData($procedureDeleted409);
+    }
+
     private function serializeData($data): string
     {
         $xml = $this->serializer->serialize($data, 'xml');
@@ -289,6 +305,16 @@ class XBeteiligungService
         $messageContent->setVorgangsID($this->uuid());
         $messageContent->setPlanID($procedureId);
         $messageContent->setBeteiligungsID($procedureId); // why does only a 409 Message still has this property?
+
+        return $messageContent;
+    }
+
+    public function generateMain309MessageContent(string $procedureId): Nachrichteninhalt309
+    {
+        $messageContent = new Nachrichteninhalt309();
+        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setPlanID($procedureId);
+        $messageContent->setBeteiligungsID($procedureId);
 
         return $messageContent;
     }
@@ -750,6 +776,9 @@ class XBeteiligungService
         } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 ) {
             $code = '0302'; // 0302
             //$name = 'planung2Beteiligung.RaumordnungAktualisieren.0302';
+        } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungRaumordnungLoeschen0309 ) {
+            $code = '0309'; // 0309
+            //$name = 'planung2Beteiligung.RaumordnungLoeschen.0309';
         } else {
             $this->logger->error('Class '.$messageObject::class.' not supported yet');
             throw new Exception(

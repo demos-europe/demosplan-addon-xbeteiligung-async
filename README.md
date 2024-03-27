@@ -36,7 +36,8 @@ add `xbeteiligung:` as prefix to xml_root_name in
 `schema.Planung2BeteiligungBeteiligungKommunalAktualisieren0402.yml`,
 `schema.Planung2BeteiligungBeteiligungKommunalLoeschen0409.yml`,
 `schema.Planung2BeteiligungBeteiligungRaumordnungNeu0301.yml`,
-`schema.Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302.yml`
+`schema.Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302.yml`,
+`schema.Planung2BeteiligungBeteiligungRaumordnungLoeschen0309.yml`
 
 Example - xml_root_name: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
 
@@ -52,6 +53,13 @@ Add the following to enum in xbeteiligung-codes.xsd (search for "0401" then you 
     <xs:annotation>
         <xs:appinfo>
             <beschreibung>planung2Beteiligung.RaumordnungAktualisieren.0302</beschreibung>
+        </xs:appinfo>
+    </xs:annotation>
+</xs:enumeration>
+<xs:enumeration value="0309">
+    <xs:annotation>
+        <xs:appinfo>
+            <beschreibung>planung2Beteiligung.RaumordnungLoeschen.0309</beschreibung>
         </xs:appinfo>
     </xs:annotation>
 </xs:enumeration>`

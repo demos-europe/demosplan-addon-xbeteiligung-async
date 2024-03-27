@@ -1897,6 +1897,13 @@
                   </xs:appinfo>
               </xs:annotation>
           </xs:enumeration>
+          <xs:enumeration value="0309">
+              <xs:annotation>
+                  <xs:appinfo>
+                      <beschreibung>planung2Beteiligung.RaumordnungLoeschen.0309</beschreibung>
+                  </xs:appinfo>
+              </xs:annotation>
+          </xs:enumeration>
          <xs:enumeration value="0401">
             <xs:annotation>
                <xs:appinfo>
