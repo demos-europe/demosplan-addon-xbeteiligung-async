@@ -9,6 +9,8 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\SingleDocumentInterface;
+use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\RelevantPropertiesForUpdatedProcedure;
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
@@ -26,7 +28,8 @@ class XBeteiligungProcedureChanged
 
     public function __construct(
         private readonly XBeteiligungService $xBeteiligungService,
-        private readonly XBeteiligungDebugger $xBeteiligungDebugger
+        private readonly XBeteiligungDebugger $xBeteiligungDebugger,
+        private readonly PermissionEvaluatorInterface  $permissionEvaluator
     )
     {
     }
@@ -158,10 +161,15 @@ class XBeteiligungProcedureChanged
      */
     private function onProcedureSoftDeleted(ProcedureInterface $procedure): void
     {
-        $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
-        $procedureMessage = $this->xBeteiligungService->createProcedureMessage($xml, $procedure->getId());
-        $this->xBeteiligungService->saveProcedureMessageOnFlush($procedureMessage);
-        $this->xBeteiligungDebugger->createDebugMessageForCreatedXML($procedure, $xml, 'soft deleted');
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_create_procedure_message_0409())) {
+            $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
+            $this->createProcedureDeleteMessage($xml, $procedure);
+        }
+
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_create_procedure_message_0309())) {
+            $xml = $this->xBeteiligungService->createXMLFor309($procedure->getId());
+            $this->createProcedureDeleteMessage($xml, $procedure);
+        }
     }
 
     /**
@@ -169,21 +177,40 @@ class XBeteiligungProcedureChanged
      */
     private function onProcedureUpdated(array $changeSet, ProcedureInterface $procedureAfterUpdate): void
     {
-        if (RelevantPropertiesForUpdatedProcedure::propertyHasChanged($changeSet)) {
-            $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($procedureAfterUpdate);
-            $procedureMessage = $this->xBeteiligungService->createProcedureMessage(
-                $xml,
-                $procedureAfterUpdate->getId()
-            );
-            $this->deleteCurrentProcedureMessageIfExist();
-            $this->xBeteiligungService->saveProcedureMessageOnFlush($procedureMessage);
-            $this->currentProcedureMessage = $procedureMessage->getId();
-            $this->xBeteiligungDebugger->createDebugMessageForCreatedXML(
-                $procedureAfterUpdate,
-                $xml,
-                'updated'
-            );
+        if (RelevantPropertiesForUpdatedProcedure::propertyHasChanged($changeSet)
+        ) {
+            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_create_procedure_message_0402())) {
+                $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($procedureAfterUpdate);
+                $this->createProcedureUpdatedMessage($xml, $procedureAfterUpdate);
+            }
+            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_create_procedure_message_0302())) {
+                $xml = $this->xBeteiligungService->createXMLFor302($procedureAfterUpdate);
+                $this->createProcedureUpdatedMessage($xml, $procedureAfterUpdate);
+            }
         }
+    }
+
+    private function createProcedureUpdatedMessage(string $xml, ProcedureInterface $procedure): void
+    {
+        $procedureMessage = $this->xBeteiligungService->createProcedureMessage(
+            $xml,
+            $procedure->getId()
+        );
+        $this->deleteCurrentProcedureMessageIfExist();
+        $this->xBeteiligungService->saveProcedureMessageOnFlush($procedureMessage);
+        $this->currentProcedureMessage = $procedureMessage->getId();
+        $this->xBeteiligungDebugger->createDebugMessageForCreatedXML(
+            $procedure,
+            $xml,
+            'updated'
+        );
+    }
+
+    private function createProcedureDeleteMessage(string $xml, ProcedureInterface $procedure): void
+    {
+        $procedureMessage = $this->xBeteiligungService->createProcedureMessage($xml, $procedure->getId());
+        $this->xBeteiligungService->saveProcedureMessageOnFlush($procedureMessage);
+        $this->xBeteiligungDebugger->createDebugMessageForCreatedXML($procedure, $xml, 'soft deleted');
     }
 
     private function deleteCurrentProcedureMessageIfExist(): void {
