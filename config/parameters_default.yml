@@ -8,3 +8,6 @@ parameters:
   # the expected Xbeteiligung instance
   xbeteiligung_api_token: ""
 
+  # String to determine which type of procedure messages should be generated.
+  # For Example: Kommunal, Raumordnung or Planfeststellung
+  procedure_message_type: ""

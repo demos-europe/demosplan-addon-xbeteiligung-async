@@ -16,6 +16,36 @@ class Features extends AbstractPermissionMeta
         return new self('feature_read_procedure_message');
     }
 
+    public static function feature_create_procedure_message_0301(): self
+    {
+        return new self('feature_create_procedure_message_0301');
+    }
+
+    public static function feature_create_procedure_message_0302(): self
+    {
+        return new self('feature_create_procedure_message_0302');
+    }
+
+    public static function feature_create_procedure_message_0309(): self
+    {
+        return new self('feature_create_procedure_message_0309');
+    }
+
+    public static function feature_create_procedure_message_0401(): self
+    {
+        return new self('feature_create_procedure_message_0401');
+    }
+
+    public static function feature_create_procedure_message_0402(): self
+    {
+        return new self('feature_create_procedure_message_0402');
+    }
+
+    public static function feature_create_procedure_message_0409(): self
+    {
+        return new self('feature_create_procedure_message_0409');
+    }
+
     /**
      * @inheritDoc
      */
