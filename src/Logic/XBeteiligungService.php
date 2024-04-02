@@ -92,7 +92,7 @@ class XBeteiligungService
     /**
      * @throws Exception
      */
-    public function createProcedureNew401FromObject(ProcedureInterface $procedure): string
+    public function createXMLFor401(ProcedureInterface $procedure): string
     {
         $procedureCreated401Object = new Planung2BeteiligungBeteiligungKommunalNeu0401();
         $procedureCreated401Object = $this->setProductInfo($procedureCreated401Object); // required
@@ -122,7 +122,7 @@ class XBeteiligungService
     /**
      * @throws Exception
      */
-    public function createProcedureUpdate402FromObject(ProcedureInterface $procedure): string
+    public function createXMLFor402(ProcedureInterface $procedure): string
     {
         $procedureUpdated402Object = new Planung2BeteiligungBeteiligungKommunalAktualisieren0402();
         $procedureUpdated402Object = $this->setProductInfo($procedureUpdated402Object); // required
@@ -153,7 +153,7 @@ class XBeteiligungService
     /**
      * @throws Exception
      */
-    public function createProcedureDeleted409FromObject(string $procedureId): string
+    public function createXMLFor409(string $procedureId): string
     {
         $procedureDeleted409Object = new Planung2BeteiligungBeteiligungKommunalLoeschen0409();
         $procedureDeleted409Object = $this->setProductInfo($procedureDeleted409Object); // required

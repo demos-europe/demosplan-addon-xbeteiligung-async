@@ -54,7 +54,7 @@ class XBeteiligungService409Test extends TestCase
 
     public function testPlanung2BeteiligungBeteiligungNeu0409(): void
     {
-        $procedureXml = $this->sut->createProcedureDeleted409FromObject($this->testProcedure->getId());
+        $procedureXml = $this->sut->createXMLFor409($this->testProcedure->getId());
 
         $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);

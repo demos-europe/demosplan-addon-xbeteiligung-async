@@ -54,7 +54,7 @@ class XBeteiligungService402Test extends TestCase
 
     public function testPlanung2BeteiligungBeteiligungNeu0402(): void
     {
-        $procedureXml = $this->sut->createProcedureUpdate402FromObject($this->testProcedure);
+        $procedureXml = $this->sut->createXMLFor402($this->testProcedure);
 
         $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);

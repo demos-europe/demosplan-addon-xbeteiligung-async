@@ -57,7 +57,7 @@ class XBeteiligungService401Test extends TestCase
 
     public function testPlanung2BeteiligungBeteiligungNeu0401(): void
     {
-        $procedureXml = $this->sut->createProcedureNew401FromObject($this->testProcedure);
+        $procedureXml = $this->sut->createXMLFor401($this->testProcedure);
 
         $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);
@@ -72,7 +72,7 @@ class XBeteiligungService401Test extends TestCase
 
     public function testPlanung2BeteiligungBeteiligungNeu0401NoBBox(): void
     {
-        $procedureXml = $this->sut->createProcedureNew401FromObject($this->testProcedureWithoutBBox);
+        $procedureXml = $this->sut->createXMLFor401($this->testProcedureWithoutBBox);
 
         $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);

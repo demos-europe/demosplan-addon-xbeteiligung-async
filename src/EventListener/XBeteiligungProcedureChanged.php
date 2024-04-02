@@ -162,7 +162,7 @@ class XBeteiligungProcedureChanged
     private function onProcedureSoftDeleted(ProcedureInterface $procedure): void
     {
         if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_delete())) {
-            $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
+            $xml = $this->xBeteiligungService->createXMLFor409($procedure->getId());
             $this->createProcedureDeleteMessage($xml, $procedure);
         }
 
@@ -180,7 +180,7 @@ class XBeteiligungProcedureChanged
         if (RelevantPropertiesForUpdatedProcedure::propertyHasChanged($changeSet)
         ) {
             if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_update())) {
-                $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($procedureAfterUpdate);
+                $xml = $this->xBeteiligungService->createXMLFor402($procedureAfterUpdate);
                 $this->createProcedureUpdatedMessage($xml, $procedureAfterUpdate);
             }
             if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_update())) {
