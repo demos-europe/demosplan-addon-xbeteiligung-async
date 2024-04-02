@@ -73,70 +73,6 @@ class XBeteiligungService
     public const XBETEILIGUNG_VERSION = '0.9';
     public const STANDARD = 'XBeteiligung';
     private \JMS\Serializer\Serializer $serializer;
-
-    // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
-    // code: 2000 -> Frühzeitige Behördenbeteiligung
-    // code: 3000 -> Aufstellungsbeschluss -- nicht beteiligungsrelevant
-    // code: 3600 -> Einleitungszustimmung -- nicht beteiligungsrelevant
-    // code: 4000 -> Frühzeitige Öffentlichkeitsbeteiligung
-    // code: 5000 -> Beteiligung Töb
-    // code: 6000 -> öffentliche Auslegung
-    // code: 7000 -> Feststellungsverfahren -- nicht beteiligungsrelevant
-    // code: 8000 -> Schlussphase -- nicht beteiligungsrelevant
-    // code: 9998 -> kein VS // no clue what that means - but it is beteiligungsrelevant
-    private const PUBLICPARTICIPATIONPHASEMAP = [
-        'configuration' => [
-            'code' => '1000',
-            'name' => 'Einleitungsphase',
-        ],
-        'earlyparticipation' => [
-            'code' => '4000',
-            'name' => 'Frühzeitige Öffentlichkeitsbeteiligung',
-        ],
-        'participation' => [
-            'code' => '6000',
-            'name' => 'öffentliche Auslegung',
-        ],
-        'anotherparticipation' => [
-            'code' => '6000',
-            'name' => 'öffentliche Auslegung',
-        ],
-        'evaluating' => [ // todo not sure about this one - pls check
-            'code' => '7000',
-            'name' => 'Feststellungsverfahren',
-        ],
-        'closed' => [
-            'code' => '8000',
-            'name' => 'Schlussphase',
-        ]
-    ];
-    private const INSTITUTIONPARTICIPATIONPHASEMAP = [
-        'configuration' => [
-            'code' => '1000',
-            'name' => 'Einleitungsphase',
-        ],
-        'earlyparticipation' => [
-            'code' => '2000',
-            'name' => 'Frühzeitige Behördenbeteiligung',
-        ],
-        'participation' => [
-            'code' => '5000',
-            'name' => 'Beteiligung Töb',
-        ],
-        'anotherparticipation' => [
-            'code' => '5000',
-            'name' => 'Beteiligung Töb',
-        ],
-        'evaluating' => [ // todo not sure about this one - pls check
-            'code' => '7000',
-            'name' => 'Feststellungsverfahren',
-        ],
-        'closed' => [
-            'code' => '8000',
-            'name' => 'Schlussphase',
-        ]
-    ];
-
     private const NON_EXISTING_CODE = 'work probably in progress';
     private const NON_EXISTING_CODE_NAME =
         'Die XLeitstelle muss im Rahmen der Eintragung von Diensten in das DVDV erstellt werden';
@@ -342,11 +278,11 @@ class XBeteiligungService
         $procedurePhaseCode->setListVersionID('1.0');
         $procedurePhaseCode->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
         //$procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung'); // not expected in validation
-        // find code in self::PUBLICPARTICIPATIONPHASEMAP
 
         $procedurePhaseCodeCode = '4000';
-        if (array_key_exists($procedure->getPublicParticipationPhase(), self::PUBLICPARTICIPATIONPHASEMAP)) {
-            $procedurePhaseCodeCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
+        if (array_key_exists($procedure->getPublicParticipationPhase(), PhaseMapper::PUBLIC_PARTICIPATION)) {
+            $procedurePhaseCodeCode =
+                PhaseMapper::PUBLIC_PARTICIPATION[$procedure->getPublicParticipationPhase()]['code'];
         }
         $procedurePhaseCode->setCode($procedurePhaseCodeCode);
         $participationType->setVerfahrensschrittKommunal($procedurePhaseCode); // required - we want to use it
@@ -406,8 +342,9 @@ class XBeteiligungService
         // find code in self::PUBLICPARTICIPATIONPHASEMAP
 
         $procedurePhaseCodeCode = '4000';
-        if (array_key_exists($procedure->getPublicParticipationPhase(), self::PUBLICPARTICIPATIONPHASEMAP)) {
-            $procedurePhaseCodeCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
+        if (array_key_exists($procedure->getPublicParticipationPhase(), PhaseMapper::PUBLIC_PARTICIPATION)) {
+            $procedurePhaseCodeCode =
+                PhaseMapper::PUBLIC_PARTICIPATION[$procedure->getPublicParticipationPhase()]['code'];
         }
         $procedurePhaseCode->setCode($procedurePhaseCodeCode);
         $participationType->setVerfahrensschritt($procedurePhaseCode); // required - we want to use it
@@ -909,11 +846,11 @@ class XBeteiligungService
         $codeProcedurePhase->setListVersionID('');
         $codeProcedurePhase->setListVersionID('1.0');
         $codeProcedurePhase->setCode(
-            self::INSTITUTIONPARTICIPATIONPHASEMAP[$procedure->getPhase()]['code']
+            PhaseMapper::INSTITUTION_PARTICIPATION[$procedure->getPhase()]['code']
         );
         // not expected in validation
 //        $codeProcedurePhase->setName(
-//            self::INSTITUTIONPARTICIPATIONPHASEMAP[$procedure->getPhase()]['name']
+//            PhaseMapper::INSTITUTION_PARTICIPATION[$procedure->getPhase()]['name']
 //        );
 
         return $codeProcedurePhase;
@@ -925,11 +862,11 @@ class XBeteiligungService
         $codeProcedurePhase->setListVersionID('');
         $codeProcedurePhase->setListVersionID('1.0');
         $codeProcedurePhase->setCode(
-            self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code']
+            PhaseMapper::PUBLIC_PARTICIPATION[$procedure->getPublicParticipationPhase()]['code']
         );
         // not expected in validation
 //        $codeProcedurePhase->setName(
-//            self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['name']
+//            PhaseMapper::PUBLIC_PARTICIPATION[$procedure->getPublicParticipationPhase()]['name']
 //        );
 
         return $codeProcedurePhase;
