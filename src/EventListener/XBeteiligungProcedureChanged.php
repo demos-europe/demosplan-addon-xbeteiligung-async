@@ -161,12 +161,12 @@ class XBeteiligungProcedureChanged
      */
     private function onProcedureSoftDeleted(ProcedureInterface $procedure): void
     {
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_create_procedure_message_0409())) {
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_delete())) {
             $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
             $this->createProcedureDeleteMessage($xml, $procedure);
         }
 
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_create_procedure_message_0309())) {
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_delete())) {
             $xml = $this->xBeteiligungService->createXMLFor309($procedure->getId());
             $this->createProcedureDeleteMessage($xml, $procedure);
         }
@@ -179,11 +179,11 @@ class XBeteiligungProcedureChanged
     {
         if (RelevantPropertiesForUpdatedProcedure::propertyHasChanged($changeSet)
         ) {
-            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_create_procedure_message_0402())) {
+            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_update())) {
                 $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($procedureAfterUpdate);
                 $this->createProcedureUpdatedMessage($xml, $procedureAfterUpdate);
             }
-            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_create_procedure_message_0302())) {
+            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_update())) {
                 $xml = $this->xBeteiligungService->createXMLFor302($procedureAfterUpdate);
                 $this->createProcedureUpdatedMessage($xml, $procedureAfterUpdate);
             }

@@ -33,17 +33,17 @@ class PermissionInitializer implements PermissionInitializerInterface
         if (ProcedureMessageTyp::KOMMUNAL->value === $this->procedureMessageTyp)
         {
             $permissionCollection->configurePermissionInstance(
-                Features::feature_create_procedure_message_0401(),
+                Features::feature_procedure_message_kom_create(),
                 PermissionConditionBuilder::start()->enableAlways()
             );
 
             $permissionCollection->configurePermissionInstance(
-                Features::feature_create_procedure_message_0402(),
+                Features::feature_procedure_message_kom_update(),
                 PermissionConditionBuilder::start()->enableAlways()
             );
 
             $permissionCollection->configurePermissionInstance(
-                Features::feature_create_procedure_message_0409(),
+                Features::feature_procedure_message_kom_delete(),
                 PermissionConditionBuilder::start()->enableAlways()
             );
         }
@@ -51,17 +51,17 @@ class PermissionInitializer implements PermissionInitializerInterface
         if (ProcedureMessageTyp::RAUMORDNUNG->value === $this->procedureMessageTyp)
         {
             $permissionCollection->configurePermissionInstance(
-                Features::feature_create_procedure_message_0301(),
+                Features::feature_procedure_message_rog_create(),
                 PermissionConditionBuilder::start()->enableAlways()
             );
 
             $permissionCollection->configurePermissionInstance(
-                Features::feature_create_procedure_message_0302(),
+                Features::feature_procedure_message_rog_update(),
                 PermissionConditionBuilder::start()->enableAlways()
             );
 
             $permissionCollection->configurePermissionInstance(
-                Features::feature_create_procedure_message_0309(),
+                Features::feature_procedure_message_rog_delete(),
                 PermissionConditionBuilder::start()->enableAlways()
             );
         }

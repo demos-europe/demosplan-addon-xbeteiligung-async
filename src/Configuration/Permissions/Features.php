@@ -16,34 +16,34 @@ class Features extends AbstractPermissionMeta
         return new self('feature_read_procedure_message');
     }
 
-    public static function feature_create_procedure_message_0301(): self
+    public static function feature_procedure_message_rog_create(): self
     {
-        return new self('feature_create_procedure_message_0301');
+        return new self('feature_procedure_message_rog_create');
     }
 
-    public static function feature_create_procedure_message_0302(): self
+    public static function feature_procedure_message_rog_update(): self
     {
-        return new self('feature_create_procedure_message_0302');
+        return new self('feature_procedure_message_rog_update');
     }
 
-    public static function feature_create_procedure_message_0309(): self
+    public static function feature_procedure_message_rog_delete(): self
     {
-        return new self('feature_create_procedure_message_0309');
+        return new self('feature_procedure_message_rog_delete');
     }
 
-    public static function feature_create_procedure_message_0401(): self
+    public static function feature_procedure_message_kom_create(): self
     {
-        return new self('feature_create_procedure_message_0401');
+        return new self('feature_procedure_message_kom_create');
     }
 
-    public static function feature_create_procedure_message_0402(): self
+    public static function feature_procedure_message_kom_update(): self
     {
-        return new self('feature_create_procedure_message_0402');
+        return new self('feature_procedure_message_kom_update');
     }
 
-    public static function feature_create_procedure_message_0409(): self
+    public static function feature_procedure_message_kom_delete(): self
     {
-        return new self('feature_create_procedure_message_0409');
+        return new self('feature_procedure_message_kom_delete');
     }
 
     /**

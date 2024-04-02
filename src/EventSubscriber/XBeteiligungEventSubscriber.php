@@ -43,12 +43,12 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
      */
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_create_procedure_message_0401())) {
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
             $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
             $this->createProcedureMessage($xml, $event->getProcedure());
         }
 
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_create_procedure_message_0301())) {
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
             $xml = $this->xBeteiligungService->createXMLFor301($event->getProcedure());
             $this->createProcedureMessage($xml, $event->getProcedure());
         }
