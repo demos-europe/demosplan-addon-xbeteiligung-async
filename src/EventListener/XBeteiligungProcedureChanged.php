@@ -24,7 +24,7 @@ use Exception;
 class XBeteiligungProcedureChanged
 {
     private UnitOfWork $unitOfWork;
-    private ?string $currentProcedureMessage = null;
+    private array $updatedProcedures = [];
 
     public function __construct(
         private readonly PermissionEvaluatorInterface  $permissionEvaluator,
@@ -59,7 +59,7 @@ class XBeteiligungProcedureChanged
                 continue;
             }
             $changeSet = $this->unitOfWork->getEntityChangeSet($procedureSettings);
-            $this->onProcedureChanged($procedureSettings->getProcedure(), $changeSet);
+            $this->addUniqueRelevantProcedure($changeSet, $procedureSettings->getProcedure());
         }
 
         foreach ($proceduresToUpdate as $procedure) {
@@ -67,22 +67,22 @@ class XBeteiligungProcedureChanged
                 continue;
             }
             $changeSet = $this->unitOfWork->getEntityChangeSet($procedure);
-            $this->onProcedureChanged($procedure, $changeSet);
+            $this->addUniqueRelevantProcedure($changeSet, $procedure);
         }
 
         foreach ($elementsToUpdate as $elements) {
-            if (!$elements->getEnabled() && !$elements->getProcedure()->getMaster()) {
-                $changeSet = $this->unitOfWork->getEntityChangeSet($elements);
-                if (isset($changeSet['enabled']) && false === $changeSet['enabled'][1]) {
-                    $this->onProcedureChanged($elements->getProcedure(), $changeSet);
-                }
-                continue;
-            }
             if ($elements->getProcedure()->getMaster()) {
                 continue;
             }
+            if (!$elements->getEnabled()) {
+                $changeSet = $this->unitOfWork->getEntityChangeSet($elements);
+                if (isset($changeSet['enabled']) && false === $changeSet['enabled'][1]) {
+                    $this->addUniqueRelevantProcedure($changeSet, $elements->getProcedure());
+                }
+                continue;
+            }
             $changeSet = $this->unitOfWork->getEntityChangeSet($elements);
-            $this->onProcedureChanged($elements->getProcedure(), $changeSet);
+            $this->addUniqueRelevantProcedure($changeSet, $elements->getProcedure());
         }
 
         foreach ($singleDocumentsToInsert as $singleDocument) {
@@ -90,7 +90,7 @@ class XBeteiligungProcedureChanged
                 continue;
             }
             $this->xBeteiligungService->getPlanningDocumentsLinkCreator()->setNewSingleDocument($singleDocument);
-            $this->onProcedureChanged($singleDocument->getProcedure(), ['new_single_document' => '']);
+            $this->addUniqueRelevantProcedure(['new_single_document' => ''], $singleDocument->getProcedure());
         }
 
         foreach ($singleDocumentsToDelete as $singleDocument) {
@@ -99,7 +99,7 @@ class XBeteiligungProcedureChanged
             }
             $this->xBeteiligungService->getPlanningDocumentsLinkCreator()
                 ->addDeletedSingleDocument($singleDocument->getId());
-            $this->onProcedureChanged($singleDocument->getProcedure(), ['delete_single_document' => '']);
+            $this->addUniqueRelevantProcedure(['delete_single_document' => ''], $singleDocument->getProcedure());
         }
 
         foreach ($singleDocumentsToUpdate as $singleDocument) {
@@ -111,12 +111,16 @@ class XBeteiligungProcedureChanged
                 if (isset($changeSet['visible']) && false === $changeSet['visible'][1]) {
                     $this->xBeteiligungService->getPlanningDocumentsLinkCreator()
                         ->setUpdatedSingleDocument($singleDocument);
-                    $this->onProcedureChanged($singleDocument->getProcedure(), ['update_single_document' => '']);
+                    $this->addUniqueRelevantProcedure(['update_single_document' => ''], $singleDocument->getProcedure());
                 }
                 continue;
             }
             $this->xBeteiligungService->getPlanningDocumentsLinkCreator()->setUpdatedSingleDocument($singleDocument);
-            $this->onProcedureChanged($singleDocument->getProcedure(), ['update_single_document' => '']);
+            $this->addUniqueRelevantProcedure(['update_single_document' => ''], $singleDocument->getProcedure());
+        }
+
+        foreach ($this->updatedProcedures as $updatedProcedure) {
+            $this->onProcedureChanged($updatedProcedure);
         }
     }
 
@@ -149,11 +153,11 @@ class XBeteiligungProcedureChanged
     /**
      * @throws Exception
      */
-    public function onProcedureChanged(ProcedureInterface $procedure, array $changeSet): void
+    public function onProcedureChanged(ProcedureInterface $procedure): void
     {
         $procedure->getDeleted()
             ? $this->onProcedureSoftDeleted($procedure)
-            : $this->onProcedureUpdated($changeSet, $procedure);
+            : $this->onProcedureUpdated($procedure);
     }
 
     /** The procedure still exists, only a delte flag is set.
@@ -175,18 +179,15 @@ class XBeteiligungProcedureChanged
     /**
      * @throws Exception
      */
-    private function onProcedureUpdated(array $changeSet, ProcedureInterface $procedureAfterUpdate): void
+    private function onProcedureUpdated(ProcedureInterface $procedureAfterUpdate): void
     {
-        if (RelevantPropertiesForUpdatedProcedure::propertyHasChanged($changeSet)
-        ) {
-            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_update())) {
-                $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($procedureAfterUpdate);
-                $this->createProcedureUpdatedMessage($xml, $procedureAfterUpdate);
-            }
-            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_update())) {
-                $xml = $this->xBeteiligungService->createXMLFor302($procedureAfterUpdate);
-                $this->createProcedureUpdatedMessage($xml, $procedureAfterUpdate);
-            }
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_update())) {
+            $xml = $this->xBeteiligungService->createProcedureUpdate402FromObject($procedureAfterUpdate);
+            $this->createProcedureUpdatedMessage($xml, $procedureAfterUpdate);
+        }
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_update())) {
+            $xml = $this->xBeteiligungService->createXMLFor302($procedureAfterUpdate);
+            $this->createProcedureUpdatedMessage($xml, $procedureAfterUpdate);
         }
     }
 
@@ -196,9 +197,7 @@ class XBeteiligungProcedureChanged
             $xml,
             $procedure->getId()
         );
-        $this->deleteCurrentProcedureMessageIfExist();
         $this->xBeteiligungService->saveProcedureMessageOnFlush($procedureMessage);
-        $this->currentProcedureMessage = $procedureMessage->getId();
         $this->xBeteiligungDebugger->createDebugMessageForCreatedXML(
             $procedure,
             $xml,
@@ -213,9 +212,11 @@ class XBeteiligungProcedureChanged
         $this->xBeteiligungDebugger->createDebugMessageForCreatedXML($procedure, $xml, 'soft deleted');
     }
 
-    private function deleteCurrentProcedureMessageIfExist(): void {
-        if (null !== $this->currentProcedureMessage) {
-            $this->xBeteiligungService->deleteProcedureMessageOnFlush($this->currentProcedureMessage);
+    private function addUniqueRelevantProcedure(array $changeSet, ProcedureInterface $updatedProcedure): void
+    {
+        if (RelevantPropertiesForUpdatedProcedure::propertyHasChanged($changeSet) &&
+            !array_key_exists($updatedProcedure->getId(), $this->updatedProcedures)) {
+            $this->updatedProcedures[$updatedProcedure->getId()] = $updatedProcedure;
         }
     }
 }
