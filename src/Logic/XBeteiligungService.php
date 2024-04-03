@@ -66,6 +66,7 @@ use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
 use Psr\Log\LoggerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class XBeteiligungService
@@ -364,7 +365,7 @@ class XBeteiligungService
                 $this->router->generate(
                     'DemosPlan_procedure_public_detail',
                     ['procedure' => $procedure->getId()],
-                    RouterInterface::ABSOLUTE_URL
+                    UrlGeneratorInterface::ABSOLUTE_URL
                 )
             );
         }
@@ -437,7 +438,7 @@ class XBeteiligungService
                 $this->router->generate(
                     'DemosPlan_procedure_public_detail',
                     ['procedure' => $procedure->getId()],
-                    RouterInterface::ABSOLUTE_URL
+                    UrlGeneratorInterface::ABSOLUTE_URL
                 )
             );
         }
