@@ -22,9 +22,9 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly XBeteiligungService $xBeteiligungService,
+        private readonly PermissionEvaluatorInterface $permissionEvaluator,
         private readonly XBeteiligungDebugger $xBeteiligungDebugger,
-        private readonly PermissionEvaluatorInterface $permissionEvaluator
+        private readonly XBeteiligungService $xBeteiligungService
     ) {
     }
 
