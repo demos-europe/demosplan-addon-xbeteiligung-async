@@ -15,6 +15,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungType
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensunterlagetypType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageType;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class PlanningDocumentsLinkCreator
@@ -178,7 +179,7 @@ class PlanningDocumentsLinkCreator
             $this->router->generate(
                 'core_file_procedure',
                 ['procedureId' => $procedureId, 'hash' => $fileInfo->getHash()],
-                RouterInterface::ABSOLUTE_URL
+                UrlGeneratorInterface::ABSOLUTE_URL
             )
         );
     }
@@ -196,7 +197,7 @@ class PlanningDocumentsLinkCreator
             $this->router->generate(
                 'DemosPlan_public_plandocument_paragraph',
                 ['procedure' => $procedureId, 'elementId' => $elementId],
-                RouterInterface::ABSOLUTE_URL
+                UrlGeneratorInterface::ABSOLUTE_URL
             )
         );
     }
