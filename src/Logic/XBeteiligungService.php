@@ -762,22 +762,22 @@ class XBeteiligungService
     {
         if ($messageObject instanceof Planung2BeteiligungBeteiligungKommunalNeu0401) {
             $code = '0401';
-            //$name = 'planung2Beteiligung.BeteiligungKommunalNeu.0401';
+            $name = 'planung2Beteiligung.BeteiligungKommunalNeu.0401';
         } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungKommunalAktualisieren0402) {
             $code = '0402';
-            //$name = 'planung2Beteiligung.BeteiligungKommunalAktualisieren.0402';
+            $name = 'planung2Beteiligung.BeteiligungKommunalAktualisieren.0402';
         } elseif ($messageObject instanceof  Planung2BeteiligungBeteiligungKommunalLoeschen0409) {
             $code = '0409';
-            //$name = 'planung2Beteiligung.BeteiligungKommunalLoeschen.0409';
+            $name = 'planung2Beteiligung.BeteiligungKommunalLoeschen.0409';
         } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungRaumordnungNeu0301 ) {
             $code = '0301'; // 0301
-            //$name = 'planung2Beteiligung.BeteiligungRaumordnungNeu.0301';
+            $name = 'planung2Beteiligung.BeteiligungRaumordnungNeu.0301';
         } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 ) {
             $code = '0302'; // 0302
-            //$name = 'planung2Beteiligung.RaumordnungAktualisieren.0302';
+            $name = 'planung2Beteiligung.RaumordnungAktualisieren.0302';
         } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungRaumordnungLoeschen0309 ) {
             $code = '0309'; // 0309
-            //$name = 'planung2Beteiligung.RaumordnungLoeschen.0309';
+            $name = 'planung2Beteiligung.RaumordnungLoeschen.0309';
         } else {
             $this->logger->error('Class '.$messageObject::class.' not supported yet');
             throw new Exception(
@@ -790,7 +790,7 @@ class XBeteiligungService
         $messageTypeCode = new CodeXBeteiligungNachrichtenType();
         $messageTypeCode->setListURI('urn:xoev-de:xleitstelle:codeliste:xbeteiligung-nachrichten');
         $messageTypeCode->setListVersionID('1.0');
-        //$messageTypeCode->setName($name); // not expected in validation
+        $messageTypeCode->setName($name);
         $messageTypeCode->setCode($code);
 
         // id has to match pattern: '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
