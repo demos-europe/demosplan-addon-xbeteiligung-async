@@ -12,11 +12,11 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class PermissionInitializer implements PermissionInitializerInterface
 {
     private bool $restrictedAccess;
-    private string $procedureMessageTyp;
+    private string $procedureMessageType;
     public function __construct(GlobalConfigInterface $globalConfig, ParameterBagInterface $parameterBag)
     {
         $this->restrictedAccess = $globalConfig->hasProcedureUserRestrictedAccess();
-        $this->procedureMessageTyp = $parameterBag->get('procedure_message_type');
+        $this->procedureMessageType = $parameterBag->get('procedure_message_type');
     }
 
     /**
@@ -30,7 +30,7 @@ class PermissionInitializer implements PermissionInitializerInterface
                 ->enableAlways()
         );
 
-        if (ProcedureMessageTyp::KOMMUNAL->value === $this->procedureMessageTyp)
+        if (ProcedureMessageTyp::KOMMUNAL->value === $this->procedureMessageType)
         {
             $permissionCollection->configurePermissionInstance(
                 Features::feature_procedure_message_kom_create(),
@@ -48,7 +48,7 @@ class PermissionInitializer implements PermissionInitializerInterface
             );
         }
 
-        if (ProcedureMessageTyp::RAUMORDNUNG->value === $this->procedureMessageTyp)
+        if (ProcedureMessageTyp::RAUMORDNUNG->value === $this->procedureMessageType)
         {
             $permissionCollection->configurePermissionInstance(
                 Features::feature_procedure_message_rog_create(),
