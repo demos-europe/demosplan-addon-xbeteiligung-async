@@ -77,6 +77,8 @@ class XBeteiligungService402Test extends TestCase
         $gisMo->method('getLayers')->willReturn('de_basemapde_web_raster_farbe');
         $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn(new ArrayCollection([$gisMo]));
         $procedureSettingsMock = $this->createMock(ProcedureSettingsInterface::class);
+        $procedureSettingsMock->method('getTerritory')
+            ->willReturn(self::GEO_JSON_FG_TEST);
         $procedureSettingsMock->method('getMapExtent')
             ->willReturn('904640.92309477,7067292.9633037,1195347.6354542,7350657.5148909');
         $this->repoMock->method('getRootLayerCategory')->willReturn($gisLayerCategoryInterfaceMock);

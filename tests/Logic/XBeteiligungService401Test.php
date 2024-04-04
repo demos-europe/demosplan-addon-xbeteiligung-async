@@ -33,6 +33,8 @@ class XBeteiligungService401Test extends TestCase
 
     private XBeteiligungService $sut;
 
+    private const GEO_JSON_FG_TEST = '{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[1116296.9705734858,6634813.663749559],[1117905.9884860306,6634187.8624979565],[1117301.031359643,6636161.866445964],[1115603.7905328334,6635901.465925163],[1116296.9705734858,6634813.663749559]]]},"properties":null}]}';
+
      protected function setUp(): void
     {
         parent::setUp();
@@ -58,7 +60,6 @@ class XBeteiligungService401Test extends TestCase
     public function testPlanung2BeteiligungBeteiligungNeu0401(): void
     {
         $procedureXml = $this->sut->createProcedureNew401FromObject($this->testProcedure);
-
         $isValid = $this->sut->isValidMessage($procedureXml, true);
         self::assertTrue($isValid);
     }
@@ -142,6 +143,8 @@ class XBeteiligungService401Test extends TestCase
         $procedureSettingsMock = $this->createMock(
             ProcedureSettingsInterface::class
         );
+        $procedureSettingsMock->method('getTerritory')
+            ->willReturn(self::GEO_JSON_FG_TEST);
         if ($withBBox) {
             $procedureSettingsMock->method('getMapExtent')
                 ->willReturn(

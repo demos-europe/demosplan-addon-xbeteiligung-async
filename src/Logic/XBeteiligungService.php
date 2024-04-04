@@ -370,9 +370,8 @@ class XBeteiligungService
             );
         }
 
-        // todo Format wird noch geprüft.
-        $participationType->setGeltungsbereich(''); // required - we dont want to use it
-        $participationType->setRaeumlicheBeschreibung(''); // required - we dont want it
+        $participationType->setGeltungsbereich($procedure->getSettings()->getTerritory());
+        $participationType->setRaeumlicheBeschreibung('');
 
         $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure));
         $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure));
@@ -431,7 +430,7 @@ class XBeteiligungService
 
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
-        ); // optional - we want to use it
+        );
         if (in_array($procedure->getPublicParticipationPhasePermissionset(),
             [ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_READ, ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_WRITE])) {
 
@@ -444,9 +443,8 @@ class XBeteiligungService
             );
         }
 
-        // todo Format wird noch geprüft.
-        $participationType->setGeltungsbereich(''); // required - we dont want to use it
-        $participationType->setRaeumlicheBeschreibung(''); // required - we dont want it
+        $participationType->setGeltungsbereich('');
+        $participationType->setRaeumlicheBeschreibung('');
 
         return $participationType;
     }

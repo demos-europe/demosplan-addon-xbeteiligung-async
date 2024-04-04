@@ -21,7 +21,8 @@ enum RelevantPropertiesForUpdatedProcedure: string
     case PublicParticipationEndDate = 'publicParticipationEndDate';
     case PublicParticipationPhase = 'publicParticipationPhase';
     case Phase = 'phase';
-    case BoundingBox = 'mapExtent'; // why mapExtend? see here: T32377
+    case BoundingBox = 'mapExtent'; // why mapExtend? see here: DPLAN-2012
+    case Territory = 'territory'; // geoJson FG for Geltungsbereich
     case File = 'file';
     case CurrentSlug = 'currentSlug'; // public procedure url
     case Enabled = 'enabled'; // category (element) is enabled in procedure
