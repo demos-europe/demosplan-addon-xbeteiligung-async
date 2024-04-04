@@ -451,16 +451,8 @@ class XBeteiligungService
     }
     private function createNewCodePlanartKommunalType(): CodePlanartKommunalType
     {
-        // todo what do we want here - where is the difference - there are tons more
-        // Quelle AdoRepo: urn-xoev-de-xleitstelle-codeliste-planartkommune_1.0
-        // just wrote down the ones about "Bebauung"
-        // Code: 6_1_QualifizierterBPlan -> Qualifizierter Bebauungsplan
-        // Code: 6_2_VorhabenbezogenerBPlan -> Vorhabenbezogener Bebauungsplan
-        // Code: 6_3_EinfacherBPlan -> Einfacher Bebauungsplan
-        // Code: 6_6_BebauungsplanZurWohnraumversorgung -> Bebauungsplan zur Wohnraumversorgung
-        // Code: 6_Bebauungsplan -> Bebauungsplan
         $planType = new CodePlanartKommunalType();
-        $planType->setCode('6_3_EinfacherBPlan') // easy has to be good right :)
+        $planType->setCode('6_3_EinfacherBPlan')
             ->setName('Einfacher Bebauungsplan')
             ->setListVersionID('1.0')
             ->setListURI('urn:xoev-de:xleitstelle:codeliste:planartkommunal');
@@ -471,9 +463,8 @@ class XBeteiligungService
     private function createNewCodePlanartRaumordnungType(): CodePlanartRaumordnungType
     {
         $planType = new CodePlanartRaumordnungType();
-        // todo: wrong code here, code is not in codeliste:planartraumordnung
-        $planType->setCode('6_3_EinfacherBPlan')
-            ->setName('Einfacher Bebauungsplan')
+        $planType->setCode('3_1_Regionalplan')
+            ->setName('Regionalplan')
             ->setListVersionID('1.0')
             ->setListURI('urn:xoev-de:xleitstelle:codeliste:planartraumordnung');
 
