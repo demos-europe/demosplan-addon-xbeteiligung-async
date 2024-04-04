@@ -461,7 +461,7 @@ class XBeteiligungService
         // Code: 6_Bebauungsplan -> Bebauungsplan
         $planType = new CodePlanartKommunalType();
         $planType->setCode('6_3_EinfacherBPlan') // easy has to be good right :)
-        //->setName('Einfacher Bebauungsplan') not expected in validation
+            ->setName('Einfacher Bebauungsplan')
             ->setListVersionID('1.0')
             ->setListURI('urn:xoev-de:xleitstelle:codeliste:planartkommunal');
 
@@ -471,7 +471,9 @@ class XBeteiligungService
     private function createNewCodePlanartRaumordnungType(): CodePlanartRaumordnungType
     {
         $planType = new CodePlanartRaumordnungType();
+        // todo: wrong code here, code is not in codeliste:planartraumordnung
         $planType->setCode('6_3_EinfacherBPlan')
+            ->setName('Einfacher Bebauungsplan')
             ->setListVersionID('1.0')
             ->setListURI('urn:xoev-de:xleitstelle:codeliste:planartraumordnung');
 
