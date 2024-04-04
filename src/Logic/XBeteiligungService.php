@@ -419,6 +419,7 @@ class XBeteiligungService
 
         // currently required fields
         $timeSpan = new ZeitraumType();
+        // todo: öffentlichen zeitraum nehmen
         $timeSpan->setBeginn($procedure->getStartDate());
         $timeSpan->setEnde($procedure->getEndDate());
         $participationType->setZeitraum($timeSpan);
