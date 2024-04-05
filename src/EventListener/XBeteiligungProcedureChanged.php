@@ -53,6 +53,8 @@ class XBeteiligungProcedureChanged
         $singleDocumentsToDelete = $this->getDeleted(SingleDocumentInterface::class);
         /** @var array<int, SingleDocumentInterface> $singleDocumentsToUpdate */
         $singleDocumentsToUpdate = $this->getUpdated(SingleDocumentInterface::class);
+        /** @var array<int, ProcedurePhaseInterface> $procedurePhases */
+
 
         foreach ($procedureSettingsToUpdate as $procedureSettings) {
             if ($procedureSettings->getProcedure()->getMaster()) {
