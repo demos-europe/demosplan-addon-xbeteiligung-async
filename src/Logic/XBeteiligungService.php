@@ -438,6 +438,7 @@ class XBeteiligungService
             );
         }
 
+        // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
         $participationType->setGeltungsbereich('');
         $participationType->setRaeumlicheBeschreibung('');
 
