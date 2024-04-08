@@ -342,7 +342,7 @@ class XBeteiligungService
         $procedurePhaseName = 'Frühzeitige Öffentlichkeitsbeteiligung';
         if (array_key_exists($procedure->getPublicParticipationPhase(), self::PUBLICPARTICIPATIONPHASEMAP)) {
             $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
-            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
+            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['name'];
         }
         $procedurePhase->setCode($procedurePhaseCode);
         $procedurePhase->setName($procedurePhaseName);
