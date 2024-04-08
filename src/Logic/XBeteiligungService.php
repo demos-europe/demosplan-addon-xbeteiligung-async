@@ -334,25 +334,21 @@ class XBeteiligungService
 
         $participationType->setPlanartKommunal($this->createNewCodePlanartKommunalType()); // optional
 
-        //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
-        // why is this code present in this layer - i dont get it - email to Stephan is on the way
-        // As far as I understood our meeting - this code should only be present within the institution/participation
-        // type thingies.
-        $procedurePhaseCode = new CodeVerfahrensschrittKommunalType();
-        $procedurePhaseCode->setListVersionID('1.0');
-        $procedurePhaseCode->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
-        //$procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung'); // not expected in validation
-        // find code in self::PUBLICPARTICIPATIONPHASEMAP
-
-        $procedurePhaseCodeCode = '4000';
+        // ********* CAN BE REMOVED WITH NEXT STANDARD UPDATE (HOPEFULLY) **********************************************
+        $procedurePhase = new CodeVerfahrensschrittKommunalType();
+        $procedurePhase->setListVersionID('1.0');
+        $procedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
+        $procedurePhaseCode = '4000';
+        $procedurePhaseName = 'Frühzeitige Öffentlichkeitsbeteiligung';
         if (array_key_exists($procedure->getPublicParticipationPhase(), self::PUBLICPARTICIPATIONPHASEMAP)) {
-            $procedurePhaseCodeCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
+            $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
+            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
         }
-        $procedurePhaseCode->setCode($procedurePhaseCodeCode);
-        $participationType->setVerfahrensschrittKommunal($procedurePhaseCode); // required - we want to use it
-        //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
+        $procedurePhase->setCode($procedurePhaseCode);
+        $procedurePhase->setName($procedurePhaseName);
+        $participationType->setVerfahrensschrittKommunal($procedurePhase); // required - we want to use it
+        // *************************************************************************************************************
 
-        //$participationType->setVerfahrensartKommunal(new CodeVerfahrensartKommunalType); // optional
         $participationType->setBeschreibungPlanungsanlass(str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''))); // optional - we want to use it
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
@@ -393,25 +389,21 @@ class XBeteiligungService
 
         $participationType->setPlanart($this->createNewCodePlanartRaumordnungType()); // optional
 
-        //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
-        // why is this code present in this layer - i dont get it - email to Stephan is on the way
-        // As far as I understood our meeting - this code should only be present within the institution/participation
-        // type thingies.
-        $procedurePhaseCode = new  CodeVerfahrensschrittRaumordnungType();
-        $procedurePhaseCode->setListVersionID('1.0');
-        $procedurePhaseCode->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung');
-        //$procedurePhaseCode->setName('Frühzeitige Öffentlichkeitsbeteiligung'); // not expected in validation
-        // find code in self::PUBLICPARTICIPATIONPHASEMAP
-
-        $procedurePhaseCodeCode = '4000';
+        // ********* CAN BE REMOVED WITH NEXT STANDARD UPDATE (HOPEFULLY) **********************************************
+        $procedurePhase = new  CodeVerfahrensschrittRaumordnungType();
+        $procedurePhase->setListVersionID('1.0');
+        $procedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung');
+        $procedurePhaseCode = '4000';
+        $procedurePhaseName = 'Frühzeitige Öffentlichkeitsbeteiligung';
         if (array_key_exists($procedure->getPublicParticipationPhase(), self::PUBLICPARTICIPATIONPHASEMAP)) {
-            $procedurePhaseCodeCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
+            $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
+            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['name'];
         }
-        $procedurePhaseCode->setCode($procedurePhaseCodeCode);
-        $participationType->setVerfahrensschritt($procedurePhaseCode); // required - we want to use it
-        //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
+        $procedurePhase->setCode($procedurePhaseCode);
+        $procedurePhase->setName($procedurePhaseName);
+        $participationType->setVerfahrensschritt($procedurePhase); // required - we want to use it
+        // *************************************************************************************************************
 
-        //$participationType->setVerfahrensartKommunal(new CodeVerfahrensartKommunalType); // optional
         $participationType->setBeschreibungPlanungsanlass(str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''))); // optional - we want to use it
 
         // currently required fields
