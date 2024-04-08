@@ -404,15 +404,20 @@ class XBeteiligungService
         $participationType->setVerfahrensschritt($procedurePhase); // required - we want to use it
         // *************************************************************************************************************
 
-        $participationType->setBeschreibungPlanungsanlass(str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''))); // optional - we want to use it
+        $participationType->setBeschreibungPlanungsanlass(
+            str_replace(
+                '<br>',
+                "\n",
+                strip_tags($procedure->getExternalDesc() ?? '')
+            )
+        ); // optional - we want to use it
 
         // currently required fields
         $timeSpan = new ZeitraumType();
-        // todo: öffentlichen zeitraum nehmen
-        $timeSpan->setBeginn($procedure->getStartDate());
-        $timeSpan->setEnde($procedure->getEndDate());
+        $timeSpan->setBeginn($procedure->getPublicParticipationStartDate());
+        $timeSpan->setEnde($procedure->getPublicParticipationEndDate());
         $participationType->setZeitraum($timeSpan);
-        //$participationType->setAktuelleMitteilung($this->getInstitutionNewsList($procedure));
+        $participationType->setAktuelleMitteilung($this->getInstitutionNewsList($procedure));
         $participationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         );
