@@ -332,7 +332,6 @@ class XBeteiligungService
         $participationType->setPlanID($procedure->getId()); // required
         $participationType->setPlanname($procedure->getName()); // required
 
-        // $participationType->setArbeitstitel(''); // optional
         $participationType->setPlanartKommunal($this->createNewCodePlanartKommunalType()); // optional
 
         //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
@@ -392,7 +391,6 @@ class XBeteiligungService
         $participationType->setPlanID($procedure->getId()); // required
         $participationType->setPlanname($procedure->getName()); // required
 
-        // $participationType->setArbeitstitel(''); // optional
         $participationType->setPlanart($this->createNewCodePlanartRaumordnungType()); // optional
 
         //todo FLIEGT RAUS setBeteiligungOeffentlichkeit & setBeteiligungTOEB beinhalten das
