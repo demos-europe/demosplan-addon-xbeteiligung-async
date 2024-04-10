@@ -268,8 +268,10 @@ class XBeteiligungService
     private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
     {
         $messageContent = new Nachrichteninhalt401();
-        $messageContent->setVorgangsID($this->uuid());  // required
-        $messageContent->setBeteiligung($this->generateParticipationContentFor401OR402Message($procedure)); // optional
+        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setBeteiligung(
+            $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungKommunalType())
+        );
 
         return $messageContent;
     }
@@ -278,7 +280,9 @@ class XBeteiligungService
     {
         $messageContent = new Nachrichteninhalt301();
         $messageContent->setVorgangsID($this->uuid());
-        $messageContent->setBeteiligung($this->generateParticipationContentFor301OR302Message($procedure));
+        $messageContent->setBeteiligung(
+            $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungRaumordnungType())
+        );
 
         return $messageContent;
     }
@@ -287,7 +291,9 @@ class XBeteiligungService
     {
         $messageContent = new Nachrichteninhalt402();
         $messageContent->setVorgangsID($this->uuid());
-        $messageContent->setBeteiligung($this->generateParticipationContentFor401OR402Message($procedure)); // optional
+        $messageContent->setBeteiligung(
+            $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungKommunalType())
+        );
 
         return $messageContent;
     }
@@ -296,7 +302,9 @@ class XBeteiligungService
     {
         $messageContent = new Nachrichteninhalt302();
         $messageContent->setVorgangsID($this->uuid());
-        $messageContent->setBeteiligung($this->generateParticipationContentFor301OR302Message($procedure));
+        $messageContent->setBeteiligung(
+            $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungRaumordnungType())
+        );
 
         return $messageContent;
     }
@@ -342,8 +350,11 @@ class XBeteiligungService
      * @deprecated This information is (for 0301/0302 will be) moved to another type.
      * See for 0401/0402 {@link self::getPublicProcedurePhaseCodeType()}.
      */
-    private function createCodeType(CodeType $codeType, string $listUri, string $publicParticipationPhase): CodeType
-    {
+    private function createCodeType(
+        CodeVerfahrensschrittKommunalType|CodeVerfahrensschrittRaumordnungType $codeType,
+        string $listUri,
+        string $publicParticipationPhase
+    ): CodeVerfahrensschrittKommunalType|CodeVerfahrensschrittRaumordnungType {
         $codeType->setListVersionID('1.0');
         $codeType->setListURI($listUri);
         $procedurePhaseCode = '4000';
@@ -381,27 +392,20 @@ class XBeteiligungService
         );
     }
 
-    private function generateParticipationContentFor401OR402Message(ProcedureInterface $procedure): BeteiligungKommunalType
-    {
-        $participationType = new BeteiligungKommunalType();
+    /**
+     * @param BeteiligungKommunalType|BeteiligungRaumordnungType    $participationType
+     *
+     * @return BeteiligungKommunalType|BeteiligungRaumordnungType
+     */
+    private function generateParticipationContentForX01OrX02Message(
+        ProcedureInterface $procedure,
+        mixed $participationType
+    ): mixed {
         $participationType->setAkteurVorhaben(
             $this->createAkteurVorhabenType($procedure->getOrga()?->getName() ?? '')
         );
-
-        $participationType->setPlanID($procedure->getId()); // required
-        $participationType->setPlanname($procedure->getName()); // required
-        $participationType->setPlanartKommunal($this->createNewCodePlanartKommunalType()); // optional
-
-        /** @var CodeVerfahrensschrittKommunalType $codeType */
-        $codeType = $this->createCodeType(
-            new CodeVerfahrensschrittKommunalType(),
-            'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal',
-            $procedure->getPublicParticipationPhase()
-        );
-        $participationType->setVerfahrensschrittKommunal(
-            $codeType
-        );
-
+        $participationType->setPlanID($procedure->getId());
+        $participationType->setPlanname($procedure->getName());
         $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
@@ -415,35 +419,50 @@ class XBeteiligungService
                 )
             );
         }
-
-        $participationType->setGeltungsbereich($procedure->getSettings()->getTerritory());
         $participationType->setRaeumlicheBeschreibung('');
 
+        if ($participationType instanceof BeteiligungKommunalType) {
+            $participationType = $this->setBeteiligungKommunalTypeSpecific($participationType, $procedure);
+        }
+
+        if ($participationType instanceof BeteiligungRaumordnungType) {
+            $participationType = $this->setBeteiligungRaumordnungTypeSpecific($participationType, $procedure);
+        }
+
+        return $participationType;
+    }
+
+    private function setBeteiligungKommunalTypeSpecific(
+        BeteiligungKommunalType $participationType,
+        ProcedureInterface $procedure
+    ): BeteiligungKommunalType {
+        $participationType->setPlanartKommunal($this->createNewCodePlanartKommunalType()); // optional
+        $participationType->setVerfahrensschrittKommunal(
+            $this->createCodeType(
+                new CodeVerfahrensschrittKommunalType(),
+                'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal',
+                $procedure->getPublicParticipationPhase()
+            )
+        );
+        $participationType->setGeltungsbereich($procedure->getSettings()->getTerritory());
         $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure));
         $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure));
 
         return $participationType;
     }
 
-    private function generateParticipationContentFor301OR302Message(ProcedureInterface $procedure): BeteiligungRaumordnungType
-    {
-        $participationType = new BeteiligungRaumordnungType();
-        $participationType->setAkteurVorhaben(
-            $this->createAkteurVorhabenType($procedure->getOrga()?->getName() ?? '')
-        );
-
-        $participationType->setPlanID($procedure->getId()); // required
-        $participationType->setPlanname($procedure->getName()); // required
+    private function setBeteiligungRaumordnungTypeSpecific(
+        BeteiligungRaumordnungType $participationType,
+        ProcedureInterface $procedure
+    ): BeteiligungRaumordnungType {
         $participationType->setPlanart($this->createNewCodePlanartRaumordnungType()); // optional
-
-        /** @var CodeVerfahrensschrittRaumordnungType $codeType */
-        $codeType = $this->createCodeType(
-            new  CodeVerfahrensschrittRaumordnungType(),
-            'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung',
-            $procedure->getPublicParticipationPhase()
+        $participationType->setVerfahrensschritt(
+            $this->createCodeType(
+                new  CodeVerfahrensschrittRaumordnungType(),
+                'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung',
+                $procedure->getPublicParticipationPhase()
+            )
         );
-        $participationType->setVerfahrensschritt($codeType);
-
         // ***********currently for 0301 and 0302 required fields*******************************************************
         // deprecated: With next standard update this setters could be removed.
         $participationType->setZeitraum(
@@ -454,26 +473,9 @@ class XBeteiligungService
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         );
         $participationType->setDurchgang(1);
-        // *************************************************************************************************************
-
-        $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
-        $participationType->setFlaechenabgrenzungUrl(
-            $this->generateFaceBoundaryWMSUrl($procedure)
-        );
-        if (self::hasReadOrWritePermissionSet($procedure->getPublicParticipationPhasePermissionset())) {
-            $participationType->setBeteiligungURL(
-                $this->router->generate(
-                    'DemosPlan_procedure_public_detail',
-                    ['procedure' => $procedure->getId()],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                )
-            );
-        }
-
         // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
         $participationType->setGeltungsbereich('');
-        $participationType->setRaeumlicheBeschreibung('');
-
+        // *************************************************************************************************************
         // *** With the next standard update something like this should be available. **********************************
         //$participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure));
         //$participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure));
@@ -481,6 +483,7 @@ class XBeteiligungService
 
         return $participationType;
     }
+
     private function createNewCodePlanartKommunalType(): CodePlanartKommunalType
     {
         $planType = new CodePlanartKommunalType();
