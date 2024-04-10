@@ -435,13 +435,15 @@ class XBeteiligungService
         );
         $participationType->setVerfahrensschritt($codeType);
 
-        $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
-
-        // currently required fields
+        // ***********currently for 0301 and 0302 required fields*******************************************************
+        // deprecated: With next standard update this setters could be removed.
         $participationType->setZeitraum(
             $this->createTimeSpanOfProcedurePhase($procedure->getPublicParticipationPhaseObject())
         );
         $participationType->setAktuelleMitteilung($this->getPublicNewsList($procedure));
+        // *************************************************************************************************************
+
+        $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
         $participationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         );
