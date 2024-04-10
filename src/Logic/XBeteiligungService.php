@@ -474,6 +474,11 @@ class XBeteiligungService
         $participationType->setGeltungsbereich('');
         $participationType->setRaeumlicheBeschreibung('');
 
+        // *** With the next standard update something like this should be available. **********************************
+        //$participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure));
+        //$participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure));
+        // *************************************************************************************************************
+
         return $participationType;
     }
     private function createNewCodePlanartKommunalType(): CodePlanartKommunalType
