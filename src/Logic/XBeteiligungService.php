@@ -434,7 +434,7 @@ class XBeteiligungService
         $timeSpan->setBeginn($procedure->getPublicParticipationStartDate());
         $timeSpan->setEnde($procedure->getPublicParticipationEndDate());
         $participationType->setZeitraum($timeSpan);
-        $participationType->setAktuelleMitteilung($this->getInstitutionNewsList($procedure));
+        $participationType->setAktuelleMitteilung($this->getPublicNewsList($procedure));
         $participationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         );
