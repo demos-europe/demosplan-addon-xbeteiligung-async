@@ -441,14 +441,13 @@ class XBeteiligungService
             $this->createTimeSpanOfProcedurePhase($procedure->getPublicParticipationPhaseObject())
         );
         $participationType->setAktuelleMitteilung($this->getPublicNewsList($procedure));
-        // *************************************************************************************************************
-
-        $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
         $participationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         );
         $participationType->setDurchgang(1);
+        // *************************************************************************************************************
 
+        $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
         );
