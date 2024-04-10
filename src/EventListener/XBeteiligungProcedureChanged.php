@@ -136,7 +136,11 @@ class XBeteiligungProcedureChanged
                     $procedurePhase->getId()
                 );
             }
-            if (null !== $procedure) {
+            if (null === $procedure) {
+                continue;
+            }
+
+            if (!$procedure->getMaster()) {
                 $this->onProcedureChanged($procedure, $changeSet);
             }
         }
