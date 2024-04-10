@@ -370,6 +370,17 @@ class XBeteiligungService
         return $timeSpan->setBeginn($procedurePhase->getStartDate())->setEnde($procedurePhase->getEndDate());
     }
 
+    private static function hasReadOrWritePermissionSet(string $permissionSet): bool
+    {
+        return in_array($permissionSet,
+            [
+                ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_READ,
+                ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_WRITE
+            ],
+            true
+        );
+    }
+
     private function generateParticipationContentFor401OR402Message(ProcedureInterface $procedure): BeteiligungKommunalType
     {
         $participationType = new BeteiligungKommunalType();
@@ -394,10 +405,8 @@ class XBeteiligungService
         $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
-        ); // optional - we want to use it
-        if (in_array($procedure->getPublicParticipationPhasePermissionset(),
-            [ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_READ, ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_WRITE])) {
-
+        );
+        if (self::hasReadOrWritePermissionSet($procedure->getPublicParticipationPhasePermissionset())) {
             $participationType->setBeteiligungURL(
                 $this->router->generate(
                     'DemosPlan_procedure_public_detail',
@@ -451,9 +460,7 @@ class XBeteiligungService
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
         );
-        if (in_array($procedure->getPublicParticipationPhasePermissionset(),
-            [ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_READ, ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_WRITE])) {
-
+        if (self::hasReadOrWritePermissionSet($procedure->getPublicParticipationPhasePermissionset())) {
             $participationType->setBeteiligungURL(
                 $this->router->generate(
                     'DemosPlan_procedure_public_detail',
