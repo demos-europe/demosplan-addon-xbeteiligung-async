@@ -34,6 +34,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeTy
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBeteiligungNachrichtenType;
@@ -319,35 +320,63 @@ class XBeteiligungService
         return $messageContent;
     }
 
+    /**
+     * Creates a type which holds information about the initiator and other actors of a procedure.
+     */
+    private function createAkteurVorhabenType(string $orgaName): AkteurVorhabenType
+    {
+        $actorsOfProcedure = new AkteurVorhabenType();
+        $organisationType = new OrganisationTypeType();
+        $organisationName = new NameOrganisationTypeType();
+        $organisationName->setName($orgaName);
+        $organisationType->setName($organisationName);
+        $actorsOfProcedure->setVeranlasser($organisationType);
+
+        return $actorsOfProcedure;
+    }
+
+    /**
+     * CAN BE REMOVED WITH NEXT STANDARD UPDATE (HOPEFULLY)
+     * Creates a type for holding information about the public participation phase of a procedure.
+     * @deprecated This information is (for 0301/0302 will be) moved to another type.
+     * See for 0401/0402 {@link self::getPublicProcedurePhaseCodeType()}.
+     */
+    private function createCodeType(CodeType $codeType, string $listUri, string $publicParticipationPhase): CodeType
+    {
+        $codeType->setListVersionID('1.0');
+        $codeType->setListURI($listUri);
+        $procedurePhaseCode = '4000';
+        $procedurePhaseName = 'Frühzeitige Öffentlichkeitsbeteiligung';
+        if (array_key_exists($publicParticipationPhase, self::PUBLICPARTICIPATIONPHASEMAP)) {
+            $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASEMAP[$publicParticipationPhase]['code'];
+            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASEMAP[$publicParticipationPhase]['name'];
+        }
+        $codeType->setCode($procedurePhaseCode);
+        $codeType->setName($procedurePhaseName);
+
+        return $codeType;
+    }
+
     private function generateParticipationContentFor401OR402Message(ProcedureInterface $procedure): BeteiligungKommunalType
     {
         $participationType = new BeteiligungKommunalType();
-        $procedureInitiatingOrganisation = new AkteurVorhabenType();
-        $organisationType = new OrganisationTypeType();
-        $organisationName = new NameOrganisationTypeType();
-        $organisationName->setName($procedure->getOrga()?->getName() ?? '');
-        $organisationType->setName($organisationName);
-        $procedureInitiatingOrganisation->setVeranlasser($organisationType);
-        $participationType->setAkteurVorhaben($procedureInitiatingOrganisation);
+        $participationType->setAkteurVorhaben(
+            $this->createAkteurVorhabenType($procedure->getOrga()?->getName() ?? '')
+        );
+
         $participationType->setPlanID($procedure->getId()); // required
         $participationType->setPlanname($procedure->getName()); // required
-
         $participationType->setPlanartKommunal($this->createNewCodePlanartKommunalType()); // optional
 
-        // ********* CAN BE REMOVED WITH NEXT STANDARD UPDATE (HOPEFULLY) **********************************************
-        $procedurePhase = new CodeVerfahrensschrittKommunalType();
-        $procedurePhase->setListVersionID('1.0');
-        $procedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
-        $procedurePhaseCode = '4000';
-        $procedurePhaseName = 'Frühzeitige Öffentlichkeitsbeteiligung';
-        if (array_key_exists($procedure->getPublicParticipationPhase(), self::PUBLICPARTICIPATIONPHASEMAP)) {
-            $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
-            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['name'];
-        }
-        $procedurePhase->setCode($procedurePhaseCode);
-        $procedurePhase->setName($procedurePhaseName);
-        $participationType->setVerfahrensschrittKommunal($procedurePhase); // required - we want to use it
-        // *************************************************************************************************************
+        /** @var CodeVerfahrensschrittKommunalType $codeType */
+        $codeType = $this->createCodeType(
+            new CodeVerfahrensschrittKommunalType(),
+            'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal',
+            $procedure->getPublicParticipationPhase()
+        );
+        $participationType->setVerfahrensschrittKommunal(
+            $codeType
+        );
 
         $participationType->setBeschreibungPlanungsanlass(str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''))); // optional - we want to use it
         $participationType->setFlaechenabgrenzungUrl(
@@ -377,32 +406,21 @@ class XBeteiligungService
     private function generateParticipationContentFor301OR302Message(ProcedureInterface $procedure): BeteiligungRaumordnungType
     {
         $participationType = new BeteiligungRaumordnungType();
-        $procedureInitiatingOrganisation = new AkteurVorhabenType();
-        $organisationType = new OrganisationTypeType();
-        $organisationName = new NameOrganisationTypeType();
-        $organisationName->setName($procedure->getOrga()?->getName() ?? '');
-        $organisationType->setName($organisationName);
-        $procedureInitiatingOrganisation->setVeranlasser($organisationType);
-        $participationType->setAkteurVorhaben($procedureInitiatingOrganisation);
+        $participationType->setAkteurVorhaben(
+            $this->createAkteurVorhabenType($procedure->getOrga()?->getName() ?? '')
+        );
+
         $participationType->setPlanID($procedure->getId()); // required
         $participationType->setPlanname($procedure->getName()); // required
-
         $participationType->setPlanart($this->createNewCodePlanartRaumordnungType()); // optional
 
-        // ********* CAN BE REMOVED WITH NEXT STANDARD UPDATE (HOPEFULLY) **********************************************
-        $procedurePhase = new  CodeVerfahrensschrittRaumordnungType();
-        $procedurePhase->setListVersionID('1.0');
-        $procedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung');
-        $procedurePhaseCode = '4000';
-        $procedurePhaseName = 'Frühzeitige Öffentlichkeitsbeteiligung';
-        if (array_key_exists($procedure->getPublicParticipationPhase(), self::PUBLICPARTICIPATIONPHASEMAP)) {
-            $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code'];
-            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['name'];
-        }
-        $procedurePhase->setCode($procedurePhaseCode);
-        $procedurePhase->setName($procedurePhaseName);
-        $participationType->setVerfahrensschritt($procedurePhase); // required - we want to use it
-        // *************************************************************************************************************
+        /** @var CodeVerfahrensschrittRaumordnungType $codeType */
+        $codeType = $this->createCodeType(
+            new  CodeVerfahrensschrittRaumordnungType(),
+            'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung',
+            $procedure->getPublicParticipationPhase()
+        );
+        $participationType->setVerfahrensschritt($codeType);
 
         $participationType->setBeschreibungPlanungsanlass(
             str_replace(
