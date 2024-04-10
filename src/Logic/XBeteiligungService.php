@@ -357,6 +357,11 @@ class XBeteiligungService
         return $codeType;
     }
 
+    private function getExternalDescriptionOfProcedure(ProcedureInterface $procedure): string
+    {
+        return str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''));
+    }
+
     private function generateParticipationContentFor401OR402Message(ProcedureInterface $procedure): BeteiligungKommunalType
     {
         $participationType = new BeteiligungKommunalType();
@@ -378,7 +383,7 @@ class XBeteiligungService
             $codeType
         );
 
-        $participationType->setBeschreibungPlanungsanlass(str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''))); // optional - we want to use it
+        $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
         ); // optional - we want to use it
@@ -422,13 +427,7 @@ class XBeteiligungService
         );
         $participationType->setVerfahrensschritt($codeType);
 
-        $participationType->setBeschreibungPlanungsanlass(
-            str_replace(
-                '<br>',
-                "\n",
-                strip_tags($procedure->getExternalDesc() ?? '')
-            )
-        ); // optional - we want to use it
+        $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
 
         // currently required fields
         $timeSpan = new ZeitraumType();
