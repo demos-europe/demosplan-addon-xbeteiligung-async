@@ -362,6 +362,13 @@ class XBeteiligungService
         return str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''));
     }
 
+    private function createTimeSpanOfProcedurePhase(DateTime $startDate, DateTime $endDate): ZeitraumType
+    {
+        $timeSpan = new ZeitraumType();
+
+        return $timeSpan->setBeginn($startDate)->setEnde($endDate);
+    }
+
     private function generateParticipationContentFor401OR402Message(ProcedureInterface $procedure): BeteiligungKommunalType
     {
         $participationType = new BeteiligungKommunalType();
@@ -430,10 +437,9 @@ class XBeteiligungService
         $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
 
         // currently required fields
-        $timeSpan = new ZeitraumType();
-        $timeSpan->setBeginn($procedure->getPublicParticipationStartDate());
-        $timeSpan->setEnde($procedure->getPublicParticipationEndDate());
-        $participationType->setZeitraum($timeSpan);
+        $participationType->setZeitraum($this->createTimeSpanOfProcedurePhase(
+            $procedure->getPublicParticipationStartDate(), $procedure->getPublicParticipationEndDate())
+        );
         $participationType->setAktuelleMitteilung($this->getPublicNewsList($procedure));
         $participationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
@@ -491,10 +497,9 @@ class XBeteiligungService
         $institutionParticipationType->setBeteiligungsID($this->uuid());
         // this MetadatenAnlageType should support a base64 container to dump files into, but it does not - S.C. is informed
         //$publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
-        $timeSpan = new ZeitraumType();
-        $timeSpan->setBeginn($procedure->getStartDate());
-        $timeSpan->setEnde($procedure->getEndDate());
-        $institutionParticipationType->setZeitraum($timeSpan); // optional - we want to use it
+        $institutionParticipationType->setZeitraum(
+            $this->createTimeSpanOfProcedurePhase($procedure->getStartDate(), $procedure->getEndDate())
+        );
         $institutionParticipationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
@@ -515,10 +520,9 @@ class XBeteiligungService
         $publicParticipationType->setBeteiligungsID($this->uuid());
         // this MetadatenAnlageType should support a base64 container to dump files into but it does not - S.C. is informed
         // $publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
-        $timeSpan = new ZeitraumType();
-        $timeSpan->setBeginn($procedure->getPublicParticipationStartDate());
-        $timeSpan->setEnde($procedure->getPublicParticipationEndDate());
-        $publicParticipationType->setZeitraum($timeSpan); // optional - we want to use it
+        $publicParticipationType->setZeitraum($this->createTimeSpanOfProcedurePhase(
+            $procedure->getPublicParticipationStartDate(), $procedure->getPublicParticipationEndDate())
+        );
         $publicParticipationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
