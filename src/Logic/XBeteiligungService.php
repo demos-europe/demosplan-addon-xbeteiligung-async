@@ -35,7 +35,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeTy
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBeteiligungNachrichtenType;
