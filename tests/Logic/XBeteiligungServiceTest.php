@@ -9,6 +9,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
@@ -76,15 +77,18 @@ abstract class XBeteiligungServiceTest extends TestCase
         $procedure->method('getOrga')->willReturn($orga);
         $procedure->method('getName')->willReturn('Mars 2050');
         $procedure->method('getDesc')->willReturn('return will be planned on the fly :)');
-        $procedure->method('getStartDate')->willReturn(new DateTime());
-        $procedure->method('getEndDate')->willReturn((new DateTime())->add(new DateInterval('P7D')));
-        $procedure->method('getSettings')->willReturn($procedureSettingsMock);
+        $startDate = new DateTime();
+        $endDate = (new DateTime())->add(new DateInterval('P7D'));
+        $procedure->method('getStartDate')->willReturn($startDate);
+        $procedure->method('getEndDate')->willReturn($endDate);
+        $procedurePhaseMock = $this->createMock(ProcedurePhaseInterface::class);
+        $procedurePhaseMock->method('getStartDate')->willReturn($startDate);
+        $procedurePhaseMock->method('getEndDate')->willReturn($endDate);
+        $procedure->method('getPhaseObject')->willReturn($procedurePhaseMock);
+        $procedure->method('getPublicParticipationPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
         $procedure->method('getPhase')->willReturn('earlyparticipation');
-        $procedure->method('getPublicParticipationStartDate')->willReturn(new DateTime());
-        $procedure->method('getPublicParticipationEndDate')->willReturn(
-            (new DateTime())->add(new DateInterval('P7D'))
-        );
+        $procedure->method('getSettings')->willReturn($procedureSettingsMock);
         $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(
             [
                 'result' => [
