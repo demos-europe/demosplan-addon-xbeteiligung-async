@@ -188,4 +188,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungRaumordnungType:
                 inline: false
                 entry_name: anlage
                 skip_when_empty: true
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/1'

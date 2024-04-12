@@ -472,6 +472,8 @@ class XBeteiligungService
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         );
         $participationType->setDurchgang(1);
+        $participationType->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
+
         // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
         $participationType->setGeltungsbereich('');
         // *************************************************************************************************************

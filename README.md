@@ -69,6 +69,8 @@ comment out `namespace: ...` in `schema.CodeType.yml` for
 
 comment out `namespace: ...` in `src/Soap/metadata/schema.BeteiligungKommunalOeffentlichkeitType.yml`
 for `anlagen`->`xml_list`
+comment out `namespace: ...` in `src/Soap/metadata/schema.BeteiligungRaumordnungType.yml`
+for `anlagen`->`xml_list`
 
 comment out `namespace: ...` in `src/Soap/metadata/schema.MetadatenAnlageType.yml`
 for `bezeichnung` and `anlageart` and `mimeType` and `anhangOderVerlinkung`.
