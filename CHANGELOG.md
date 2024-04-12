@@ -1,6 +1,10 @@
 # Changelog
 
 ## UNRELEASED
+- implement 03xx procedure messages
+- introduce new config parameter and new permissions for creation
+of different procedure messages (03xx, 04xx)
+
 ## v0.5 (2024-02-09)
 - use stable addon installer version
 - add release script

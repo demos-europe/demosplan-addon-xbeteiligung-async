@@ -16,7 +16,7 @@
   },
   "minimum-stability": "stable",
   "require": {
-    "demos-europe/demosplan-addon": "^0.12",
+    "demos-europe/demosplan-addon": "^0.30",
     "demos-europe/demosplan-addon-installer": "^0",
     "doctrine/doctrine-bundle": "^2",
     "ext-dom": "*",
@@ -30,7 +30,7 @@
     "php": ">=8.1 || < 8.3",
     "proj4php/proj4php": "^2.0",
     "symfony/http-client": "^6.2",
-    "symfony/http-kernel": "^6.0",
+    "symfony/http-kernel": "5.*.*",
     "symfony/security-core": "^5.4"
   },
   "config": {
