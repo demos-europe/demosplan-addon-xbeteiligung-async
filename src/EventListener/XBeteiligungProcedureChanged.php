@@ -43,21 +43,23 @@ class XBeteiligungProcedureChanged
     {
         $this->unitOfWork = $eventArgs->getObjectManager()->getUnitOfWork();
 
-        /** @var array<int, ProcedureInterface> $proceduresToUpdate */
-        $proceduresToUpdate = $this->getUpdated(ProcedureInterface::class);
-        /** @var array<int, ProcedureSettingsInterface> $procedureSettingsToUpdate */
-        $procedureSettingsToUpdate = $this->getUpdated(ProcedureSettingsInterface::class);
-        /** @var array<int, ElementsInterface> $elementsToUpdate */
-        $elementsToUpdate = $this->getUpdated(ElementsInterface::class);
-        /** @var array<int, SingleDocumentInterface> $singleDocumentsToInsert */
-        $singleDocumentsToInsert = $this->getInsertions(SingleDocumentInterface::class);
-        /** @var array<int, SingleDocumentInterface> $singleDocumentsToDelete */
-        $singleDocumentsToDelete = $this->getDeleted(SingleDocumentInterface::class);
-        /** @var array<int, SingleDocumentInterface> $singleDocumentsToUpdate */
-        $singleDocumentsToUpdate = $this->getUpdated(SingleDocumentInterface::class);
-        /** @var array<int, ProcedurePhaseInterface> $procedurePhasesToUpdate */
-        $procedurePhasesToUpdate = $this->getUpdated(ProcedurePhaseInterface::class);
+        $this->handleProcedureSettingsUpdates();
+        $this->handleProcedureUpdates();
+        $this->handleElementsUpdates();
+        $this->handleSingleDocumentsInsertions();
+        $this->handleSingleDocumentsDeletions();
+        $this->handleSingleDocumentsUpdates();
+        $this->handleProcedurePhasesUpdates($eventArgs);
 
+        foreach ($this->updatedProcedures as $updatedProcedure) {
+            $this->onProcedureChanged($updatedProcedure);
+        }
+    }
+
+    private function handleProcedureSettingsUpdates(): void
+    {
+        /** @var ProcedureSettingsInterface[] $procedureSettingsToUpdate */
+        $procedureSettingsToUpdate = $this->getUpdated(ProcedureSettingsInterface::class);
 
         foreach ($procedureSettingsToUpdate as $procedureSettings) {
             if ($procedureSettings->getProcedure()->getMaster()) {
@@ -66,6 +68,12 @@ class XBeteiligungProcedureChanged
             $changeSet = $this->unitOfWork->getEntityChangeSet($procedureSettings);
             $this->addUniqueRelevantProcedure($changeSet, $procedureSettings->getProcedure());
         }
+    }
+
+    private function handleProcedureUpdates(): void
+    {
+        /** @var ProcedureInterface[] $proceduresToUpdate */
+        $proceduresToUpdate = $this->getUpdated(ProcedureInterface::class);
 
         foreach ($proceduresToUpdate as $procedure) {
             if ($procedure->getMaster()) {
@@ -74,6 +82,12 @@ class XBeteiligungProcedureChanged
             $changeSet = $this->unitOfWork->getEntityChangeSet($procedure);
             $this->addUniqueRelevantProcedure($changeSet, $procedure);
         }
+    }
+
+    private function handleElementsUpdates(): void
+    {
+        /** @var ElementsInterface[] $elementsToUpdate */
+        $elementsToUpdate = $this->getUpdated(ElementsInterface::class);
 
         foreach ($elementsToUpdate as $elements) {
             if ($elements->getProcedure()->getMaster()) {
@@ -89,6 +103,12 @@ class XBeteiligungProcedureChanged
             $changeSet = $this->unitOfWork->getEntityChangeSet($elements);
             $this->addUniqueRelevantProcedure($changeSet, $elements->getProcedure());
         }
+    }
+
+    private function handleSingleDocumentsInsertions(): void
+    {
+        /** @var SingleDocumentInterface[] $singleDocumentsToInsert */
+        $singleDocumentsToInsert = $this->getInsertions(SingleDocumentInterface::class);
 
         foreach ($singleDocumentsToInsert as $singleDocument) {
             if (!$singleDocument->getElement()->getEnabled() || $singleDocument->getProcedure()->getMaster()) {
@@ -97,6 +117,12 @@ class XBeteiligungProcedureChanged
             $this->xBeteiligungService->getPlanningDocumentsLinkCreator()->setNewSingleDocument($singleDocument);
             $this->addUniqueRelevantProcedure(['new_single_document' => ''], $singleDocument->getProcedure());
         }
+    }
+
+    private function handleSingleDocumentsDeletions(): void
+    {
+        /** @var SingleDocumentInterface[] $singleDocumentsToDelete */
+        $singleDocumentsToDelete = $this->getDeleted(SingleDocumentInterface::class);
 
         foreach ($singleDocumentsToDelete as $singleDocument) {
             if (!$singleDocument->getElement()->getEnabled() || $singleDocument->getProcedure()->getMaster()) {
@@ -106,6 +132,12 @@ class XBeteiligungProcedureChanged
                 ->addDeletedSingleDocument($singleDocument->getId());
             $this->addUniqueRelevantProcedure(['delete_single_document' => ''], $singleDocument->getProcedure());
         }
+    }
+
+    private function handleSingleDocumentsUpdates(): void
+    {
+        /** @var SingleDocumentInterface[] $singleDocumentsToUpdate */
+        $singleDocumentsToUpdate = $this->getUpdated(SingleDocumentInterface::class);
 
         foreach ($singleDocumentsToUpdate as $singleDocument) {
             if (!$singleDocument->getElement()->getEnabled() || $singleDocument->getProcedure()->getMaster()) {
@@ -123,10 +155,12 @@ class XBeteiligungProcedureChanged
             $this->xBeteiligungService->getPlanningDocumentsLinkCreator()->setUpdatedSingleDocument($singleDocument);
             $this->addUniqueRelevantProcedure(['update_single_document' => ''], $singleDocument->getProcedure());
         }
+    }
 
-        foreach ($this->updatedProcedures as $updatedProcedure) {
-            $this->onProcedureChanged($updatedProcedure);
-        }
+    private function handleProcedurePhasesUpdates(OnFlushEventArgs $eventArgs): void
+    {
+        /** @var ProcedurePhaseInterface[] $procedurePhasesToUpdate */
+        $procedurePhasesToUpdate = $this->getUpdated(ProcedurePhaseInterface::class);
 
         foreach ($procedurePhasesToUpdate as $procedurePhase) {
             $changeSet = $this->unitOfWork->getEntityChangeSet($procedurePhase);
