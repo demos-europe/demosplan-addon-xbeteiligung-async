@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+
+## v0.6 (2024-04-12)
 - implement 03xx procedure messages
 - introduce new config parameter and new permissions for creation
 of different procedure messages (03xx, 04xx)
