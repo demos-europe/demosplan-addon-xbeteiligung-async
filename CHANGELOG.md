@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+
+## v0.6.1 (2024-04-12)
 - fix missing documents in 0302 messages
 
 ## v0.6 (2024-04-12)
