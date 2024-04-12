@@ -175,24 +175,7 @@ class XBeteiligungProcedureChanged
                 );
             }
             if (null !== $procedure && !$procedure->getMaster()) {
-                $this->onProcedureChanged($procedure, $changeSet);
-            }
-        }
-
-        foreach ($procedurePhasesToUpdate as $procedurePhase) {
-            $changeSet = $this->unitOfWork->getEntityChangeSet($procedurePhase);
-            /** @var ProcedurePhaseRepositoryInterface $procedurePhaseRepository */
-            $procedurePhaseRepository = $eventArgs->getObjectManager()->getRepository(
-                ProcedurePhaseInterface::class
-            );
-            $procedure = $procedurePhaseRepository->getProcedureByInstitutionPhaseId($procedurePhase->getId());
-            if (null === $procedure) {
-                $procedure = $procedurePhaseRepository->getProcedureByPublicParticipationPhaseId(
-                    $procedurePhase->getId()
-                );
-            }
-            if (null !== $procedure && !$procedure->getMaster()) {
-                $this->onProcedureChanged($procedure, $changeSet);
+                $this->addUniqueRelevantProcedure($changeSet, $procedure);
             }
         }
     }
