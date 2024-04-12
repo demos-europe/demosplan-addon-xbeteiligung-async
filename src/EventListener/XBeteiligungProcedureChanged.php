@@ -7,8 +7,10 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\EventListener;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\SingleDocumentInterface;
+use DemosEurope\DemosplanAddon\Contracts\Repositories\ProcedurePhaseRepositoryInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\RelevantPropertiesForUpdatedProcedure;
@@ -53,6 +55,9 @@ class XBeteiligungProcedureChanged
         $singleDocumentsToDelete = $this->getDeleted(SingleDocumentInterface::class);
         /** @var array<int, SingleDocumentInterface> $singleDocumentsToUpdate */
         $singleDocumentsToUpdate = $this->getUpdated(SingleDocumentInterface::class);
+        /** @var array<int, ProcedurePhaseInterface> $procedurePhasesToUpdate */
+        $procedurePhasesToUpdate = $this->getUpdated(ProcedurePhaseInterface::class);
+
 
         foreach ($procedureSettingsToUpdate as $procedureSettings) {
             if ($procedureSettings->getProcedure()->getMaster()) {
@@ -121,6 +126,23 @@ class XBeteiligungProcedureChanged
 
         foreach ($this->updatedProcedures as $updatedProcedure) {
             $this->onProcedureChanged($updatedProcedure);
+        }
+
+        foreach ($procedurePhasesToUpdate as $procedurePhase) {
+            $changeSet = $this->unitOfWork->getEntityChangeSet($procedurePhase);
+            /** @var ProcedurePhaseRepositoryInterface $procedurePhaseRepository */
+            $procedurePhaseRepository = $eventArgs->getObjectManager()->getRepository(
+                ProcedurePhaseInterface::class
+            );
+            $procedure = $procedurePhaseRepository->getProcedureByInstitutionPhaseId($procedurePhase->getId());
+            if (null === $procedure) {
+                $procedure = $procedurePhaseRepository->getProcedureByPublicParticipationPhaseId(
+                    $procedurePhase->getId()
+                );
+            }
+            if (null !== $procedure && !$procedure->getMaster()) {
+                $this->onProcedureChanged($procedure, $changeSet);
+            }
         }
     }
 
