@@ -24,8 +24,8 @@ class PlanningDocumentsLinkCreator
     private array $newSingleDocuments = [];
     /** @var array<string, SingleDocumentInterface> $updatedSingleDocuments */
     private array $updatedSingleDocuments = [];
-    /** @var string[]|null $deletedSingleDocumentIds */
-    private ?array $deletedSingleDocumentIds = null;
+    /** @var array<string, string<int, string>> $deletedSingleDocumentIds */
+    private array $deletedSingleDocumentIds = [];
 
     public function __construct(
         private readonly FileServiceInterface $fileService,
@@ -45,14 +45,13 @@ class PlanningDocumentsLinkCreator
         $this->updatedSingleDocuments[$procedureId] = $updatedSingleDocument;
     }
 
-    public function addDeletedSingleDocument(string $deletedSingleDocumentId): void
+    public function addDeletedSingleDocument(string $procedureId, string $deletedSingleDocumentId): void
     {
-        if (null === $this->deletedSingleDocumentIds) {
-            $this->deletedSingleDocumentIds = [$deletedSingleDocumentId];
-            return;
+        if (!array_key_exists($procedureId, $this->deletedSingleDocumentIds)) {
+            $this->deletedSingleDocumentIds[$procedureId] = [];
         }
-
-        $this->deletedSingleDocumentIds = array_merge($this->deletedSingleDocumentIds, [$deletedSingleDocumentId]);
+        $this->deletedSingleDocumentIds[$procedureId] =
+            array_merge($this->deletedSingleDocumentIds[$procedureId], [$deletedSingleDocumentId]);
     }
 
     /**
@@ -112,7 +111,8 @@ class PlanningDocumentsLinkCreator
             }
 
             // a single doc or more than one was deleted
-            if (null !== $this->deletedSingleDocumentIds && $this->isDocumentScheduledForDeletion($singleDocument)) {
+            if ([] !== $this->deletedSingleDocumentIds
+                && $this->isDocumentScheduledForDeletion($singleDocument, $procedureId)) {
                 continue;
             }
 
@@ -132,10 +132,10 @@ class PlanningDocumentsLinkCreator
         return $planningDocuments;
     }
 
-    private function isDocumentScheduledForDeletion(SingleDocumentInterface $singleDocument): bool
+    private function isDocumentScheduledForDeletion(SingleDocumentInterface $singleDocument, string $procedureId): bool
     {
-        foreach ($this->deletedSingleDocumentIds as $singleDocumentToDelete) {
-            if ($singleDocumentToDelete === $singleDocument->getId()) {
+        foreach ($this->deletedSingleDocumentIds[$procedureId] as $singleDocumentToDeleteId) {
+            if ($singleDocumentToDeleteId === $singleDocument->getId()) {
                 return true;
             }
         }

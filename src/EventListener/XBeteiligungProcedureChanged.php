@@ -131,7 +131,7 @@ class XBeteiligungProcedureChanged
                 continue;
             }
             $this->xBeteiligungService->getPlanningDocumentsLinkCreator()
-                ->addDeletedSingleDocument($singleDocument->getId());
+                ->addDeletedSingleDocument($singleDocument->getProcedure()->getId(), $singleDocument->getId());
             $this->addUniqueRelevantProcedure(['delete_single_document' => ''], $singleDocument->getProcedure());
         }
     }
