@@ -22,7 +22,8 @@ class PlanningDocumentsLinkCreator
 {
     /** @var array<string, SingleDocumentInterface> $newSingleDocuments */
     private array $newSingleDocuments = [];
-    private ?SingleDocumentInterface $updatedSingleDocument = null;
+    /** @var array<string, SingleDocumentInterface> $updatedSingleDocuments */
+    private array $updatedSingleDocuments = [];
     /** @var string[]|null $deletedSingleDocumentIds */
     private ?array $deletedSingleDocumentIds = null;
 
@@ -39,9 +40,9 @@ class PlanningDocumentsLinkCreator
         $this->newSingleDocuments[$procedureId] = $newSingleDocument;
     }
 
-    public function setUpdatedSingleDocument(SingleDocumentInterface $updatedSingleDocument): void
+    public function addUpdatedSingleDocument(string $procedureId, SingleDocumentInterface $updatedSingleDocument): void
     {
-        $this->updatedSingleDocument = $updatedSingleDocument;
+        $this->updatedSingleDocuments[$procedureId] = $updatedSingleDocument;
     }
 
     public function addDeletedSingleDocument(string $deletedSingleDocumentId): void
@@ -97,14 +98,14 @@ class PlanningDocumentsLinkCreator
 
         foreach($element->getDocuments() as $singleDocument) {
             // a single doc was updated
-            if (null !== $this->updatedSingleDocument
-                && $this->updatedSingleDocument->getVisible()
-                && '' !== $this->updatedSingleDocument->getDocument()
-                && $this->updatedSingleDocument->getId() === $singleDocument->getId()
+            if (array_key_exists($procedureId, $this->updatedSingleDocuments)
+                && $this->updatedSingleDocuments[$procedureId]->getVisible()
+                && '' !== $this->updatedSingleDocuments[$procedureId]->getDocument()
+                && $this->updatedSingleDocuments[$procedureId]->getId() === $singleDocument->getId()
             ) {
                 $planningDocuments[] = $this->createLinkForSingleDoc(
                     $element->getTitle(),
-                    $this->fileService->getFileInfoFromFileString($this->updatedSingleDocument->getDocument()),
+                    $this->fileService->getFileInfoFromFileString($this->updatedSingleDocuments[$procedureId]->getDocument()),
                     $procedureId
                 );
                 continue;

@@ -149,12 +149,13 @@ class XBeteiligungProcedureChanged
                 $changeSet = $this->unitOfWork->getEntityChangeSet($singleDocument);
                 if (isset($changeSet['visible']) && false === $changeSet['visible'][1]) {
                     $this->xBeteiligungService->getPlanningDocumentsLinkCreator()
-                        ->setUpdatedSingleDocument($singleDocument);
+                        ->addUpdatedSingleDocument($singleDocument->getProcedure()->getId(), $singleDocument);
                     $this->addUniqueRelevantProcedure(['update_single_document' => ''], $singleDocument->getProcedure());
                 }
                 continue;
             }
-            $this->xBeteiligungService->getPlanningDocumentsLinkCreator()->setUpdatedSingleDocument($singleDocument);
+            $this->xBeteiligungService->getPlanningDocumentsLinkCreator()
+                ->addUpdatedSingleDocument($singleDocument->getProcedure()->getId(), $singleDocument);
             $this->addUniqueRelevantProcedure(['update_single_document' => ''], $singleDocument->getProcedure());
         }
     }
