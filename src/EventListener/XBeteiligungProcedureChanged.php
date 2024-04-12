@@ -111,10 +111,12 @@ class XBeteiligungProcedureChanged
         $singleDocumentsToInsert = $this->getInsertions(SingleDocumentInterface::class);
 
         foreach ($singleDocumentsToInsert as $singleDocument) {
-            if (!$singleDocument->getElement()->getEnabled() || $singleDocument->getProcedure()->getMaster()) {
+            $procedure = $singleDocument->getProcedure();
+            if ($procedure->getMaster() || !$singleDocument->getElement()->getEnabled()) {
                 continue;
             }
-            $this->xBeteiligungService->getPlanningDocumentsLinkCreator()->setNewSingleDocument($singleDocument);
+            $this->xBeteiligungService->getPlanningDocumentsLinkCreator()
+                ->addNewSingleDocument($procedure->getId(), $singleDocument);
             $this->addUniqueRelevantProcedure(['new_single_document' => ''], $singleDocument->getProcedure());
         }
     }

@@ -20,7 +20,8 @@ use Symfony\Component\Routing\RouterInterface;
 
 class PlanningDocumentsLinkCreator
 {
-    private ?SingleDocumentInterface $newSingleDocument = null;
+    /** @var array<string, SingleDocumentInterface> $newSingleDocuments */
+    private array $newSingleDocuments = [];
     private ?SingleDocumentInterface $updatedSingleDocument = null;
     /** @var string[]|null $deletedSingleDocumentIds */
     private ?array $deletedSingleDocumentIds = null;
@@ -33,9 +34,9 @@ class PlanningDocumentsLinkCreator
     {
     }
 
-    public function setNewSingleDocument(SingleDocumentInterface $newSingleDocument): void
+    public function addNewSingleDocument(string $procedureId, SingleDocumentInterface $newSingleDocument): void
     {
-        $this->newSingleDocument = $newSingleDocument;
+        $this->newSingleDocuments[$procedureId] = $newSingleDocument;
     }
 
     public function setUpdatedSingleDocument(SingleDocumentInterface $updatedSingleDocument): void
@@ -82,10 +83,11 @@ class PlanningDocumentsLinkCreator
     {
         $planningDocuments = [];
         // a new single doc was added
-        if (null !== $this->newSingleDocument && '' !== $this->newSingleDocument->getDocument()) {
+        if (array_key_exists($procedureId, $this->newSingleDocuments)
+            && '' !== $this->newSingleDocuments[$procedureId]->getDocument()) {
             $planningDocuments[] = $this->createLinkForSingleDoc(
                 $element->getTitle(),
-                $this->fileService->getFileInfoFromFileString($this->newSingleDocument->getDocument()),
+                $this->fileService->getFileInfoFromFileString($this->newSingleDocuments[$procedureId]->getDocument()),
                 $procedureId
             );
         }
