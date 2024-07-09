@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.3.2 (2024-07-09)
 - use stable addon installer version
 
 ## v0.3.1 (2023-11-09)
