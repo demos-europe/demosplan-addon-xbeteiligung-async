@@ -62,6 +62,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschr
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
+use Doctrine\Common\Collections\Collection;
 use Exception;
 use InvalidArgumentException;
 use Ramsey\Uuid\Uuid;
@@ -589,6 +590,53 @@ class XBeteiligungService
         return $author;
     }
 
+    private function getAvailableGisLayer(Collection $gisLayers): ?GisLayerInterface
+    {
+        $availableGisLayer = null;
+
+        if (count($gisLayers) === 0)
+        {
+            return $availableGisLayer;
+        }
+
+        // available visible and enabled layers are prioritized to be used as available layer
+        $availableVisibleAndEnabledGisLayer = $gisLayers
+            ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->getType() === 'base')
+            ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->hasDefaultVisibility() === true)
+            ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->isEnabled() === true);
+        if (count($availableVisibleAndEnabledGisLayer) !== 0) {
+            $availableGisLayer = $availableVisibleAndEnabledGisLayer->first();
+
+            return $availableGisLayer;
+        }
+
+        // if there are no available visible and enabled layers then only enabled layer are prioritized now to be used
+        // as available layer
+        $availableEnabledGisLayer = $gisLayers
+            ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->getType() === 'base')
+            ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->isEnabled() === true);
+        if (count($availableEnabledGisLayer) !== 0) {
+            $availableGisLayer = $availableEnabledGisLayer->first();
+
+            return $availableGisLayer;
+        }
+
+        // if there are no available visible and enabled layers and no only enabled layers then only visble layer are
+        // prioritized now to be used as available layer
+        $availableVisibleGisLayer = $gisLayers
+            ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->getType() === 'base')
+            ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->hasDefaultVisibility() === true);
+
+        if (count($availableVisibleGisLayer) !== 0) {
+            $availableGisLayer = $availableVisibleGisLayer->first();
+
+            return $availableGisLayer;
+        }
+
+        // if there are no available visible and enabled layers then the first layer will be used as available layer
+        return $gisLayers->first();
+    }
+
     private function generateFaceBoundaryWMSUrl(ProcedureInterface $procedure): string
     {
         $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
@@ -599,13 +647,9 @@ class XBeteiligungService
         }
 
         $gisLayers = $rootCategory->getGisLayers();
-        $basemapGisLayer = null;
-        /** @var GisLayerInterface $gisLayer */
-        foreach ($gisLayers as $gisLayer) {
-            if ('basemap' === $gisLayer->getName()) {
-                $basemapGisLayer = $gisLayer;
-            }
-        }
+
+        $availableGisLayer = $this->getAvailableGisLayer($gisLayers);
+
         // why mapExtend? see here: T32377
         $bboxArray = explode(',', $procedure->getSettings()->getMapExtent());
         $absWidth = 1;
@@ -620,13 +664,14 @@ class XBeteiligungService
             $absHeight = abs($south - $north);
         }
 
-        $url = $basemapGisLayer->getUrl();
+
+        $url = $availableGisLayer?->getUrl();
         $serviceType = '?SERVICE=WMS';
-        $version = '&VERSION=' . $basemapGisLayer->getLayerVersion();
+        $version = '&VERSION=' . $availableGisLayer?->getLayerVersion();
         $request = '&REQUEST=GetMap';
         $format = '&FORMAT=image%2Fpng';
         $transparent = '&TRANSPARENT=true';
-        $layers = '&LAYERS=' . str_replace(',', '%2C', $basemapGisLayer->getLayers());
+        $layers = '&LAYERS=' . str_replace(',', '%2C', $availableGisLayer?->getLayers());
         $width = '&WIDTH=' . '512';
         $height = '&HEIGHT=' . 512 * ($absHeight / $absWidth);
         $crs = '&CRS=EPSG%3A3857';
@@ -744,8 +789,8 @@ class XBeteiligungService
 
         $postMailBoxAddress = new PostalischeInlandsanschriftPostfachanschriftTypeType();
         $postMailBoxAddress->setPostfach('') // optional
-            ->setPostleitzahl('') // required
-            ->setWohnort('') // required
+        ->setPostleitzahl('') // required
+        ->setWohnort('') // required
         ;
         $postAddress->setPostfach($postMailBoxAddress);
 
@@ -772,8 +817,8 @@ class XBeteiligungService
 
         $postMailBoxAddress = new PostalischeInlandsanschriftPostfachanschriftTypeType();
         $postMailBoxAddress->setPostfach('') // optional
-            ->setPostleitzahl('') // required
-            ->setWohnort('') // required
+        ->setPostleitzahl('') // required
+        ->setWohnort('') // required
         ;
         //$postAddress->setPostfach($postMailBoxAddress); // required not expected in validation
 
