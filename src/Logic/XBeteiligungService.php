@@ -592,11 +592,9 @@ class XBeteiligungService
 
     private function getAvailableGisLayer(Collection $gisLayers): ?GisLayerInterface
     {
-        $availableGisLayer = null;
-
         if (count($gisLayers) === 0)
         {
-            return $availableGisLayer;
+            return null;
         }
 
         // available visible and enabled layers are prioritized to be used as available layer
@@ -605,9 +603,8 @@ class XBeteiligungService
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->hasDefaultVisibility() === true)
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->isEnabled() === true);
         if (count($availableVisibleAndEnabledGisLayer) !== 0) {
-            $availableGisLayer = $availableVisibleAndEnabledGisLayer->first();
 
-            return $availableGisLayer;
+            return $availableVisibleAndEnabledGisLayer->first();
         }
 
         // if there are no available visible and enabled layers then only enabled layer are prioritized now to be used
@@ -616,9 +613,8 @@ class XBeteiligungService
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->getType() === 'base')
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->isEnabled() === true);
         if (count($availableEnabledGisLayer) !== 0) {
-            $availableGisLayer = $availableEnabledGisLayer->first();
 
-            return $availableGisLayer;
+            return $availableEnabledGisLayer->first();
         }
 
         // if there are no available visible and enabled layers and no only enabled layers then only visble layer are
@@ -628,9 +624,8 @@ class XBeteiligungService
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->hasDefaultVisibility() === true);
 
         if (count($availableVisibleGisLayer) !== 0) {
-            $availableGisLayer = $availableVisibleGisLayer->first();
 
-            return $availableGisLayer;
+            return $availableVisibleGisLayer->first();
         }
 
         // if there are no available visible and enabled layers then the first layer will be used as available layer
