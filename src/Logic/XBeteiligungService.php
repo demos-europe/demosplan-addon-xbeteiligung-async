@@ -602,7 +602,7 @@ class XBeteiligungService
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->getType() === 'base')
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->hasDefaultVisibility() === true)
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->isEnabled() === true);
-        if (count($availableVisibleAndEnabledGisLayer) !== 0) {
+        if (0 !== count($availableVisibleAndEnabledGisLayer)) {
 
             return $availableVisibleAndEnabledGisLayer->first();
         }
@@ -612,7 +612,7 @@ class XBeteiligungService
         $availableEnabledGisLayer = $gisLayers
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->getType() === 'base')
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->isEnabled() === true);
-        if (count($availableEnabledGisLayer) !== 0) {
+        if (0 !== count($availableEnabledGisLayer)) {
 
             return $availableEnabledGisLayer->first();
         }
@@ -623,7 +623,7 @@ class XBeteiligungService
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->getType() === 'base')
             ->filter(fn (GisLayerInterface $gisLayer) => $gisLayer->hasDefaultVisibility() === true);
 
-        if (count($availableVisibleGisLayer) !== 0) {
+        if (0 !== count($availableVisibleGisLayer)) {
 
             return $availableVisibleGisLayer->first();
         }
