@@ -27,8 +27,11 @@ use Symfony\Component\Routing\RouterInterface;
 abstract class XBeteiligungServiceTest extends TestCase
 {
     protected MockObject $gisLayerCategoryRepository;
-    protected MockObject $testProcedure;
+    protected MockObject $testProcedureWithBaseMap;
+    protected MockObject $testProcedureWithoutGisMo;
+    protected MockObject $testProcedureWithCustomisedGisMo;
     protected MockObject $testProcedureWithoutBBox;
+    protected array $testProcedures;
     protected MockObject $procedureNewsService;
     protected MockObject $procedureMessageRepository;
     protected XBeteiligungService $sut;
@@ -40,9 +43,17 @@ abstract class XBeteiligungServiceTest extends TestCase
 
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
-        $this->testProcedure = $this->getTestProcedure($this->getTestProcedureSettings());
-        $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false));
+        $this->testProcedureWithBaseMap = $this->getTestProcedure($this->getTestProcedureSettings(), $this->getGisMoWithBaseMap());
+        $this->testProcedureWithoutGisMo = $this->getTestProcedure($this->getTestProcedureSettings(), null);
+        $this->testProcedureWithCustomisedGisMo = $this->getTestProcedure($this->getTestProcedureSettings(), $this->getGisMoWithCustomisedGisMo());
+        $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false), $this->getGisMoWithBaseMap());
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
+
+        $this->testProcedures = [
+            $this->testProcedureWithBaseMap,
+            $this->testProcedureWithoutGisMo,
+            $this->testProcedureWithCustomisedGisMo
+        ];
 
         $serializer = new SerializerFactory();
         $this->sut = new XBeteiligungService(
@@ -56,16 +67,32 @@ abstract class XBeteiligungServiceTest extends TestCase
         );
     }
 
-    protected function getTestProcedure(MockObject $procedureSettingsMock)
+    private function getGisMoWithBaseMap(): GisLayerInterface
     {
-        $gisLayerCategoryInterfaceMock = $this->createMock(
-            GisLayerCategoryInterface::class
-        );
         $gisMo = $this->createMock(GisLayerInterface::class);
         $gisMo->method('getName')->willReturn('basemap');
         $gisMo->method('getUrl')->willReturn('https://sgx.geodatenzentrum.de/wms_basemapde');
         $gisMo->method('getLayerVersion')->willReturn('1.3.0');
         $gisMo->method('getLayers')->willReturn('de_basemapde_web_raster_farbe');
+
+        return $gisMo;
+    }
+        private function getGisMoWithCustomisedGisMo(): GisLayerInterface
+    {
+        $gisMo = $this->createMock(GisLayerInterface::class);
+        $gisMo->method('getName')->willReturn('CustomLayerName');
+        $gisMo->method('getUrl')->willReturn('CustomLayerUrl');
+        $gisMo->method('getLayerVersion')->willReturn('CustomLayerVersion');
+        $gisMo->method('getLayers')->willReturn('CustomLayer');
+
+        return $gisMo;
+    }
+    protected function getTestProcedure(MockObject $procedureSettingsMock, ?GisLayerInterface $gisMo)
+    {
+        $gisLayerCategoryInterfaceMock = $this->createMock(
+            GisLayerCategoryInterface::class
+        );
+
         $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn(new ArrayCollection([$gisMo]));
         $this->gisLayerCategoryRepository->method('getRootLayerCategory')->willReturn($gisLayerCategoryInterfaceMock);
 

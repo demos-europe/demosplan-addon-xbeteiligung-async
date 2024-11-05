@@ -8,14 +8,18 @@ class XBeteiligungService401Test extends XBeteiligungServiceTest
 
     public function testPlanung2BeteiligungBeteiligungNeu0401(): void
     {
-        $procedureXml = $this->sut->createProcedureNew401FromObject($this->testProcedure);
-        $this->validateProcedureXML($procedureXml);
+        foreach ($this->testProcedures as $procedure) {
+            $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
+            $this->validateProcedureXML($procedureXml);
+        }
     }
 
     public function testPlanung2BeteiligungBeteiligungNeu0301(): void
     {
-        $procedureXml = $this->sut->createXMLFor301($this->testProcedure);
-        $this->validateProcedureXML($procedureXml);
+        foreach ($this->testProcedures as $procedure) {
+            $procedureXml = $this->sut->createXMLFor301($procedure);
+            $this->validateProcedureXML($procedureXml);
+        }
     }
 
     public function testPlanung2BeteiligungBeteiligungNeu0401NoBBox(): void
