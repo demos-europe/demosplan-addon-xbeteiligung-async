@@ -98,10 +98,24 @@ abstract class XBeteiligungServiceTest extends TestCase
         return $VisibleGisMo;
     }
 
+    private function createNotEnabledAndNotVisibleGisMOck(): GisLayerInterface
+    {
+        $VisibleGisMo = $this->createMock(GisLayerInterface::class);
+        $VisibleGisMo->method('getName')->willReturn('CustomLayerName');
+        $VisibleGisMo->method('getUrl')->willReturn('CustomLayerUrl');
+        $VisibleGisMo->method('getLayerVersion')->willReturn('CustomLayerVersion');
+        $VisibleGisMo->method('getLayers')->willReturn('CustomLayer');
+        $VisibleGisMo->method('getType')->willReturn('base');
+        $VisibleGisMo->method('hasDefaultVisibility')->willReturn(true);
+        $VisibleGisMo->method('isEnabled')->willReturn(false);
+
+        return $VisibleGisMo;
+    }
+
     public function testGetAvailableGisLayer()
     {
         // In this case the procedure has 3 layers and one of them is enabled and visible, and it should be returned
-        // and used
+        // and used (visible and enabled layers are prioritized to be used as available layer)
         $gisMo = new ArrayCollection();
         $gisMo->add($this->createEnabledGisMOck());
         $gisMo->add($this->createVisibleGisMOck());
@@ -113,7 +127,8 @@ abstract class XBeteiligungServiceTest extends TestCase
         $this->assertEquals($availableGis->isEnabled(),true);
 
         // In this case the procedure has 2 layers and one of them is enabled, and it should be returned
-        // and used
+        // and used (if there are no visible and enabled layers then only enabled layers are prioritized to be used as
+        // available layer)
         $gisMo = new ArrayCollection();
         $gisMo->add($this->createEnabledGisMOck());
         $gisMo->add($this->createVisibleGisMOck());
@@ -122,6 +137,17 @@ abstract class XBeteiligungServiceTest extends TestCase
         $this->assertNotEmpty($availableGis);
         $this->assertEquals($availableGis->hasDefaultVisibility(),false);
         $this->assertEquals($availableGis->isEnabled(),true);
+
+        // In this case the procedure has 2 layers and one of them is visible, and it should be returned
+        // and used  (if there are no visible and enabled layers and no only enabled layers then only visible layers
+        // are prioritized to be used as available layer)
+        $gisMo = new ArrayCollection();
+        $gisMo->add($this->createNotEnabledAndNotVisibleGisMOck());
+        $gisMo->add($this->createVisibleGisMOck());
+        $availableGis= $this->sut->getAvailableGisLayer($gisMo);
+
+        $this->assertNotEmpty($availableGis);
+        $this->assertEquals($availableGis->hasDefaultVisibility(),true);
     }
     protected function getTestProcedure(MockObject $procedureSettingsMock)
     {
@@ -129,6 +155,8 @@ abstract class XBeteiligungServiceTest extends TestCase
             GisLayerCategoryInterface::class
         );
 
+        // we can use here any of the created gisMo, practically the 'getAvailableGisLayer' decide which layer will
+        // be used (see testGetAvailableGisLayer) but for now we can use any of the created mocks.
         $gisMo = $this->createEnabledAndVisibleGisMOck();
         $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn($gisMo);
 
