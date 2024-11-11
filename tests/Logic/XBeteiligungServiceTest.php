@@ -155,8 +155,8 @@ abstract class XBeteiligungServiceTest extends TestCase
             GisLayerCategoryInterface::class
         );
 
-        // practically the 'getAvailableGisLayer' decide which layer will
-        // be used (see testGetAvailableGisLayer) but for now we can use any of the created mocks.
+        // practically the 'getAvailableGisLayer' decide which layer will be used (see testGetAvailableGisLayer) but
+        // for now we can use any of the created mocks.
         $gisMo = $this->createEnabledAndVisibleGisMOck();
         $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn($gisMo);
 
