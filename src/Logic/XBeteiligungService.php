@@ -590,7 +590,7 @@ class XBeteiligungService
         return $author;
     }
 
-    private function getAvailableGisLayer(Collection $gisLayers): ?GisLayerInterface
+    public function getAvailableGisLayer(Collection $gisLayers): ?GisLayerInterface
     {
         if (count($gisLayers) === 0)
         {

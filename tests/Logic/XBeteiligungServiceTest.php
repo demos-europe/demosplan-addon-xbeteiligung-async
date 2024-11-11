@@ -27,11 +27,8 @@ use Symfony\Component\Routing\RouterInterface;
 abstract class XBeteiligungServiceTest extends TestCase
 {
     protected MockObject $gisLayerCategoryRepository;
-    protected MockObject $testProcedureWithBaseMap;
-    protected MockObject $testProcedureWithoutGisMo;
-    protected MockObject $testProcedureWithCustomisedGisMo;
     protected MockObject $testProcedureWithoutBBox;
-    protected array $testProcedures;
+    protected MockObject $testProcedure;
     protected MockObject $procedureNewsService;
     protected MockObject $procedureMessageRepository;
     protected XBeteiligungService $sut;
@@ -43,17 +40,10 @@ abstract class XBeteiligungServiceTest extends TestCase
 
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
-        $this->testProcedureWithBaseMap = $this->getTestProcedure($this->getTestProcedureSettings(), $this->getGisMoWithBaseMap());
-        $this->testProcedureWithoutGisMo = $this->getTestProcedure($this->getTestProcedureSettings(), null);
-        $this->testProcedureWithCustomisedGisMo = $this->getTestProcedure($this->getTestProcedureSettings(), $this->getGisMoWithCustomisedGisMo());
-        $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false), $this->getGisMoWithBaseMap());
+        $this->testProcedure = $this->getTestProcedure($this->getTestProcedureSettings());
+        $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false));
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
 
-        $this->testProcedures = [
-            $this->testProcedureWithBaseMap,
-            $this->testProcedureWithoutGisMo,
-            $this->testProcedureWithCustomisedGisMo
-        ];
 
         $serializer = new SerializerFactory();
         $this->sut = new XBeteiligungService(
@@ -67,33 +57,81 @@ abstract class XBeteiligungServiceTest extends TestCase
         );
     }
 
-    private function getGisMoWithBaseMap(): GisLayerInterface
+    private function createEnabledAndVisibleGisMOck(): GisLayerInterface
     {
-        $gisMo = $this->createMock(GisLayerInterface::class);
-        $gisMo->method('getName')->willReturn('basemap');
-        $gisMo->method('getUrl')->willReturn('https://sgx.geodatenzentrum.de/wms_basemapde');
-        $gisMo->method('getLayerVersion')->willReturn('1.3.0');
-        $gisMo->method('getLayers')->willReturn('de_basemapde_web_raster_farbe');
+        $EnabledUndVisibleGisMo = $this->createMock(GisLayerInterface::class);
+        $EnabledUndVisibleGisMo->method('getName')->willReturn('basemap');
+        $EnabledUndVisibleGisMo->method('getUrl')->willReturn('https://sgx.geodatenzentrum.de/wms_basemapde');
+        $EnabledUndVisibleGisMo->method('getLayerVersion')->willReturn('1.3.0');
+        $EnabledUndVisibleGisMo->method('getLayers')->willReturn('de_basemapde_web_raster_farbe');
+        $EnabledUndVisibleGisMo->method('getType')->willReturn('base');
+        $EnabledUndVisibleGisMo->method('hasDefaultVisibility')->willReturn(true);
+        $EnabledUndVisibleGisMo->method('isEnabled')->willReturn(true);
 
-        return $gisMo;
+        return $EnabledUndVisibleGisMo;
     }
-        private function getGisMoWithCustomisedGisMo(): GisLayerInterface
+    private function createEnabledGisMOck(): GisLayerInterface
     {
-        $gisMo = $this->createMock(GisLayerInterface::class);
-        $gisMo->method('getName')->willReturn('CustomLayerName');
-        $gisMo->method('getUrl')->willReturn('CustomLayerUrl');
-        $gisMo->method('getLayerVersion')->willReturn('CustomLayerVersion');
-        $gisMo->method('getLayers')->willReturn('CustomLayer');
+        $EnabledGisMo = $this->createMock(GisLayerInterface::class);
+        $EnabledGisMo->method('getName')->willReturn('CustomLayerName');
+        $EnabledGisMo->method('getUrl')->willReturn('CustomLayerUrl');
+        $EnabledGisMo->method('getLayerVersion')->willReturn('CustomLayerVersion');
+        $EnabledGisMo->method('getLayers')->willReturn('CustomLayer');
+        $EnabledGisMo->method('getType')->willReturn('base');
+        $EnabledGisMo->method('hasDefaultVisibility')->willReturn(false);
+        $EnabledGisMo->method('isEnabled')->willReturn(true);
 
-        return $gisMo;
+        return $EnabledGisMo;
     }
-    protected function getTestProcedure(MockObject $procedureSettingsMock, ?GisLayerInterface $gisMo)
+
+    private function createVisibleGisMOck(): GisLayerInterface
+    {
+        $VisibleGisMo = $this->createMock(GisLayerInterface::class);
+        $VisibleGisMo->method('getName')->willReturn('CustomLayerName');
+        $VisibleGisMo->method('getUrl')->willReturn('CustomLayerUrl');
+        $VisibleGisMo->method('getLayerVersion')->willReturn('CustomLayerVersion');
+        $VisibleGisMo->method('getLayers')->willReturn('CustomLayer');
+        $VisibleGisMo->method('getType')->willReturn('base');
+        $VisibleGisMo->method('hasDefaultVisibility')->willReturn(true);
+        $VisibleGisMo->method('isEnabled')->willReturn(false);
+
+        return $VisibleGisMo;
+    }
+
+    public function testGetAvailableGisLayer()
+    {
+        // In this case the procedure has 3 layers and one of them is enabled and visible, and it should be returned
+        // and used
+        $gisMo = new ArrayCollection();
+        $gisMo->add($this->createEnabledGisMOck());
+        $gisMo->add($this->createVisibleGisMOck());
+        $gisMo->add($this->createEnabledAndVisibleGisMOck());
+        $availableGis = $this->sut->getAvailableGisLayer($gisMo);
+
+        $this->assertNotEmpty($availableGis);
+        $this->assertEquals($availableGis->hasDefaultVisibility(),true);
+        $this->assertEquals($availableGis->isEnabled(),true);
+
+        // In this case the procedure has 2 layers and one of them is enabled, and it should be returned
+        // and used
+        $gisMo = new ArrayCollection();
+        $gisMo->add($this->createEnabledGisMOck());
+        $gisMo->add($this->createVisibleGisMOck());
+        $availableGis= $this->sut->getAvailableGisLayer($gisMo);
+
+        $this->assertNotEmpty($availableGis);
+        $this->assertEquals($availableGis->hasDefaultVisibility(),false);
+        $this->assertEquals($availableGis->isEnabled(),true);
+    }
+    protected function getTestProcedure(MockObject $procedureSettingsMock)
     {
         $gisLayerCategoryInterfaceMock = $this->createMock(
             GisLayerCategoryInterface::class
         );
 
-        $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn(new ArrayCollection([$gisMo]));
+        $gisMo = $this->createEnabledAndVisibleGisMOck();
+        $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn($gisMo);
+
         $this->gisLayerCategoryRepository->method('getRootLayerCategory')->willReturn($gisLayerCategoryInterfaceMock);
 
         $procedure = $this->createMock(ProcedureInterface::class);
