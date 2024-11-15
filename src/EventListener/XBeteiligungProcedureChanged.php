@@ -54,6 +54,8 @@ class XBeteiligungProcedureChanged
         foreach ($this->updatedProcedures as $updatedProcedure) {
             $this->onProcedureChanged($updatedProcedure);
         }
+
+        $this->updatedProcedures = [];
     }
 
     private function handleProcedureSettingsUpdates(): void
