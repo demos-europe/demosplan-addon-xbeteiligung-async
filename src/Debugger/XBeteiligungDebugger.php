@@ -20,7 +20,7 @@ class XBeteiligungDebugger
         ProcedureInterface $procedure,
         string $xml,
         string $procedureState): void {
-        $this->logger->debug(
+        $this->logger->info(
             'XML created for a ' . $procedureState . ' procedure.',
             [
                 'procedure' => $procedure,

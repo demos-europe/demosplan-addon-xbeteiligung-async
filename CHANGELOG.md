@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Log xml messages in default log level info
+
 ## v0.7 (2024-11-15)
 - add public detail url always to X01 and X02 messages
 
