@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- add public detail url always to X01 and X02 messages
 
 ## v0.6.1 (2024-04-12)
 - fix missing documents in 0302 messages

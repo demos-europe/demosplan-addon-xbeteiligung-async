@@ -409,15 +409,13 @@ class XBeteiligungService
         $participationType->setFlaechenabgrenzungUrl(
             $this->generateFaceBoundaryWMSUrl($procedure)
         );
-        if (self::hasReadOrWritePermissionSet($procedure->getPublicParticipationPhasePermissionset())) {
-            $participationType->setBeteiligungURL(
-                $this->router->generate(
-                    'DemosPlan_procedure_public_detail',
-                    ['procedure' => $procedure->getId()],
-                    UrlGeneratorInterface::ABSOLUTE_URL
-                )
-            );
-        }
+        $participationType->setBeteiligungURL(
+            $this->router->generate(
+                'DemosPlan_procedure_public_detail',
+                ['procedure' => $procedure->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            )
+        );
         $participationType->setRaeumlicheBeschreibung('');
 
         if ($participationType instanceof BeteiligungKommunalType) {
