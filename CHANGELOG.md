@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- refactor XBeteiligungProcedureChanged Event Listener and PlanningDocumentsLinkCreator
+
 ## v0.7 (2024-11-15)
 - add public detail url always to X01 and X02 messages
 
