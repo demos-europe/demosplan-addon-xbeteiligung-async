@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.8 (2024-11-18)
 - Log xml messages in default log level info
 
 ## v0.7 (2024-11-15)
