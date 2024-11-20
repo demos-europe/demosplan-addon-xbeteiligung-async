@@ -3,6 +3,9 @@
 ## UNRELEASED
 - refactor XBeteiligungProcedureChanged Event Listener and PlanningDocumentsLinkCreator
 
+## v0.8 (2024-11-18)
+- Log xml messages in default log level info
+
 ## v0.7 (2024-11-15)
 - add public detail url always to X01 and X02 messages
 
