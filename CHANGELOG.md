@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- fix addon version constraint to allow any minor version higher than 0.30
+
 ## v0.8 (2024-11-18)
 - Log xml messages in default log level info
 
