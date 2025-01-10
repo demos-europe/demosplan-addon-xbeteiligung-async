@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 - refactor XBeteiligungProcedureChanged Event Listener and PlanningDocumentsLinkCreator
+- circumvent removing entities from the unitOfWork computed change set after adding them onFlush
 
 ## v0.9 (2024-12-20)
 - fix addon version constraint to allow any minor version higher than 0.30

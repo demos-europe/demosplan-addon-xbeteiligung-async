@@ -1004,12 +1004,4 @@ class XBeteiligungService
     {
         return $this->planningDocumentsLinkCreator;
     }
-
-    public function getProcedureMessage(string $procedureMessageId): ProcedureMessage {
-        return $this->procedureMessageRepository->get($procedureMessageId);
-    }
-
-    public function deleteProcedureMessageOnFlush(string $procedureMessageId): void {
-        $this->procedureMessageRepository->deleteOnFlush($procedureMessageId);
-    }
 }
