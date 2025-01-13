@@ -471,6 +471,7 @@ class XBeteiligungService
         );
         $participationType->setDurchgang(1);
         $participationType->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
+
         // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
         $participationType->setGeltungsbereich('');
         // *************************************************************************************************************
@@ -1002,13 +1003,5 @@ class XBeteiligungService
     public function getPlanningDocumentsLinkCreator(): PlanningDocumentsLinkCreator
     {
         return $this->planningDocumentsLinkCreator;
-    }
-
-    public function getProcedureMessage(string $procedureMessageId): ProcedureMessage {
-        return $this->procedureMessageRepository->get($procedureMessageId);
-    }
-
-    public function deleteProcedureMessageOnFlush(string $procedureMessageId): void {
-        $this->procedureMessageRepository->deleteOnFlush($procedureMessageId);
     }
 }

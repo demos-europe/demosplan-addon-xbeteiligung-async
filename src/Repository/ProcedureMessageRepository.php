@@ -54,13 +54,6 @@ class ProcedureMessageRepository extends ServiceEntityRepository
         $this->entityManager->getUnitOfWork()->computeChangeSet($classMeta, $procedureMessage);
     }
 
-    public function deleteOnFlush(string $procedureMessageId):void {
-        $classMeta = $this->getEntityManager()->getClassMetadata(ProcedureMessage::class);
-        $procedureMessage = $this->get($procedureMessageId);
-        $this->entityManager->remove($procedureMessage);
-        $this->entityManager->getUnitOfWork()->computeChangeSet($classMeta, $procedureMessage);
-    }
-
     /**
      * @param string $procedureMessageID
      * @return string

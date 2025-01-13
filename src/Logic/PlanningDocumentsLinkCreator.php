@@ -15,14 +15,17 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungType
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensunterlagetypType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageType;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class PlanningDocumentsLinkCreator
 {
-    private ?SingleDocumentInterface $newSingleDocument = null;
-    private ?SingleDocumentInterface $updatedSingleDocument = null;
-    /** @var string[]|null $deletedSingleDocumentIds */
-    private ?array $deletedSingleDocumentIds = null;
+    /** @var array<string, SingleDocumentInterface> $newSingleDocuments */
+    private array $newSingleDocuments = [];
+    /** @var array<string, SingleDocumentInterface> $updatedSingleDocuments */
+    private array $updatedSingleDocuments = [];
+    /** @var array<string, string<int, string>> $deletedSingleDocumentIds */
+    private array $deletedSingleDocumentIds = [];
 
     public function __construct(
         private readonly FileServiceInterface $fileService,
@@ -32,24 +35,23 @@ class PlanningDocumentsLinkCreator
     {
     }
 
-    public function setNewSingleDocument(SingleDocumentInterface $newSingleDocument): void
+    public function addNewSingleDocument(string $procedureId, SingleDocumentInterface $newSingleDocument): void
     {
-        $this->newSingleDocument = $newSingleDocument;
+        $this->newSingleDocuments[$procedureId] = $newSingleDocument;
     }
 
-    public function setUpdatedSingleDocument(SingleDocumentInterface $updatedSingleDocument): void
+    public function addUpdatedSingleDocument(string $procedureId, SingleDocumentInterface $updatedSingleDocument): void
     {
-        $this->updatedSingleDocument = $updatedSingleDocument;
+        $this->updatedSingleDocuments[$procedureId] = $updatedSingleDocument;
     }
 
-    public function addDeletedSingleDocument(string $deletedSingleDocumentId): void
+    public function addDeletedSingleDocument(string $procedureId, string $deletedSingleDocumentId): void
     {
-        if (null === $this->deletedSingleDocumentIds) {
-            $this->deletedSingleDocumentIds = [$deletedSingleDocumentId];
-            return;
+        if (!array_key_exists($procedureId, $this->deletedSingleDocumentIds)) {
+            $this->deletedSingleDocumentIds[$procedureId] = [];
         }
-
-        $this->deletedSingleDocumentIds = array_merge($this->deletedSingleDocumentIds, [$deletedSingleDocumentId]);
+        $this->deletedSingleDocumentIds[$procedureId] =
+            array_merge($this->deletedSingleDocumentIds[$procedureId], [$deletedSingleDocumentId]);
     }
 
     /**
@@ -81,10 +83,11 @@ class PlanningDocumentsLinkCreator
     {
         $planningDocuments = [];
         // a new single doc was added
-        if (null !== $this->newSingleDocument && '' !== $this->newSingleDocument->getDocument()) {
+        if (array_key_exists($procedureId, $this->newSingleDocuments)
+            && '' !== $this->newSingleDocuments[$procedureId]->getDocument()) {
             $planningDocuments[] = $this->createLinkForSingleDoc(
                 $element->getTitle(),
-                $this->fileService->getFileInfoFromFileString($this->newSingleDocument->getDocument()),
+                $this->fileService->getFileInfoFromFileString($this->newSingleDocuments[$procedureId]->getDocument()),
                 $procedureId
             );
         }
@@ -94,21 +97,22 @@ class PlanningDocumentsLinkCreator
 
         foreach($element->getDocuments() as $singleDocument) {
             // a single doc was updated
-            if (null !== $this->updatedSingleDocument
-                && $this->updatedSingleDocument->getVisible()
-                && '' !== $this->updatedSingleDocument->getDocument()
-                && $this->updatedSingleDocument->getId() === $singleDocument->getId()
+            if (array_key_exists($procedureId, $this->updatedSingleDocuments)
+                && $this->updatedSingleDocuments[$procedureId]->getVisible()
+                && '' !== $this->updatedSingleDocuments[$procedureId]->getDocument()
+                && $this->updatedSingleDocuments[$procedureId]->getId() === $singleDocument->getId()
             ) {
                 $planningDocuments[] = $this->createLinkForSingleDoc(
                     $element->getTitle(),
-                    $this->fileService->getFileInfoFromFileString($this->updatedSingleDocument->getDocument()),
+                    $this->fileService->getFileInfoFromFileString($this->updatedSingleDocuments[$procedureId]->getDocument()),
                     $procedureId
                 );
                 continue;
             }
 
             // a single doc or more than one was deleted
-            if (null !== $this->deletedSingleDocumentIds && $this->isDocumentScheduledForDeletion($singleDocument)) {
+            if ([] !== $this->deletedSingleDocumentIds
+                && $this->isDocumentScheduledForDeletion($singleDocument, $procedureId)) {
                 continue;
             }
 
@@ -128,10 +132,10 @@ class PlanningDocumentsLinkCreator
         return $planningDocuments;
     }
 
-    private function isDocumentScheduledForDeletion(SingleDocumentInterface $singleDocument): bool
+    private function isDocumentScheduledForDeletion(SingleDocumentInterface $singleDocument, string $procedureId): bool
     {
-        foreach ($this->deletedSingleDocumentIds as $singleDocumentToDelete) {
-            if ($singleDocumentToDelete === $singleDocument->getId()) {
+        foreach ($this->deletedSingleDocumentIds[$procedureId] as $singleDocumentToDeleteId) {
+            if ($singleDocumentToDeleteId === $singleDocument->getId()) {
                 return true;
             }
         }
@@ -178,7 +182,7 @@ class PlanningDocumentsLinkCreator
             $this->router->generate(
                 'core_file_procedure',
                 ['procedureId' => $procedureId, 'hash' => $fileInfo->getHash()],
-                RouterInterface::ABSOLUTE_URL
+                UrlGeneratorInterface::ABSOLUTE_URL
             )
         );
     }
@@ -196,7 +200,7 @@ class PlanningDocumentsLinkCreator
             $this->router->generate(
                 'DemosPlan_public_plandocument_paragraph',
                 ['procedure' => $procedureId, 'elementId' => $elementId],
-                RouterInterface::ABSOLUTE_URL
+                UrlGeneratorInterface::ABSOLUTE_URL
             )
         );
     }
