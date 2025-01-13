@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+
+## v0.10 (2025-01-13)
 - refactor XBeteiligungProcedureChanged Event Listener and PlanningDocumentsLinkCreator
 - circumvent removing entities from the unitOfWork computed change set after adding them onFlush
 
