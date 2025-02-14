@@ -814,13 +814,13 @@ class XBeteiligungService
             $code = '0309'; // 0309
             $name = 'planung2Beteiligung.RaumordnungLoeschen.0309';
         } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungPlanfeststellungNeu0201 ) {
-            $code = '0201'; // 0309
+            $code = '0201'; // 0201
             $name = 'planung2Beteiligung.BeteiligungPlanfeststellungNeu.0201';
         } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202 ) {
-            $code = '0202'; // 0309
+            $code = '0202'; // 0202
             $name = 'planung2Beteiligung.BeteiligungPlanfeststellungAktualisieren.0202';
         } elseif ($messageObject instanceof Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209 ) {
-            $code = '0209'; // 0309
+            $code = '0209'; // 0209
             $name = 'planung2Beteiligung.BeteiligungPlanfeststellungLoeschen.0209';
         } else {
             $this->logger->error('Class '.$messageObject::class.' not supported yet');

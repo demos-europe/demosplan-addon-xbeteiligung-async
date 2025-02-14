@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic;
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\XBeteiligingService;
 
 class XBeteiligungService402Test extends XBeteiligungServiceTest
 {

@@ -31,11 +31,13 @@ class XBeteiligungMessageHeadG2GTypeBuilder
         $messageIdentification = new IdentifikationNachrichtType();
         $code = new CodeType();
         $messageIdentification->setNachrichtentyp($code);
+        $messageIdentification->setErstellungszeitpunkt(new DateTime());
         $this->head->setIdentifikationNachricht($messageIdentification);
 
         // Reader
         $reader = new BehoerdeTypeType();
         $this->head->setLeser($reader);
+        //TODO: set Verzeichnisdienst
         $leserBehoerdenkennung = new BehoerdenkennungTypeType();
         $reader->setBehoerdenkennung($leserBehoerdenkennung);
         $reader->setBehoerdenname('');

@@ -11,10 +11,13 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\XtaFormatException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XtaProcedureCommonFeatures;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XtaResponseValue;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType\WeitereAkteureAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401\Planung2BeteiligungBeteiligungKommunalNeu0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt401;
+use Doctrine\DBAL\ConnectionException;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
@@ -81,6 +84,9 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
         return $this->xtaBeteiligungMessageFactory->buildProcedureCreatedErrorXtaResponse421($errorTypes, $xmlObject401);
     }
 
+    /**
+     * @throws XtaFormatException
+     */
     public function createNewKommunalProcedureFromXBauleitplanungMessageWithResponse(
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
     ): XtaResponseValue
@@ -90,6 +96,12 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
         return $this->xtaBeteiligungMessageFactory->buildProcedureCreatedXtaResponse411($procedure, $xmlObject401);
     }
 
+    /**
+     * @throws OptimisticLockException
+     * @throws ConnectionException
+     * @throws ORMException
+     * @throws XtaFormatException
+     */
     public function createNewKommunalProcedureFromXBauleitplanungMessage(
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401,
     ): ProcedureInterface
@@ -102,8 +114,18 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
             );
             throw new XtaFormatException('Message content is missing');
         }
-        //TODO: implement procedure creation
-        return $this->createProcedureEntity($messageContent);
+
+        return $this->transactionService->executeAndFlushInTransaction(
+            function () use ($messageContent) {
+                $procedure = $this->createProcedureEntity($messageContent);
+                $participationPhase = new CodeVerfahrensschrittKommunalType();
+                $participationPhase->setCode($messageContent->getVerfahrensschrittKommunal()?->getCode());
+                $procedure->setPhase($participationPhase->getCode());
+                $procedure->getSettings()->setTerritory($messageContent->getGeltungsbereich());
+                return $procedure;
+            }
+        );
+
 
     }
 
@@ -120,9 +142,9 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
     protected function createProcedureArrayFormatFromBeteiligungType(
         BeteiligungKommunalType $procedureObject,
     ): array {
-        /** @var WeitereAkteureAnonymousPHPType|null $otherActors */
-        $otherActors = $procedureObject->getAkteurVorhaben()?->getWeitereAkteure();
-        $orga = $otherActors->getAkteur();
+
+        $initiator = $procedureObject->getAkteurVorhaben();
+        $orga = $initiator?->getVeranlasser();
         if (null === $orga) {
             throw new InvalidArgumentException("Organisation not set");
         }
@@ -137,7 +159,7 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
             'action'                                                        => 'new',
             'r_master'                                                      => 'false',
             'r_copymaster'                                                  => $this->procedureService->getMasterTemplateId(),
-            'r_procedure_type'                                              => $this->procedureTypeService->getProcedureTypeByName('Bauleitplanung')->getId(),
+            'r_procedure_type'                                              => $this->procedureTypeService->getProcedureTypeByName('Beteiligung')->getId(),
             'xtaPlanId'                                                     => $procedureObject->getPlanID(),
         ];
     }

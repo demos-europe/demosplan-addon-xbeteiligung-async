@@ -1051,7 +1051,7 @@ class XBeteiligungResponseMessageFactory
 
         $simpleXML->addAttribute('xmlns:xmlns:xoev-code', 'http://xoev.de/schemata/code/1_0');
         $simpleXML->addAttribute('xmlsn:xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        $simpleXML->addAttribute('xmlsn:xsi:schemaLocation', 'http://xbauleitplanung.de ../xbauleitplanung-beteiligung2planung.xsd');
+        $simpleXML->addAttribute('xmlsn:xsi:schemaLocation', 'https://www.xleitstelle.de/xbeteiligung/1 xbeteiligung-planung2beteiligung.xsd');
 
         return $simpleXML->asXML();
     }
