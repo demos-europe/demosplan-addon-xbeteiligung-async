@@ -33,14 +33,12 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeFehlerartType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBeteiligungNachrichtenType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
@@ -1058,14 +1056,4 @@ class XBeteiligungService
         throw new InvalidArgumentException('Message payload not supported');
     }
 
-    public function getErrorType(string $errorCode, string $errorDescription): FehlerType
-    {
-        $errorCodeType = new CodeFehlerartType();
-        $errorCodeType->setCode($errorCode);
-        $errorType = new FehlerType();
-        $errorType->setBeschreibung($errorDescription);
-        $errorType->setArt($errorCodeType);
-
-        return $errorType;
-    }
 }

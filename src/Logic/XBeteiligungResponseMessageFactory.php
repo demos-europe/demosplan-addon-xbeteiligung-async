@@ -925,21 +925,19 @@ class XBeteiligungResponseMessageFactory
     {
         $headerBuilder->setAgentAgencyIdentificationPrefixListVersionId('', $agentType)
             // Reader => Behoerdenkennung => praefix
-            //TODO: check what is prefix code
-            //->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
+            //TODO: check what is Agency Address, name, contact code
+            ->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
             ->setAgentAgencyIdentificationPrefixName($prefixName, $agentType)
             // Reader => Behoerdenkennung => Kennung
             ->setAgentAgencyIdentificationLabelListURI('', $agentType)
             ->setAgentAgencyIdentificationLabelListVersionID('', $agentType)
             ->setAgentAgencyIdentificationLabelCode('0200', $agentType)
             ->setAgentAgencyIdentificationLabelName($prefixName, $agentType)
-            //TODO: check what is agency name
-            //->setAgentAgencyName('BSW Hamburg', $agentType)
+            ->setAgentAgencyName('BSW Hamburg', $agentType)
             // Reader => Erreichbarkeit[0] (Contact[0]) => Kennung (Label)
             ->setAgentContactChannelCode('01', 0, $agentType)
             ->setAgentContactChannelName('E-Mail', 0, $agentType)
-            //TODO: check what is contact label
-            //->setAgentContactLabel('info@gv.hamburg.de', 0, $agentType)
+            ->setAgentContactLabel('info@gv.hamburg.de', 0, $agentType)
             ->setAgentAddition('', 0, $agentType)
             ->setAgentAddressBuildingNumber('19', $agentType)
             ->setAgentAddressBuildingAdditionalLetter('b', $agentType)
@@ -947,8 +945,7 @@ class XBeteiligungResponseMessageFactory
             ->setAgentAddressBuildingFloorNumber('3', $agentType)
             ->setAgentAddressStreet('Neuenfelder Straße', $agentType)
             ->setAgentAddressBuildingApartmentNumber('4', $agentType)
-            //TODO: check what is municipal
-            //->setAgentAddressMunicipal('Freie und Hansestadt Hamburg', $agentType)
+            ->setAgentAddressMunicipal('Freie und Hansestadt Hamburg', $agentType)
             ->setAgentMunicipalPreviousCorporation('', $agentType)
             ->setAgentApartmentOwner('', $agentType)
             ->setAgentAddressBuildingAdditionalInfo('Hinterhaus', $agentType)

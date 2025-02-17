@@ -37,7 +37,6 @@ class XBeteiligungMessageHeadG2GTypeBuilder
         // Reader
         $reader = new BehoerdeTypeType();
         $this->head->setLeser($reader);
-        //TODO: set Verzeichnisdienst
         $leserBehoerdenkennung = new BehoerdenkennungTypeType();
         $reader->setBehoerdenkennung($leserBehoerdenkennung);
         $reader->setBehoerdenname('');

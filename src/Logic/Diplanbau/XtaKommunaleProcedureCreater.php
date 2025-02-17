@@ -12,7 +12,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XtaProcedureCommonFeatures;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XtaResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeFehlerartType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401\Planung2BeteiligungBeteiligungKommunalNeu0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt401;
 use Doctrine\DBAL\ConnectionException;
@@ -40,19 +42,19 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
         } catch (AddonUserNotFoundException $exception) {
             $userLogin = $exception->getUserLogin();
             $message = str_replace('%1$s', $userLogin, XBeteiligungService::MISSING_USER_ERROR_DESCRIPTION);
-            $errorTypes = [$this->xBeteiligungService->getErrorType(
+            $errorTypes = [$this->getErrorType(
                 XBeteiligungService::MISSING_USER_ERROR_CODE,
                 $message
             )];
             $this->logger->error('On create new Procedure: unable to determine user.', [$exception]);
         } catch (SchemaException $exception) {
-            $errorTypes = [$this->xBeteiligungService->getErrorType(
+            $errorTypes = [$this->getErrorType(
                 XBeteiligungService::WRONG_ATTACHMENT_FORMAT_ERROR_CODE,
                 XBeteiligungService::WRONG_ATTACHMENT_FORMAT_ERROR_DESCRIPTION
             )];
             $this->logger->error('On create new Procedure: wrong attachment format.', [$exception]);
         } catch (AccessDeniedException $exception) {
-            $errorTypes = [$this->xBeteiligungService->getErrorType(
+            $errorTypes = [$this->getErrorType(
                 XBeteiligungService::ACCESS_DENIED_ERROR_CODE,
                 XBeteiligungService::ACCESS_DENIED_ERROR_DESCRIPTION),
             ];
@@ -60,28 +62,39 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
         } catch (AddonContentMandatoryFieldsException $exception) {
             $errorTypes = [];
             foreach ($exception->getMandatoryFieldMessages() as $mandatoryFieldMessage) {
-                $errorTypes[] = $this->xBeteiligungService->getErrorType(XBeteiligungService::MISCELLANEOUS_ERROR_CODE, $mandatoryFieldMessage);
+                $errorTypes[] = $this->getErrorType(XBeteiligungService::MISCELLANEOUS_ERROR_CODE, $mandatoryFieldMessage);
             }
             $this->logger->error('On create new Procedure: mandatory field is missing.', [$exception]);
         } catch (AddonOrgaNotFoundException $exception) {
-            $errorTypes = [$this->xBeteiligungService->getErrorType(
+            $errorTypes = [$this->getErrorType(
                 XBeteiligungService::GENERIC_ERROR_CODE,
                 $this->translator->trans('error.organisation.of.user.not.found')
             )];
             $this->logger->error('On create new Procedure: related organisation not found.', [$exception]);
         } catch (InvalidArgumentException $exception) {
             //return untranslated error message?
-            $errorTypes = [$this->xBeteiligungService->getErrorType(XBeteiligungService::GENERIC_ERROR_CODE, $exception->getMessage())];
+            $errorTypes = [$this->getErrorType(XBeteiligungService::GENERIC_ERROR_CODE, $exception->getMessage())];
             $this->logger->error('On create new Procedure: invalid argument.', [$exception]);
         } catch (Exception $exception) {
             $this->logger->error('Unspecific exception', [$exception]);
-            $errorTypes = [$this->xBeteiligungService->getErrorType(
+            $errorTypes = [$this->getErrorType(
                 XBeteiligungService::GENERIC_ERROR_CODE,
                 XBeteiligungService::GENERIC_ERROR_DESCRIPTION
             )];
         }
 
         return $this->xtaBeteiligungMessageFactory->buildProcedureCreatedErrorXtaResponse421($errorTypes, $xmlObject401);
+    }
+
+    private function getErrorType(string $errorCode, string $errorDescription): FehlerType
+    {
+        $errorCodeType = new CodeFehlerartType();
+        $errorCodeType->setCode($errorCode);
+        $errorType = new FehlerType();
+        $errorType->setBeschreibung($errorDescription);
+        $errorType->setArt($errorCodeType);
+
+        return $errorType;
     }
 
     /**
