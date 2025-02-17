@@ -10,7 +10,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterfa
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class XtaProcedureCommonFeatures
 {
@@ -22,7 +22,7 @@ abstract class XtaProcedureCommonFeatures
         protected readonly UserHandlerInterface                $userHandler,
         protected readonly EntityManagerInterface              $entityManager,
         protected readonly XBeteiligungResponseMessageFactory  $xtaBeteiligungMessageFactory,
-        protected readonly Translator                          $translator,
+        protected readonly TranslatorInterface                 $translator,
     )
     {
     }
