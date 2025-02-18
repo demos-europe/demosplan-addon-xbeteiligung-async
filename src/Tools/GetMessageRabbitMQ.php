@@ -34,15 +34,15 @@ class GetMessageRabbitMQ
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
             $routingKey = '';
         }
-        $this->client->addRequest('', $this->rabbitMqQueueName, 'XBeteiligung_xtaGet', $routingKey, 300);
+        $this->client->addRequest('', $this->rabbitMqQueueName, 'XBeteiligung_Get', $routingKey, 300);
         $replies = $this->client->getReplies();
-        $result = Json::decodeToArray($replies['XBeteiligung_xtaGet']);
-        $this->logger->info('Got response from XTA-Service', [$result]);
+        $result = Json::decodeToArray($replies['XBeteiligung_Get']);
+        $this->logger->info('Got response from RabbitMQ', [$result]);
         foreach ($result as $message) {
             $this->logger->info('Process message', [$message]);
             try {
                 $xtaResponseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction($message);
-                $this->sendWithXtaToBroker($xtaResponseObject->getPayload());
+                $this->sendRabbitMq($xtaResponseObject->getPayload());
             } catch (InvalidArgumentException $e) {
                 $this->logger->error('Message payload not supported', [$e]);
             } catch (SchemaException $e) {
@@ -64,25 +64,25 @@ class GetMessageRabbitMQ
      * @throws AMQPTimeoutException
      * @throws Exception
      */
-    protected function sendWithXtaToBroker(string $xmlString, int $expiration = 300): bool
+    protected function sendRabbitMq(string $xmlString, int $expiration = 300): bool
     {
         $routingKey = $this->globalConfig->getProjectPrefix();
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
             $routingKey = '';
         }
-        $this->logger->info('Send Response to XTA', [$xmlString]);
+        $this->logger->info('Send Response to RabbitMQ', [$xmlString]);
         $this->client->addRequest(
             $xmlString,
-            'xtaSendDemosPlan',
-            'XBeteiligung_xtaSend',
+            $this->rabbitMqQueueName,
+            'XBeteiligung_Send',
             $routingKey,
             $expiration
         );
         $replies = $this->client->getReplies();
 
-        $this->logger->info('Replies from XTA', [$replies]);
+        $this->logger->info('Replies from RabbitMQ', [$replies]);
 
-        return Json::decodeToMatchingType($replies['XBeteiligung_xtaSend']);
+        return Json::decodeToMatchingType($replies['XBeteiligung_Send']);
     }
 
     /**
