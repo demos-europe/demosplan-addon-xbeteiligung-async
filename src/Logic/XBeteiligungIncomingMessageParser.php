@@ -142,7 +142,7 @@ class XBeteiligungIncomingMessageParser
     private function validateRequiredNamespace(SimpleXMLElement $simpleXML): void
     {
         $namespaces = $simpleXML->getNamespaces();
-        if (!in_array('http://xbeteiligung.de/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION, $namespaces, true)) {
+        if (!in_array('http://xleitstelle.de/xbeteiligung/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION, $namespaces, true)) {
             throw new SchemaException('Unexpected namespace, won’t continue');
         }
     }
