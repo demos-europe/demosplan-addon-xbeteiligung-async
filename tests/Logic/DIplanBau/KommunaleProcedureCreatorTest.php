@@ -54,7 +54,7 @@ class KommunaleProcedureCreatorTest extends TestCase
         );
 
         // Act
-        $procedure = $this->sut->createNewKommunalProcedureFromXBauleitplanungMessage($inputMsgObj);
+        $procedure = $this->sut->createNewKommunalProcedureFromXBeteiligungMessage($inputMsgObj);
         $inputMsgContent = $inputMsgObj->getNachrichteninhalt()->getBeteiligung();
 
         // Assert

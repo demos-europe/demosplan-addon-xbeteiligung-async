@@ -38,7 +38,7 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
     ): XtaResponseValue
     {
         try {
-            return $this->createNewKommunalProcedureFromXBauleitplanungMessageWithResponse($xmlObject401);
+            return $this->createNewKommunalProcedureFromXBeteiligungMessageWithResponse($xmlObject401);
         } catch (AddonUserNotFoundException $exception) {
             $userLogin = $exception->getUserLogin();
             $message = str_replace('%1$s', $userLogin, XBeteiligungService::MISSING_USER_ERROR_DESCRIPTION);
@@ -100,11 +100,11 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
     /**
      * @throws XtaFormatException
      */
-    public function createNewKommunalProcedureFromXBauleitplanungMessageWithResponse(
+    public function createNewKommunalProcedureFromXBeteiligungMessageWithResponse(
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
     ): XtaResponseValue
     {
-        $procedure = $this->createNewKommunalProcedureFromXBauleitplanungMessage($xmlObject401);
+        $procedure = $this->createNewKommunalProcedureFromXBeteiligungMessage($xmlObject401);
 
         return $this->xtaBeteiligungMessageFactory->buildProcedureCreatedXtaResponse411($procedure, $xmlObject401);
     }
@@ -115,7 +115,7 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
      * @throws ORMException
      * @throws XtaFormatException
      */
-    public function createNewKommunalProcedureFromXBauleitplanungMessage(
+    public function createNewKommunalProcedureFromXBeteiligungMessage(
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401,
     ): ProcedureInterface
     {

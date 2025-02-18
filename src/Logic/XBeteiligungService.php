@@ -1011,46 +1011,46 @@ class XBeteiligungService
             $messageAttachments = $message['messageAttachments'];
             $xmlObject402 = $this->incomingMessageParser->getXmlObject($payload, 402);
 
-            return $this->updateProcedureFromXBauleitplanungMessageOrErrorMessage($xmlObject402, $messageAttachments);
+            return $this->updateProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject402, $messageAttachments);
         }
         if (str_contains($payload, self::DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER)) {
             $xmlObject409 = $this->incomingMessageParser->getXmlObject($payload, 409);
 
-            return $this->deleteProcedureFromXBauleitplanungMessageOrErrorMessage($xmlObject409);
+            return $this->deleteProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject409);
         }
         if (self::NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
             $messageAttachments = $message['messageAttachments'] ?? [];
             $xmlObject301 = $this->incomingMessageParser->getXmlObject($payload, 301);
 
-            return $this->createNewProcedureFromXBauleitplanungMessageOrErrorMessage($xmlObject301, $messageAttachments);
+            return $this->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject301, $messageAttachments);
         }
         if (self::UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
             $messageAttachments = $message['messageAttachments'];
             $xmlObject302 = $this->incomingMessageParser->getXmlObject($payload, 302);
 
-            return $this->updateProcedureFromXBauleitplanungMessageOrErrorMessage($xmlObject302, $messageAttachments);
+            return $this->updateProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject302, $messageAttachments);
         }
         if (str_contains($payload, self::DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER)) {
             $xmlObject309 = $this->incomingMessageParser->getXmlObject($payload, 309);
 
-            return $this->deleteProcedureFromXBauleitplanungMessageOrErrorMessage($xmlObject309);
+            return $this->deleteProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject309);
         }
         if (self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
             $messageAttachments = $message['messageAttachments'] ?? [];
             $xmlObject201 = $this->incomingMessageParser->getXmlObject($payload, 201);
 
-            return $this->createNewProcedureFromXBauleitplanungMessageOrErrorMessage($xmlObject201, $messageAttachments);
+            return $this->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject201, $messageAttachments);
         }
         if (self::UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
             $messageAttachments = $message['messageAttachments'];
             $xmlObject202 = $this->incomingMessageParser->getXmlObject($payload, 202);
 
-            return $this->updateProcedureFromXBauleitplanungMessageOrErrorMessage($xmlObject202, $messageAttachments);
+            return $this->updateProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject202, $messageAttachments);
         }
         if (str_contains($payload, self::DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER)) {
             $xmlObject209 = $this->incomingMessageParser->getXmlObject($payload, 209);
 
-            return $this->deleteProcedureFromXBauleitplanungMessageOrErrorMessage($xmlObject209);
+            return $this->deleteProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject209);
         }
         */
         throw new InvalidArgumentException('Message payload not supported');
