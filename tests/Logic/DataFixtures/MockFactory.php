@@ -45,6 +45,11 @@ class MockFactory extends TestCase
         return $this->createMock(Translator::class);
     }
 
+    public function getProcedureTypeService(): ProcedureTypeServiceInterface
+    {
+        return $this->createMock(ProcedureTypeServiceInterface::class);
+    }
+
     public function getProcedureMock(): MockObject|ProcedureInterface
     {
         $procedureMock = $this->createMock(ProcedureInterface::class);

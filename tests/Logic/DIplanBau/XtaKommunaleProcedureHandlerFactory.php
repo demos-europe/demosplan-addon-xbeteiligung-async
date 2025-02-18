@@ -21,6 +21,7 @@ class XtaKommunaleProcedureHandlerFactory
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->mockFactory->getProcedureServiceInterface(),
             $this->mockFactory->getProcedureServiceStorage(),
+            $this->mockFactory->getProcedureTypeService(),
             $this->mockFactory->getUserHandlerMock(),
             $this->mockFactory->getEntityManagerMock(),
             $this->mockFactory->getResponseMessageFactoryMock(),

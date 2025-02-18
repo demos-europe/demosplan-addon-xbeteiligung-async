@@ -7,6 +7,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -19,6 +20,7 @@ abstract class XtaProcedureCommonFeatures
         protected readonly LoggerInterface                     $logger,
         protected readonly ProcedureServiceInterface           $procedureService,
         protected readonly ProcedureServiceStorageInterface    $procedureServiceStorage,
+        protected readonly ProcedureTypeServiceInterface       $procedureTypeService,
         protected readonly UserHandlerInterface                $userHandler,
         protected readonly EntityManagerInterface              $entityManager,
         protected readonly XBeteiligungResponseMessageFactory  $xtaBeteiligungMessageFactory,
