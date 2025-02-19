@@ -36,7 +36,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
         private readonly ParameterBagInterface        $parameterBag,
         private readonly LoggerInterface              $cockpitLogger,
         private readonly GetMessageRabbitMQ           $getMessageRabbitMQ,
-        private readonly KommunaleProcedureCreater    $KommunaleProcedureCreater,
+        private readonly KommunaleProcedureCreater    $kommunaleProcedureCreater,
     ) {
     }
 
@@ -75,7 +75,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
         if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
-            $xml = $this->KommunaleProcedureCreater->createProcedureNew401FromObject($event->getProcedure());
+            $xml = $this->kommunaleProcedureCreater->createProcedureNew401FromObject($event->getProcedure());
             $this->createProcedureMessage($xml, $event->getProcedure());
         }
 
