@@ -27,7 +27,6 @@ abstract class ProcedureCommonFeatures
         protected readonly XBeteiligungResponseMessageFactory $xBeteiligungMessageFactory,
         protected readonly TranslatorInterface                $translator,
         protected readonly TransactionServiceInterface        $transactionService,
-        protected readonly XBeteiligungService                $xBeteiligungService,
     )
     {
     }

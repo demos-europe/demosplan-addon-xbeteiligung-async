@@ -5,12 +5,8 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures;
 use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
@@ -36,7 +32,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MockFactory extends TestCase
 {
     private ProcedureInterface|MockObject|null $procedure;
-    protected XBeteiligungService $xBeteiligungService;
 
     public function createNewMock(string $className): MockObject
     {
@@ -61,11 +56,6 @@ class MockFactory extends TestCase
     public function getTransActionServiceInterfaceMock(): TransactionServiceInterface
     {
         return $this->createMock(TransactionServiceInterface::class);
-    }
-
-    public function getXBeteiligungServiceMock(): XBeteiligungService
-    {
-        return $this->xBeteiligungService;
     }
 
     public function getProcedureMock(): MockObject|ProcedureInterface

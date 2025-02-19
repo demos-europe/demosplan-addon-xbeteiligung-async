@@ -26,8 +26,7 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getEntityManagerMock(),
             $this->mockFactory->getResponseMessageFactoryMock(),
             $this->mockFactory->getTranslatorMock(),
-            $this->mockFactory->getTransActionServiceInterfaceMock(),
-            $this->mockFactory->getXBeteiligungServiceMock(),
+            $this->mockFactory->getTransActionServiceInterfaceMock()
         ];
 
         switch ($handlerType) {
