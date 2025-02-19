@@ -41,8 +41,8 @@ class GetMessageRabbitMQ
         foreach ($result as $message) {
             $this->logger->info('Process message', [$message]);
             try {
-                $xtaResponseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction($message);
-                $this->sendRabbitMq($xtaResponseObject->getPayload());
+                $responseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction($message);
+                $this->sendRabbitMq($responseObject->getPayload());
             } catch (InvalidArgumentException $e) {
                 $this->logger->error('Message payload not supported', [$e]);
             } catch (SchemaException $e) {
@@ -58,9 +58,6 @@ class GetMessageRabbitMQ
     }
 
     /**
-     * Send the the message that a procedure was created over the rabbit to the XTA java client to be send to the
-     * configured message broker.
-     *
      * @throws AMQPTimeoutException
      * @throws Exception
      */

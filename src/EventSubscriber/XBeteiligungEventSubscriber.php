@@ -16,7 +16,7 @@ use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInte
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\XtaKommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\GetMessageRabbitMQ;
 use Exception;
@@ -30,14 +30,13 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly PermissionEvaluatorInterface $permissionEvaluator,
-        private readonly XBeteiligungDebugger $xBeteiligungDebugger,
-        private readonly XBeteiligungService $xBeteiligungService,
-        private AddonMaintenanceEventInterface $addonMaintenanceEvent,
-        private readonly CacheInterface $cache,
-        private readonly ParameterBagInterface $parameterBag,
-        private readonly LoggerInterface $cockpitLogger,
-        private readonly GetMessageRabbitMQ $getMessageRabbitMQ,
-        private readonly XtaKommunaleProcedureCreater $xtaKommunaleProcedureCreater,
+        private readonly XBeteiligungDebugger         $xBeteiligungDebugger,
+        private readonly XBeteiligungService          $xBeteiligungService,
+        private readonly CacheInterface               $cache,
+        private readonly ParameterBagInterface        $parameterBag,
+        private readonly LoggerInterface              $cockpitLogger,
+        private readonly GetMessageRabbitMQ           $getMessageRabbitMQ,
+        private readonly KommunaleProcedureCreater    $KommunaleProcedureCreater,
     ) {
     }
 
@@ -54,13 +53,13 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 
     public function handleAddonMaintenanceEvent(AddonMaintenanceEventInterface $event): void
     {
-        if (false === $this->parameterBag->get('enable_xta_communication')) {
+        if (false === $this->parameterBag->get('enable_communication')) {
             return;
         }
         try {
-            $this->cache->get('XtaMessageBrokerDelay', function (ItemInterface $item): void {
-                $ttl = $this->parameterBag->get('xta_communication_delay');
-                $this->cockpitLogger->info('Fetch XTA-Messages with delay '.$ttl);
+            $this->cache->get('MessageBrokerDelay', function (ItemInterface $item): void {
+                $ttl = $this->parameterBag->get('communication_delay');
+                $this->cockpitLogger->info('Fetch Messages with delay '.$ttl);
                 $item->expiresAfter($ttl);
 
                 $this->getMessageRabbitMQ->getMessages();
@@ -76,7 +75,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
         if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
-            $xml = $this->xtaKommunaleProcedureCreater->createProcedureNew401FromObject($event->getProcedure());
+            $xml = $this->KommunaleProcedureCreater->createProcedureNew401FromObject($event->getProcedure());
             $this->createProcedureMessage($xml, $event->getProcedure());
         }
 

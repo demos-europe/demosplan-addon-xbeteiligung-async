@@ -14,8 +14,11 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -52,7 +55,10 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->procedureNewsService,
             $this->procedureMessageRepository,
             $this->createMock( PlanningDocumentsLinkCreator::class),
-            $this->createMock(RouterInterface::class)
+            $this->createMock(RouterInterface::class),
+            $this->createMock(XBeteiligungIncomingMessageParser::class),
+            $this->createMock(XBeteiligungResponseMessageFactory::class),
+            $this->createMock(KommunaleProcedureCreater::class),
         );
     }
 

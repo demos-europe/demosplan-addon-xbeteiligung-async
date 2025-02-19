@@ -7,10 +7,10 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonContentMandatoryFieldsException;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonOrgaNotFoundException;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonUserNotFoundException;
-use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\XtaFormatException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\FormatException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XtaProcedureCommonFeatures;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XtaResponseValue;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeFehlerartType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
@@ -25,7 +25,7 @@ use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
+class KommunaleProcedureCreater extends ProcedureCommonFeatures
 {
 
     /**
@@ -35,7 +35,7 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
      */
     public function createNewProcedureFromXBeteiligungMessageOrErrorMessage(
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
-    ): XtaResponseValue
+    ): ResponseValue
     {
         try {
             return $this->createNewKommunalProcedureFromXBeteiligungMessageWithResponse($xmlObject401);
@@ -83,7 +83,7 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
             )];
         }
 
-        return $this->xtaBeteiligungMessageFactory->buildProcedureCreatedErrorXtaResponse421($errorTypes, $xmlObject401);
+        return $this->xBeteiligungMessageFactory->buildProcedureCreatedErrorResponse421($errorTypes, $xmlObject401);
     }
 
     private function getErrorType(string $errorCode, string $errorDescription): FehlerType
@@ -98,22 +98,22 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
     }
 
     /**
-     * @throws XtaFormatException
+     * @throws FormatException
      */
     public function createNewKommunalProcedureFromXBeteiligungMessageWithResponse(
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
-    ): XtaResponseValue
+    ): ResponseValue
     {
         $procedure = $this->createNewKommunalProcedureFromXBeteiligungMessage($xmlObject401);
 
-        return $this->xtaBeteiligungMessageFactory->buildProcedureCreatedXtaResponse411($procedure, $xmlObject401);
+        return $this->xBeteiligungMessageFactory->buildProcedureCreatedResponse411($procedure, $xmlObject401);
     }
 
     /**
      * @throws OptimisticLockException
      * @throws ConnectionException
      * @throws ORMException
-     * @throws XtaFormatException
+     * @throws FormatException
      */
     public function createNewKommunalProcedureFromXBeteiligungMessage(
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401,
@@ -125,7 +125,7 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
                 'Message content is missing',
                 ['xmlObject401' => var_export($xmlObject401, true)]
             );
-            throw new XtaFormatException('Message content is missing');
+            throw new FormatException('Message content is missing');
         }
 
         return $this->transactionService->executeAndFlushInTransaction(
@@ -172,7 +172,7 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
             'action'                                                        => 'new',
             'r_master'                                                      => 'false',
             'r_copymaster'                                                  => $this->procedureService->getMasterTemplateId(),
-            'r_procedure_type'                                              => $this->procedureTypeService->getProcedureTypeByName('Beteiligung')->getId(),
+            'r_procedure_type'                                              => $this->procedureTypeService->getProcedureTypeByName('Beteiligung')?->getId(),
             'xtaPlanId'                                                     => $procedureObject->getPlanID(),
         ];
     }
@@ -181,7 +181,7 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
     {
         //TODO: Dupplicate with XtaKommunaleProcedureCreater, should delete after adjustment test
         $procedureCreated401Object = new Planung2BeteiligungBeteiligungKommunalNeu0401();
-        $procedureCreated401Object = $this->xtaBeteiligungMessageFactory->setProductInfo($procedureCreated401Object); // required
+        $procedureCreated401Object = $this->xBeteiligungMessageFactory->setProductInfo($procedureCreated401Object); // required
         $procedureCreated401Object->setNachrichtenkopf(
             $this->xBeteiligungService->createMessageHeadFor($procedureCreated401Object)
         ); // required
@@ -189,14 +189,14 @@ class XtaKommunaleProcedureCreater extends XtaProcedureCommonFeatures
             $this->generateMain401MessageContent($procedure)
         ); // required
 
-        return $this->xtaBeteiligungMessageFactory->serializeData($procedureCreated401Object);
+        return $this->xBeteiligungMessageFactory->serializeData($procedureCreated401Object);
     }
 
     private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
     {
         //TODO: Dupplicate with XtaKommunaleProcedureCreater, should delete after adjustment test
         $messageContent = new Nachrichteninhalt401();
-        $messageContent->setVorgangsID($this->xtaBeteiligungMessageFactory->uuid());
+        $messageContent->setVorgangsID($this->xBeteiligungMessageFactory->uuid());
         $messageContent->setBeteiligung(
             $this->xBeteiligungService->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungKommunalType())
         );

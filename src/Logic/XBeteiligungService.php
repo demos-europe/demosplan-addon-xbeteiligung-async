@@ -19,7 +19,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\XtaKommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
@@ -73,7 +73,6 @@ use Psr\Log\LoggerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class XBeteiligungService
 {
@@ -174,9 +173,8 @@ class XBeteiligungService
         private readonly PlanningDocumentsLinkCreator        $planningDocumentsLinkCreator,
         private readonly RouterInterface                     $router,
         private readonly XBeteiligungIncomingMessageParser   $incomingMessageParser,
-        private readonly TranslatorInterface                 $translator,
-        private readonly XBeteiligungResponseMessageFactory  $xtaBeteiligungMessageFactory,
-        private readonly XtaKommunaleProcedureCreater        $xtaKommunaleProcedureCreater,
+        private readonly XBeteiligungResponseMessageFactory  $beteiligungMessageFactory,
+        private readonly KommunaleProcedureCreater           $kommunaleProcedureCreater,
     ) {
         $this->serializer = $serializerFactory->getSerializer();
     }
@@ -186,9 +184,9 @@ class XBeteiligungService
      */
     public function createProcedureNew401FromObject(ProcedureInterface $procedure): string
     {
-        //TODO: Dupplicate with XtaKommunaleProcedureCreater, should delete after adjustment test
+        //TODO: Dupplicate with KommunaleProcedureCreater, should delete after adjustment test
         $procedureCreated401Object = new Planung2BeteiligungBeteiligungKommunalNeu0401();
-        $procedureCreated401Object = $this->xtaBeteiligungMessageFactory->setProductInfo($procedureCreated401Object); // required
+        $procedureCreated401Object = $this->beteiligungMessageFactory->setProductInfo($procedureCreated401Object); // required
         $procedureCreated401Object->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureCreated401Object)
         ); // required
@@ -196,20 +194,20 @@ class XBeteiligungService
             $this->generateMain401MessageContent($procedure)
         ); // required
 
-        return $this->xtaBeteiligungMessageFactory->serializeData($procedureCreated401Object);
+        return $this->beteiligungMessageFactory->serializeData($procedureCreated401Object);
     }
 
     public function createXMLFor301(ProcedureInterface $procedure)
     {
         $procedureCreated301 = new Planung2BeteiligungBeteiligungRaumordnungNeu0301();
-        $procedureCreated301 = $this->xtaBeteiligungMessageFactory->setProductInfo($procedureCreated301); // required
+        $procedureCreated301 = $this->beteiligungMessageFactory->setProductInfo($procedureCreated301); // required
         $procedureCreated301->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureCreated301)
         ); // required
         $procedureCreated301->setNachrichteninhalt(
             $this->generateMain301MessageContent($procedure)
         ); // required
-        return $this->xtaBeteiligungMessageFactory->serializeData($procedureCreated301);
+        return $this->beteiligungMessageFactory->serializeData($procedureCreated301);
     }
 
     /**
@@ -218,7 +216,7 @@ class XBeteiligungService
     public function createProcedureUpdate402FromObject(ProcedureInterface $procedure): string
     {
         $procedureUpdated402Object = new Planung2BeteiligungBeteiligungKommunalAktualisieren0402();
-        $procedureUpdated402Object = $this->xtaBeteiligungMessageFactory->setProductInfo($procedureUpdated402Object); // required
+        $procedureUpdated402Object = $this->beteiligungMessageFactory->setProductInfo($procedureUpdated402Object); // required
         $procedureUpdated402Object->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureUpdated402Object)
         ); // required
@@ -226,13 +224,13 @@ class XBeteiligungService
             $this->generateMain402MessageContent($procedure)
         ); // required
 
-        return $this->xtaBeteiligungMessageFactory->serializeData($procedureUpdated402Object);
+        return $this->beteiligungMessageFactory->serializeData($procedureUpdated402Object);
     }
 
     public function createXMLFor302(ProcedureInterface $procedure): string
     {
         $procedureUpdated302 = new Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302();
-        $procedureUpdated302 = $this->xtaBeteiligungMessageFactory->setProductInfo($procedureUpdated302);
+        $procedureUpdated302 = $this->beteiligungMessageFactory->setProductInfo($procedureUpdated302);
         $procedureUpdated302->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureUpdated302)
         );
@@ -240,7 +238,7 @@ class XBeteiligungService
             $this->generateMain302MessageContent($procedure)
         );
 
-        return $this->xtaBeteiligungMessageFactory->serializeData($procedureUpdated302);
+        return $this->beteiligungMessageFactory->serializeData($procedureUpdated302);
     }
 
     /**
@@ -249,19 +247,19 @@ class XBeteiligungService
     public function createProcedureDeleted409FromObject(string $procedureId): string
     {
         $procedureDeleted409Object = new Planung2BeteiligungBeteiligungKommunalLoeschen0409();
-        $procedureDeleted409Object = $this->xtaBeteiligungMessageFactory->setProductInfo($procedureDeleted409Object); // required
+        $procedureDeleted409Object = $this->beteiligungMessageFactory->setProductInfo($procedureDeleted409Object); // required
         $procedureDeleted409Object->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureDeleted409Object)
         ); // required
         $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedureId));
 
-        return $this->xtaBeteiligungMessageFactory->serializeData($procedureDeleted409Object);
+        return $this->beteiligungMessageFactory->serializeData($procedureDeleted409Object);
     }
 
     public function createXMLFor309(string $procedureId): string
     {
         $procedureDeleted409 = new Planung2BeteiligungBeteiligungRaumordnungLoeschen0309();
-        $procedureDeleted409 = $this->xtaBeteiligungMessageFactory->setProductInfo($procedureDeleted409);
+        $procedureDeleted409 = $this->beteiligungMessageFactory->setProductInfo($procedureDeleted409);
         $procedureDeleted409->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureDeleted409)
         );
@@ -269,14 +267,14 @@ class XBeteiligungService
             $this->generateMain309MessageContent($procedureId)
         );
 
-        return $this->xtaBeteiligungMessageFactory->serializeData($procedureDeleted409);
+        return $this->beteiligungMessageFactory->serializeData($procedureDeleted409);
     }
 
     private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
     {
-        //TODO: Dupplicate with XtaKommunaleProcedureCreater, should delete after adjustment test
+        //TODO: Dupplicate with KommunaleProcedureCreater, should delete after adjustment test
         $messageContent = new Nachrichteninhalt401();
-        $messageContent->setVorgangsID($this->xtaBeteiligungMessageFactory->uuid());
+        $messageContent->setVorgangsID($this->beteiligungMessageFactory->uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungKommunalType())
         );
@@ -287,7 +285,7 @@ class XBeteiligungService
     private function generateMain301MessageContent(ProcedureInterface $procedure): Nachrichteninhalt301
     {
         $messageContent = new Nachrichteninhalt301();
-        $messageContent->setVorgangsID($this->xtaBeteiligungMessageFactory->uuid());
+        $messageContent->setVorgangsID($this->beteiligungMessageFactory->uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungRaumordnungType())
         );
@@ -298,7 +296,7 @@ class XBeteiligungService
     private function generateMain402MessageContent(ProcedureInterface $procedure): Nachrichteninhalt402
     {
         $messageContent = new Nachrichteninhalt402();
-        $messageContent->setVorgangsID($this->xtaBeteiligungMessageFactory->uuid());
+        $messageContent->setVorgangsID($this->beteiligungMessageFactory->uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungKommunalType())
         );
@@ -309,7 +307,7 @@ class XBeteiligungService
     private function generateMain302MessageContent(ProcedureInterface $procedure): Nachrichteninhalt302
     {
         $messageContent = new Nachrichteninhalt302();
-        $messageContent->setVorgangsID($this->xtaBeteiligungMessageFactory->uuid());
+        $messageContent->setVorgangsID($this->beteiligungMessageFactory->uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungRaumordnungType())
         );
@@ -320,7 +318,7 @@ class XBeteiligungService
     private function generateMain409MessageContent(string $procedureId): Nachrichteninhalt409
     {
         $messageContent = new Nachrichteninhalt409();
-        $messageContent->setVorgangsID($this->xtaBeteiligungMessageFactory->uuid());
+        $messageContent->setVorgangsID($this->beteiligungMessageFactory->uuid());
         $messageContent->setPlanID($procedureId);
         $messageContent->setBeteiligungsID($procedureId); // why does only a 409 Message still has this property?
 
@@ -330,7 +328,7 @@ class XBeteiligungService
     public function generateMain309MessageContent(string $procedureId): Nachrichteninhalt309
     {
         $messageContent = new Nachrichteninhalt309();
-        $messageContent->setVorgangsID($this->xtaBeteiligungMessageFactory->uuid());
+        $messageContent->setVorgangsID($this->beteiligungMessageFactory->uuid());
         $messageContent->setPlanID($procedureId);
         $messageContent->setBeteiligungsID($procedureId);
 
@@ -519,7 +517,7 @@ class XBeteiligungService
         $institutionParticipationType = new BeteiligungKommunalTOEBType();
 
         // we as demos think this id is useless - did not win the discussion as it seems :(
-        $institutionParticipationType->setBeteiligungsID($this->xtaBeteiligungMessageFactory->uuid());
+        $institutionParticipationType->setBeteiligungsID($this->beteiligungMessageFactory->uuid());
         // this MetadatenAnlageType should support a base64 container to dump files into, but it does not - S.C. is informed
         //$publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
         $institutionParticipationType->setZeitraum($this->createTimeSpanOfProcedurePhase($procedure->getPhaseObject()));
@@ -540,7 +538,7 @@ class XBeteiligungService
     {
         $publicParticipationType = new BeteiligungKommunalOeffentlichkeitType();
         // we as demos think this id is useless - did not win the discussion as it seems :(
-        $publicParticipationType->setBeteiligungsID($this->xtaBeteiligungMessageFactory->uuid());
+        $publicParticipationType->setBeteiligungsID($this->beteiligungMessageFactory->uuid());
         // this MetadatenAnlageType should support a base64 container to dump files into but it does not - S.C. is informed
         // $publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
         $publicParticipationType->setZeitraum(
@@ -836,7 +834,7 @@ class XBeteiligungService
         $messageTypeCode->setCode($code);
 
         // id has to match pattern: '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
-        $identificationMessage->setNachrichtenUUID($this->xtaBeteiligungMessageFactory->uuid()); // required
+        $identificationMessage->setNachrichtenUUID($this->beteiligungMessageFactory->uuid()); // required
         $identificationMessage->setErstellungszeitpunkt(new DateTime()); // required
         $identificationMessage->setNachrichtentyp($messageTypeCode); // required
 
@@ -869,7 +867,7 @@ class XBeteiligungService
         $document->schemaValidate($path);
         $errors = libxml_get_errors();
         foreach ($errors as $error) {
-            $this->logger->warning('Invalid xta message', [$error]);
+            $this->logger->warning('Invalid message', [$error]);
             if ($verboseDebug) {
                 print_r($error);
             }
@@ -996,14 +994,14 @@ class XBeteiligungService
     /**
      * @throws SchemaException
      */
-    public function determineMessageContextAndDelegateAction(array $message): XtaResponseValue
+    public function determineMessageContextAndDelegateAction(array $message): ResponseValue
     {
         $payload = $message['messageData'];
         $messageTypeCode = array_key_exists('messageTypeCode', $message) ? $message['messageTypeCode'] : '';
         $this->logger->info('Incoming message type', [$messageTypeCode]);
         if (self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
             $xmlObject401 = $this->incomingMessageParser->getXmlObject($payload, 401);
-            return $this->xtaKommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
+            return $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
         }
         /*
          * TODO: Implement the following message types

@@ -2,7 +2,7 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau;
 
-class XtaKommunaleProcedureRemover
+class KommunaleProcedureUpdater
 {
 
 }

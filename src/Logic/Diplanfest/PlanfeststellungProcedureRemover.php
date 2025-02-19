@@ -2,7 +2,7 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanfest;
 
-class XtaPlanfeststellungProcedureUpdater
+class PlanfeststellungProcedureRemover
 {
 
 }

@@ -107,10 +107,10 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureCreatedXtaResponse411(
+    public function buildProcedureCreatedResponse411(
         ProcedureInterface $procedure,
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
-    ): XtaResponseValue
+    ): ResponseValue
     {
         try {
             $procedureCreated = new ProcedureCreated();
@@ -119,7 +119,7 @@ class XBeteiligungResponseMessageFactory
             $procedureCreated->setPlanId($planId);
             $procedureCreated->lock();
 
-            $xtaResponse = new XtaResponseValue();
+            $response = new ResponseValue();
             $message = new Beteiligung2PlanungBeteiligungKommunalNeuOK0411();
             $this->setProductInfo($message);
 
@@ -140,14 +140,14 @@ class XBeteiligungResponseMessageFactory
             $messageXml = $this->serializeData($message);
             $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-            $xtaResponse->setPayload($messageXml);
-            $xtaResponse->lock();
+            $response->setPayload($messageXml);
+            $response->lock();
 
-            return $xtaResponse;
+            return $response;
         } catch (Exception $e) {
-            $this->dplanCockpitLogger->error('A Procedure with id "'.$procedure->getId().'" was created but the XTA Message (Beteiligung2PlanungBeteiligungNeuOK0411) couldn\'t be built.');
+            $this->dplanCockpitLogger->error('A Procedure with id "'.$procedure->getId().'" was created but the Message (Beteiligung2PlanungBeteiligungNeuOK0411) couldn\'t be built.');
 
-            return new XtaResponseValue();
+            return new ResponseValue();
         }
     }
 
@@ -156,16 +156,16 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureUpdateOKXtaResponse412(
+    public function buildProcedureUpdateOKResponse412(
         Planung2BeteiligungBeteiligungKommunalAktualisieren0402 $xmlObject402,
         ProcedureInterface                                      $procedure
-    ): XtaResponseValue {
+    ): ResponseValue {
         try {
             $procedureId = $procedure->getId();
             $planId = $xmlObject402->getNachrichteninhalt()->getBeteiligung()->getPlanID();
             $instanceId = $xmlObject402->getNachrichteninhalt()->getVorgangsID();
 
-            $xtaResponse = new XtaResponseValue();
+            $response = new ResponseValue();
             $message = new Beteiligung2PlanungBeteiligungKommunalAktualisierenOK0412();
             $this->setProductInfo($message);
 
@@ -186,18 +186,18 @@ class XBeteiligungResponseMessageFactory
             $messageXml = $this->serializeData($message);
             $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-            $xtaResponse->setPayload($messageXml);
-            $xtaResponse->lock();
+            $response->setPayload($messageXml);
+            $response->lock();
 
-            return $xtaResponse;
+            return $response;
         } catch (Exception $e) {
             $this->dplanCockpitLogger->error(
                 'A Procedure with id "'.$procedure->getId().
-                '" was updated but the XTA Message (Beteiligung2PlanungBeteiligung) couldn\'t be built.',
+                '" was updated but the Message (Beteiligung2PlanungBeteiligung) couldn\'t be built.',
                 [$e]
             );
 
-            return new XtaResponseValue();
+            return new ResponseValue();
         }
     }
 
@@ -206,7 +206,7 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureDeletedXtaResponse419(Planung2BeteiligungBeteiligungKommunalLoeschen0409 $xmlObject409): XtaResponseValue
+    public function buildProcedureDeletedResponse419(Planung2BeteiligungBeteiligungKommunalLoeschen0409 $xmlObject409): ResponseValue
     {
         try {
             $message = new Beteiligung2PlanungBeteiligungKommunalLoeschenOK0419();
@@ -229,17 +229,17 @@ class XBeteiligungResponseMessageFactory
             $messageXml = $this->serializeData($message);
             $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-            $xtaResponse = new XtaResponseValue();
-            $xtaResponse->setPayload($messageXml);
-            $xtaResponse->lock();
+            $response = new ResponseValue();
+            $response->setPayload($messageXml);
+            $response->lock();
 
-            return $xtaResponse;
+            return $response;
         } catch (Exception $e) {
             $this->dplanCockpitLogger->error('A Procedure with id "'
                 .$xmlObject409->getNachrichteninhalt()->getBeteiligungsID()
-                .'" was deleted but the XTA Message (Beteiligung2PlanungBeteiligungNeuOK0419) couldn\'t be built.', [$e]);
+                .'" was deleted but the Message (Beteiligung2PlanungBeteiligungNeuOK0419) couldn\'t be built.', [$e]);
 
-            return new XtaResponseValue();
+            return new ResponseValue();
         }
     }
 
@@ -249,10 +249,10 @@ class XBeteiligungResponseMessageFactory
      * @param array<int, FehlerType> $errorTypes
      *
      */
-    public function buildProcedureCreatedErrorXtaResponse421(
+    public function buildProcedureCreatedErrorResponse421(
         array $errorTypes,
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
-    ): XtaResponseValue {
+    ): ResponseValue {
         $message = new Beteiligung2PlanungBeteiligungKommunalNeuNOK0421();
         $this->setProductInfo($message);
 
@@ -276,11 +276,11 @@ class XBeteiligungResponseMessageFactory
         $messageXml = $this->serializeData($message);
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-        $xtaResponse = new XtaResponseValue();
-        $xtaResponse->setPayload($messageXml);
-        $xtaResponse->lock();
+        $response = new ResponseValue();
+        $response->setPayload($messageXml);
+        $response->lock();
 
-        return $xtaResponse;
+        return $response;
     }
 
     /**
@@ -290,10 +290,10 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws SchemaException
      */
-    public function buildProcedureUpdateErrorXtaResponse422(
+    public function buildProcedureUpdateErrorResponse422(
         array $errorTypes,
         Planung2BeteiligungBeteiligungKommunalAktualisieren0402 $xmlObject402
-    ): XtaResponseValue {
+    ): ResponseValue {
         $message = new Beteiligung2PlanungBeteiligungKommunalAktualisierenNOK0422();
         $this->setProductInfo($message);
 
@@ -318,11 +318,11 @@ class XBeteiligungResponseMessageFactory
         $messageXml = $this->serializeData($message);
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-        $xtaResponse = new XtaResponseValue();
-        $xtaResponse->setPayload($messageXml);
-        $xtaResponse->lock();
+        $response = new ResponseValue();
+        $response->setPayload($messageXml);
+        $response->lock();
 
-        return $xtaResponse;
+        return $response;
     }
 
     /**
@@ -331,10 +331,10 @@ class XBeteiligungResponseMessageFactory
      * @param array<int, FehlerType> $errorTypes
      *
      */
-    public function buildProcedureDeletedErrorXtaResponse429(
+    public function buildProcedureDeletedErrorResponse429(
         array $errorTypes,
         Planung2BeteiligungBeteiligungKommunalLoeschen0409 $xmlObject409
-    ): XtaResponseValue {
+    ): ResponseValue {
         $message = new Beteiligung2PlanungBeteiligungKommunalLoeschenNOK0429();
         $this->setProductInfo($message);
 
@@ -360,11 +360,11 @@ class XBeteiligungResponseMessageFactory
 
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-        $xtaResponse = new XtaResponseValue();
-        $xtaResponse->setPayload($messageXml);
-        $xtaResponse->lock();
+        $response = new ResponseValue();
+        $response->setPayload($messageXml);
+        $response->lock();
 
-        return $xtaResponse;
+        return $response;
     }
 
     /**
@@ -372,10 +372,10 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureCreatedXtaResponse311(
+    public function buildProcedureCreatedResponse311(
         ProcedureInterface $procedure,
         Planung2BeteiligungBeteiligungRaumordnungNeu0301 $xmlObject401
-    ): XtaResponseValue
+    ): ResponseValue
     {
         try {
             $procedureCreated = new ProcedureCreated();
@@ -384,7 +384,7 @@ class XBeteiligungResponseMessageFactory
             $procedureCreated->setPlanId($planId);
             $procedureCreated->lock();
 
-            $xtaResponse = new XtaResponseValue();
+            $response = new ResponseValue();
             $message = new Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311();
             $this->setProductInfo($message);
 
@@ -405,14 +405,14 @@ class XBeteiligungResponseMessageFactory
             $messageXml = $this->serializeData($message);
             $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-            $xtaResponse->setPayload($messageXml);
-            $xtaResponse->lock();
+            $response->setPayload($messageXml);
+            $response->lock();
 
-            return $xtaResponse;
+            return $response;
         } catch (Exception $e) {
-            $this->dplanCockpitLogger->error('A Procedure with id "'.$procedure->getId().'" was created but the XTA Message (Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311) couldn\'t be built.');
+            $this->dplanCockpitLogger->error('A Procedure with id "'.$procedure->getId().'" was created but the Message (Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311) couldn\'t be built.');
 
-            return new XtaResponseValue();
+            return new ResponseValue();
         }
     }
 
@@ -421,16 +421,16 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureUpdateOKXtaResponse312(
+    public function buildProcedureUpdateOKResponse312(
         Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 $xmlObject402,
         ProcedureInterface                                      $procedure
-    ): XtaResponseValue {
+    ): ResponseValue {
         try {
             $procedureId = $procedure->getId();
             $planId = $xmlObject402->getNachrichteninhalt()->getBeteiligung()->getPlanID();
             $instanceId = $xmlObject402->getNachrichteninhalt()->getVorgangsID();
 
-            $xtaResponse = new XtaResponseValue();
+            $response = new ResponseValue();
             $message = new Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312();
             $this->setProductInfo($message);
 
@@ -451,18 +451,18 @@ class XBeteiligungResponseMessageFactory
             $messageXml = $this->serializeData($message);
             $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-            $xtaResponse->setPayload($messageXml);
-            $xtaResponse->lock();
+            $response->setPayload($messageXml);
+            $response->lock();
 
-            return $xtaResponse;
+            return $response;
         } catch (Exception $e) {
             $this->dplanCockpitLogger->error(
                 'A Procedure with id "'.$procedure->getId().
-                '" was updated but the XTA Message (Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312) couldn\'t be built.',
+                '" was updated but the Message (Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312) couldn\'t be built.',
                 [$e]
             );
 
-            return new XtaResponseValue();
+            return new ResponseValue();
         }
     }
 
@@ -471,9 +471,9 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureDeletedXtaResponse319(
+    public function buildProcedureDeletedResponse319(
         Planung2BeteiligungBeteiligungRaumordnungLoeschen0309 $xmlObject409
-    ): XtaResponseValue
+    ): ResponseValue
     {
         try {
             $message = new Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319();
@@ -496,17 +496,17 @@ class XBeteiligungResponseMessageFactory
             $messageXml = $this->serializeData($message);
             $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-            $xtaResponse = new XtaResponseValue();
-            $xtaResponse->setPayload($messageXml);
-            $xtaResponse->lock();
+            $response = new ResponseValue();
+            $response->setPayload($messageXml);
+            $response->lock();
 
-            return $xtaResponse;
+            return $response;
         } catch (Exception $e) {
             $this->dplanCockpitLogger->error('A Procedure with id "'
                 .$xmlObject409->getNachrichteninhalt()->getBeteiligungsID()
-                .'" was deleted but the XTA Message (Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319) couldn\'t be built.', [$e]);
+                .'" was deleted but the Message (Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319) couldn\'t be built.', [$e]);
 
-            return new XtaResponseValue();
+            return new ResponseValue();
         }
     }
 
@@ -516,10 +516,10 @@ class XBeteiligungResponseMessageFactory
      * @param array<int, FehlerType> $errorTypes
      *
      */
-    public function buildProcedureCreatedErrorXtaResponse321(
+    public function buildProcedureCreatedErrorResponse321(
         array $errorTypes,
         Planung2BeteiligungBeteiligungRaumordnungNeu0301 $xmlObject401
-    ): XtaResponseValue {
+    ): ResponseValue {
         $message = new Beteiligung2PlanungBeteiligungRaumordnungNeuNOK0321();
         $this->setProductInfo($message);
 
@@ -543,11 +543,11 @@ class XBeteiligungResponseMessageFactory
         $messageXml = $this->serializeData($message);
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-        $xtaResponse = new XtaResponseValue();
-        $xtaResponse->setPayload($messageXml);
-        $xtaResponse->lock();
+        $response = new ResponseValue();
+        $response->setPayload($messageXml);
+        $response->lock();
 
-        return $xtaResponse;
+        return $response;
     }
 
     /**
@@ -557,10 +557,10 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws SchemaException
      */
-    public function buildProcedureUpdateErrorXtaResponse322(
+    public function buildProcedureUpdateErrorResponse322(
         array $errorTypes,
         Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 $xmlObject402
-    ): XtaResponseValue {
+    ): ResponseValue {
         $message = new Beteiligung2PlanungBeteiligungRaumordnungAktualisierenNOK0322();
         $this->setProductInfo($message);
 
@@ -585,11 +585,11 @@ class XBeteiligungResponseMessageFactory
         $messageXml = $this->serializeData($message);
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-        $xtaResponse = new XtaResponseValue();
-        $xtaResponse->setPayload($messageXml);
-        $xtaResponse->lock();
+        $response = new ResponseValue();
+        $response->setPayload($messageXml);
+        $response->lock();
 
-        return $xtaResponse;
+        return $response;
     }
 
     /**
@@ -598,10 +598,10 @@ class XBeteiligungResponseMessageFactory
      * @param array<int, FehlerType> $errorTypes
      *
      */
-    public function buildProcedureDeletedErrorXtaResponse329(
+    public function buildProcedureDeletedErrorResponse329(
         array $errorTypes,
         Planung2BeteiligungBeteiligungRaumordnungLoeschen0309 $xmlObject409
-    ): XtaResponseValue {
+    ): ResponseValue {
         $message = new Beteiligung2PlanungBeteiligungRaumordnungLoeschenNOK0329();
         $this->setProductInfo($message);
 
@@ -627,11 +627,11 @@ class XBeteiligungResponseMessageFactory
 
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-        $xtaResponse = new XtaResponseValue();
-        $xtaResponse->setPayload($messageXml);
-        $xtaResponse->lock();
+        $response = new ResponseValue();
+        $response->setPayload($messageXml);
+        $response->lock();
 
-        return $xtaResponse;
+        return $response;
     }
 
     /**
@@ -639,10 +639,10 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureCreatedXtaResponse211(
+    public function buildProcedureCreatedResponse211(
         ProcedureInterface $procedure,
         Planung2BeteiligungBeteiligungPlanfeststellungNeu0201 $xmlObject401
-    ): XtaResponseValue
+    ): ResponseValue
     {
         try {
             $procedureCreated = new ProcedureCreated();
@@ -651,7 +651,7 @@ class XBeteiligungResponseMessageFactory
             $procedureCreated->setPlanId($planId);
             $procedureCreated->lock();
 
-            $xtaResponse = new XtaResponseValue();
+            $response = new ResponseValue();
             $message = new Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211();
             $this->setProductInfo($message);
 
@@ -672,14 +672,14 @@ class XBeteiligungResponseMessageFactory
             $messageXml = $this->serializeData($message);
             $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-            $xtaResponse->setPayload($messageXml);
-            $xtaResponse->lock();
+            $response->setPayload($messageXml);
+            $response->lock();
 
-            return $xtaResponse;
+            return $response;
         } catch (Exception $e) {
-            $this->dplanCockpitLogger->error('A Procedure with id "'.$procedure->getId().'" was created but the XTA Message (Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211) couldn\'t be built.');
+            $this->dplanCockpitLogger->error('A Procedure with id "'.$procedure->getId().'" was created but the Message (Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211) couldn\'t be built.');
 
-            return new XtaResponseValue();
+            return new ResponseValue();
         }
     }
 
@@ -688,16 +688,16 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureUpdateOKXtaResponse212(
+    public function buildProcedureUpdateOKResponse212(
         Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202 $xmlObject402,
         ProcedureInterface                                      $procedure
-    ): XtaResponseValue {
+    ): ResponseValue {
         try {
             $procedureId = $procedure->getId();
             $planId = $xmlObject402->getNachrichteninhalt()->getBeteiligung()->getPlanID();
             $instanceId = $xmlObject402->getNachrichteninhalt()->getVorgangsID();
 
-            $xtaResponse = new XtaResponseValue();
+            $response = new ResponseValue();
             $message = new Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenOK0212();
             $this->setProductInfo($message);
 
@@ -718,18 +718,18 @@ class XBeteiligungResponseMessageFactory
             $messageXml = $this->serializeData($message);
             $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-            $xtaResponse->setPayload($messageXml);
-            $xtaResponse->lock();
+            $response->setPayload($messageXml);
+            $response->lock();
 
-            return $xtaResponse;
+            return $response;
         } catch (Exception $e) {
             $this->dplanCockpitLogger->error(
                 'A Procedure with id "'.$procedure->getId().
-                '" was updated but the XTA Message (Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenOK0212) couldn\'t be built.',
+                '" was updated but the Message (Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenOK0212) couldn\'t be built.',
                 [$e]
             );
 
-            return new XtaResponseValue();
+            return new ResponseValue();
         }
     }
 
@@ -738,7 +738,7 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureDeletedXtaResponse219(Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209 $xmlObject409): XtaResponseValue
+    public function buildProcedureDeletedResponse219(Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209 $xmlObject409): ResponseValue
     {
         try {
             $message = new Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219();
@@ -761,17 +761,17 @@ class XBeteiligungResponseMessageFactory
             $messageXml = $this->serializeData($message);
             $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-            $xtaResponse = new XtaResponseValue();
-            $xtaResponse->setPayload($messageXml);
-            $xtaResponse->lock();
+            $response = new ResponseValue();
+            $response->setPayload($messageXml);
+            $response->lock();
 
-            return $xtaResponse;
+            return $response;
         } catch (Exception $e) {
             $this->dplanCockpitLogger->error('A Procedure with id "'
                 .$xmlObject409->getNachrichteninhalt()->getBeteiligungsID()
-                .'" was deleted but the XTA Message (Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219) couldn\'t be built.', [$e]);
+                .'" was deleted but the Message (Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219) couldn\'t be built.', [$e]);
 
-            return new XtaResponseValue();
+            return new ResponseValue();
         }
     }
 
@@ -781,10 +781,10 @@ class XBeteiligungResponseMessageFactory
      * @param array<int, FehlerType> $errorTypes
      *
      */
-    public function buildProcedureCreatedErrorXtaResponse221(
+    public function buildProcedureCreatedErrorResponse221(
         array $errorTypes,
         Planung2BeteiligungBeteiligungPlanfeststellungNeu0201 $xmlObject401
-    ): XtaResponseValue {
+    ): ResponseValue {
         $message = new Beteiligung2PlanungBeteiligungPlanfeststellungNeuNOK0221();
         $this->setProductInfo($message);
 
@@ -808,11 +808,11 @@ class XBeteiligungResponseMessageFactory
         $messageXml = $this->serializeData($message);
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-        $xtaResponse = new XtaResponseValue();
-        $xtaResponse->setPayload($messageXml);
-        $xtaResponse->lock();
+        $response = new ResponseValue();
+        $response->setPayload($messageXml);
+        $response->lock();
 
-        return $xtaResponse;
+        return $response;
     }
 
     /**
@@ -822,10 +822,10 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws SchemaException
      */
-    public function buildProcedureUpdateErrorXtaResponse222(
+    public function buildProcedureUpdateErrorResponse222(
         array $errorTypes,
         Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202 $xmlObject402
-    ): XtaResponseValue {
+    ): ResponseValue {
         $message = new Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222();
         $this->setProductInfo($message);
 
@@ -850,11 +850,11 @@ class XBeteiligungResponseMessageFactory
         $messageXml = $this->serializeData($message);
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-        $xtaResponse = new XtaResponseValue();
-        $xtaResponse->setPayload($messageXml);
-        $xtaResponse->lock();
+        $response = new ResponseValue();
+        $response->setPayload($messageXml);
+        $response->lock();
 
-        return $xtaResponse;
+        return $response;
     }
 
     /**
@@ -863,10 +863,10 @@ class XBeteiligungResponseMessageFactory
      * @param array<int, FehlerType> $errorTypes
      *
      */
-    public function buildProcedureDeletedErrorXtaResponse229(
+    public function buildProcedureDeletedErrorResponse229(
         array $errorTypes,
         Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209 $xmlObject409
-    ): XtaResponseValue {
+    ): ResponseValue {
         $message = new Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenNOK0229();
         $this->setProductInfo($message);
 
@@ -892,11 +892,11 @@ class XBeteiligungResponseMessageFactory
 
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($messageXml);
 
-        $xtaResponse = new XtaResponseValue();
-        $xtaResponse->setPayload($messageXml);
-        $xtaResponse->lock();
+        $response = new ResponseValue();
+        $response->setPayload($messageXml);
+        $response->lock();
 
-        return $xtaResponse;
+        return $response;
     }
 
     /**

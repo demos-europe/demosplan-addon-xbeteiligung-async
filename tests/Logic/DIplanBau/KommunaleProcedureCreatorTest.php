@@ -7,7 +7,7 @@ use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\XtaKommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\KommunaleProcedureCreater;
 use JMS\Serializer\Serializer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Log\Logger;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Log\Logger;
 class KommunaleProcedureCreatorTest extends TestCase
 {
     /**
-     * @var XtaKommunaleProcedureCreater
+     * @var KommunaleProcedureCreater
      */
     protected $sut;
 
@@ -37,8 +37,8 @@ class KommunaleProcedureCreatorTest extends TestCase
         $this->mockFactory = $mockFactory;
         $this->logger = new Logger();
         $this->serializer = SerializerFactory::getSerializer();
-        $xtaProcedureHandlerFactory = new XtaKommunaleProcedureHandlerFactory($mockFactory);
-        $this->sut = $xtaProcedureHandlerFactory->createXtaProcedureHandler('creator');
+        $procedureHandlerFactory = new KommunaleProcedureHandlerFactory($mockFactory);
+        $this->sut = $procedureHandlerFactory->createProcedureHandler('creator');
 
     }
 

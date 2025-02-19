@@ -6,7 +6,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ValueObject;
 
-class XtaResponseValue extends ValueObject
+class ResponseValue extends ValueObject
 {
     /** XML string */
     protected string $payload;

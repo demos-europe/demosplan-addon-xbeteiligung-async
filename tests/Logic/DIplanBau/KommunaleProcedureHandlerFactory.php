@@ -3,19 +3,19 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DIplanBau;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\XtaKommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\KommunaleProcedureCreater;
 use InvalidArgumentException;
 
-class XtaKommunaleProcedureHandlerFactory
+class KommunaleProcedureHandlerFactory
 {
     public function __construct(private MockFactory $mockFactory)
     {
         $this->mockFactory = $mockFactory;
     }
 
-    public function createXtaProcedureHandler(
+    public function createProcedureHandler(
         string $handlerType
-    ): XtaKommunaleProcedureCreater {
+    ): KommunaleProcedureCreater {
         $commonDependencies = [
             $this->mockFactory->getCurrentUserProviderInterfaceMock(),
             $this->mockFactory->getLoggerInterfaceMock(),
@@ -26,11 +26,13 @@ class XtaKommunaleProcedureHandlerFactory
             $this->mockFactory->getEntityManagerMock(),
             $this->mockFactory->getResponseMessageFactoryMock(),
             $this->mockFactory->getTranslatorMock(),
+            $this->mockFactory->getTransActionServiceInterfaceMock(),
+            $this->mockFactory->getXBeteiligungServiceMock(),
         ];
 
         switch ($handlerType) {
             case 'creator':
-                return new XtaKommunaleProcedureCreater(...$commonDependencies);
+                return new KommunaleProcedureCreater(...$commonDependencies);
             default:
                 throw new InvalidArgumentException('Invalid handler type');
         }

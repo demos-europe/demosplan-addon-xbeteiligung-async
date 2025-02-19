@@ -2,7 +2,7 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\DiplanRog;
 
-class XtaRaumordnungProcedureRemover
+class RaumordnungProcedureRemover
 {
 
 }
