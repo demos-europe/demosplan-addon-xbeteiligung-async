@@ -19,7 +19,6 @@ use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungResponseMessageFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
