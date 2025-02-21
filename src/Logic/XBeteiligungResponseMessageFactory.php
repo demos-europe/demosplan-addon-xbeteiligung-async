@@ -66,7 +66,7 @@ use Ramsey\Uuid\Uuid;
 use const  LIBXML_NOCDATA;
 class XBeteiligungResponseMessageFactory
 {
-    public const XBETEILIGUNG_VERSION = '1';
+    public const XBETEILIGUNG_VERSION = 'V14';
     public const STANDARD = 'XBeteiligung';
     /**
      * @var LoggerInterface
@@ -124,7 +124,7 @@ class XBeteiligungResponseMessageFactory
             $this->setProductInfo($message);
 
             $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+            $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'K1');
             $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
             $headerBuilder = $this->setMessageInfo($headerBuilder, '0411');
             $header = $headerBuilder->build();
@@ -170,7 +170,7 @@ class XBeteiligungResponseMessageFactory
             $this->setProductInfo($message);
 
             $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+            $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'K1');
             $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
             $headerBuilder = $this->setMessageInfo($headerBuilder, '0412');
             $header = $headerBuilder->build();
@@ -213,7 +213,7 @@ class XBeteiligungResponseMessageFactory
             $this->setProductInfo($message);
 
             $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+            $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'K1');
             $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
             $headerBuilder = $this->setMessageInfo($headerBuilder, '0419');
             $header = $headerBuilder->build();
@@ -257,7 +257,7 @@ class XBeteiligungResponseMessageFactory
         $this->setProductInfo($message);
 
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
+        $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'LGV');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, '0421');
         $header = $headerBuilder->build();
@@ -298,7 +298,7 @@ class XBeteiligungResponseMessageFactory
         $this->setProductInfo($message);
 
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
+        $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'LGV');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, '0422');
         $header = $headerBuilder->build();
@@ -339,7 +339,7 @@ class XBeteiligungResponseMessageFactory
         $this->setProductInfo($message);
 
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
+        $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'LGV');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, '0429');
         $header = $headerBuilder->build();
@@ -389,7 +389,7 @@ class XBeteiligungResponseMessageFactory
             $this->setProductInfo($message);
 
             $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+            $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'K1');
             $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
             $headerBuilder = $this->setMessageInfo($headerBuilder, '0311');
             $header = $headerBuilder->build();
@@ -435,7 +435,7 @@ class XBeteiligungResponseMessageFactory
             $this->setProductInfo($message);
 
             $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+            $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'K1');
             $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
             $headerBuilder = $this->setMessageInfo($headerBuilder, '0312');
             $header = $headerBuilder->build();
@@ -480,7 +480,7 @@ class XBeteiligungResponseMessageFactory
             $this->setProductInfo($message);
 
             $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+            $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'K1');
             $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
             $headerBuilder = $this->setMessageInfo($headerBuilder, '0319');
             $header = $headerBuilder->build();
@@ -524,7 +524,7 @@ class XBeteiligungResponseMessageFactory
         $this->setProductInfo($message);
 
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
+        $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'LGV');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, '0321');
         $header = $headerBuilder->build();
@@ -565,7 +565,7 @@ class XBeteiligungResponseMessageFactory
         $this->setProductInfo($message);
 
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
+        $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'LGV');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, '0322');
         $header = $headerBuilder->build();
@@ -606,7 +606,7 @@ class XBeteiligungResponseMessageFactory
         $this->setProductInfo($message);
 
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
+        $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'LGV');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, '0329');
         $header = $headerBuilder->build();
@@ -656,7 +656,7 @@ class XBeteiligungResponseMessageFactory
             $this->setProductInfo($message);
 
             $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+            $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'K1');
             $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
             $headerBuilder = $this->setMessageInfo($headerBuilder, '0211');
             $header = $headerBuilder->build();
@@ -702,7 +702,7 @@ class XBeteiligungResponseMessageFactory
             $this->setProductInfo($message);
 
             $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+            $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'K1');
             $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
             $headerBuilder = $this->setMessageInfo($headerBuilder, '0212');
             $header = $headerBuilder->build();
@@ -745,7 +745,7 @@ class XBeteiligungResponseMessageFactory
             $this->setProductInfo($message);
 
             $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+            $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'K1');
             $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
             $headerBuilder = $this->setMessageInfo($headerBuilder, '0219');
             $header = $headerBuilder->build();
@@ -789,7 +789,7 @@ class XBeteiligungResponseMessageFactory
         $this->setProductInfo($message);
 
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
+        $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'LGV');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, '0221');
         $header = $headerBuilder->build();
@@ -830,7 +830,7 @@ class XBeteiligungResponseMessageFactory
         $this->setProductInfo($message);
 
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
+        $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'LGV');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, '0222');
         $header = $headerBuilder->build();
@@ -871,7 +871,7 @@ class XBeteiligungResponseMessageFactory
         $this->setProductInfo($message);
 
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
+        $headerBuilder = $this->setDiplanCockpitInfo($headerBuilder, 'reader', 'LGV');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, '0229');
         $header = $headerBuilder->build();
@@ -906,10 +906,10 @@ class XBeteiligungResponseMessageFactory
     {
         $messageObject->setProdukt('A1'); // required
         $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
-        $messageObject->setProduktversion(self::XBETEILIGUNG_VERSION); // optional
+        $messageObject->setProduktversion('1.0'); // optional
         $messageObject->setStandard(self::STANDARD); // required
         // $messageObject->setTest(''); // optional
-        $messageObject->setVersion(self::XBETEILIGUNG_VERSION); // required
+        $messageObject->setVersion('1.0'); // required
 
         return $messageObject;
     }
@@ -917,7 +917,7 @@ class XBeteiligungResponseMessageFactory
     /**
      * Creates an object with the info for K1 (to be used as reader or author in xml's).
      */
-    private function setK1Info(
+    private function setDiplanCockpitInfo(
         XBeteiligungMessageHeadG2GTypeBuilder $headerBuilder,
         string $agentType,
         string $prefixName

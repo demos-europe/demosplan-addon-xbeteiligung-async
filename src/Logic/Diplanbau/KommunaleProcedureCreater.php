@@ -146,8 +146,8 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         BeteiligungKommunalType $messageContent,
     ): ProcedureInterface {
         $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent);
-        //TODO: implement procedure creation
-        $userId = $this->entityManager->getRepository(UserInterface::class)->findOneBy([$this->currentUserProvider->getUser()->getUserIdentifier()]);
+        $userId = $this->entityManager->getRepository(UserInterface::class)->
+            findOneBy([$this->currentUserProvider->getUser()->getUserIdentifier()]);
         $procedureData = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
         return $this->procedureService->getProcedure($procedureData?->getId());
     }
@@ -161,12 +161,10 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         if (null === $orga) {
             throw new InvalidArgumentException("Organisation not set");
         }
-        //TODO: adjust procedure data
         return [
             'r_name'                                                        => $procedureObject->getPlanname(),
             'r_desc'                                                        => $procedureObject->getBeschreibungPlanungsanlass(),
             'r_externalDesc'                                                => $procedureObject->getBeschreibungPlanungsanlass(),
-            'r_publicParticipationPublicationEnabled'                       => false,
             'orgaId'                                                        => $orga->getId(),
             'orgaName'                                                      => $orga->getName(),
             'action'                                                        => 'new',
