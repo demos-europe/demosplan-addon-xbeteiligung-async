@@ -16,7 +16,7 @@ use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInte
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\GetMessageRabbitMQ;
 use Exception;
@@ -75,7 +75,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
         if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
-            $xml = $this->kommunaleProcedureCreater->createProcedureNew401FromObject($event->getProcedure());
+            $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
             $this->createProcedureMessage($xml, $event->getProcedure());
         }
 

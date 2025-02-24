@@ -170,3 +170,4 @@ class XBeteiligungIncomingMessageParser
         return $message;
     }
 }
+

@@ -3,7 +3,7 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DIplanBau;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use InvalidArgumentException;
 
 class KommunaleProcedureHandlerFactory

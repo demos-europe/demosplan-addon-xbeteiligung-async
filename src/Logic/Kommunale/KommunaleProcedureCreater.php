@@ -1,6 +1,6 @@
 <?php
 
-namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau;
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
@@ -131,9 +131,13 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         return $this->transactionService->executeAndFlushInTransaction(
             function () use ($messageContent) {
                 $procedure = $this->createProcedureEntity($messageContent);
-                $participationPhase = new CodeVerfahrensschrittKommunalType();
-                $participationPhase->setCode($messageContent->getVerfahrensschrittKommunal()?->getCode());
-                $procedure->setPhase($participationPhase->getCode());
+                $phase = $messageContent->getVerfahrensschrittKommunal();
+                $phase = $phase === null ? '' : $phase->getCode();
+                $this->logger->info(
+                    'Procedure phase from XML message',
+                    [$phase]
+                );
+                $procedure->setPhase($phase);
                 $procedure->getSettings()->setTerritory($messageContent->getGeltungsbereich());
                 return $procedure;
             }
@@ -174,33 +178,5 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'xtaPlanId'                                                     => $procedureObject->getPlanID(),
         ];
     }
-
-    public function createProcedureNew401FromObject(ProcedureInterface $procedure): string
-    {
-        //TODO: Dupplicate with XtaKommunaleProcedureCreater, should delete after adjustment test
-        $procedureCreated401Object = new Planung2BeteiligungBeteiligungKommunalNeu0401();
-        $procedureCreated401Object = $this->xBeteiligungMessageFactory->setProductInfo($procedureCreated401Object); // required
-        $procedureCreated401Object->setNachrichtenkopf(
-            $this->xBeteiligungService->createMessageHeadFor($procedureCreated401Object)
-        ); // required
-        $procedureCreated401Object->setNachrichteninhalt(
-            $this->generateMain401MessageContent($procedure)
-        ); // required
-
-        return $this->xBeteiligungMessageFactory->serializeData($procedureCreated401Object);
-    }
-
-    private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
-    {
-        //TODO: Dupplicate with XtaKommunaleProcedureCreater, should delete after adjustment test
-        $messageContent = new Nachrichteninhalt401();
-        $messageContent->setVorgangsID($this->xBeteiligungMessageFactory->uuid());
-        $messageContent->setBeteiligung(
-            $this->xBeteiligungService->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungKommunalType())
-        );
-
-        return $messageContent;
-    }
-
 
 }

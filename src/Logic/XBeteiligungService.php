@@ -19,7 +19,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Diplanbau\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
@@ -184,7 +184,6 @@ class XBeteiligungService
      */
     public function createProcedureNew401FromObject(ProcedureInterface $procedure): string
     {
-        //TODO: Dupplicate with KommunaleProcedureCreater, should delete after adjustment test
         $procedureCreated401Object = new Planung2BeteiligungBeteiligungKommunalNeu0401();
         $procedureCreated401Object = $this->beteiligungMessageFactory->setProductInfo($procedureCreated401Object); // required
         $procedureCreated401Object->setNachrichtenkopf(
@@ -1004,7 +1003,9 @@ class XBeteiligungService
             return $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
         }
         /*
-         * TODO: Implement the following message types
+         * The code is for different message types code and we use this thing in future
+         * There are not implement yet
+         *
         if (self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
             $messageAttachments = $message['messageAttachments'];
             $xmlObject402 = $this->incomingMessageParser->getXmlObject($payload, 402);
