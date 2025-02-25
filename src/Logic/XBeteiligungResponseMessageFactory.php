@@ -6,8 +6,6 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalAktualisierenNOK0422;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalAktualisierenOK0412;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalLoeschenNOK0429;
@@ -45,7 +43,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBetei
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungNeuNOK0321;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409;
@@ -136,11 +133,6 @@ class XBeteiligungResponseMessageFactory
         return $serializerBuilder->build();
     }
 
-    public function getSerializer(): Serializer
-    {
-        return $this->serializer;
-    }
-
     /**
      * Builds a valid XBeteiligungsmessage as a response of creating a procedure.
      *
@@ -151,43 +143,13 @@ class XBeteiligungResponseMessageFactory
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
     ): ResponseValue
     {
-        try {
-            $procedureCreated = new ProcedureCreated();
-            $procedureCreated->setProcedureId($procedure->getId());
-            $planId = $xmlObject401->getNachrichteninhalt()->getBeteiligung()->getPlanID();
-            $procedureCreated->setPlanId($planId);
-            $procedureCreated->lock();
-
-            $response = new ResponseValue();
-            $message = new Beteiligung2PlanungBeteiligungKommunalNeuOK0411();
-            $this->setProductInfo($message);
-
-            $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
-            $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-            $headerBuilder = $this->setMessageInfo($headerBuilder, '0411');
-            $header = $headerBuilder->build();
-
-            $content = new NachrichteninhaltAnonymousPHPType0411();
-            $content->setBeteiligungsID($procedureCreated->getProcedureId());
-            $content->setPlanID($procedureCreated->getPlanId());
-            $content->setVorgangsID($xmlObject401->getNachrichteninhalt()->getVorgangsID());
-
-            $message->setNachrichtenkopf($header);
-            $message->setNachrichteninhalt($content);
-
-            $messageXml = $this->serializeData($message);
-            $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-            $response->setPayload($messageXml);
-            $response->lock();
-
-            return $response;
-        } catch (Exception $e) {
-            $this->dplanCockpitLogger->error('A Procedure with id "'.$procedure->getId().'" was created but the Message (Beteiligung2PlanungBeteiligungNeuOK0411) couldn\'t be built.');
-
-            return new ResponseValue();
-        }
+        return $this->buildProcedureCreatedResponse(
+            $procedure,
+            $xmlObject401,
+            new Beteiligung2PlanungBeteiligungKommunalNeuOK0411(),
+            new NachrichteninhaltAnonymousPHPType0411(),
+            '0411'
+        );
     }
 
     /**
@@ -199,45 +161,13 @@ class XBeteiligungResponseMessageFactory
         Planung2BeteiligungBeteiligungKommunalAktualisieren0402 $xmlObject402,
         ProcedureInterface                                      $procedure
     ): ResponseValue {
-        try {
-            $procedureId = $procedure->getId();
-            $planId = $xmlObject402->getNachrichteninhalt()->getBeteiligung()->getPlanID();
-            $instanceId = $xmlObject402->getNachrichteninhalt()->getVorgangsID();
-
-            $response = new ResponseValue();
-            $message = new Beteiligung2PlanungBeteiligungKommunalAktualisierenOK0412();
-            $this->setProductInfo($message);
-
-            $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
-            $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-            $headerBuilder = $this->setMessageInfo($headerBuilder, '0412');
-            $header = $headerBuilder->build();
-
-            $content = new NachrichteninhaltAnonymousPHPType0412();
-            $content->setBeteiligungsID($procedureId);
-            $content->setPlanID($planId);
-            $content->setVorgangsID($instanceId);
-
-            $message->setNachrichtenkopf($header);
-            $message->setNachrichteninhalt($content);
-
-            $messageXml = $this->serializeData($message);
-            $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-            $response->setPayload($messageXml);
-            $response->lock();
-
-            return $response;
-        } catch (Exception $e) {
-            $this->dplanCockpitLogger->error(
-                'A Procedure with id "'.$procedure->getId().
-                '" was updated but the Message (Beteiligung2PlanungBeteiligung) couldn\'t be built.',
-                [$e]
-            );
-
-            return new ResponseValue();
-        }
+        return $this->buildProcedureUpdateResponse(
+            $procedure,
+            $xmlObject402,
+            new Beteiligung2PlanungBeteiligungKommunalAktualisierenOK0412(),
+            new NachrichteninhaltAnonymousPHPType0412(),
+            '0412'
+        );
     }
 
     /**
@@ -247,39 +177,12 @@ class XBeteiligungResponseMessageFactory
      */
     public function buildProcedureDeletedResponse419(Planung2BeteiligungBeteiligungKommunalLoeschen0409 $xmlObject409): ResponseValue
     {
-        try {
-            $message = new Beteiligung2PlanungBeteiligungKommunalLoeschenOK0419();
-            $this->setProductInfo($message);
-
-            $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
-            $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-            $headerBuilder = $this->setMessageInfo($headerBuilder, '0419');
-            $header = $headerBuilder->build();
-
-            $content = new NachrichteninhaltAnonymousPHPType0419();
-            $content->setBeteiligungsID($xmlObject409->getNachrichteninhalt()->getBeteiligungsID());
-            $content->setPlanID($xmlObject409->getNachrichteninhalt()->getPlanID());
-            $content->setVorgangsID($xmlObject409->getNachrichteninhalt()->getVorgangsID());
-
-            $message->setNachrichtenkopf($header);
-            $message->setNachrichteninhalt($content);
-
-            $messageXml = $this->serializeData($message);
-            $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-            $response = new ResponseValue();
-            $response->setPayload($messageXml);
-            $response->lock();
-
-            return $response;
-        } catch (Exception $e) {
-            $this->dplanCockpitLogger->error('A Procedure with id "'
-                .$xmlObject409->getNachrichteninhalt()->getBeteiligungsID()
-                .'" was deleted but the Message (Beteiligung2PlanungBeteiligungNeuOK0419) couldn\'t be built.', [$e]);
-
-            return new ResponseValue();
-        }
+        return $this->buildProcedureDeletedResponse(
+            $xmlObject409,
+            new Beteiligung2PlanungBeteiligungKommunalLoeschenOK0419(),
+            new NachrichteninhaltAnonymousPHPType0419(),
+            '0419'
+        );
     }
 
     /**
@@ -292,34 +195,13 @@ class XBeteiligungResponseMessageFactory
         array $errorTypes,
         Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
     ): ResponseValue {
-        $message = new Beteiligung2PlanungBeteiligungKommunalNeuNOK0421();
-        $this->setProductInfo($message);
-
-        $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
-        $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-        $headerBuilder = $this->setMessageInfo($headerBuilder, '0421');
-        $header = $headerBuilder->build();
-
-        $content = new NachrichteninhaltAnonymousPHPType0421();
-        $content->setVorgangsID($xmlObject401->getNachrichteninhalt()->getVorgangsID());
-        $content->setPlanID($xmlObject401->getNachrichteninhalt()->getBeteiligung()->getPlanID());
-
-        foreach ($errorTypes as $errorType) {
-            $content->addToFehler($errorType);
-        }
-
-        $message->setNachrichtenkopf($header);
-        $message->setNachrichteninhalt($content);
-
-        $messageXml = $this->serializeData($message);
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-        $response = new ResponseValue();
-        $response->setPayload($messageXml);
-        $response->lock();
-
-        return $response;
+        return $this->buildErrorResponse(
+            $errorTypes,
+            $xmlObject401,
+            new Beteiligung2PlanungBeteiligungKommunalNeuNOK0421(),
+            new NachrichteninhaltAnonymousPHPType0421(),
+            '0421'
+        );
     }
 
     /**
@@ -332,36 +214,15 @@ class XBeteiligungResponseMessageFactory
     public function buildProcedureUpdateErrorResponse422(
         array $errorTypes,
         Planung2BeteiligungBeteiligungKommunalAktualisieren0402 $xmlObject402
-    ): ResponseValue {
-        $message = new Beteiligung2PlanungBeteiligungKommunalAktualisierenNOK0422();
-        $this->setProductInfo($message);
-
-        $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
-        $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-        $headerBuilder = $this->setMessageInfo($headerBuilder, '0422');
-        $header = $headerBuilder->build();
-
-        $content = new NachrichteninhaltAnonymousPHPType0422();
-        $content->setVorgangsID($xmlObject402->getNachrichteninhalt()->getVorgangsID());
-        $content->setPlanID($xmlObject402->getNachrichteninhalt()->getBeteiligung()->getPlanID());
-        $content->setBeteiligungsID($xmlObject402->getNachrichteninhalt()->getBeteiligung()->getBeteiligungsID());
-
-        foreach ($errorTypes as $errorType) {
-            $content->addToFehler($errorType);
-        }
-
-        $message->setNachrichtenkopf($header);
-        $message->setNachrichteninhalt($content);
-
-        $messageXml = $this->serializeData($message);
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-        $response = new ResponseValue();
-        $response->setPayload($messageXml);
-        $response->lock();
-
-        return $response;
+    ): ResponseValue
+    {
+        return $this->buildErrorResponse(
+            $errorTypes,
+            $xmlObject402,
+            new Beteiligung2PlanungBeteiligungKommunalAktualisierenNOK0422(),
+            new NachrichteninhaltAnonymousPHPType0422(),
+            '0422'
+        );
     }
 
     /**
@@ -373,37 +234,15 @@ class XBeteiligungResponseMessageFactory
     public function buildProcedureDeletedErrorResponse429(
         array $errorTypes,
         Planung2BeteiligungBeteiligungKommunalLoeschen0409 $xmlObject409
-    ): ResponseValue {
-        $message = new Beteiligung2PlanungBeteiligungKommunalLoeschenNOK0429();
-        $this->setProductInfo($message);
-
-        $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
-        $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-        $headerBuilder = $this->setMessageInfo($headerBuilder, '0429');
-        $header = $headerBuilder->build();
-
-        $content = new NachrichteninhaltAnonymousPHPType0429();
-        $content->setVorgangsID($xmlObject409->getNachrichteninhalt()->getVorgangsID());
-        $content->setPlanID($xmlObject409->getNachrichteninhalt()->getPlanID());
-        $content->setBeteiligungsID($xmlObject409->getNachrichteninhalt()->getBeteiligungsID());
-
-        foreach ($errorTypes as $errorType) {
-            $content->addToFehler($errorType);
-        }
-
-        $message->setNachrichtenkopf($header);
-        $message->setNachrichteninhalt($content);
-
-        $messageXml = $this->serializeData($message);
-
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-        $response = new ResponseValue();
-        $response->setPayload($messageXml);
-        $response->lock();
-
-        return $response;
+    ): ResponseValue
+    {
+        return $this->buildErrorResponse(
+            $errorTypes,
+            $xmlObject409,
+            new Beteiligung2PlanungBeteiligungKommunalLoeschenNOK0429(),
+            new NachrichteninhaltAnonymousPHPType0429(),
+            '0429'
+        );
     }
 
     /**
@@ -416,43 +255,13 @@ class XBeteiligungResponseMessageFactory
         Planung2BeteiligungBeteiligungRaumordnungNeu0301 $xmlObject401
     ): ResponseValue
     {
-        try {
-            $procedureCreated = new ProcedureCreated();
-            $procedureCreated->setProcedureId($procedure->getId());
-            $planId = $xmlObject401->getNachrichteninhalt()->getBeteiligung()->getPlanID();
-            $procedureCreated->setPlanId($planId);
-            $procedureCreated->lock();
-
-            $response = new ResponseValue();
-            $message = new Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311();
-            $this->setProductInfo($message);
-
-            $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
-            $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-            $headerBuilder = $this->setMessageInfo($headerBuilder, '0311');
-            $header = $headerBuilder->build();
-
-            $content = new NachrichteninhaltAnonymousPHPType0311();
-            $content->setBeteiligungsID($procedureCreated->getProcedureId());
-            $content->setPlanID($procedureCreated->getPlanId());
-            $content->setVorgangsID($xmlObject401->getNachrichteninhalt()->getVorgangsID());
-
-            $message->setNachrichtenkopf($header);
-            $message->setNachrichteninhalt($content);
-
-            $messageXml = $this->serializeData($message);
-            $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-            $response->setPayload($messageXml);
-            $response->lock();
-
-            return $response;
-        } catch (Exception $e) {
-            $this->dplanCockpitLogger->error('A Procedure with id "'.$procedure->getId().'" was created but the Message (Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311) couldn\'t be built.');
-
-            return new ResponseValue();
-        }
+        return $this->buildProcedureCreatedResponse(
+            $procedure,
+            $xmlObject401,
+            new Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311(),
+            new NachrichteninhaltAnonymousPHPType0311(),
+            '0311'
+        );
     }
 
     /**
@@ -461,48 +270,16 @@ class XBeteiligungResponseMessageFactory
      * @throws Exception
      */
     public function buildProcedureUpdateOKResponse312(
-        Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 $xmlObject402,
+        Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 $xmlObject302,
         ProcedureInterface                                      $procedure
     ): ResponseValue {
-        try {
-            $procedureId = $procedure->getId();
-            $planId = $xmlObject402->getNachrichteninhalt()->getBeteiligung()->getPlanID();
-            $instanceId = $xmlObject402->getNachrichteninhalt()->getVorgangsID();
-
-            $response = new ResponseValue();
-            $message = new Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312();
-            $this->setProductInfo($message);
-
-            $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
-            $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-            $headerBuilder = $this->setMessageInfo($headerBuilder, '0312');
-            $header = $headerBuilder->build();
-
-            $content = new NachrichteninhaltAnonymousPHPType0312();
-            $content->setBeteiligungsID($procedureId);
-            $content->setPlanID($planId);
-            $content->setVorgangsID($instanceId);
-
-            $message->setNachrichtenkopf($header);
-            $message->setNachrichteninhalt($content);
-
-            $messageXml = $this->serializeData($message);
-            $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-            $response->setPayload($messageXml);
-            $response->lock();
-
-            return $response;
-        } catch (Exception $e) {
-            $this->dplanCockpitLogger->error(
-                'A Procedure with id "'.$procedure->getId().
-                '" was updated but the Message (Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312) couldn\'t be built.',
-                [$e]
-            );
-
-            return new ResponseValue();
-        }
+        return $this->buildProcedureUpdateResponse(
+            $procedure,
+            $xmlObject302,
+            new Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312(),
+            new NachrichteninhaltAnonymousPHPType0312(),
+            '0312'
+        );
     }
 
     /**
@@ -511,42 +288,15 @@ class XBeteiligungResponseMessageFactory
      * @throws Exception
      */
     public function buildProcedureDeletedResponse319(
-        Planung2BeteiligungBeteiligungRaumordnungLoeschen0309 $xmlObject409
+        Planung2BeteiligungBeteiligungRaumordnungLoeschen0309 $xmlObject309
     ): ResponseValue
     {
-        try {
-            $message = new Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319();
-            $this->setProductInfo($message);
-
-            $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
-            $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-            $headerBuilder = $this->setMessageInfo($headerBuilder, '0319');
-            $header = $headerBuilder->build();
-
-            $content = new NachrichteninhaltAnonymousPHPType0319();
-            $content->setBeteiligungsID($xmlObject409->getNachrichteninhalt()->getBeteiligungsID());
-            $content->setPlanID($xmlObject409->getNachrichteninhalt()->getPlanID());
-            $content->setVorgangsID($xmlObject409->getNachrichteninhalt()->getVorgangsID());
-
-            $message->setNachrichtenkopf($header);
-            $message->setNachrichteninhalt($content);
-
-            $messageXml = $this->serializeData($message);
-            $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-            $response = new ResponseValue();
-            $response->setPayload($messageXml);
-            $response->lock();
-
-            return $response;
-        } catch (Exception $e) {
-            $this->dplanCockpitLogger->error('A Procedure with id "'
-                .$xmlObject409->getNachrichteninhalt()->getBeteiligungsID()
-                .'" was deleted but the Message (Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319) couldn\'t be built.', [$e]);
-
-            return new ResponseValue();
-        }
+        return $this->buildProcedureDeletedResponse(
+            $xmlObject309,
+            new Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319(),
+            new NachrichteninhaltAnonymousPHPType0319(),
+            '0319'
+        );
     }
 
     /**
@@ -557,36 +307,15 @@ class XBeteiligungResponseMessageFactory
      */
     public function buildProcedureCreatedErrorResponse321(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungRaumordnungNeu0301 $xmlObject401
+        Planung2BeteiligungBeteiligungRaumordnungNeu0301 $xmlObject301
     ): ResponseValue {
-        $message = new Beteiligung2PlanungBeteiligungRaumordnungNeuNOK0321();
-        $this->setProductInfo($message);
-
-        $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
-        $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-        $headerBuilder = $this->setMessageInfo($headerBuilder, '0321');
-        $header = $headerBuilder->build();
-
-        $content = new NachrichteninhaltAnonymousPHPType0321();
-        $content->setVorgangsID($xmlObject401->getNachrichteninhalt()->getVorgangsID());
-        $content->setPlanID($xmlObject401->getNachrichteninhalt()->getBeteiligung()->getPlanID());
-
-        foreach ($errorTypes as $errorType) {
-            $content->addToFehler($errorType);
-        }
-
-        $message->setNachrichtenkopf($header);
-        $message->setNachrichteninhalt($content);
-
-        $messageXml = $this->serializeData($message);
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-        $response = new ResponseValue();
-        $response->setPayload($messageXml);
-        $response->lock();
-
-        return $response;
+        return $this->buildErrorResponse(
+            $errorTypes,
+            $xmlObject301,
+            new Beteiligung2PlanungBeteiligungRaumordnungNeuNOK0321(),
+            new NachrichteninhaltAnonymousPHPType0321(),
+            '0321'
+        );
     }
 
     /**
@@ -598,37 +327,16 @@ class XBeteiligungResponseMessageFactory
      */
     public function buildProcedureUpdateErrorResponse322(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 $xmlObject402
-    ): ResponseValue {
-        $message = new Beteiligung2PlanungBeteiligungRaumordnungAktualisierenNOK0322();
-        $this->setProductInfo($message);
-
-        $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
-        $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-        $headerBuilder = $this->setMessageInfo($headerBuilder, '0322');
-        $header = $headerBuilder->build();
-
-        $content = new NachrichteninhaltAnonymousPHPType0322();
-        $content->setVorgangsID($xmlObject402->getNachrichteninhalt()->getVorgangsID());
-        $content->setPlanID($xmlObject402->getNachrichteninhalt()->getBeteiligung()->getPlanID());
-        $content->setBeteiligungsID($xmlObject402->getNachrichteninhalt()->getBeteiligung()->getBeteiligungsID());
-
-        foreach ($errorTypes as $errorType) {
-            $content->addToFehler($errorType);
-        }
-
-        $message->setNachrichtenkopf($header);
-        $message->setNachrichteninhalt($content);
-
-        $messageXml = $this->serializeData($message);
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-        $response = new ResponseValue();
-        $response->setPayload($messageXml);
-        $response->lock();
-
-        return $response;
+        Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 $xmlObject302
+    ): ResponseValue
+    {
+        return $this->buildErrorResponse(
+            $errorTypes,
+            $xmlObject302,
+            new Beteiligung2PlanungBeteiligungRaumordnungAktualisierenNOK0322(),
+            new NachrichteninhaltAnonymousPHPType0322(),
+            '0302'
+        );
     }
 
     /**
@@ -639,38 +347,16 @@ class XBeteiligungResponseMessageFactory
      */
     public function buildProcedureDeletedErrorResponse329(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungRaumordnungLoeschen0309 $xmlObject409
-    ): ResponseValue {
-        $message = new Beteiligung2PlanungBeteiligungRaumordnungLoeschenNOK0329();
-        $this->setProductInfo($message);
-
-        $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
-        $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-        $headerBuilder = $this->setMessageInfo($headerBuilder, '0329');
-        $header = $headerBuilder->build();
-
-        $content = new NachrichteninhaltAnonymousPHPType0329();
-        $content->setVorgangsID($xmlObject409->getNachrichteninhalt()->getVorgangsID());
-        $content->setPlanID($xmlObject409->getNachrichteninhalt()->getPlanID());
-        $content->setBeteiligungsID($xmlObject409->getNachrichteninhalt()->getBeteiligungsID());
-
-        foreach ($errorTypes as $errorType) {
-            $content->addToFehler($errorType);
-        }
-
-        $message->setNachrichtenkopf($header);
-        $message->setNachrichteninhalt($content);
-
-        $messageXml = $this->serializeData($message);
-
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-        $response = new ResponseValue();
-        $response->setPayload($messageXml);
-        $response->lock();
-
-        return $response;
+        Planung2BeteiligungBeteiligungRaumordnungLoeschen0309 $xmlObject309
+    ): ResponseValue
+    {
+        return $this->buildErrorResponse(
+            $errorTypes,
+            $xmlObject309,
+            new Beteiligung2PlanungBeteiligungRaumordnungLoeschenNOK0329(),
+            new NachrichteninhaltAnonymousPHPType0329(),
+            '0329'
+        );
     }
 
     /**
@@ -683,43 +369,13 @@ class XBeteiligungResponseMessageFactory
         Planung2BeteiligungBeteiligungPlanfeststellungNeu0201 $xmlObject401
     ): ResponseValue
     {
-        try {
-            $procedureCreated = new ProcedureCreated();
-            $procedureCreated->setProcedureId($procedure->getId());
-            $planId = $xmlObject401->getNachrichteninhalt()->getBeteiligung()->getPlanID();
-            $procedureCreated->setPlanId($planId);
-            $procedureCreated->lock();
-
-            $response = new ResponseValue();
-            $message = new Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211();
-            $this->setProductInfo($message);
-
-            $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
-            $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-            $headerBuilder = $this->setMessageInfo($headerBuilder, '0211');
-            $header = $headerBuilder->build();
-
-            $content = new NachrichteninhaltAnonymousPHPType0211();
-            $content->setBeteiligungsID($procedureCreated->getProcedureId());
-            $content->setPlanID($procedureCreated->getPlanId());
-            $content->setVorgangsID($xmlObject401->getNachrichteninhalt()->getVorgangsID());
-
-            $message->setNachrichtenkopf($header);
-            $message->setNachrichteninhalt($content);
-
-            $messageXml = $this->serializeData($message);
-            $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-            $response->setPayload($messageXml);
-            $response->lock();
-
-            return $response;
-        } catch (Exception $e) {
-            $this->dplanCockpitLogger->error('A Procedure with id "'.$procedure->getId().'" was created but the Message (Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211) couldn\'t be built.');
-
-            return new ResponseValue();
-        }
+        return $this->buildProcedureCreatedResponse(
+            $procedure,
+            $xmlObject401,
+            new Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211(),
+            new NachrichteninhaltAnonymousPHPType0211(),
+            '0211'
+        );
     }
 
     /**
@@ -728,48 +384,16 @@ class XBeteiligungResponseMessageFactory
      * @throws Exception
      */
     public function buildProcedureUpdateOKResponse212(
-        Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202 $xmlObject402,
-        ProcedureInterface                                      $procedure
+        Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202 $xmlObject202,
+        ProcedureInterface                                              $procedure
     ): ResponseValue {
-        try {
-            $procedureId = $procedure->getId();
-            $planId = $xmlObject402->getNachrichteninhalt()->getBeteiligung()->getPlanID();
-            $instanceId = $xmlObject402->getNachrichteninhalt()->getVorgangsID();
-
-            $response = new ResponseValue();
-            $message = new Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenOK0212();
-            $this->setProductInfo($message);
-
-            $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
-            $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-            $headerBuilder = $this->setMessageInfo($headerBuilder, '0212');
-            $header = $headerBuilder->build();
-
-            $content = new NachrichteninhaltAnonymousPHPType0212();
-            $content->setBeteiligungsID($procedureId);
-            $content->setPlanID($planId);
-            $content->setVorgangsID($instanceId);
-
-            $message->setNachrichtenkopf($header);
-            $message->setNachrichteninhalt($content);
-
-            $messageXml = $this->serializeData($message);
-            $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-            $response->setPayload($messageXml);
-            $response->lock();
-
-            return $response;
-        } catch (Exception $e) {
-            $this->dplanCockpitLogger->error(
-                'A Procedure with id "'.$procedure->getId().
-                '" was updated but the Message (Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenOK0212) couldn\'t be built.',
-                [$e]
-            );
-
-            return new ResponseValue();
-        }
+        return $this->buildProcedureUpdateResponse(
+            $procedure,
+            $xmlObject202,
+            new Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenOK0212(),
+            new NachrichteninhaltAnonymousPHPType0212(),
+            '0212'
+        );
     }
 
     /**
@@ -777,41 +401,16 @@ class XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureDeletedResponse219(Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209 $xmlObject409): ResponseValue
+    public function buildProcedureDeletedResponse219(
+        Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209 $xmlObject209
+    ): ResponseValue
     {
-        try {
-            $message = new Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219();
-            $this->setProductInfo($message);
-
-            $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-            $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
-            $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-            $headerBuilder = $this->setMessageInfo($headerBuilder, '0219');
-            $header = $headerBuilder->build();
-
-            $content = new NachrichteninhaltAnonymousPHPType0219();
-            $content->setBeteiligungsID($xmlObject409->getNachrichteninhalt()->getBeteiligungsID());
-            $content->setPlanID($xmlObject409->getNachrichteninhalt()->getPlanID());
-            $content->setVorgangsID($xmlObject409->getNachrichteninhalt()->getVorgangsID());
-
-            $message->setNachrichtenkopf($header);
-            $message->setNachrichteninhalt($content);
-
-            $messageXml = $this->serializeData($message);
-            $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-            $response = new ResponseValue();
-            $response->setPayload($messageXml);
-            $response->lock();
-
-            return $response;
-        } catch (Exception $e) {
-            $this->dplanCockpitLogger->error('A Procedure with id "'
-                .$xmlObject409->getNachrichteninhalt()->getBeteiligungsID()
-                .'" was deleted but the Message (Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219) couldn\'t be built.', [$e]);
-
-            return new ResponseValue();
-        }
+        return $this->buildProcedureDeletedResponse(
+            $xmlObject209,
+            new Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219(),
+            new NachrichteninhaltAnonymousPHPType0219(),
+            '0219'
+        );
     }
 
     /**
@@ -822,36 +421,15 @@ class XBeteiligungResponseMessageFactory
      */
     public function buildProcedureCreatedErrorResponse221(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungPlanfeststellungNeu0201 $xmlObject401
+        Planung2BeteiligungBeteiligungPlanfeststellungNeu0201 $xmlObject201
     ): ResponseValue {
-        $message = new Beteiligung2PlanungBeteiligungPlanfeststellungNeuNOK0221();
-        $this->setProductInfo($message);
-
-        $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
-        $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-        $headerBuilder = $this->setMessageInfo($headerBuilder, '0221');
-        $header = $headerBuilder->build();
-
-        $content = new NachrichteninhaltAnonymousPHPType0221();
-        $content->setVorgangsID($xmlObject401->getNachrichteninhalt()->getVorgangsID());
-        $content->setPlanID($xmlObject401->getNachrichteninhalt()->getBeteiligung()->getPlanID());
-
-        foreach ($errorTypes as $errorType) {
-            $content->addToFehler($errorType);
-        }
-
-        $message->setNachrichtenkopf($header);
-        $message->setNachrichteninhalt($content);
-
-        $messageXml = $this->serializeData($message);
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-        $response = new ResponseValue();
-        $response->setPayload($messageXml);
-        $response->lock();
-
-        return $response;
+        return $this->buildErrorResponse(
+            $errorTypes,
+            $xmlObject201,
+            new Beteiligung2PlanungBeteiligungPlanfeststellungNeuNOK0221(),
+            new NachrichteninhaltAnonymousPHPType0221(),
+            '0221'
+        );
     }
 
     /**
@@ -863,37 +441,16 @@ class XBeteiligungResponseMessageFactory
      */
     public function buildProcedureUpdateErrorResponse222(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202 $xmlObject402
-    ): ResponseValue {
-        $message = new Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222();
-        $this->setProductInfo($message);
-
-        $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
-        $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-        $headerBuilder = $this->setMessageInfo($headerBuilder, '0222');
-        $header = $headerBuilder->build();
-
-        $content = new NachrichteninhaltAnonymousPHPType0222();
-        $content->setVorgangsID($xmlObject402->getNachrichteninhalt()->getVorgangsID());
-        $content->setPlanID($xmlObject402->getNachrichteninhalt()->getBeteiligung()->getPlanID());
-        $content->setBeteiligungsID($xmlObject402->getNachrichteninhalt()->getBeteiligung()->getBeteiligungsID());
-
-        foreach ($errorTypes as $errorType) {
-            $content->addToFehler($errorType);
-        }
-
-        $message->setNachrichtenkopf($header);
-        $message->setNachrichteninhalt($content);
-
-        $messageXml = $this->serializeData($message);
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-        $response = new ResponseValue();
-        $response->setPayload($messageXml);
-        $response->lock();
-
-        return $response;
+        Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202 $xmlObject202
+    ): ResponseValue
+    {
+        return $this->buildErrorResponse(
+            $errorTypes,
+            $xmlObject202,
+            new Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222(),
+            new NachrichteninhaltAnonymousPHPType0222(),
+            '0222'
+        );
     }
 
     /**
@@ -904,38 +461,16 @@ class XBeteiligungResponseMessageFactory
      */
     public function buildProcedureDeletedErrorResponse229(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209 $xmlObject409
-    ): ResponseValue {
-        $message = new Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenNOK0229();
-        $this->setProductInfo($message);
-
-        $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'LGV');
-        $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
-        $headerBuilder = $this->setMessageInfo($headerBuilder, '0229');
-        $header = $headerBuilder->build();
-
-        $content = new NachrichteninhaltAnonymousPHPType0229();
-        $content->setVorgangsID($xmlObject409->getNachrichteninhalt()->getVorgangsID());
-        $content->setPlanID($xmlObject409->getNachrichteninhalt()->getPlanID());
-        $content->setBeteiligungsID($xmlObject409->getNachrichteninhalt()->getBeteiligungsID());
-
-        foreach ($errorTypes as $errorType) {
-            $content->addToFehler($errorType);
-        }
-
-        $message->setNachrichtenkopf($header);
-        $message->setNachrichteninhalt($content);
-
-        $messageXml = $this->serializeData($message);
-
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($content, $messageXml);
-
-        $response = new ResponseValue();
-        $response->setPayload($messageXml);
-        $response->lock();
-
-        return $response;
+        Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209 $xmlObject209
+    ): ResponseValue
+    {
+        return $this->buildErrorResponse(
+            $errorTypes,
+            $xmlObject209,
+            new Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenNOK0229(),
+            new NachrichteninhaltAnonymousPHPType0229(),
+            '0229'
+        );
     }
 
     /**
@@ -953,6 +488,142 @@ class XBeteiligungResponseMessageFactory
         return $messageObject;
     }
 
+    private function buildHeader(string $messageType)
+    {
+        $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
+        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+        $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
+        $headerBuilder = $this->setMessageInfo($headerBuilder, $messageType);
+        return $headerBuilder->build();
+    }
+
+    private function setResponse (
+        $contentClass,
+        $messageClass,
+        $header,
+    )
+    {
+        $response = new ResponseValue();
+        $messageClass->setNachrichtenkopf($header);
+        $messageClass->setNachrichteninhalt($contentClass);
+        $messageXml = $this->serializeData($messageClass);
+        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($contentClass, $messageXml);
+        $response->setPayload($messageXml);
+        $response->lock();
+
+        return $response;
+    }
+
+    private function buildProcedureCreatedResponse(
+        ProcedureInterface $procedure,
+                           $xmlObject,
+        NachrichtG2GTypeType $messageClass,
+        $contentClass,
+        string $messageType,
+    ): ResponseValue {
+        try {
+            $procedureCreated = $this->createProcedureCreated($procedure, $xmlObject);
+            $this->setProductInfo($messageClass);
+            $header = $this->buildHeader($messageType);
+            $contentClass->setBeteiligungsID($procedureCreated->getProcedureId());
+            $contentClass->setPlanID($procedureCreated->getPlanId());
+            $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()->getVorgangsID());
+
+            return $this->setResponse($contentClass, $messageClass, $header);
+        } catch (Exception $e) {
+            $this->dplanCockpitLogger->error(
+                'A Procedure with id "' . $procedure->getId() . '" was created but the Message couldn\'t be built.',
+                [$e]
+            );
+
+            return new ResponseValue();
+        }
+    }
+
+    private function buildProcedureUpdateResponse(
+        ProcedureInterface $procedure,
+                           $xmlObject,
+        NachrichtG2GTypeType $messageClass,
+        $contentClass,
+        string $messageType,
+    ): ResponseValue {
+        try {
+            $procedureId = $procedure->getId();
+            $planId = $xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID();
+            $instanceId = $xmlObject->getNachrichteninhalt()->getVorgangsID();
+            $this->setProductInfo($messageClass);
+            $header = $this->buildHeader($messageType);
+            $contentClass->setBeteiligungsID($procedureId);
+            $contentClass->setPlanID($planId);
+            $contentClass->setVorgangsID($instanceId);
+
+            return $this->setResponse($contentClass, $messageClass, $header);
+        } catch (Exception $e) {
+            $this->dplanCockpitLogger->error(
+                'A Procedure with id "'.$procedure->getId().
+                '" was updated but the Message (Beteiligung2PlanungBeteiligung) couldn\'t be built.',
+                [$e]
+            );
+
+            return new ResponseValue();
+        }
+    }
+
+    private function buildProcedureDeletedResponse(
+        $xmlObject,
+        NachrichtG2GTypeType $messageClass,
+        $contentClass,
+        string $messageType,
+    ): ResponseValue {
+        try {
+            $this->setProductInfo($messageClass);
+            $header = $this->buildHeader($messageType);
+            $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()->getBeteiligungsID());
+            $contentClass->setPlanID($xmlObject->getNachrichteninhalt()->getPlanID());
+            $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()->getVorgangsID());
+
+            return $this->setResponse($contentClass, $messageClass, $header);
+        } catch (Exception $e) {
+            $this->dplanCockpitLogger->error('A Procedure with id "'
+                .$xmlObject->getNachrichteninhalt()->getBeteiligungsID()
+                .'was deleted but the Message (Beteiligung2PlanungBeteiligungNeuOK'.$messageType.') couldn\'t be built.', [$e]);
+
+            return new ResponseValue();
+        }
+    }
+
+    private function buildErrorResponse(
+        array $errorTypes,
+              $xmlObject,
+        NachrichtG2GTypeType $messageClass,
+        $contentClass,
+        string $messageType
+    ): ResponseValue {
+        $this->setProductInfo($messageClass);
+        $header = $this->buildHeader($messageType);
+        $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()->getVorgangsID());
+        $contentClass->setPlanID($xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID());
+        $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()->getBeteiligung()->getBeteiligungsID());
+        foreach ($errorTypes as $errorType) {
+            $contentClass->addToFehler($errorType);
+        }
+
+        return $this->setResponse($contentClass, $messageClass, $header);
+    }
+
+    private function createProcedureCreated(
+        ProcedureInterface $procedure,
+        $xmlObject
+    ): ProcedureCreated
+    {
+        $procedureCreated = new ProcedureCreated();
+        $procedureCreated->setProcedureId($procedure->getId());
+        $procedureCreated->setPlanId($xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID());
+        $procedureCreated->lock();
+
+        return $procedureCreated;
+    }
+
     /**
      * Creates an object with the info for K1 (to be used as reader or author in xml's).
      */
@@ -964,7 +635,6 @@ class XBeteiligungResponseMessageFactory
     {
         $headerBuilder->setAgentAgencyIdentificationPrefixListVersionId('', $agentType)
             // Reader => Behoerdenkennung => praefix
-            //TODO: check what is Agency Address, name, contact code
             ->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
             ->setAgentAgencyIdentificationPrefixName($prefixName, $agentType)
             // Reader => Behoerdenkennung => Kennung
@@ -1007,7 +677,6 @@ class XBeteiligungResponseMessageFactory
         $headerBuilder
             // Autor => Behoerdenkennung => Prefix
             ->setAgentAgencyIdentificationPrefixListVersionId('', $agentType)
-            //TODO: check what is prefix code
             //->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
             ->setAgentAgencyIdentificationPrefixName('DEMOS E-Partizipation GmbH', $agentType)
             // Autor => Behoerdenkennung => Kennung (Label)
@@ -1032,7 +701,6 @@ class XBeteiligungResponseMessageFactory
             ->setAgentAddressBuildingFloorNumber('', $agentType)
             ->setAgentAddressStreet('Eifflerstraße', $agentType)
             ->setAgentAddressBuildingApartmentNumber('4', $agentType)
-            //TODO: check what is municipal
             //->setAgentAddressMunicipal('Freie und Hansestadt Hamburg', $agentType)
             ->setAgentMunicipalPreviousCorporation('', $agentType)
             ->setAgentApartmentOwner('', $agentType)
