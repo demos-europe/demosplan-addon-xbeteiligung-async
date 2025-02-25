@@ -2,6 +2,7 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
+use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonContentMandatoryFieldsException;
@@ -13,10 +14,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeFehlerartType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401\Planung2BeteiligungBeteiligungKommunalNeu0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt401;
 use Doctrine\DBAL\ConnectionException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -139,6 +139,8 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 );
                 $procedure->setPhase($phase);
                 $procedure->getSettings()->setTerritory($messageContent->getGeltungsbereich());
+                $akteur = $messageContent->getAkteurVorhaben();
+                $procedure->setOrga($this->mapToOrgaInterface($akteur?->getVeranlasser()));
                 return $procedure;
             }
         );
@@ -149,19 +151,19 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     private function createProcedureEntity(
         BeteiligungKommunalType $messageContent,
     ): ProcedureInterface {
-        $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent);
+        // get user from message should be set, because of that userId here is not correct
         $userId = $this->entityManager->getRepository(UserInterface::class)->
-            findOneBy([$this->currentUserProvider->getUser()->getUserIdentifier()]);
+        findOneBy([$this->currentUserProvider->getUser()->getUserIdentifier()]);
+        $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $userId);
         $procedureData = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
         return $this->procedureService->getProcedure($procedureData?->getId());
     }
 
     protected function createProcedureArrayFormatFromBeteiligungType(
         BeteiligungKommunalType $procedureObject,
+        UserInterface $user,
     ): array {
-
-        $initiator = $procedureObject->getAkteurVorhaben();
-        $orga = $initiator?->getVeranlasser();
+        $orga = $user->getOrga();
         if (null === $orga) {
             throw new InvalidArgumentException("Organisation not set");
         }
@@ -177,6 +179,17 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'r_procedure_type'                                              => $this->procedureTypeService->getProcedureTypeByName('Beteiligung')?->getId(),
             'xtaPlanId'                                                     => $procedureObject->getPlanID(),
         ];
+    }
+
+    private function mapToOrgaInterface(?OrganisationTypeType $organisationType): ?OrgaInterface
+    {
+        if ($organisationType === null) {
+            return null;
+        }
+
+        // Implement the logic to map OrganisationTypeType to OrgaInterface
+        // This is a placeholder and should be replaced with actual mapping logic
+        return $this->entityManager->getRepository(OrgaInterface::class)->find($organisationType->getId());
     }
 
 }
