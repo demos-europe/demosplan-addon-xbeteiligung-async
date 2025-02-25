@@ -83,7 +83,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             )];
         }
 
-        return $this->xBeteiligungMessageFactory->buildProcedureCreatedErrorResponse421($errorTypes, $xmlObject401);
+        return $this->kommunaleMessageFactory->buildProcedureCreatedErrorResponse421($errorTypes, $xmlObject401);
     }
 
     private function getErrorType(string $errorCode, string $errorDescription): FehlerType
@@ -106,7 +106,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     {
         $procedure = $this->createNewKommunalProcedureFromXBeteiligungMessage($xmlObject401);
 
-        return $this->xBeteiligungMessageFactory->buildProcedureCreatedResponse411($procedure, $xmlObject401);
+        return $this->kommunaleMessageFactory->buildProcedureCreatedResponse411($procedure, $xmlObject401);
     }
 
     /**

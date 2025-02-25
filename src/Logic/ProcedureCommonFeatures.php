@@ -10,6 +10,10 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterfa
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -24,7 +28,9 @@ abstract class ProcedureCommonFeatures
         protected readonly ProcedureTypeServiceInterface      $procedureTypeService,
         protected readonly UserHandlerInterface               $userHandler,
         protected readonly EntityManagerInterface             $entityManager,
-        protected readonly XBeteiligungResponseMessageFactory $xBeteiligungMessageFactory,
+        protected readonly KommunaleMessageFactory            $kommunaleMessageFactory,
+        protected readonly RaumordnungMessageFactory          $raumordnungMessageFactory,
+        protected readonly PlanfeststellungMessageFactory     $planfeststellungMessageFactory,
         protected readonly TranslatorInterface                $translator,
         protected readonly TransactionServiceInterface        $transactionService,
     )

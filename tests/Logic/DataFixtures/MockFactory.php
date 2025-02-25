@@ -2,7 +2,6 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures;
 
-use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
@@ -18,7 +17,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungResponseMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;

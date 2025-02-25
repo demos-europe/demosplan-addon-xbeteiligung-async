@@ -2,6 +2,7 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409;
