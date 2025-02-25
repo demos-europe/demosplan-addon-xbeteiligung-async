@@ -21,6 +21,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungNeu0201;
+use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 
 class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
