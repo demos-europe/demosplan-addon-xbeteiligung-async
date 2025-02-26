@@ -20,6 +20,7 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\UnsupportedMessageTypeException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
@@ -71,13 +72,14 @@ use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
+use JMS\Serializer\Serializer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class XBeteiligungService
 {
-    private \JMS\Serializer\Serializer $serializer;
+    private Serializer $serializer;
 
     // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
     // code: 2000 -> Frühzeitige Behördenbeteiligung
@@ -106,7 +108,7 @@ class XBeteiligungService
             'code' => '6000',
             'name' => 'öffentliche Auslegung',
         ],
-        'evaluating' => [ // todo not sure about this one - pls check
+        'evaluating' => [
             'code' => '7000',
             'name' => 'Feststellungsverfahren',
         ],
@@ -132,7 +134,7 @@ class XBeteiligungService
             'code' => '5000',
             'name' => 'Beteiligung Töb',
         ],
-        'evaluating' => [ // todo not sure about this one - pls check
+        'evaluating' => [
             'code' => '7000',
             'name' => 'Feststellungsverfahren',
         ],
@@ -272,7 +274,6 @@ class XBeteiligungService
 
     private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
     {
-        //TODO: Dupplicate with KommunaleProcedureCreater, should delete after adjustment test
         $messageContent = new Nachrichteninhalt401();
         $messageContent->setVorgangsID($this->beteiligungMessageFactory->uuid());
         $messageContent->setBeteiligung(
@@ -820,7 +821,7 @@ class XBeteiligungService
             $name = 'planung2Beteiligung.BeteiligungPlanfeststellungLoeschen.0209';
         } else {
             $this->logger->error('Class '.$messageObject::class.' not supported yet');
-            throw new Exception(
+            throw new UnsupportedMessageTypeException(
                 $messageObject::class . ' is not supported - unable to set messageIdentification code'
             );
         }

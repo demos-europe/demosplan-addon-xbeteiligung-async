@@ -1,12 +1,12 @@
 <?php
 
-namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DIplanBau;
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use JMS\Serializer\Serializer;
 use PHPUnit\Framework\TestCase;
@@ -29,11 +29,11 @@ class KommunaleProcedureCreatorTest extends TestCase
      */
     protected $serializer;
 
-    private MockFactory $mockFactory;
+    private MockFactoryTest $mockFactory;
 
     protected function setUp(): void
     {
-        $mockFactory = new MockFactory();
+        $mockFactory = new MockFactoryTest();
         $this->mockFactory = $mockFactory;
         $this->logger = new Logger();
         $this->serializer = SerializerFactory::getSerializer();

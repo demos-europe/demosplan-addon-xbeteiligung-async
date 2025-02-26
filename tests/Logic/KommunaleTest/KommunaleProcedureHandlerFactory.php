@@ -1,14 +1,14 @@
 <?php
 
-namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DIplanBau;
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use InvalidArgumentException;
 
 class KommunaleProcedureHandlerFactory
 {
-    public function __construct(private MockFactory $mockFactory)
+    public function __construct(private MockFactoryTest $mockFactory)
     {
         $this->mockFactory = $mockFactory;
     }

@@ -23,7 +23,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     /**
      * @var NachrichtenkopfG2GType
      */
-    protected $head;
+    protected NachrichtenkopfG2GType $head;
 
     public function __construct()
     {
@@ -47,17 +47,17 @@ class XBeteiligungMessageHeadG2GTypeBuilder
         $readerErreichbarkeit = new KommunikationTypeType();
         $readerErreichbarkeitChannel = new CodeErreichbarkeitTypeType();
         $readerErreichbarkeit->setKanal($readerErreichbarkeitChannel);
-        $this->head->getLeser()->addToErreichbarkeit($readerErreichbarkeit);
+        $this->head->getLeser()?->addToErreichbarkeit($readerErreichbarkeit);
         $readerAnschrift = new PostalischeInlandsanschriftTypeType();
         $readerAnschriftGebaeude = new PostalischeInlandsanschriftGebaeudeanschriftTypeType();
         $readerAnschrift->setGebaeude($readerAnschriftGebaeude);
-        $this->head->getLeser()->setAnschrift($readerAnschrift);
+        $this->head->getLeser()?->setAnschrift($readerAnschrift);
         $codePrefix = new CodePraefixTypeType();
         $codePrefix->setListURI(null);
         $codePrefix->setListVersionID('');
         $leserBehoerdenkennung->setPraefix($codePrefix);
         $hausnummerBisAType = new HausnummernBisAnonymousPHPType();
-        $this->head->getLeser()->getAnschrift()->getGebaeude()->setHausnummernBis($hausnummerBisAType);
+        $this->head->getLeser()?->getAnschrift()?->getGebaeude()?->setHausnummernBis($hausnummerBisAType);
 
         // Author
         $author = new BehoerdeErreichbarTypeType();
@@ -80,7 +80,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
         $authorPostalischeInlandsanschriftType->setGebaeude($authorGebaeude);
         $author->setAnschrift($authorPostalischeInlandsanschriftType);
         $hausnummerBisAType = new HausnummernBisAnonymousPHPType();
-        $this->head->getAutor()->getAnschrift()->getGebaeude()->setHausnummernBis($hausnummerBisAType);
+        $this->head->getAutor()?->getAnschrift()?->getGebaeude()?->setHausnummernBis($hausnummerBisAType);
         $authorCodeErreichbarkeit = new CodeErreichbarkeitTypeType();
         $authorErreichbarkeit->setKanal($authorCodeErreichbarkeit);
     }
@@ -88,7 +88,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     /**
      * @return NachrichtenkopfG2GType
      */
-    public function build()
+    public function build(): NachrichtenkopfG2GType
     {
         return $this->head;
     }
@@ -98,9 +98,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setCreationTime($time)
+    public function setCreationTime(DateTime $time): static
     {
-        $this->head->getIdentifikationNachricht()->setErstellungszeitpunkt($time);
+        $this->head->getIdentifikationNachricht()?->setErstellungszeitpunkt($time);
 
         return $this;
     }
@@ -110,9 +110,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setMessageIdentificationTypeCode($messageTypeCode)
+    public function setMessageIdentificationTypeCode(string $messageTypeCode): static
     {
-        $this->head->getIdentifikationNachricht()->getNachrichtentyp()->setCode($messageTypeCode);
+        $this->head->getIdentifikationNachricht()?->getNachrichtentyp()?->setCode($messageTypeCode);
 
         return $this;
     }
@@ -122,9 +122,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAgencyIdentificationPrefixListURI($uri, string $agentType)
+    public function setAgentAgencyIdentificationPrefixListURI($uri, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()->getPraefix()->setListURI($uri);
+        $this->getAgent($agentType)->getBehoerdenkennung()?->getPraefix()?->setListURI($uri);
 
         return $this;
     }
@@ -134,9 +134,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setMessageIdentificationUUID($uuid)
+    public function setMessageIdentificationUUID($uuid): static
     {
-        $this->head->getIdentifikationNachricht()->setNachrichtenUUID($uuid);
+        $this->head->getIdentifikationNachricht()?->setNachrichtenUUID($uuid);
 
         return $this;
     }
@@ -146,9 +146,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAgencyIdentificationPrefixCode($code, string $agentType)
+    public function setAgentAgencyIdentificationPrefixCode($code, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()->getPraefix()->setCode($code);
+        $this->getAgent($agentType)->getBehoerdenkennung()?->getPraefix()?->setCode($code);
 
         return $this;
     }
@@ -158,9 +158,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAgencyIdentificationPrefixName($name, string $agentType)
+    public function setAgentAgencyIdentificationPrefixName($name, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()->getPraefix()->setName($name);
+        $this->getAgent($agentType)->getBehoerdenkennung()?->getPraefix()?->setName($name);
 
         return $this;
     }
@@ -170,9 +170,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAgencyIdentificationLabelCode($code, string $agentType)
+    public function setAgentAgencyIdentificationLabelCode($code, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()->getKennung()->setCode($code);
+        $this->getAgent($agentType)->getBehoerdenkennung()?->getKennung()?->setCode($code);
 
         return $this;
     }
@@ -183,12 +183,12 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentContactChannelListURI($uri, $index = 0, string $agentType)
+    public function setAgentContactChannelListURI($uri, string $agentType, int $index = 0): static
     {
         if (!isset($this->getAgent($agentType)->getErreichbarkeit()[$index])) {
             $this->newAgentKommunikationType($index, $agentType);
         }
-        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()->setListURI($uri);
+        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()?->setListURI($uri);
 
         return $this;
     }
@@ -199,12 +199,12 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentContactChannelListVersionID($id, $index = 0, string $agentType)
+    public function setAgentContactChannelListVersionID($id, string $agentType, int $index = 0): static
     {
         if (!isset($this->getAgent($agentType)->getErreichbarkeit()[$index])) {
             $this->newAgentKommunikationType($index, $agentType);
         }
-        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()->setCode($id);
+        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()?->setCode($id);
 
         return $this;
     }
@@ -215,12 +215,12 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentContactChannelCode($code, $index = 0, string $agentType)
+    public function setAgentContactChannelCode($code, string $agentType, int $index = 0): static
     {
         if (!isset($this->getAgent($agentType)->getErreichbarkeit()[$index])) {
             $this->newAgentKommunikationType($index, $agentType);
         }
-        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()->setCode($code);
+        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()?->setCode($code);
 
         return $this;
     }
@@ -231,12 +231,12 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentContactChannelName($name, $index = 0, string $agentType)
+    public function setAgentContactChannelName($name, string $agentType, int $index = 0): static
     {
         if (!isset($this->getAgent($agentType)->getErreichbarkeit()[$index])) {
             $this->newAgentKommunikationType($index, $agentType);
         }
-        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()->setName($name);
+        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()?->setName($name);
 
         return $this;
     }
@@ -247,7 +247,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentContactLabel($label, $index = 0, string $agentType)
+    public function setAgentContactLabel($label, string $agentType, int $index = 0): static
     {
         if (!isset($this->getAgent($agentType)->getErreichbarkeit()[$index])) {
             $this->newAgentKommunikationType($index, $agentType);
@@ -262,9 +262,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setMessageIdentificationListURI($uri)
+    public function setMessageIdentificationListURI(string $uri): static
     {
-        $this->head->getIdentifikationNachricht()->getNachrichtentyp()->setListURI($uri);
+        $this->head->getIdentifikationNachricht()?->getNachrichtentyp()?->setListURI($uri);
 
         return $this;
     }
@@ -274,9 +274,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setMessageIdenfificationListVersionId($id)
+    public function setMessageIdenfificationListVersionId(string $id): static
     {
-        $this->head->getIdentifikationNachricht()->getNachrichtentyp()->setCode($id);
+        $this->head->getIdentifikationNachricht()?->getNachrichtentyp()?->setCode($id);
 
         return $this;
     }
@@ -286,9 +286,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressBuildingNumber($number, string $agentType)
+    public function setAgentAddressBuildingNumber($number, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->setHausnummer($number);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setHausnummer($number);
 
         return $this;
     }
@@ -298,9 +298,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressBuildingZipcode($zipcode, string $agentType)
+    public function setAgentAddressBuildingZipcode($zipcode, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->setPostleitzahl($zipcode);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setPostleitzahl($zipcode);
 
         return $this;
     }
@@ -310,9 +310,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressStreet($street, string $agentType)
+    public function setAgentAddressStreet($street, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->setStrasse($street);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setStrasse($street);
 
         return $this;
     }
@@ -322,9 +322,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressMunicipal($municipal, string $agentType)
+    public function setAgentAddressMunicipal($municipal, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->setWohnort($municipal);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setWohnort($municipal);
 
         return $this;
     }
@@ -334,7 +334,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAgencyName($name, string $agentType)
+    public function setAgentAgencyName($name, string $agentType): static
     {
         $this->getAgent($agentType)->setBehoerdenname($name);
 
@@ -346,9 +346,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressBuildingAdditionalLetter($letter, string $agentType)
+    public function setAgentAddressBuildingAdditionalLetter($letter, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->setHausnummerBuchstabeZusatzziffer($letter);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setHausnummerBuchstabeZusatzziffer($letter);
 
         return $this;
     }
@@ -358,9 +358,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressBuildingApartmentNumber($number, string $agentType)
+    public function setAgentAddressBuildingApartmentNumber($number, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->setTeilnummerDerHausnummer($number);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setTeilnummerDerHausnummer($number);
 
         return $this;
     }
@@ -370,9 +370,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressBuildingFloorNumber($number, string $agentType)
+    public function setAgentAddressBuildingFloorNumber($number, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->setStockwerkswohnungsnummer($number);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setStockwerkswohnungsnummer($number);
 
         return $this;
     }
@@ -382,9 +382,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressBuildingAdditionalInfo($info, string $agentType)
+    public function setAgentAddressBuildingAdditionalInfo($info, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->setZusatzangaben($info);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setZusatzangaben($info);
 
         return $this;
     }
@@ -394,9 +394,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAgencyIdentificationPrefixListVersionId($versionId, string $agentType)
+    public function setAgentAgencyIdentificationPrefixListVersionId($versionId, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()->getPraefix()->setCode($versionId);
+        $this->getAgent($agentType)->getBehoerdenkennung()?->getPraefix()?->setCode($versionId);
 
         return $this;
     }
@@ -406,9 +406,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAgencyIdentificationLabelListVersionID($versionId, string $agentType)
+    public function setAgentAgencyIdentificationLabelListVersionID($versionId, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()->getKennung()->setCode($versionId);
+        $this->getAgent($agentType)->getBehoerdenkennung()?->getKennung()?->setCode($versionId);
 
         return $this;
     }
@@ -418,9 +418,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAgencyIdentificationLabelListURI($uri, string $agentType)
+    public function setAgentAgencyIdentificationLabelListURI($uri, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()->getKennung()->setCode($uri);
+        $this->getAgent($agentType)->getBehoerdenkennung()?->getKennung()?->setCode($uri);
 
         return $this;
     }
@@ -430,9 +430,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAgencyIdentificationLabelName($name, string $agentType)
+    public function setAgentAgencyIdentificationLabelName($name, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()->getKennung()->setName($name);
+        $this->getAgent($agentType)->getBehoerdenkennung()?->getKennung()?->setName($name);
 
         return $this;
     }
@@ -443,7 +443,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddition($addition, $index = 0, string $agentType)
+    public function setAgentAddition($addition, string $agentType, int $index = 0): static
     {
         $this->getAgent($agentType)->getErreichbarkeit()[$index]->setZusatz($addition);
 
@@ -455,9 +455,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressBuildingNumberBis($number, string $agentType)
+    public function setAgentAddressBuildingNumberBis($number, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->getHausnummernBis()->setHausnummerBis($number);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->getHausnummernBis()?->setHausnummerBis($number);
 
         return $this;
     }
@@ -467,9 +467,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressBuildingAdditionalLetterBis($letter, string $agentType)
+    public function setAgentAddressBuildingAdditionalLetterBis($letter, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->getHausnummernBis()->setHausnummerbuchstabezusatzzifferBis($letter);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->getHausnummernBis()?->setHausnummerbuchstabezusatzzifferBis($letter);
 
         return $this;
     }
@@ -479,9 +479,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentAddressBuildingApartmentNumberBis($number, string $agentType)
+    public function setAgentAddressBuildingApartmentNumberBis($number, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->getHausnummernBis()->setTeilnummerderhausnummerBis($number);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->getHausnummernBis()?->setTeilnummerderhausnummerBis($number);
 
         return $this;
     }
@@ -491,7 +491,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @param $index
      */
-    private function newAgentKommunikationType($index, string $agentType)
+    private function newAgentKommunikationType($index, string $agentType): void
     {
         $authorCommunicationTypes = $this->getAgent($agentType)->getErreichbarkeit();
         $communicationType = new KommunikationTypeType();
@@ -503,7 +503,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     /**
      * @return BehoerdeTypeType|mixed
      */
-    private function getAgent(string $agentType)
+    private function getAgent(string $agentType): mixed
     {
         return 'reader' === $agentType ? $this->head->getLeser() : $this->head->getAutor();
     }
@@ -511,9 +511,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     /**
      * @return $this
      */
-    public function setAgentApartmentOwner(string $owner, string $agentType)
+    public function setAgentApartmentOwner(string $owner, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->setWohnungsinhaber($owner);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setWohnungsinhaber($owner);
 
         return $this;
     }
@@ -524,9 +524,9 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      *
      * @return $this
      */
-    public function setAgentMunicipalPreviousCorporation($corporation, string $agentType)
+    public function setAgentMunicipalPreviousCorporation($corporation, string $agentType): static
     {
-        $this->getAgent($agentType)->getAnschrift()->getGebaeude()->setWohnortFruehererGemeindename($corporation);
+        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setWohnortFruehererGemeindename($corporation);
 
         return $this;
     }

@@ -36,7 +36,6 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
         private readonly ParameterBagInterface        $parameterBag,
         private readonly LoggerInterface              $cockpitLogger,
         private readonly GetMessageRabbitMQ           $getMessageRabbitMQ,
-        private readonly KommunaleProcedureCreater    $kommunaleProcedureCreater,
     ) {
     }
 

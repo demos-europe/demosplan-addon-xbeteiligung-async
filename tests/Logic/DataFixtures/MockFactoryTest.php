@@ -27,7 +27,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-class MockFactory extends TestCase
+class MockFactoryTest extends TestCase
 {
     private ProcedureInterface|MockObject|null $procedure;
 
