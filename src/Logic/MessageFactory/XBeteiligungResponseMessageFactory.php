@@ -313,7 +313,7 @@ class XBeteiligungResponseMessageFactory
             // Autor => Behoerdenkennung => Prefix
             ->setAgentAgencyIdentificationPrefixListVersionId('', $agentType)
             //->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
-            ->setAgentAgencyIdentificationPrefixName('DEMOS GmbH', $agentType)
+            ->setAgentAgencyIdentificationPrefixName('DEMOS plan GmbH', $agentType)
             // Autor => Behoerdenkennung => Kennung (Label)
             ->setAgentAgencyIdentificationLabelListURI('', $agentType)
             ->setAgentAgencyIdentificationLabelListVersionID('', $agentType)
