@@ -2,7 +2,9 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
-class KommunaleProcedureRemover
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
+
+class KommunaleProcedureRemover extends ProcedureCommonFeatures
 {
 
 }

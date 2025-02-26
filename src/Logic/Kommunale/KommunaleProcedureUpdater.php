@@ -2,7 +2,9 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
-class KommunaleProcedureUpdater
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
+
+class KommunaleProcedureUpdater extends ProcedureCommonFeatures
 {
 
 }
