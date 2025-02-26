@@ -89,5 +89,4 @@ class GetMessageRabbitMQ
     {
         $this->client = $client;
     }
-
 }
