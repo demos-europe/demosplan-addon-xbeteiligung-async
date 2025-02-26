@@ -52,13 +52,13 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 
     public function handleAddonMaintenanceEvent(AddonMaintenanceEventInterface $event): void
     {
-        if (false === $this->parameterBag->get('enable_communication')) {
+        if (true === $this->parameterBag->get('enable_rabbitmq_communication')) {
             return;
         }
         try {
             $this->cache->get('MessageBrokerDelay', function (ItemInterface $item): void {
-                $ttl = $this->parameterBag->get('communication_delay');
-                $this->cockpitLogger->info('Fetch Messages with delay '.$ttl);
+                $ttl = $this->parameterBag->get('rabbitmq_communication_delay');
+                $this->cockpitLogger->info('Fetch RabbitMQ Messages with delay '.$ttl);
                 $item->expiresAfter($ttl);
 
                 $this->getMessageRabbitMQ->processMessages();
