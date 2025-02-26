@@ -868,7 +868,7 @@ class XBeteiligungService
         $document->schemaValidate($path);
         $errors = libxml_get_errors();
         foreach ($errors as $error) {
-            $this->logger->warning('Invalid message', [$error]);
+            $this->logger->warning('Invalid XML message', [$error]);
             if ($verboseDebug) {
                 print_r($error);
             }
