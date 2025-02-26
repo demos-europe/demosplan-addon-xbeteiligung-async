@@ -28,7 +28,7 @@ class GetMessageRabbitMQ
     /**
      * @throws JsonException
      */
-    public function getMessages(): void
+    public function processMessages(): void
     {
         $routingKey = $this->globalConfig->getProjectPrefix();
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {

@@ -61,7 +61,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
                 $this->cockpitLogger->info('Fetch Messages with delay '.$ttl);
                 $item->expiresAfter($ttl);
 
-                $this->getMessageRabbitMQ->getMessages();
+                $this->getMessageRabbitMQ->processMessages();
             });
         } catch (Exception $e) {
             $this->cockpitLogger->warning('failed to get procedure-create messages', [$e]);
