@@ -24,6 +24,7 @@ use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Webmozart\Assert\Assert;
 
 class KommunaleProcedureCreater extends ProcedureCommonFeatures
 {
@@ -152,8 +153,8 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         BeteiligungKommunalType $messageContent,
     ): ProcedureInterface {
         // get user from message should be set, because of that userId here is not correct
-        $userId = $this->entityManager->getRepository(UserInterface::class)->
-        findOneBy([$this->currentUserProvider->getUser()->getUserIdentifier()]);
+        $userId = null;
+        Assert::notNull($userId, 'User not found');
         $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $userId);
         $procedureData = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
         return $this->procedureService->getProcedure($procedureData?->getId());
