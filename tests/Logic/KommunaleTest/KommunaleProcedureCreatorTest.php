@@ -36,7 +36,7 @@ class KommunaleProcedureCreatorTest extends TestCase
         $mockFactory = new MockFactoryTest();
         $this->mockFactory = $mockFactory;
         $this->logger = new Logger();
-        $this->serializer = SerializerFactory::getSerializer();
+        $this->serializer = new SerializerFactory();
         $procedureHandlerFactory = new KommunaleProcedureHandlerFactory($mockFactory);
         $this->sut = $procedureHandlerFactory->createProcedureHandler('creator');
 
