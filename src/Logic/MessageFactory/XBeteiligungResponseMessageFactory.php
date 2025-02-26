@@ -313,7 +313,7 @@ class XBeteiligungResponseMessageFactory
             // Autor => Behoerdenkennung => Prefix
             ->setAgentAgencyIdentificationPrefixListVersionId('', $agentType)
             //->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
-            ->setAgentAgencyIdentificationPrefixName('DEMOS E-Partizipation GmbH', $agentType)
+            ->setAgentAgencyIdentificationPrefixName('DEMOS GmbH', $agentType)
             // Autor => Behoerdenkennung => Kennung (Label)
             ->setAgentAgencyIdentificationLabelListURI('', $agentType)
             ->setAgentAgencyIdentificationLabelListVersionID('', $agentType)
@@ -393,15 +393,15 @@ class XBeteiligungResponseMessageFactory
         if (in_array($content, $this->messageTypeMapping['400']['classes'], true)) {
             $simpleXML->addAttribute(
                 self::SCHEMALOCATION,
-                'https://www.xleitstelle.de/xbeteiligung/1 ../xbeteiligung-kommunaleBauleitplanung.xsd');
+                'https://www.xleitstelle.de/xbeteiligung/1 ../../xbeteiligung-kommunaleBauleitplanung.xsd');
         } elseif (in_array($content, $this->messageTypeMapping['300']['clasess'], true)) {
             $simpleXML->addAttribute(
                 self::SCHEMALOCATION,
-                'https://www.xleitstelle.de/xbeteiligung/1 ../xbeteiligung-raumordnung.xsd');
+                'https://www.xleitstelle.de/xbeteiligung/1 ../../xbeteiligung-raumordnung.xsd');
         } elseif (in_array($content, $this->messageTypeMapping['200']['classes'], true)) {
             $simpleXML->addAttribute(
                 self::SCHEMALOCATION,
-                'https://www.xleitstelle.de/xbeteiligung/1 ../xbeteiligung-planfeststellung.xsd');
+                'https://www.xleitstelle.de/xbeteiligung/1 ../../xbeteiligung-planfeststellung.xsd');
         }
 
         return $simpleXML->asXML();
