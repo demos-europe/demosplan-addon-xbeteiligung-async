@@ -13,7 +13,7 @@ parameters:
   procedure_message_type: ""
 
   # Use for incoming messages from rabbitMQ
-  enable_rabbitmq_communication: false
+  addon_xbeteiligung_async_enable_rabbitmq_communication: false
 
   # Maximum time in seconds we are allowed to rabbitMQ Message Broker
-  rabbitmq_communication_delay: 300
+  addon_xbeteiligung_async_rabbitmq_communication_delay: 300
