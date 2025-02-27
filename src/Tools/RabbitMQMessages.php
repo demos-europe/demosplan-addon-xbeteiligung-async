@@ -13,7 +13,7 @@ use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use Psr\Log\LoggerInterface;
 
-class GetMessageRabbitMQ
+class RabbitMQMessages
 {
     protected RpcClient $client;
 

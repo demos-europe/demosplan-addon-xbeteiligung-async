@@ -18,7 +18,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Tools\GetMessageRabbitMQ;
+use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessages;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -35,7 +35,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
         private readonly CacheInterface               $cache,
         private readonly ParameterBagInterface        $parameterBag,
         private readonly LoggerInterface              $cockpitLogger,
-        private readonly GetMessageRabbitMQ           $getMessageRabbitMQ,
+        private readonly RabbitMQMessages             $getMessageRabbitMQ,
     ) {
     }
 
