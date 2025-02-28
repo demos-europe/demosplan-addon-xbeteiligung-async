@@ -11,20 +11,31 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Events\AddonMaintenanceEventInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessages;
 use Exception;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly PermissionEvaluatorInterface $permissionEvaluator,
-        private readonly XBeteiligungDebugger $xBeteiligungDebugger,
-        private readonly XBeteiligungService $xBeteiligungService
+        private readonly XBeteiligungDebugger         $xBeteiligungDebugger,
+        private readonly XBeteiligungService          $xBeteiligungService,
+        private readonly CacheInterface               $cache,
+        private readonly ParameterBagInterface        $parameterBag,
+        private readonly LoggerInterface              $cockpitLogger,
+        private readonly RabbitMQMessages             $getMessageRabbitMQ,
     ) {
     }
 
@@ -34,8 +45,27 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents(): array
     {
         return [
-            PostNewProcedureCreatedEventInterface::class => 'newProcedureCreated',
+            PostNewProcedureCreatedEventInterface::class => ['newProcedureCreated'],
+            AddonMaintenanceEventInterface::class => ['handleAddonMaintenanceEvent'],
         ];
+    }
+
+    public function handleAddonMaintenanceEvent(AddonMaintenanceEventInterface $event): void
+    {
+        if (true === $this->parameterBag->get('addon_xbeteiligung_async_enable_rabbitmq_communication')) {
+            return;
+        }
+        try {
+            $this->cache->get('MessageBrokerDelay', function (ItemInterface $item): void {
+                $ttl = $this->parameterBag->get('addon_xbeteiligung_async_rabbitmq_communication_delay');
+                $this->cockpitLogger->info('Fetch RabbitMQ Messages with delay '.$ttl);
+                $item->expiresAfter($ttl);
+
+                $this->getMessageRabbitMQ->processMessages();
+            });
+        } catch (Exception $e) {
+            $this->cockpitLogger->warning('failed to get procedure-create messages', [$e]);
+        }
     }
 
     /**

@@ -28,6 +28,7 @@
     "goetas-webservices/xsd2php-runtime": "^0.2.16",
     "jms/serializer": "^3.23",
     "php": ">=8.1 || < 8.3",
+    "php-amqplib/rabbitmq-bundle": "2.*",
     "proj4php/proj4php": "^2.0",
     "symfony/http-client": "^6.2",
     "symfony/http-kernel": "5.*.*",

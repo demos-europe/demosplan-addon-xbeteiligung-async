@@ -65,6 +65,30 @@ class Features extends AbstractPermissionMeta
     }
 
     /**
+     * Needed to generate a procedure message of type 0201.
+     */
+    public static function feature_procedure_message_pln_create(): self
+    {
+        return new self('feature_procedure_message_pln_create');
+    }
+
+    /**
+     * Needed to generate a procedure message of type 0202.
+     */
+    public static function feature_procedure_message_pln_update(): self
+    {
+        return new self('feature_procedure_message_pln_update');
+    }
+
+    /**
+     * Needed to generate a procedure message of type 0209.
+     */
+    public static function feature_procedure_message_pln_delete(): self
+    {
+        return new self('feature_procedure_message_pln_delete');
+    }
+
+    /**
      * @inheritDoc
      */
     public function getAddonIdentifier(): ?string

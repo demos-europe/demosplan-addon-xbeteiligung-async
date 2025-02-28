@@ -1,0 +1,546 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/12"
+           xmlns:bn-g2g="http://xoev.de/schemata/basisnachricht/g2g/1_1"
+           xmlns:dinspec91379="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"
+           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/2/1"
+           targetNamespace="https://www.xleitstelle.de/xbeteiligung/12"
+           version="1.2"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XBeteiligung</nameLang>
+            <nameKurz>XBeteiligung</nameKurz>
+            <nameTechnisch>xbeteiligung</nameTechnisch>
+            <kennung>urn:xoev-de:xleitstelle:standard:xbeteiligung</kennung>
+            <beschreibung>Beteiligungsverfahren - OZG</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.2</version>
+            <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren nach dem BauGB, dem ROG und in der Planfeststellung</beschreibung>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.4</versionXOEVHandbuch>
+            <versionXGenerator>3.1.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 4</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:include schemaLocation="xbeteiligung-baukasten.xsd"/>
+   <xs:import schemaLocation="din-91379-datatypes.xsd"
+              namespace="urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03"/>
+   <xs:import schemaLocation="xbau-kernmodul-datentypen.xsd"
+              namespace="http://www.xleitstelle.de/xbau/kernmodul/1/2/1"/>
+   <xs:import schemaLocation="xoev-basisnachricht-g2g_1.1.xsd"
+              namespace="http://xoev.de/schemata/basisnachricht/g2g/1_1"/>
+   <xs:element name="allgemein.stellungnahme.Neuabgegeben.0701">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht übermittelt Informationen über eine neu abgegebene Stellungnahme inklusive etwaiger Anhänge an das Planungsportal. Die Informationen enthalten ggf. auch solche, die durch die Behörde erfasst wurden, die das Beteiligungsverfahren durchführt.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID, die in der Nachricht 0201, 0301 oder 0401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="stellungnahme"
+                                       minOccurs="0"
+                                       type="xbeteiligung:Stellungnahme">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enthält die Stellungnahme der beteiligten Stelle.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Aktualisiert.0702">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht übermittelt aktualisierte Informationen zu einer bereits übermittelten Stellungnahmen inklusive etwaiger Anhänge an das Planungsportal.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID, die in der Nachricht 0201, 0301 oder 0401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="stellungnahme" type="xbeteiligung:Stellungnahme">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enthält die aktualisierte Stellungnahme der beteiligten Stelle.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Geloescht.0709">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird an das Planungsportal versendet und enthält die zum Löschen einer Stellungnahme notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID, die in der Nachricht 0201, 0301 oder 0401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="stellungnahmeID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Stellungnahme-ID, die in der Nachricht 0701/0702 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="planID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Plan-ID, die in der Nachricht 0201, 0301 oder 0401 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Neuabgegeben.OK.0711">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Quittierungsnachricht wird nach einer erfolgreichen Einreichung einer neuen Stellungnahme durch das Planungsportal versendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID der Nachrichten 0201, 0301 oder 0401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="stellungnahmeID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Stellungnahme-ID, die in der Nachricht 0701 von der beteiligten Stelle übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Aktualisiert.OK.0712">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Quittierungsnachricht wird nach einer erfolgreichen Aktualisierung einer Stellungnahme durch das Planungsportal versendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID der Nachrichten 0201, 0301 oder 0401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="stellungnahmeID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Stellungnahme-ID, die in der Nachricht 0702 von der beteiligten Stelle übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Geloescht.OK.0719">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Quittierungsnachricht wird nach einer erfolgreichen Löschung einer Stellungnahme durch das Planungsportal versendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID der Nachrichten 0201, 0301 oder 0401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="stellungnahmeID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Stellungnahme-ID, die in der Nachricht 0709 von der beteiligten Stelle übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Neuabgegeben.NOK.0721">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese negative Quittierungsnachricht wird nach einer misserfolgten Einreichung einer Stellungnahme durch das Planungsportal versendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID der Nachrichten 0201, 0301 oder 0401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="stellungnahmeID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Stellungnahme-ID, die in der Nachricht 0701 von der beteiligten Stelle übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="fehler"
+                                       minOccurs="0"
+                                       maxOccurs="unbounded"
+                                       type="xbeteiligung:Fehler">
+                              <xs:annotation>
+                                 <xs:documentation>Beschreibung der Fehler.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Aktualisiert.NOK.0722">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese negative Quittierungsnachricht wird nach einer misserfolgten Aktualisierung einer Stellungnahme durch das Planungsportal versendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID der Nachrichten 0201, 0301 oder 0401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="stellungnahmeID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Stellungnahme-ID, die in der Nachricht 0702 von der beteiligten Stelle übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="fehler"
+                                       minOccurs="0"
+                                       maxOccurs="unbounded"
+                                       type="xbeteiligung:Fehler">
+                              <xs:annotation>
+                                 <xs:documentation>Beschreibung der Fehler.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Geloescht.NOK.0729">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese negative Quittierungsnachricht wird nach einer misserfolgten Löschung einer Stellungnahme durch das Planungsportal versendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID der Nachrichten 0201, 0301 oder 0401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="stellungnahmeID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Stellungnahme-ID, die in der Nachricht 0709 von der beteiligten Stelle übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="fehler"
+                                       minOccurs="0"
+                                       maxOccurs="unbounded"
+                                       type="xbeteiligung:Fehler">
+                              <xs:annotation>
+                                 <xs:documentation>Beschreibung der Fehler.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Aufforderung.0750">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird an weitere Kommunikationspartner versendet und enthält die Aufforderung zur Abgabe einer Stellungnahme in einem Beteiligungsverfahren.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Hier muss eine Vorgangs-ID übermittelt werden, auf die sich die beteiligte Stelle in ihrer Antwort bezieht. Die Vorgangs-ID wird dabei unverändert in die Antwortnachricht übernommen.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligung" type="xbeteiligung:Beteiligung">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enhält alle Angaben zur dem Beteiligungsverfahren für das zu einer Stellungnahme aufgefordert wird.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="rechtsfolgen" minOccurs="0" type="dinspec91379:datatypeC">
+                              <xs:annotation>
+                                 <xs:documentation>Hier können Rechtsfolgen übermittelt werden, die sich aus dem Verzicht auf Abgabe einer Stellungnahme ergeben.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Aufforderung.OK.0760">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird als Quittungsnachricht an die Behörde versendet, die das Beteiligungsverfahren durchführt, wenn die Verarbeitung der Nachricht zur Aufforderung zur Stellungnahme erfolgreich verarbeitet werden konnte.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.OK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.stellungnahme.Aufforderung.NOK.0770">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird als negative Quittungsnachricht an die Behörde versendet, die das Beteiligungsverfahren durchführt, wenn die Verarbeitung der Nachricht zur Aufforderung zur Stellungnahme nicht verarbeitet werden konnte.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.NOK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.starttermin.Bestaetigung.1001">
+      <xs:annotation>
+         <xs:documentation>Diese Nachricht wird eine Woche vor Start eines Beteiligungsverfahren von einem Planungsprotal an die Behörde, die das Beteiligungsverfahren durchführt, gesendet, damit die gesetzlich vorgeschriebene Ankündigung des Beteiligungsverfahren erfolgen kann.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:annotation>
+                        <xs:documentation>Nachricht bestätigt, den Beginn des Auslegungszeitraums und der entsprechenden Veröffentlichung eine Woche vorher.</xs:documentation>
+                     </xs:annotation>
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="beteiligungsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>ID des Beteiligungsverfahrens, die mit der Nachricht 0401 als "vorgangsID" übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID der Nachrichten 0201, 0301 oder 0401 und der sich darauf beziehenden Nachrichten aus der Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="planID" minOccurs="0" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Hier kann die ID des Planverfahrens übermittelt werden.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="datumStartBeteiligung" type="xs:date">
+                              <xs:annotation>
+                                 <xs:documentation>Hier ist das Datum zu übermitteln, an dem das Beteiligungsverfahren startet.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="datumVeroeffentlichungBeteiligung"
+                                       minOccurs="0"
+                                       type="xs:date">
+                              <xs:annotation>
+                                 <xs:documentation>Hier ist das Datum zu übermitteln, an dem das Beteiligungsverfahren veröffentlicht werden soll.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.starttermin.Bestaetigung.OK.1011">
+      <xs:annotation>
+         <xs:documentation>Quittierungsnachricht einer erfolgreichen Terminbestätigung.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.OK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="allgemein.starttermin.Bestaetigung.NOK.1021">
+      <xs:annotation>
+         <xs:documentation>Negative Quittierungsnachricht einer misserfolgten Terminbestätigung.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.NOK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+</xs:schema>
