@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of the package demosplan.
  *
@@ -16,9 +18,8 @@ use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInte
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessages;
+use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -35,7 +36,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
         private readonly CacheInterface               $cache,
         private readonly ParameterBagInterface        $parameterBag,
         private readonly LoggerInterface              $cockpitLogger,
-        private readonly RabbitMQMessages             $getMessageRabbitMQ,
+        private readonly RabbitMQMessageBroker        $rabbitMQMessageBroker,
     ) {
     }
 
@@ -61,7 +62,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
                 $this->cockpitLogger->info('Fetch RabbitMQ Messages with delay '.$ttl);
                 $item->expiresAfter($ttl);
 
-                $this->getMessageRabbitMQ->processMessages();
+                $this->rabbitMQMessageBroker->processMessages();
             });
         } catch (Exception $e) {
             $this->cockpitLogger->warning('failed to get procedure-create messages', [$e]);

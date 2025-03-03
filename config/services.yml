@@ -22,7 +22,7 @@ services:
     DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAnySimpleTypeHandler:
         lazy: true
 
-    DemosEurope\DemosplanAddon\XBeteiligung\Tools\GetMessageRabbitMQ:
+    DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker:
         calls:
             - [ 'setClient', [ '@old_sound_rabbit_mq.demos_plan_import_rpc' ] ]
         lazy: true
