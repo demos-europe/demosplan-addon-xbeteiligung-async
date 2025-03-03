@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tools;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
@@ -13,7 +15,7 @@ use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use Psr\Log\LoggerInterface;
 
-class RabbitMQMessages
+class RabbitMQMessageBroker
 {
     protected RpcClient $client;
 
