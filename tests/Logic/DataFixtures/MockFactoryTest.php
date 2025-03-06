@@ -16,8 +16,15 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterfa
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
+use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -54,6 +61,11 @@ class MockFactoryTest extends TestCase
     public function getTransActionServiceInterfaceMock(): TransactionServiceInterface
     {
         return $this->createMock(TransactionServiceInterface::class);
+    }
+
+    public function getStatementCreatorMock(): StatementCreator
+    {
+        return $this->createMock(StatementCreator::class);
     }
 
     public function getProcedureMock(): MockObject|ProcedureInterface
@@ -222,6 +234,139 @@ class MockFactoryTest extends TestCase
         $entityManagerMock->method('getRepository')->willReturn($repositoryMock);
 
         return $entityManagerMock;
+    }
+
+    public function isValidMessage(string $message, bool $verboseDebug = false, string $xsdFile = 'xbeteiligung-planung2beteiligung.xsd'): bool
+    {
+        $path = AddonPath::getRootPath('/Resources/xsd/'.$xsdFile);
+        $document = new \DOMDocument();
+        $document->loadXML($message);
+        $isValid = $document->schemaValidate($path);
+        if ($isValid) {
+            return true;
+        }
+        // revalidate with error handling
+        libxml_use_internal_errors(true);
+        $document->schemaValidate($path);
+        $errors = libxml_get_errors();
+        foreach ($errors as $error) {
+            if ($verboseDebug) {
+                print_r($error);
+            }
+        }
+        libxml_clear_errors();
+        libxml_use_internal_errors(false);
+        if ($verboseDebug) {
+            print_r($message);
+        }
+
+        return false;
+    }
+
+    public function validateProductInfo(NachrichtG2GType $xmlMessage): void
+    {
+        // message tests
+        self::assertSame('DiPlan Cockpit', $xmlMessage->getProdukt());
+        self::assertSame('DEMOS plan GmbH', $xmlMessage->getProdukthersteller());
+        self::assertSame('XBeteiligung', $xmlMessage->getStandard());
+        self::assertSame('1.1', $xmlMessage->getVersion());
+    }
+
+    public function validateMessageId(string $msgType, NachrichtenkopfG2GType $header): void
+    {
+        self::assertSame($msgType, $header->getIdentifikationNachricht()->getNachrichtentyp()->getCode());
+    }
+
+    /**
+     * Tests that received Agency (either reader or author) has expected info.
+     *
+     * @param KommunikationTypeType[] $commChannels
+     */
+    public function validateK1Agency(BehoerdeTypeType $agency, string $prefixName, $commChannels): void
+    {
+        if (isset($commChannels['telefon'])) {
+            $tlfComm = $commChannels['telefon'];
+            self::assertSame('02', $tlfComm->getKanal()->getCode());
+            self::assertSame('Telefon', $tlfComm->getKanal()->getName());
+            self::assertSame('0049 40 22 86 73 57 0', $tlfComm->getKennung());
+            self::assertEmpty($tlfComm->getZusatz());
+        }
+        if (isset($commChannels['email'])) {
+            $emailComm = $commChannels['email'];
+            self::assertSame('01', $emailComm->getKanal()->getCode());
+            self::assertSame('E-Mail', $emailComm->getKanal()->getName());
+            self::assertSame('info@gv.hamburg.de', $emailComm->getKennung());
+            self::assertEmpty($emailComm->getZusatz());
+        }
+
+        self::assertSame('diplanfhh', $agency->getBehoerdenkennung()->getPraefix()->getCode());
+        self::assertSame($prefixName, $agency->getBehoerdenkennung()->getPraefix()->getName());
+        self::assertSame('0200', $agency->getBehoerdenkennung()->getKennung()->getCode());
+        self::assertSame($prefixName, $agency->getBehoerdenkennung()->getKennung()->getName());
+        self::assertSame('BSW Hamburg', $agency->getBehoerdenname());
+        self::assertEmpty($agency->getBehoerdenkennung()->getPraefix()->getListVersionID());
+        self::assertEmpty($agency->getBehoerdenkennung()->getKennung()->getListURI());
+        self::assertEmpty($agency->getBehoerdenkennung()->getKennung()->getListVersionID());
+
+        $agencyAddress = $agency->getAnschrift()->getGebaeude();
+        self::assertSame('19', $agencyAddress->getHausnummer());
+        self::assertSame('b', $agencyAddress->getHausnummerBuchstabeZusatzziffer());
+        self::assertSame('21109', $agencyAddress->getPostleitzahl());
+        self::assertSame('3', $agencyAddress->getStockwerkswohnungsnummer());
+        self::assertSame('Neuenfelder Straße', $agencyAddress->getStrasse());
+        self::assertSame('4', $agencyAddress->getTeilnummerDerHausnummer());
+        self::assertSame('Freie und Hansestadt Hamburg', $agencyAddress->getWohnort());
+        self::assertEmpty($agencyAddress->getWohnortFruehererGemeindename());
+        self::assertEmpty($agencyAddress->getWohnungsinhaber());
+        self::assertSame('Hinterhaus', $agencyAddress->getZusatzangaben());
+        self::assertSame('22', $agencyAddress->getHausnummernBis()->getHausnummerBis());
+        self::assertSame('c', $agencyAddress->getHausnummernBis()->getHausnummerbuchstabezusatzzifferBis());
+        self::assertSame('3', $agencyAddress->getHausnummernBis()->getTeilnummerderhausnummerBis());
+    }
+
+    public function validateDemosAgency(BehoerdeTypeType $demosAgency): void
+    {
+        $demosAddress = $demosAgency->getAnschrift()->getGebaeude();
+        // Anschrift => Gebaude
+        self::assertSame('43', $demosAddress->getHausnummer());
+        self::assertEmpty($demosAddress->getHausnummerBuchstabeZusatzziffer());
+        self::assertSame('22769', $demosAddress->getPostleitzahl());
+        self::assertEmpty($demosAddress->getStockwerkswohnungsnummer());
+        self::assertSame('Eifflerstraße', $demosAddress->getStrasse());
+        //self::assertEquals($agencyAddress1->getTeilnummerDerHausnummer(), $demosAddress->getTeilnummerDerHausnummer()); // TODO 401.xml has empty value, 411.xml has '4'
+        self::assertSame('4', $demosAddress->getTeilnummerDerHausnummer());
+        self::assertSame('Freie und Hansestadt Hamburg', $demosAddress->getWohnort());
+        self::assertEmpty($demosAddress->getWohnortFruehererGemeindename());
+        self::assertEmpty($demosAddress->getWohnungsinhaber());
+        self::assertEmpty($demosAddress->getZusatzangaben());
+
+        // Anschrift => Gebaude => Hausnummer.bis
+        self::assertEmpty($demosAddress->getHausnummernBis()->getHausnummerBis());
+        self::assertEmpty($demosAddress->getHausnummernBis()->getHausnummerbuchstabezusatzzifferBis());
+        self::assertEmpty($demosAddress->getHausnummernBis()->getTeilnummerderhausnummerBis());
+
+        // Agency => behoerdenkennung
+        self::assertEmpty($demosAgency->getBehoerdenkennung()->getPraefix()->getListVersionID());
+        self::assertSame('diplanfhh', $demosAgency->getBehoerdenkennung()->getPraefix()->getCode());
+        self::assertSame('DEMOS E-Partizipation GmbH', $demosAgency->getBehoerdenkennung()->getPraefix()->getName());
+        self::assertEmpty($demosAgency->getBehoerdenkennung()->getKennung()->getListURI());
+        self::assertEmpty($demosAgency->getBehoerdenkennung()->getKennung()->getListVersionID());
+        self::assertSame('0400', $demosAgency->getBehoerdenkennung()->getKennung()->getCode());
+        self::assertEmpty($demosAgency->getBehoerdenkennung()->getKennung()->getName());
+        self::assertEmpty($demosAgency->getBehoerdenname());
+
+        /** @var KommunikationTypeType $communication1 */
+        $communication1 = $demosAgency->getErreichbarkeit()[0];
+        self::assertSame('02', $communication1->getKanal()->getCode());
+        self::assertSame('Telefon', $communication1->getKanal()->getName());
+        self::assertSame('0049 40 22 86 73 57 0', $communication1->getKennung());
+        self::assertEmpty($communication1->getZusatz());
+
+        /** @var KommunikationTypeType $communication2 */
+        $communication2 = $demosAgency->getErreichbarkeit()[1];
+        self::assertSame('01', $communication2->getKanal()->getCode());
+        self::assertSame('E-Mail', $communication2->getKanal()->getName());
+        self::assertSame('officehamburg@demos-international.com', $communication2->getKennung());
     }
 
 }

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalAktualisierenNOK0422\Beteiligung2PlanungBeteiligungKommunalAktualisierenNOK0422AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0422;
@@ -26,8 +28,10 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBetei
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319\Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0319;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungNeuNOK0321\Beteiligung2PlanungBeteiligungRaumordnungNeuNOK0321AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0321;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311\Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0311;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungStellungnahmeNeu0701;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedureCreated;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use Exception;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\BaseTypesHandler;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\XmlSchemaDateHandler;
@@ -88,6 +92,8 @@ class XBeteiligungResponseMessageFactory
     /** @var Serializer */
     protected $serializer;
 
+    protected GlobalConfigInterface $globalConfig;
+
     public function __construct(
         LoggerInterface $dplanCockpitLogger
     ) {
@@ -123,10 +129,10 @@ class XBeteiligungResponseMessageFactory
         return $messageObject;
     }
 
-    private function buildHeader(string $messageType)
+    private function buildHeader(string $messageType, string $readerType)
     {
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', $readerType);
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, $messageType);
         return $headerBuilder->build();
@@ -149,6 +155,27 @@ class XBeteiligungResponseMessageFactory
         return $response;
     }
 
+    /**
+     * Builds a valid XBeteiligungsmessage as a response of creating a statement.
+     *
+     * @throws Exception
+     */
+    public function createBeteiligung2PlanungStellungnahmeNeu0701(StatementCreated $statementCreated): string
+    {
+        $message = new Beteiligung2PlanungStellungnahmeNeu0701();
+
+        $this->setProductInfo($message);
+        $header = $this->buildHeader('0701', 'K1');
+        $message->setNachrichtenkopf($header);
+
+        $content = $this->createBeteiligung2PlanungStellungnahmeNeu0701Content($statementCreated);
+        $message->setNachrichteninhalt($content);
+
+        $messageXml = $this->serializeData($message);
+
+        return $this->addNamespacesTo70xXML($messageXml);
+    }
+
     public function buildProcedureCreatedResponse(
         ProcedureInterface $procedure,
                            $xmlObject,
@@ -159,7 +186,7 @@ class XBeteiligungResponseMessageFactory
         try {
             $procedureCreated = $this->createProcedureCreated($procedure, $xmlObject);
             $this->setProductInfo($messageClass);
-            $header = $this->buildHeader($messageType);
+            $header = $this->buildHeader($messageType, 'K1');
             $contentClass->setBeteiligungsID($procedureCreated->getProcedureId());
             $contentClass->setPlanID($procedureCreated->getPlanId());
             $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()->getVorgangsID());
@@ -187,7 +214,7 @@ class XBeteiligungResponseMessageFactory
             $planId = $xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID();
             $instanceId = $xmlObject->getNachrichteninhalt()->getVorgangsID();
             $this->setProductInfo($messageClass);
-            $header = $this->buildHeader($messageType);
+            $header = $this->buildHeader($messageType, 'K1');
             $contentClass->setBeteiligungsID($procedureId);
             $contentClass->setPlanID($planId);
             $contentClass->setVorgangsID($instanceId);
@@ -212,7 +239,7 @@ class XBeteiligungResponseMessageFactory
     ): ResponseValue {
         try {
             $this->setProductInfo($messageClass);
-            $header = $this->buildHeader($messageType);
+            $header = $this->buildHeader($messageType, 'K1');
             $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()->getBeteiligungsID());
             $contentClass->setPlanID($xmlObject->getNachrichteninhalt()->getPlanID());
             $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()->getVorgangsID());
@@ -235,7 +262,7 @@ class XBeteiligungResponseMessageFactory
         string $messageType
     ): ResponseValue {
         $this->setProductInfo($messageClass);
-        $header = $this->buildHeader($messageType);
+        $header = $this->buildHeader($messageType, 'K1');
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()->getVorgangsID());
         $contentClass->setPlanID($xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID());
         $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()->getBeteiligung()->getBeteiligungsID());
@@ -405,6 +432,22 @@ class XBeteiligungResponseMessageFactory
         }
 
         return $simpleXML->asXML();
+    }
+
+    private function addNamespacesTo70xXML(string $xml): string
+    {
+        $simpleXML = simplexml_load_string($xml);
+
+        $simpleXML->addAttribute('xmlns:xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        $simpleXML->addAttribute('xmlns:xmlns:gml', 'http://www.opengis.net/gml/3.2');
+
+        $result = $simpleXML->asXML();
+        if (!is_string($result)) {
+            $this->dplanCockpitLogger->error('Failed to add namespaces to XML.');
+            throw new NamespaceAdditionException('Failed to add namespaces');
+        }
+
+        return $result;
     }
 
     public function uuid(): string

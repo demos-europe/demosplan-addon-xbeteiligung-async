@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tools;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Exception\JsonException;
 use DemosEurope\DemosplanAddon\Utilities\Json;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -24,6 +26,7 @@ class RabbitMQMessageBroker
         private readonly LoggerInterface $logger,
         private readonly string $rabbitMqQueueName,
         private readonly XBeteiligungService $xBeteiligungService,
+        private readonly StatementMessageFactory $statementMessageFactory
     ) {
     }
 
@@ -82,6 +85,21 @@ class RabbitMQMessageBroker
         $this->logger->info('Replies from RabbitMQ', [$replies]);
 
         return Json::decodeToMatchingType($replies['XBeteiligung_Send']);
+    }
+
+    public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): StatementCreatedEventInterface
+    {
+        $statementCreated = $this->xBeteiligungService->getStatementCreatedFromEvent($event);
+
+        // this technically returns a response which is currently unused
+        try {
+            $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
+            $this->sendRabbitMq($xmlString);
+        } catch (\Exception $e) {
+            $this->logger->warning('could not send statementCreated message', [$e]);
+        }
+
+        return $event;
     }
 
     /**
