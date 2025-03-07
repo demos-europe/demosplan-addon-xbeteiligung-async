@@ -5,32 +5,36 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 /**
  * Class representing NachrichtenkopfG2GTypeType
  *
- * Nachrichtenkopf für Nachrichten zwischen Behörden und anderen (öffentlichen) Stellen.
+ * Nachrichtenkopf für Nachrichten zwischen Behörden und anderen (öffentlichen) Stellen. Der Nachrichtenkopf umfasst Angaben zur eindeutigen Identifikation des Autors und des Lesers der Nachricht sowie der Nachricht selbst.
  * XSD Type: Nachrichtenkopf.G2GType
  */
 class NachrichtenkopfG2GTypeType
 {
     /**
+     * Dieses Element enthält Angaben zur eindeutigen Identifikation einer Nachricht.
+     *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType $identifikationNachricht
      */
     private $identifikationNachricht = null;
 
     /**
-     * Hier werden Angaben über den Leser der Nachricht übermittelt. Der Leser ist die Behörde oder andere (öffentliche) Stelle, der die Nachricht zugestellt werden soll.
+     * Dieses Element enthält Angaben zum Leser der Nachricht. Der Leser ist die fachlich zuständige Behörde / öffentliche Stelle, der die Nachricht zugestellt werden soll und die die Nachricht fachlich verarbeiten soll.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType $leser
      */
     private $leser = null;
 
     /**
-     * Hier werden Angaben über den Autor der Nachricht übermittelt, die es dem Leser ermöglichen mit dem Autor in Verbindung zu treten. Der Autor ist die Behörde oder andere (öffentliche) Stelle, die aufgrund eines Geschäftsvorfalls die Nachricht erstellt, also bspw. eine Meldebehörde oder ein Standesamt. Für die sendende Behörde wird in der behoerdenkennung immer die Kennung der für den Betroffenen zuständigen Gemeinde bzw. Ausländerbehörde oder die Kennung des für den Personenstandsfall zuständigen Standesamtes übermittelt. Sofern die sendende Behörde für einen Gemeindeverbund oder im Auftrag einer anderen Behörde handelt, ist in diesen Fällen deshalb die Angabe der zuständigen Stelle (Gemeinde oder Behörde) verpflichtend. Daraus ergibt sich auch die Konsequenz, dass Sammelnachrichten nur für die einzelnen Gemeinden bzw. Behörden zulässig sind. Sofern es keine dem obigen Sinn nach zuständige Gemeinde oder Behörde gibt (bspw. bei der Beantragung eine Führungszeugnisses in einer nicht für den Wohnort des Beantragenden zuständigen Meldebehörde), ist in dem Kindelement behoerdenkennung eine beliebige Kennung zu übermitteln, mit der der Autor im DVDV adressiert werden kann.
+     * Dieses Element enthält Angaben zum Autor der Nachricht, die es dem Leser ermöglichen, bei Bedarf mit dem Autor in Verbindung zu treten. Der Autor ist die fachlich zuständige Behörde / öffentliche Stelle, die die Nachricht erstellt.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType $autor
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType $autor
      */
     private $autor = null;
 
     /**
      * Gets as identifikationNachricht
+     *
+     * Dieses Element enthält Angaben zur eindeutigen Identifikation einer Nachricht.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType
      */
@@ -41,6 +45,8 @@ class NachrichtenkopfG2GTypeType
 
     /**
      * Sets a new identifikationNachricht
+     *
+     * Dieses Element enthält Angaben zur eindeutigen Identifikation einer Nachricht.
      *
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType $identifikationNachricht
      * @return self
@@ -54,7 +60,7 @@ class NachrichtenkopfG2GTypeType
     /**
      * Gets as leser
      *
-     * Hier werden Angaben über den Leser der Nachricht übermittelt. Der Leser ist die Behörde oder andere (öffentliche) Stelle, der die Nachricht zugestellt werden soll.
+     * Dieses Element enthält Angaben zum Leser der Nachricht. Der Leser ist die fachlich zuständige Behörde / öffentliche Stelle, der die Nachricht zugestellt werden soll und die die Nachricht fachlich verarbeiten soll.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType
      */
@@ -66,7 +72,7 @@ class NachrichtenkopfG2GTypeType
     /**
      * Sets a new leser
      *
-     * Hier werden Angaben über den Leser der Nachricht übermittelt. Der Leser ist die Behörde oder andere (öffentliche) Stelle, der die Nachricht zugestellt werden soll.
+     * Dieses Element enthält Angaben zum Leser der Nachricht. Der Leser ist die fachlich zuständige Behörde / öffentliche Stelle, der die Nachricht zugestellt werden soll und die die Nachricht fachlich verarbeiten soll.
      *
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType $leser
      * @return self
@@ -80,9 +86,9 @@ class NachrichtenkopfG2GTypeType
     /**
      * Gets as autor
      *
-     * Hier werden Angaben über den Autor der Nachricht übermittelt, die es dem Leser ermöglichen mit dem Autor in Verbindung zu treten. Der Autor ist die Behörde oder andere (öffentliche) Stelle, die aufgrund eines Geschäftsvorfalls die Nachricht erstellt, also bspw. eine Meldebehörde oder ein Standesamt. Für die sendende Behörde wird in der behoerdenkennung immer die Kennung der für den Betroffenen zuständigen Gemeinde bzw. Ausländerbehörde oder die Kennung des für den Personenstandsfall zuständigen Standesamtes übermittelt. Sofern die sendende Behörde für einen Gemeindeverbund oder im Auftrag einer anderen Behörde handelt, ist in diesen Fällen deshalb die Angabe der zuständigen Stelle (Gemeinde oder Behörde) verpflichtend. Daraus ergibt sich auch die Konsequenz, dass Sammelnachrichten nur für die einzelnen Gemeinden bzw. Behörden zulässig sind. Sofern es keine dem obigen Sinn nach zuständige Gemeinde oder Behörde gibt (bspw. bei der Beantragung eine Führungszeugnisses in einer nicht für den Wohnort des Beantragenden zuständigen Meldebehörde), ist in dem Kindelement behoerdenkennung eine beliebige Kennung zu übermitteln, mit der der Autor im DVDV adressiert werden kann.
+     * Dieses Element enthält Angaben zum Autor der Nachricht, die es dem Leser ermöglichen, bei Bedarf mit dem Autor in Verbindung zu treten. Der Autor ist die fachlich zuständige Behörde / öffentliche Stelle, die die Nachricht erstellt.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType
      */
     public function getAutor()
     {
@@ -92,12 +98,12 @@ class NachrichtenkopfG2GTypeType
     /**
      * Sets a new autor
      *
-     * Hier werden Angaben über den Autor der Nachricht übermittelt, die es dem Leser ermöglichen mit dem Autor in Verbindung zu treten. Der Autor ist die Behörde oder andere (öffentliche) Stelle, die aufgrund eines Geschäftsvorfalls die Nachricht erstellt, also bspw. eine Meldebehörde oder ein Standesamt. Für die sendende Behörde wird in der behoerdenkennung immer die Kennung der für den Betroffenen zuständigen Gemeinde bzw. Ausländerbehörde oder die Kennung des für den Personenstandsfall zuständigen Standesamtes übermittelt. Sofern die sendende Behörde für einen Gemeindeverbund oder im Auftrag einer anderen Behörde handelt, ist in diesen Fällen deshalb die Angabe der zuständigen Stelle (Gemeinde oder Behörde) verpflichtend. Daraus ergibt sich auch die Konsequenz, dass Sammelnachrichten nur für die einzelnen Gemeinden bzw. Behörden zulässig sind. Sofern es keine dem obigen Sinn nach zuständige Gemeinde oder Behörde gibt (bspw. bei der Beantragung eine Führungszeugnisses in einer nicht für den Wohnort des Beantragenden zuständigen Meldebehörde), ist in dem Kindelement behoerdenkennung eine beliebige Kennung zu übermitteln, mit der der Autor im DVDV adressiert werden kann.
+     * Dieses Element enthält Angaben zum Autor der Nachricht, die es dem Leser ermöglichen, bei Bedarf mit dem Autor in Verbindung zu treten. Der Autor ist die fachlich zuständige Behörde / öffentliche Stelle, die die Nachricht erstellt.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType $autor
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType $autor
      * @return self
      */
-    public function setAutor(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType $autor)
+    public function setAutor(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType $autor)
     {
         $this->autor = $autor;
         return $this;

@@ -1,0 +1,10 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ReferenzAntragsserviceType:
+    properties:
+        referenzAntragsservice:
+            expose: true
+            access_type: public_method
+            serialized_name: referenzAntragsservice
+            accessor:
+                getter: getReferenzAntragsservice
+                setter: setReferenzAntragsservice
+            type: string

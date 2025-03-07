@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           targetNamespace="https://www.xleitstelle.de/xbeteiligung/1"
-           version="1.0"
+           targetNamespace="https://www.xleitstelle.de/xbeteiligung/12"
+           version="1.3"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified">
+   <xs:include schemaLocation="xbeteiligung-allgemein.xsd"/>
    <xs:include schemaLocation="xbeteiligung-baukasten.xsd"/>
-   <xs:include schemaLocation="xbeteiligung-beteiligung2db.xsd"/>
-   <xs:include schemaLocation="xbeteiligung-beteiligung2extern.xsd"/>
-   <xs:include schemaLocation="xbeteiligung-beteiligung2planung.xsd"/>
    <xs:include schemaLocation="xbeteiligung-codes.xsd"/>
-   <xs:include schemaLocation="xbeteiligung-db2beteiligung.xsd"/>
-   <xs:include schemaLocation="xbeteiligung-extern2beteiligung.xsd"/>
-   <xs:include schemaLocation="xbeteiligung-planung2beteiligung.xsd"/>
+   <xs:include schemaLocation="xbeteiligung-kommunaleBauleitplanung.xsd"/>
+   <xs:include schemaLocation="xbeteiligung-planfeststellung.xsd"/>
+   <xs:include schemaLocation="xbeteiligung-raumordnung.xsd"/>
 </xs:schema>

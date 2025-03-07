@@ -13,7 +13,7 @@ class GeoreferenzierungType
     /**
      * Hier können georefierenzierte Punkte zur Verwortung übermittelt werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteTypeType[] $punkt
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteType[] $punkt
      */
     private $punkt = [
         
@@ -22,7 +22,7 @@ class GeoreferenzierungType
     /**
      * Hier können georefierenzierte Flächen zur Verwortung übermittelt werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheTypeType[] $flaeche
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheType[] $flaeche
      */
     private $flaeche = [
         
@@ -31,7 +31,7 @@ class GeoreferenzierungType
     /**
      * Hier können georefierenzierte Linien zur Verwortung übermittelt werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieTypeType[] $linie
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieType[] $linie
      */
     private $linie = [
         
@@ -43,9 +43,9 @@ class GeoreferenzierungType
      * Hier können georefierenzierte Punkte zur Verwortung übermittelt werden.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteTypeType $punkt
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteType $punkt
      */
-    public function addToPunkt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteTypeType $punkt)
+    public function addToPunkt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteType $punkt)
     {
         $this->punkt[] = $punkt;
         return $this;
@@ -82,7 +82,7 @@ class GeoreferenzierungType
      *
      * Hier können georefierenzierte Punkte zur Verwortung übermittelt werden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteTypeType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteType[]
      */
     public function getPunkt()
     {
@@ -94,7 +94,7 @@ class GeoreferenzierungType
      *
      * Hier können georefierenzierte Punkte zur Verwortung übermittelt werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteTypeType[] $punkt
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenziertePunkteType[] $punkt
      * @return self
      */
     public function setPunkt(array $punkt = null)
@@ -109,9 +109,9 @@ class GeoreferenzierungType
      * Hier können georefierenzierte Flächen zur Verwortung übermittelt werden.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheTypeType $flaeche
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheType $flaeche
      */
-    public function addToFlaeche(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheTypeType $flaeche)
+    public function addToFlaeche(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheType $flaeche)
     {
         $this->flaeche[] = $flaeche;
         return $this;
@@ -148,7 +148,7 @@ class GeoreferenzierungType
      *
      * Hier können georefierenzierte Flächen zur Verwortung übermittelt werden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheTypeType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheType[]
      */
     public function getFlaeche()
     {
@@ -160,7 +160,7 @@ class GeoreferenzierungType
      *
      * Hier können georefierenzierte Flächen zur Verwortung übermittelt werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheTypeType[] $flaeche
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteFlaecheType[] $flaeche
      * @return self
      */
     public function setFlaeche(array $flaeche = null)
@@ -175,9 +175,9 @@ class GeoreferenzierungType
      * Hier können georefierenzierte Linien zur Verwortung übermittelt werden.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieTypeType $linie
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieType $linie
      */
-    public function addToLinie(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieTypeType $linie)
+    public function addToLinie(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieType $linie)
     {
         $this->linie[] = $linie;
         return $this;
@@ -214,7 +214,7 @@ class GeoreferenzierungType
      *
      * Hier können georefierenzierte Linien zur Verwortung übermittelt werden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieTypeType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieType[]
      */
     public function getLinie()
     {
@@ -226,7 +226,7 @@ class GeoreferenzierungType
      *
      * Hier können georefierenzierte Linien zur Verwortung übermittelt werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieTypeType[] $linie
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieType[] $linie
      * @return self
      */
     public function setLinie(array $linie = null)

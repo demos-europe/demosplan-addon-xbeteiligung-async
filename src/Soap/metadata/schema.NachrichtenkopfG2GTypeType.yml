@@ -23,4 +23,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType:
             accessor:
                 getter: getAutor
                 setter: setAutor
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType

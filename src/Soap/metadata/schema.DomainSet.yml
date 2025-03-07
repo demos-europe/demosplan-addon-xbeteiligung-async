@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\DomainSet:
+    xml_root_name: domainSet
+    xml_root_namespace: 'http://www.opengis.net/gml/3.2'

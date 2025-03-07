@@ -10,14 +10,14 @@ class WeitereAkteureAnonymousPHPType
     /**
      * Daten des Beteilgten.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType $akteur
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType $akteur
      */
     private $akteur = null;
 
     /**
      * Hier ist die Rolle des Beteiligten anzugeben.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurRolleType $rolle
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RolleType $rolle
      */
     private $rolle = null;
 
@@ -26,7 +26,7 @@ class WeitereAkteureAnonymousPHPType
      *
      * Daten des Beteilgten.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType
      */
     public function getAkteur()
     {
@@ -38,10 +38,10 @@ class WeitereAkteureAnonymousPHPType
      *
      * Daten des Beteilgten.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType $akteur
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType $akteur
      * @return self
      */
-    public function setAkteur(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType $akteur)
+    public function setAkteur(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType $akteur)
     {
         $this->akteur = $akteur;
         return $this;
@@ -52,7 +52,7 @@ class WeitereAkteureAnonymousPHPType
      *
      * Hier ist die Rolle des Beteiligten anzugeben.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurRolleType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RolleType
      */
     public function getRolle()
     {
@@ -64,10 +64,10 @@ class WeitereAkteureAnonymousPHPType
      *
      * Hier ist die Rolle des Beteiligten anzugeben.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurRolleType $rolle
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RolleType $rolle
      * @return self
      */
-    public function setRolle(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurRolleType $rolle)
+    public function setRolle(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RolleType $rolle)
     {
         $this->rolle = $rolle;
         return $this;

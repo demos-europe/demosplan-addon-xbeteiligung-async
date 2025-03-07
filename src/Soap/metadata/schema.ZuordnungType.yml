@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZuordnungType:
             access_type: public_method
             serialized_name: zuordnungID
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getZuordnungID
                 setter: setZuordnungID
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZuordnungType:
             access_type: public_method
             serialized_name: zuordnungCode
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getZuordnungCode
                 setter: setZuordnungCode
@@ -25,7 +25,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZuordnungType:
             access_type: public_method
             serialized_name: vonCharNr
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getVonCharNr
                 setter: setVonCharNr
@@ -35,7 +35,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZuordnungType:
             access_type: public_method
             serialized_name: bisCharNr
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getBisCharNr
                 setter: setBisCharNr

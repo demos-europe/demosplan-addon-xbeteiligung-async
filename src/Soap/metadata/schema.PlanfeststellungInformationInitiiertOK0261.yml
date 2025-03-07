@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungInformationInitiiertOK0261:
+    xml_root_name: planfeststellung.Information.Initiiert.OK.0261
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\
             access_type: public_method
             serialized_name: beteiligungKommunalFormalTOEB
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getBeteiligungKommunalFormalTOEB
                 setter: setBeteiligungKommunalFormalTOEB
@@ -15,8 +15,8 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\
             access_type: public_method
             serialized_name: beteiligungKommunalInformellTOEB
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getBeteiligungKommunalInformellTOEB
                 setter: setBeteiligungKommunalInformellTOEB
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType\BeteiligungKommunalInformellTOEBAnonymousPHPType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBeteiligungKommunalInformellTOEBType

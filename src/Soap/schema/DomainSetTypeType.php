@@ -1,0 +1,67 @@
+<?php
+
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
+
+/**
+ * Class representing DomainSetTypeType
+ *
+ *
+ * XSD Type: DomainSetType
+ */
+class DomainSetTypeType
+{
+    /**
+     * @var bool $owns
+     */
+    private $owns = null;
+
+    /**
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AbstractGeometry $abstractGeometry
+     */
+    private $abstractGeometry = null;
+
+    /**
+     * Gets as owns
+     *
+     * @return bool
+     */
+    public function getOwns()
+    {
+        return $this->owns;
+    }
+
+    /**
+     * Sets a new owns
+     *
+     * @param bool $owns
+     * @return self
+     */
+    public function setOwns($owns)
+    {
+        $this->owns = $owns;
+        return $this;
+    }
+
+    /**
+     * Gets as abstractGeometry
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AbstractGeometry
+     */
+    public function getAbstractGeometry()
+    {
+        return $this->abstractGeometry;
+    }
+
+    /**
+     * Sets a new abstractGeometry
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AbstractGeometry $abstractGeometry
+     * @return self
+     */
+    public function setAbstractGeometry(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AbstractGeometry $abstractGeometry)
+    {
+        $this->abstractGeometry = $abstractGeometry;
+        return $this;
+    }
+}
+

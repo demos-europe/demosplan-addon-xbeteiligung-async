@@ -1,0 +1,65 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\SimpleType:
+    properties:
+        type:
+            expose: true
+            access_type: public_method
+            serialized_name: type
+            accessor:
+                getter: getType
+                setter: setType
+            xml_attribute: true
+            type: string
+        href:
+            expose: true
+            access_type: public_method
+            serialized_name: href
+            accessor:
+                getter: getHref
+                setter: setHref
+            xml_attribute: true
+            type: string
+        role:
+            expose: true
+            access_type: public_method
+            serialized_name: role
+            accessor:
+                getter: getRole
+                setter: setRole
+            xml_attribute: true
+            type: string
+        arcrole:
+            expose: true
+            access_type: public_method
+            serialized_name: arcrole
+            accessor:
+                getter: getArcrole
+                setter: setArcrole
+            xml_attribute: true
+            type: string
+        title:
+            expose: true
+            access_type: public_method
+            serialized_name: title
+            accessor:
+                getter: getTitle
+                setter: setTitle
+            xml_attribute: true
+            type: string
+        show:
+            expose: true
+            access_type: public_method
+            serialized_name: show
+            accessor:
+                getter: getShow
+                setter: setShow
+            xml_attribute: true
+            type: string
+        actuate:
+            expose: true
+            access_type: public_method
+            serialized_name: actuate
+            accessor:
+                getter: getActuate
+                setter: setActuate
+            xml_attribute: true
+            type: string

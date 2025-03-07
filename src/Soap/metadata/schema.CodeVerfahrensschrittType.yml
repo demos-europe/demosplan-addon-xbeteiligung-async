@@ -1,0 +1,32 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittType:
+    properties:
+        verfahrensschrittPlanfeststellung:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensschrittPlanfeststellung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVerfahrensschrittPlanfeststellung
+                setter: setVerfahrensschrittPlanfeststellung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittPlanfeststellungType
+        verfahrensschrittKommunal:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensschrittKommunal
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVerfahrensschrittKommunal
+                setter: setVerfahrensschrittKommunal
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType
+        verfahrensschrittRaumordnung:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensschrittRaumordnung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVerfahrensschrittRaumordnung
+                setter: setVerfahrensschrittRaumordnung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType

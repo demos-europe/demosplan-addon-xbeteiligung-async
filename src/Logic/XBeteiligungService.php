@@ -187,7 +187,7 @@ class XBeteiligungService
      */
     public function createProcedureNew401FromObject(ProcedureInterface $procedure): string
     {
-        $procedureCreated401Object = new Planung2BeteiligungBeteiligungKommunalNeu0401();
+        $procedureCreated401Object = new Pla();
         $procedureCreated401Object = $this->beteiligungMessageFactory->setProductInfo($procedureCreated401Object); // required
         $procedureCreated401Object->setNachrichtenkopf(
             $this->createMessageHeadFor($procedureCreated401Object)

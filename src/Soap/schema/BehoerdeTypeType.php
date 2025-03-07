@@ -5,20 +5,34 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 /**
  * Class representing BehoerdeTypeType
  *
- * Dieser Typ enthält Angaben über den Namen und die Erreichbarkeit einer Behörde. Eine Behörde im Sinne des Verwaltungsverfahrensgesetzes ist jede Stelle, die Aufgaben der öffentlichen Verwaltung wahrnimmt.
+ * Dieser Typ enthält Angaben zur Identifikation einer Behörde / öffentlichen Stelle in einem Verzeichnisdienst sowie ihrer Erreichbarkeit.
  * XSD Type: BehoerdeType
  */
 class BehoerdeTypeType
 {
     /**
-     * Es wird die eindeutige Behördenkennung angegeben, über die die Behörde im DVDV ermittelt werden kann. Diese hier übermittelte Behördenkennung muss es dem Leser einer Nachricht ermöglichen, den Autor einer Nachricht im DVDV zu ermitteln um diesem ggf. erforderliche elektronische Mitteilungen senden zu können (bspw. Quittungen oder Fehlernachrichten).
+     * Angabe des Verzeichnisdienstes (bspw. DVDV), in welchem die Behörde / öffentliche Stelle unter der nachfolgend angegebenen Kennung eingetragen ist.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType $behoerdenkennung
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerzeichnisdienstTypeType $verzeichnisdienst
      */
-    private $behoerdenkennung = null;
+    private $verzeichnisdienst = null;
 
     /**
-     * Angaben zur Erreichbarkeit dieser Behörde per Telefon, Telefax, E-Mail etc.
+     * Dieses Element enthält die eindeutige Kennzeichnung der Behörde / öffentlichen Stelle innerhalb des angegebenen Verzeichnisdienstes. Für den Verzeichnisdienst „DVDV“ enthält die Kennzeichnung das „Präfix“ und die „Kennung“ getrennt durch das Zeichen ':', also bspw. 'psw:01003110'.
+     *
+     * @var string $kennung
+     */
+    private $kennung = null;
+
+    /**
+     * Dieses Element enthält den Namen der Behörde / öffentlichen Stelle.
+     *
+     * @var string $name
+     */
+    private $name = null;
+
+    /**
+     * In diesem Element werden Angaben zur Erreichbarkeit übermittelt, mit denen die Behörde / öffentliche Stelle über Telefon, E-Mail etc. erreicht werden kann. Diese Angaben können z. B. verwendet werden, um in Einzelfällen Rückfragen zu stellen oder Problemklärungen durchzuführen.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType[] $erreichbarkeit
      */
@@ -27,49 +41,87 @@ class BehoerdeTypeType
     ];
 
     /**
-     * Die Anschrift dieser Behörde (für persönliches Erscheinen oder die Zusendung von Dokumenten per Briefpost an die Behörde).
+     * Gets as verzeichnisdienst
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType $anschrift
+     * Angabe des Verzeichnisdienstes (bspw. DVDV), in welchem die Behörde / öffentliche Stelle unter der nachfolgend angegebenen Kennung eingetragen ist.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerzeichnisdienstTypeType
      */
-    private $anschrift = null;
-
-    /**
-     * Es ist der Name der Behörde zu übermitteln. Er dient auch dazu, eine ggfs. erforderliche manuelle Klärung zu beschleunigen, indem bspw. der Autor einer Nachricht im Klartext übermittelt, an welche Behörde er die Nachricht schicken wollte.
-     *
-     * @var string $behoerdenname
-     */
-    private $behoerdenname = null;
-
-    /**
-     * Gets as behoerdenkennung
-     *
-     * Es wird die eindeutige Behördenkennung angegeben, über die die Behörde im DVDV ermittelt werden kann. Diese hier übermittelte Behördenkennung muss es dem Leser einer Nachricht ermöglichen, den Autor einer Nachricht im DVDV zu ermitteln um diesem ggf. erforderliche elektronische Mitteilungen senden zu können (bspw. Quittungen oder Fehlernachrichten).
-     *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType
-     */
-    public function getBehoerdenkennung()
+    public function getVerzeichnisdienst()
     {
-        return $this->behoerdenkennung;
+        return $this->verzeichnisdienst;
     }
 
     /**
-     * Sets a new behoerdenkennung
+     * Sets a new verzeichnisdienst
      *
-     * Es wird die eindeutige Behördenkennung angegeben, über die die Behörde im DVDV ermittelt werden kann. Diese hier übermittelte Behördenkennung muss es dem Leser einer Nachricht ermöglichen, den Autor einer Nachricht im DVDV zu ermitteln um diesem ggf. erforderliche elektronische Mitteilungen senden zu können (bspw. Quittungen oder Fehlernachrichten).
+     * Angabe des Verzeichnisdienstes (bspw. DVDV), in welchem die Behörde / öffentliche Stelle unter der nachfolgend angegebenen Kennung eingetragen ist.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType $behoerdenkennung
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerzeichnisdienstTypeType $verzeichnisdienst
      * @return self
      */
-    public function setBehoerdenkennung(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType $behoerdenkennung)
+    public function setVerzeichnisdienst(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerzeichnisdienstTypeType $verzeichnisdienst)
     {
-        $this->behoerdenkennung = $behoerdenkennung;
+        $this->verzeichnisdienst = $verzeichnisdienst;
+        return $this;
+    }
+
+    /**
+     * Gets as kennung
+     *
+     * Dieses Element enthält die eindeutige Kennzeichnung der Behörde / öffentlichen Stelle innerhalb des angegebenen Verzeichnisdienstes. Für den Verzeichnisdienst „DVDV“ enthält die Kennzeichnung das „Präfix“ und die „Kennung“ getrennt durch das Zeichen ':', also bspw. 'psw:01003110'.
+     *
+     * @return string
+     */
+    public function getKennung()
+    {
+        return $this->kennung;
+    }
+
+    /**
+     * Sets a new kennung
+     *
+     * Dieses Element enthält die eindeutige Kennzeichnung der Behörde / öffentlichen Stelle innerhalb des angegebenen Verzeichnisdienstes. Für den Verzeichnisdienst „DVDV“ enthält die Kennzeichnung das „Präfix“ und die „Kennung“ getrennt durch das Zeichen ':', also bspw. 'psw:01003110'.
+     *
+     * @param string $kennung
+     * @return self
+     */
+    public function setKennung($kennung)
+    {
+        $this->kennung = $kennung;
+        return $this;
+    }
+
+    /**
+     * Gets as name
+     *
+     * Dieses Element enthält den Namen der Behörde / öffentlichen Stelle.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Sets a new name
+     *
+     * Dieses Element enthält den Namen der Behörde / öffentlichen Stelle.
+     *
+     * @param string $name
+     * @return self
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
         return $this;
     }
 
     /**
      * Adds as erreichbarkeit
      *
-     * Angaben zur Erreichbarkeit dieser Behörde per Telefon, Telefax, E-Mail etc.
+     * In diesem Element werden Angaben zur Erreichbarkeit übermittelt, mit denen die Behörde / öffentliche Stelle über Telefon, E-Mail etc. erreicht werden kann. Diese Angaben können z. B. verwendet werden, um in Einzelfällen Rückfragen zu stellen oder Problemklärungen durchzuführen.
      *
      * @return self
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType $erreichbarkeit
@@ -83,7 +135,7 @@ class BehoerdeTypeType
     /**
      * isset erreichbarkeit
      *
-     * Angaben zur Erreichbarkeit dieser Behörde per Telefon, Telefax, E-Mail etc.
+     * In diesem Element werden Angaben zur Erreichbarkeit übermittelt, mit denen die Behörde / öffentliche Stelle über Telefon, E-Mail etc. erreicht werden kann. Diese Angaben können z. B. verwendet werden, um in Einzelfällen Rückfragen zu stellen oder Problemklärungen durchzuführen.
      *
      * @param int|string $index
      * @return bool
@@ -96,7 +148,7 @@ class BehoerdeTypeType
     /**
      * unset erreichbarkeit
      *
-     * Angaben zur Erreichbarkeit dieser Behörde per Telefon, Telefax, E-Mail etc.
+     * In diesem Element werden Angaben zur Erreichbarkeit übermittelt, mit denen die Behörde / öffentliche Stelle über Telefon, E-Mail etc. erreicht werden kann. Diese Angaben können z. B. verwendet werden, um in Einzelfällen Rückfragen zu stellen oder Problemklärungen durchzuführen.
      *
      * @param int|string $index
      * @return void
@@ -109,7 +161,7 @@ class BehoerdeTypeType
     /**
      * Gets as erreichbarkeit
      *
-     * Angaben zur Erreichbarkeit dieser Behörde per Telefon, Telefax, E-Mail etc.
+     * In diesem Element werden Angaben zur Erreichbarkeit übermittelt, mit denen die Behörde / öffentliche Stelle über Telefon, E-Mail etc. erreicht werden kann. Diese Angaben können z. B. verwendet werden, um in Einzelfällen Rückfragen zu stellen oder Problemklärungen durchzuführen.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType[]
      */
@@ -121,7 +173,7 @@ class BehoerdeTypeType
     /**
      * Sets a new erreichbarkeit
      *
-     * Angaben zur Erreichbarkeit dieser Behörde per Telefon, Telefax, E-Mail etc.
+     * In diesem Element werden Angaben zur Erreichbarkeit übermittelt, mit denen die Behörde / öffentliche Stelle über Telefon, E-Mail etc. erreicht werden kann. Diese Angaben können z. B. verwendet werden, um in Einzelfällen Rückfragen zu stellen oder Problemklärungen durchzuführen.
      *
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType[] $erreichbarkeit
      * @return self
@@ -129,58 +181,6 @@ class BehoerdeTypeType
     public function setErreichbarkeit(array $erreichbarkeit = null)
     {
         $this->erreichbarkeit = $erreichbarkeit;
-        return $this;
-    }
-
-    /**
-     * Gets as anschrift
-     *
-     * Die Anschrift dieser Behörde (für persönliches Erscheinen oder die Zusendung von Dokumenten per Briefpost an die Behörde).
-     *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType
-     */
-    public function getAnschrift()
-    {
-        return $this->anschrift;
-    }
-
-    /**
-     * Sets a new anschrift
-     *
-     * Die Anschrift dieser Behörde (für persönliches Erscheinen oder die Zusendung von Dokumenten per Briefpost an die Behörde).
-     *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType $anschrift
-     * @return self
-     */
-    public function setAnschrift(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType $anschrift = null)
-    {
-        $this->anschrift = $anschrift;
-        return $this;
-    }
-
-    /**
-     * Gets as behoerdenname
-     *
-     * Es ist der Name der Behörde zu übermitteln. Er dient auch dazu, eine ggfs. erforderliche manuelle Klärung zu beschleunigen, indem bspw. der Autor einer Nachricht im Klartext übermittelt, an welche Behörde er die Nachricht schicken wollte.
-     *
-     * @return string
-     */
-    public function getBehoerdenname()
-    {
-        return $this->behoerdenname;
-    }
-
-    /**
-     * Sets a new behoerdenname
-     *
-     * Es ist der Name der Behörde zu übermitteln. Er dient auch dazu, eine ggfs. erforderliche manuelle Klärung zu beschleunigen, indem bspw. der Autor einer Nachricht im Klartext übermittelt, an welche Behörde er die Nachricht schicken wollte.
-     *
-     * @param string $behoerdenname
-     * @return self
-     */
-    public function setBehoerdenname($behoerdenname)
-    {
-        $this->behoerdenname = $behoerdenname;
         return $this;
     }
 }

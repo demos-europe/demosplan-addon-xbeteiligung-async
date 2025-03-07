@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOK
             access_type: public_method
             serialized_name: vorgangsID
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getVorgangsID
                 setter: setVorgangsID
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOK
             access_type: public_method
             serialized_name: planID
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getPlanID
                 setter: setPlanID
@@ -25,26 +25,26 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOK
             access_type: public_method
             serialized_name: fehler
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getFehler
                 setter: setFehler
             xml_list:
                 inline: true
                 entry_name: fehler
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType>
         fehlerhafteUnterlagen:
             expose: true
             access_type: public_method
             serialized_name: fehlerhafteUnterlagen
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getFehlerhafteUnterlagen
                 setter: setFehlerhafteUnterlagen
             xml_list:
                 inline: true
                 entry_name: fehlerhafteUnterlagen
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerhafteUnterlageType>
