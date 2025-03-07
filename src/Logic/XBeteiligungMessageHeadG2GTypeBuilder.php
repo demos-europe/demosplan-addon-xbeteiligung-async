@@ -4,19 +4,13 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 
 use DateTime;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBehoerdenkennungTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeKommunikationKanalTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerzeichnisdienstTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType\HausnummernBisAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType;
 
 class XBeteiligungMessageHeadG2GTypeBuilder
 {
@@ -37,52 +31,31 @@ class XBeteiligungMessageHeadG2GTypeBuilder
         // Reader
         $reader = new BehoerdeTypeType();
         $this->head->setLeser($reader);
-        $leserBehoerdenkennung = new BehoerdenkennungTypeType();
-        $reader->setBehoerdenkennung($leserBehoerdenkennung);
-        $reader->setBehoerdenname('');
-        $codeBehoerdenkennung = new CodeBehoerdenkennungTypeType();
+        $reader->setKennung('');
+        $reader->setName('');
+        $codeBehoerdenkennung = new CodeVerzeichnisdienstTypeType();
         $codeBehoerdenkennung->setListVersionID('');
         $codeBehoerdenkennung->setListURI('');
-        $leserBehoerdenkennung->setKennung($codeBehoerdenkennung);
+        $reader->setVerzeichnisdienst($codeBehoerdenkennung);
         $readerErreichbarkeit = new KommunikationTypeType();
-        $readerErreichbarkeitChannel = new CodeErreichbarkeitTypeType();
+        $readerErreichbarkeitChannel = new CodeKommunikationKanalTypeType();
         $readerErreichbarkeit->setKanal($readerErreichbarkeitChannel);
         $this->head->getLeser()?->addToErreichbarkeit($readerErreichbarkeit);
-        $readerAnschrift = new PostalischeInlandsanschriftTypeType();
-        $readerAnschriftGebaeude = new PostalischeInlandsanschriftGebaeudeanschriftTypeType();
-        $readerAnschrift->setGebaeude($readerAnschriftGebaeude);
-        $this->head->getLeser()?->setAnschrift($readerAnschrift);
-        $codePrefix = new CodePraefixTypeType();
-        $codePrefix->setListURI(null);
-        $codePrefix->setListVersionID('');
-        $leserBehoerdenkennung->setPraefix($codePrefix);
-        $hausnummerBisAType = new HausnummernBisAnonymousPHPType();
-        $this->head->getLeser()?->getAnschrift()?->getGebaeude()?->setHausnummernBis($hausnummerBisAType);
 
         // Author
-        $author = new BehoerdeErreichbarTypeType();
+        $author = new BehoerdeTypeType();
         $this->head->setAutor($author);
-        $authorBehoerdenkennung = new BehoerdenkennungTypeType();
-        $author->setBehoerdenkennung($authorBehoerdenkennung);
-        $author->setBehoerdenname('');
-        $authorCodePraefix = new CodePraefixTypeType();
+        $author->setKennung('');
+        $author->setName('');
+        $authorCodePraefix = new CodeVerzeichnisdienstTypeType();
         $authorCodePraefix->setListURI(null);
         $authorCodePraefix->setListVersionID('');
-        $authorBehoerdenkennung->setPraefix($authorCodePraefix);
-        $authorCodeBehoerdenkennungType = new CodeBehoerdenkennungTypeType();
-        $authorCodeBehoerdenkennungType->setListVersionID('');
-        $authorCodeBehoerdenkennungType->setListURI('');
-        $authorBehoerdenkennung->setKennung($authorCodeBehoerdenkennungType);
+        $author->setVerzeichnisdienst($authorCodePraefix);
         $authorErreichbarkeit = new KommunikationTypeType();
         $author->addToErreichbarkeit($authorErreichbarkeit);
-        $authorPostalischeInlandsanschriftType = new PostalischeInlandsanschriftTypeType();
-        $authorGebaeude = new PostalischeInlandsanschriftGebaeudeanschriftTypeType();
-        $authorPostalischeInlandsanschriftType->setGebaeude($authorGebaeude);
-        $author->setAnschrift($authorPostalischeInlandsanschriftType);
-        $hausnummerBisAType = new HausnummernBisAnonymousPHPType();
-        $this->head->getAutor()?->getAnschrift()?->getGebaeude()?->setHausnummernBis($hausnummerBisAType);
-        $authorCodeErreichbarkeit = new CodeErreichbarkeitTypeType();
+        $authorCodeErreichbarkeit = new CodeKommunikationKanalTypeType();
         $authorErreichbarkeit->setKanal($authorCodeErreichbarkeit);
+        $this->head->getAutor()?->addToErreichbarkeit($authorErreichbarkeit);
     }
 
     /**
@@ -113,18 +86,6 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     public function setMessageIdentificationTypeCode(string $messageTypeCode): static
     {
         $this->head->getIdentifikationNachricht()?->getNachrichtentyp()?->setCode($messageTypeCode);
-
-        return $this;
-    }
-
-    /**
-     * @param $uri
-     *
-     * @return $this
-     */
-    public function setAgentAgencyIdentificationPrefixListURI($uri, string $agentType): static
-    {
-        $this->getAgent($agentType)->getBehoerdenkennung()?->getPraefix()?->setListURI($uri);
 
         return $this;
     }
@@ -178,38 +139,6 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     }
 
     /**
-     * @param $uri
-     * @param int $index
-     *
-     * @return $this
-     */
-    public function setAgentContactChannelListURI($uri, string $agentType, int $index = 0): static
-    {
-        if (!isset($this->getAgent($agentType)->getErreichbarkeit()[$index])) {
-            $this->newAgentKommunikationType($index, $agentType);
-        }
-        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()?->setListURI($uri);
-
-        return $this;
-    }
-
-    /**
-     * @param $id
-     * @param int $index
-     *
-     * @return $this
-     */
-    public function setAgentContactChannelListVersionID($id, string $agentType, int $index = 0): static
-    {
-        if (!isset($this->getAgent($agentType)->getErreichbarkeit()[$index])) {
-            $this->newAgentKommunikationType($index, $agentType);
-        }
-        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()?->setCode($id);
-
-        return $this;
-    }
-
-    /**
      * @param $code
      * @param int $index
      *
@@ -253,30 +182,6 @@ class XBeteiligungMessageHeadG2GTypeBuilder
             $this->newAgentKommunikationType($index, $agentType);
         }
         $this->getAgent($agentType)->getErreichbarkeit()[$index]->setKennung($label);
-
-        return $this;
-    }
-
-    /**
-     * @param string $uri
-     *
-     * @return $this
-     */
-    public function setMessageIdentificationListURI(string $uri): static
-    {
-        $this->head->getIdentifikationNachricht()?->getNachrichtentyp()?->setListURI($uri);
-
-        return $this;
-    }
-
-    /**
-     * @param string $id
-     *
-     * @return $this
-     */
-    public function setMessageIdenfificationListVersionId(string $id): static
-    {
-        $this->head->getIdentifikationNachricht()?->getNachrichtentyp()?->setCode($id);
 
         return $this;
     }

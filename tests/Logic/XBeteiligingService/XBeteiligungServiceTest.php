@@ -21,6 +21,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401\KommunalInitiieren0401AnonymousPHPType;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -67,6 +69,10 @@ abstract class XBeteiligungServiceTest extends TestCase
         $gisLayerCategoryInterfaceMock = $this->createMock(
             GisLayerCategoryInterface::class
         );
+        $messageObject = new KommunalInitiieren0401AnonymousPHPType();
+        $result = $this->sut->createMessageIdentification($messageObject);
+        $this->assertInstanceOf(IdentifikationNachrichtTypeType::class, $result);
+        $this->assertEquals('0401', $result->getNachrichtentyp()->getCode());
         $gisMo = $this->createMock(GisLayerInterface::class);
         $gisMo->method('getName')->willReturn('basemap');
         $gisMo->method('getUrl')->willReturn('https://sgx.geodatenzentrum.de/wms_basemapde');
