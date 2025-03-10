@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+## 1.3 (2025-03-10)
+## 1.3 (2025-03-10)
 
 ## v0.10 (2025-01-13)
 - refactor XBeteiligungProcedureChanged Event Listener and PlanningDocumentsLinkCreator
