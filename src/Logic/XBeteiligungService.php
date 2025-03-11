@@ -597,7 +597,7 @@ class XBeteiligungService
         $kanal->setCode(self::NON_EXISTING_CODE);
         $codeAuthorityIdentification->setKanal($kanal);
         $author->setErreichbarkeit([$codeAuthorityIdentification]); // required
-        $author->setErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
+        $author->addToErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
         $author->setName('DEMOS plan GmbH'); // required
 
         return $author;
@@ -700,9 +700,9 @@ class XBeteiligungService
     }
 
     /**
-     * @return array<int, KommunikationTypeType>
+     * @return KommunikationTypeType
      */
-    private function addAuthorCommunicationType(): array
+    private function addAuthorCommunicationType(): KommunikationTypeType
     {
         $communicationType = new KommunikationTypeType();
         $comCode = new CodeKommunikationKanalTypeType();
@@ -717,7 +717,7 @@ class XBeteiligungService
         $communicationType->setKennung('https://demosplan.com/impressum.html'); // required
         $communicationType->setZusatz(''); // optional
 
-        return [$communicationType];
+        return $communicationType;
     }
 
     /**
