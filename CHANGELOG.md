@@ -1,8 +1,11 @@
 # Changelog
 
 ## UNRELEASED
-## 1.3 (2025-03-10)
-## 1.3 (2025-03-10)
+
+## v0.11 (2025-03-10)
+- update the standard to 1.3 (new xsd files)
+- generate new schema yml files and php classes from xsd files
+- Update the current addon code to be functional with the new 1.3 standard.
 
 ## v0.10 (2025-01-13)
 - refactor XBeteiligungProcedureChanged Event Listener and PlanningDocumentsLinkCreator
