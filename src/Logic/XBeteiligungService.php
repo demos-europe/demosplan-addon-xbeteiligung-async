@@ -336,9 +336,7 @@ class XBeteiligungService
     {
         $actorsOfProcedure = new AkteurVorhabenType();
         $organisationType = new OrganisationType();
-        $organisationName = new NameOrganisationType();
-        $organisationName->setName($orgaName);
-        $organisationType->setName($organisationName);
+        $organisationType->setName($orgaName);
         $actorsOfProcedure->setVeranlasser($organisationType);
 
         return $actorsOfProcedure;
