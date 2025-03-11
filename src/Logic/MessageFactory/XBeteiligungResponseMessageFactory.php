@@ -101,7 +101,7 @@ class XBeteiligungResponseMessageFactory
         $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
         $messageObject->setProduktversion('1.1'); // optional
         $messageObject->setStandard(self::STANDARD); // required
-        $messageObject->setVersion('1.1'); // required
+        $messageObject->setVersion('1.3'); // required
 
         return $messageObject;
     }
