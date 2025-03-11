@@ -581,9 +581,24 @@ class XBeteiligungService
     public function createAuthorInformation(): BehoerdeTypeType
     {
         $author = new BehoerdeTypeType();
-        $author->setkennung($this->addAuthorityIdentificationOfAuthor()); // required
+        $author->setKennung('psw:01003110');
+        $prefixType = new CodeVerzeichnisdienstTypeType();
+        $prefixType->setListVersionID('');
+        $prefixType->setListURI('urn:xoev-de:bund:bmi:bit:codeliste:dvdv.praefix');
+        $prefixType->setName(self::NON_EXISTING_CODE_NAME);
+        $prefixType->setCode(self::NON_EXISTING_CODE);
+        $author->setVerzeichnisdienst($prefixType); // required
+
+        $codeAuthorityIdentification = new KommunikationTypeType();
+        $kanal = new CodeKommunikationKanalTypeType();
+        $kanal->setListVersionID('');
+        $kanal->setListURI('');
+        $kanal->setName(self::NON_EXISTING_CODE_NAME);
+        $kanal->setCode(self::NON_EXISTING_CODE);
+        $codeAuthorityIdentification->setKanal($kanal);
+        $author->setErreichbarkeit([$codeAuthorityIdentification]); // required
         $author->setErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
-        $author->setname('DEMOS plan GmbH'); // required
+        $author->setName('DEMOS plan GmbH'); // required
 
         return $author;
     }
@@ -656,29 +671,6 @@ class XBeteiligungService
         $kanal->setListURI('');
         $kanal->setName(self::NON_EXISTING_CODE_NAME);
         $kanal->setCode('work probably in progress');
-        $codeAuthorityIdentification->setKanal($kanal);
-        $authorityIdentificationType->setErreichbarkeit([$codeAuthorityIdentification]); // required
-
-        return $authorityIdentificationType;
-    }
-
-    private function addAuthorityIdentificationOfAuthor(): BehoerdeTypeType
-    {
-        $authorityIdentificationType = new BehoerdeTypeType();
-
-        $prefixType = new CodeVerzeichnisdienstTypeType();
-        $prefixType->setListVersionID('');
-        $prefixType->setListURI('urn:xoev-de:bund:bmi:bit:codeliste:dvdv.praefix');
-        $prefixType->setName(self::NON_EXISTING_CODE_NAME);
-        $prefixType->setCode(self::NON_EXISTING_CODE);
-        $authorityIdentificationType->setVerzeichnisdienst($prefixType); // required
-
-        $codeAuthorityIdentification = new KommunikationTypeType();
-        $kanal = new CodeKommunikationKanalTypeType();
-        $kanal->setListVersionID('');
-        $kanal->setListURI('');
-        $kanal->setName(self::NON_EXISTING_CODE_NAME);
-        $kanal->setCode(self::NON_EXISTING_CODE);
         $codeAuthorityIdentification->setKanal($kanal);
         $authorityIdentificationType->setErreichbarkeit([$codeAuthorityIdentification]); // required
 
@@ -771,7 +763,7 @@ class XBeteiligungService
 
         $messageTypeCode = new CodeXBeteiligungNachrichtenType();
         $messageTypeCode->setListURI('urn:xoev-de:xleitstelle:codeliste:xbeteiligung-nachrichten');
-        $messageTypeCode->setListVersionID('1.0');
+        $messageTypeCode->setListVersionID('1.3');
         $messageTypeCode->setName($name);
         $messageTypeCode->setCode($code);
 
