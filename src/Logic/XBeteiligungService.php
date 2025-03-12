@@ -568,10 +568,24 @@ class XBeteiligungService
     public function createReaderInformation(): BehoerdeTypeType
     {
         $reader = new BehoerdeTypeType();
-        $reader->setKennung($this->addReadingAuthorityIdentificationType()); // required
-//        $reader->setErreichbarkeit($this->addReaderCommunicationType()); // optional list
-//        $reader->setAnschrift($this->addReaderPostalInformation()); // optional
+        $reader->setKennung(''); // required
         $reader->setName('K3'); // required
+        $verzeichnisdienst = new CodeVerzeichnisdienstTypeType();
+        $verzeichnisdienst->setListVersionID('');
+        $verzeichnisdienst->setListURI('urn:xoev-de:bund:bmi:bit:codeliste:dvdv.praefix');
+        $verzeichnisdienst->setCode(self::NON_EXISTING_CODE);
+        $reader->setVerzeichnisdienst($verzeichnisdienst); // required
+        $reader->setName(self::NON_EXISTING_CODE_NAME);
+
+
+        $codeAuthorityIdentification = new KommunikationTypeType();
+        $kanal = new CodeKommunikationKanalTypeType();
+        $kanal->setListVersionID('');
+        $kanal->setListURI('');
+        $kanal->setName(self::NON_EXISTING_CODE_NAME);
+        $kanal->setCode('work probably in progress');
+        $codeAuthorityIdentification->setKanal($kanal);
+        $reader->setErreichbarkeit([$codeAuthorityIdentification]); // required
 
         return $reader;
     }
@@ -649,30 +663,6 @@ class XBeteiligungService
 
         return $url . $serviceType . $version . $request . $format . $transparent . $layers . $width .
             $height . $crs . $styles . $bbox;
-    }
-
-    private function addReadingAuthorityIdentificationType(): BehoerdeTypeType
-    {
-        $authorityIdentificationType = new BehoerdeTypeType();
-
-        $verzeichnisdienst = new CodeVerzeichnisdienstTypeType();
-        $verzeichnisdienst->setListVersionID('');
-        $verzeichnisdienst->setListURI('urn:xoev-de:bund:bmi:bit:codeliste:dvdv.praefix');
-        $verzeichnisdienst->setCode(self::NON_EXISTING_CODE);
-        $authorityIdentificationType->setVerzeichnisdienst($verzeichnisdienst); // required
-        $authorityIdentificationType->setName(self::NON_EXISTING_CODE_NAME);
-
-
-        $codeAuthorityIdentification = new KommunikationTypeType();
-        $kanal = new CodeKommunikationKanalTypeType();
-        $kanal->setListVersionID('');
-        $kanal->setListURI('');
-        $kanal->setName(self::NON_EXISTING_CODE_NAME);
-        $kanal->setCode('work probably in progress');
-        $codeAuthorityIdentification->setKanal($kanal);
-        $authorityIdentificationType->setErreichbarkeit([$codeAuthorityIdentification]); // required
-
-        return $authorityIdentificationType;
     }
 
     /**
