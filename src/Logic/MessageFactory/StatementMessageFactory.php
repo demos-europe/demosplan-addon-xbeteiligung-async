@@ -2,7 +2,7 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungStellungnahmeNeu0701\Beteiligung2PlanungStellungnahmeNeu0701AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeNeuabgegeben0701\AllgemeinStellungnahmeNeuabgegeben0701AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungRaumordnungType;
@@ -14,13 +14,14 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeStatusDerStellungnah
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensteilschrittType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameNatuerlichePersonType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZustimmungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfasserType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use JsonException;
 
@@ -43,25 +44,25 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $status = new CodeStatusDerStellungnahmeType();
         $status->setCode($this->statusDerStellungnahme($statementCreated->getStatus()));
         $statement->setStatus($status);
-        $verfasser = new OrganisationTypeType();
-        $orgaName = new NameOrganisationTypeType();
-        $verfasser->setName($orgaName->setName($statementCreated->getOrganizationName()));
+        $verfasser = new VerfasserType();
+        $orga = new OrganisationType();
+        $orga->setName($statementCreated->getOrganizationName());
+        $verfasser->setOrganisation($orga);
+        $natuerlichePerson = new NameNatuerlichePersonType();
+        $verfasser->setName($natuerlichePerson);
         $statement->setVerfasser($verfasser);
         $statement->setTitel($statementCreated->getTitle());
         $statement->setBeschreibung($statementCreated->getDescription());
         $this->getDurchgang($statementCreated);
         $statement->setDatum($statementCreated->getCreatedAt());
-        $zustimmung = new ZustimmungType();
         $artDerRueckmeldung = new CodeArtDerRueckmeldungType();
         $artDerRueckmeldung->setCode($this->getArtDerRueckmeldung($statementCreated->getFeedback()));
-        $zustimmung->setArtDerRueckmeldung($artDerRueckmeldung);
+        $statement->setArtDerRueckmeldung($artDerRueckmeldung);
         $artDerStellungnahme = new CodeArtDerStellungnahmeType();
         $artDerStellungnahme->setCode($this->getArtDerStellungnahme($statementCreated->getPublicUseName()));
-        $zustimmung->setArtDerStellungnahme($artDerStellungnahme);
-        $statement->setZustimmung($zustimmung);
-        // TODO: how can insert verfahrenSchritt in statement
-        $this->getVerfahrenSchritt($statementCreated);
-        // TODO: we don't have verfahrensteilschritt class
+        $statement->setArtDerStellungnahme($artDerStellungnahme);
+        $this->getVerfahrenSchritt($statementCreated, $statement);
+        $this->getVerfahrenTeilSchritt($statementCreated, $statement);
         $geoReferenzierung = $this->getGeoReferenzierung($statementCreated);
         $statement->setGeoreferenzierung([$geoReferenzierung]);
         $prioritaet = new CodePrioritaetDerStellungnahmeType();
@@ -70,7 +71,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $statement->setAbwaegungsvorschlag($abwaegungVorschlag->setCode($this->getAbwaegungVorschlag($statementCreated->getVotes())));
         $statement->setSchlagwort($statementCreated->getTags());
         $anlagen = new MetadatenAnlageType();
-        $mime = new CodeXBauMimeTypeTypeType();
+        $mime = new CodeXBauMimeTypeType();
         $mime->setCode(explode(':', $statementCreated->getFile())[3]);
         $anlagen->setMimeType($mime);
         $statement->setAnlagen([$anlagen]);
@@ -161,9 +162,8 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         return $durchgang;
     }
 
-    private function getVerfahrenSchritt(StatementCreated $statementCreated)
+    private function getVerfahrenSchritt(StatementCreated $statementCreated, StellungnahmeType $statement)
     {
-        $phaseCode = '';
         $participationType = null;
         $projectPrefix = $this->globalConfig->getProjectPrefix();
 
@@ -171,18 +171,45 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
             case self::PROJECT_PREFIX_DIPLANBAU:
                 $participationType = new CodeVerfahrensschrittKommunalType();
                 $phaseCode = $statementCreated->getPhaseCodeKommunale();
+                $participationType->setCode($phaseCode);
                 break;
             case self::PROJECT_PREFIX_DIPLANROG:
                 $participationType = new CodeVerfahrensschrittRaumordnungType();
                 $phaseCode = $statementCreated->getPhaseCodeRaumordnung();
+                $participationType->setCode($phaseCode);
                 break;
             case self::PROJECT_PREFIX_DIPLANFEST:
                 $participationType = new CodeVerfahrensschrittPlanfeststellungType();
                 $phaseCode = $statementCreated->getPhaseCodePlanfeststellung();
+                $participationType->setCode($phaseCode);
                 break;
         }
 
-        return $participationType->setCode($phaseCode);
+        return $statement->setVerfahrensschrittRaumordnung($participationType);
+    }
+
+    private function getVerfahrenTeilSchritt(StatementCreated $statementCreated, StellungnahmeType $statement)
+    {
+
+        $participationType = new CodeVerfahrensteilschrittType();
+        $projectPrefix = $this->globalConfig->getProjectPrefix();
+
+        switch ($projectPrefix) {
+            case self::PROJECT_PREFIX_DIPLANBAU:
+                $phaseCode = $statementCreated->getPartPhaseCodeKommunale();
+                $participationType->setCode($phaseCode);
+                break;
+            case self::PROJECT_PREFIX_DIPLANROG:
+                //$phaseCode = $statementCreated->getPhaseCodeRaumordnung();
+                //$statement->setVerfahrensschrittRaumordnung($phaseCode);
+                break;
+            case self::PROJECT_PREFIX_DIPLANFEST:
+                //$phaseCode = $statementCreated->getPhaseCodePlanfeststellung();
+                //$statement->setVerfahrensschrittPlanfeststellung($phaseCode);
+                break;
+        }
+
+        return $statement->setVerfahrensteilschritt($participationType);
     }
 
     /**

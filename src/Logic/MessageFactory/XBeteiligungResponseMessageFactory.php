@@ -10,6 +10,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeNeuabgegeben0701;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409;
@@ -111,10 +112,10 @@ class XBeteiligungResponseMessageFactory
         return $messageObject;
     }
 
-    private function buildHeader(string $messageType)
+    private function buildHeader(string $messageType, string $prefix)
     {
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', $prefix);
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, $messageType);
         return $headerBuilder->build();
@@ -144,11 +145,11 @@ class XBeteiligungResponseMessageFactory
      */
     public function createBeteiligung2PlanungStellungnahmeNeu0701(StatementCreated $statementCreated): string
     {
-        $message = new Beteiligung2PlanungStellungnahmeNeu0701();
+        $message = new AllgemeinStellungnahmeNeuabgegeben0701();
 
         $this->setProductInfo($message);
-        $header = $this->buildHeader('0701', 'K1');
-        $message->setNachrichtenkopf($header);
+        $header = $this->buildHeader('0701', 'LGV');
+        $message->setNachrichtenkopfG2g($header);
 
         $content = $this->createBeteiligung2PlanungStellungnahmeNeu0701Content($statementCreated);
         $message->setNachrichteninhalt($content);
