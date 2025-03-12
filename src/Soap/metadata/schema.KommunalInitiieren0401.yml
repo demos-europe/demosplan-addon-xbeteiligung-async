@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401:
+    xml_root_name: xbeteiligung:kommunal.Initiieren.0401
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

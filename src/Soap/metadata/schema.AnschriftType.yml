@@ -1,0 +1,82 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnschriftType:
+    properties:
+        strasse:
+            expose: true
+            access_type: public_method
+            serialized_name: strasse
+            accessor:
+                getter: getStrasse
+                setter: setStrasse
+            type: string
+        hausnummer:
+            expose: true
+            access_type: public_method
+            serialized_name: hausnummer
+            accessor:
+                getter: getHausnummer
+                setter: setHausnummer
+            type: string
+        strasseHausnummer:
+            expose: true
+            access_type: public_method
+            serialized_name: strasseHausnummer
+            accessor:
+                getter: getStrasseHausnummer
+                setter: setStrasseHausnummer
+            type: string
+        postfach:
+            expose: true
+            access_type: public_method
+            serialized_name: postfach
+            accessor:
+                getter: getPostfach
+                setter: setPostfach
+            type: string
+        postleitzahl:
+            expose: true
+            access_type: public_method
+            serialized_name: postleitzahl
+            accessor:
+                getter: getPostleitzahl
+                setter: setPostleitzahl
+            type: string
+        ort:
+            expose: true
+            access_type: public_method
+            serialized_name: ort
+            accessor:
+                getter: getOrt
+                setter: setOrt
+            type: string
+        ortsteil:
+            expose: true
+            access_type: public_method
+            serialized_name: ortsteil
+            accessor:
+                getter: getOrtsteil
+                setter: setOrtsteil
+            type: string
+        wohnungsgeber:
+            expose: true
+            access_type: public_method
+            serialized_name: wohnungsgeber
+            accessor:
+                getter: getWohnungsgeber
+                setter: setWohnungsgeber
+            type: string
+        zusatz:
+            expose: true
+            access_type: public_method
+            serialized_name: zusatz
+            accessor:
+                getter: getZusatz
+                setter: setZusatz
+            type: string
+        staat:
+            expose: true
+            access_type: public_method
+            serialized_name: staat
+            accessor:
+                getter: getStaat
+                setter: setStaat
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StaatType

@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
             access_type: public_method
             serialized_name: stellungnahmeID
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getStellungnahmeID
                 setter: setStellungnahmeID
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
             access_type: public_method
             serialized_name: planID
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getPlanID
                 setter: setPlanID
@@ -25,7 +25,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
             access_type: public_method
             serialized_name: beteiligungsID
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getBeteiligungsID
                 setter: setBeteiligungsID
@@ -35,7 +35,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
             access_type: public_method
             serialized_name: status
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getStatus
                 setter: setStatus
@@ -45,17 +45,17 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
             access_type: public_method
             serialized_name: verfasser
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getVerfasser
                 setter: setVerfasser
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfasserType
         titel:
             expose: true
             access_type: public_method
             serialized_name: titel
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getTitel
                 setter: setTitel
@@ -65,79 +65,125 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
             access_type: public_method
             serialized_name: beschreibung
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getBeschreibung
                 setter: setBeschreibung
             type: string
+        durchgang:
+            expose: true
+            access_type: public_method
+            serialized_name: durchgang
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getDurchgang
+                setter: setDurchgang
+            type: int
         datum:
             expose: true
             access_type: public_method
             serialized_name: datum
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getDatum
                 setter: setDatum
             type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Date
-        vormerkung:
+        artDerStellungnahme:
             expose: true
             access_type: public_method
-            serialized_name: vormerkung
+            serialized_name: artDerStellungnahme
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
-                getter: getVormerkung
-                setter: setVormerkung
-            xml_list:
-                inline: true
-                entry_name: vormerkung
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
-            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVormerkungType>
+                getter: getArtDerStellungnahme
+                setter: setArtDerStellungnahme
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerStellungnahmeType
+        artDerRueckmeldung:
+            expose: true
+            access_type: public_method
+            serialized_name: artDerRueckmeldung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getArtDerRueckmeldung
+                setter: setArtDerRueckmeldung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerRueckmeldungType
+        verfahrensschrittPlanfeststellung:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensschrittPlanfeststellung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVerfahrensschrittPlanfeststellung
+                setter: setVerfahrensschrittPlanfeststellung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittPlanfeststellungType
+        verfahrensschrittKommunal:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensschrittKommunal
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVerfahrensschrittKommunal
+                setter: setVerfahrensschrittKommunal
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType
+        verfahrensschrittRaumordnung:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensschrittRaumordnung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVerfahrensschrittRaumordnung
+                setter: setVerfahrensschrittRaumordnung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType
+        verfahrensteilschritt:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensteilschritt
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVerfahrensteilschritt
+                setter: setVerfahrensteilschritt
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensteilschrittType
         zuordnung:
             expose: true
             access_type: public_method
             serialized_name: zuordnung
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getZuordnung
                 setter: setZuordnung
             xml_list:
                 inline: true
                 entry_name: zuordnung
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZuordnungType>
-        zustimmung:
-            expose: true
-            access_type: public_method
-            serialized_name: zustimmung
-            xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
-            accessor:
-                getter: getZustimmung
-                setter: setZustimmung
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZustimmungType
         georeferenzierung:
             expose: true
             access_type: public_method
             serialized_name: georeferenzierung
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getGeoreferenzierung
                 setter: setGeoreferenzierung
             xml_list:
                 inline: true
                 entry_name: georeferenzierung
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierungType>
         prioritaet:
             expose: true
             access_type: public_method
             serialized_name: prioritaet
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getPrioritaet
                 setter: setPrioritaet
@@ -147,7 +193,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
             access_type: public_method
             serialized_name: abwaegungsvorschlag
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getAbwaegungsvorschlag
                 setter: setAbwaegungsvorschlag
@@ -157,21 +203,21 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
             access_type: public_method
             serialized_name: schlagwort
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getSchlagwort
                 setter: setSchlagwort
             xml_list:
                 inline: true
                 entry_name: schlagwort
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             type: array<string>
         anlagen:
             expose: true
             access_type: public_method
             serialized_name: anlagen
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getAnlagen
                 setter: setAnlagen
@@ -180,4 +226,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType:
                 inline: false
                 entry_name: anlage
                 skip_when_empty: true
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

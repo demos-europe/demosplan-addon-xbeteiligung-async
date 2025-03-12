@@ -7,7 +7,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType:
             accessor:
                 getter: getKanal
                 setter: setKanal
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeKommunikationKanalTypeType
         kennung:
             expose: true
             access_type: public_method

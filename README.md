@@ -31,13 +31,17 @@ In order for generated XML messages to be successfully validated,
 the following adjustments must be made after generating the classes and
 Yml files:
 
-add `xbeteiligung:` as prefix to xml_root_name in 
-`schema.Planung2BeteiligungBeteiligungKommunalNeu0401.yml`,
-`schema.Planung2BeteiligungBeteiligungKommunalAktualisieren0402.yml`,
-`schema.Planung2BeteiligungBeteiligungKommunalLoeschen0409.yml`,
-`schema.Planung2BeteiligungBeteiligungRaumordnungNeu0301.yml`,
-`schema.Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302.yml`,
-`schema.Planung2BeteiligungBeteiligungRaumordnungLoeschen0309.yml`
+add `xbeteiligung:` as prefix to xml_root_name in
+
+`schema.KommunalInitiieren0401.yml`,
+`schema.KommunalAktualisieren0402.yml`,
+`schema.KommunalLoeschen0409.yml`,
+`schema.RaumordnungInitiieren0301.yml`,
+`schema.RaumordnungAktualisieren0302.yml`,
+`schema.RaumordnungLoeschen0309.yml`,
+`schema.PlanfeststellungAktualisieren0202.yml`,
+`schema.PlanfeststellungInitiieren0201.yml`,
+`schema.PlanfeststellungLoeschen0209.yml`,
 
 Example - xml_root_name: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
 

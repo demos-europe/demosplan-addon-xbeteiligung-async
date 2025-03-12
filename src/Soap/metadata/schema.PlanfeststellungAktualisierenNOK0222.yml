@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisierenNOK0222:
+    xml_root_name: planfeststellung.Aktualisieren.NOK.0222
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

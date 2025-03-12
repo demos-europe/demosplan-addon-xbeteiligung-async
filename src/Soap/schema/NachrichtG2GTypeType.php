@@ -5,62 +5,64 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 /**
  * Class representing NachrichtG2GTypeType
  *
- * Dieser Typ realisiert die abstrakte Oberklasse für alle Nachrichten zwischen Behörden und anderen (öffentlichen) Stellen. Jede im xinneres-basismodul und den xinneres-fachmodulen definierte konkrete Nachricht erbt von diesem Typ. Auf diese Weise wird für alle xinneres-Nachrichten eine einheitliche Grundstruktur gewährleistet. Der Zusatz G2G ist die Abkürzung für den Begriff government-to-government, also die Kommunikation zwischen staatlichen Einrichtungen.
+ * Basistyp für alle Nachrichten zwischen Behörden und anderen öffentlichen Stellen (government-to-government).
  * XSD Type: Nachricht.G2GType
  */
 class NachrichtG2GTypeType
 {
     /**
-     * In diesem Attribut ist der Name des Produktes (der Software) einzutragen, mit dem diese Nachricht erstellt worden ist.
+     * In diesem Attribut ist der Name des Produktes (der Software) einzutragen, mit dem die Nachricht erstellt worden ist.
      *
      * @var string $produkt
      */
     private $produkt = null;
 
     /**
-     * In diesem Attribut ist der Name der Firma oder der Organisation einzutragen, die für das DV-Verfahren verantwortlich ist, mit dem diese Nachricht erstellt worden ist.
+     * In diesem Attribut wird der Name der Organisation / Firma übermittelt, die für das Produkt (die Software) verantwortlich ist, mit dem die Nachricht erstellt wurde.
      *
      * @var string $produkthersteller
      */
     private $produkthersteller = null;
 
     /**
-     * In diesem Attribut sollen ergänzende Hinweise zu dem Produkt, mit dem diese Nachricht erstellt worden ist, eingetragen werden. Dies sind Angaben, die für eine möglichst präzise Identifikation im Fehlerfall hilfreich sind, wie zum Beispiel Version und Patchlevel.
+     * In diesem Attribut werden ergänzende Hinweise zu dem Produkt eingetragen. Dies sind Angaben, die für eine möglichst präzise Identifikation im Fehlerfall hilfreich sind, wie zum Beispiel Version und Patchlevel.
      *
      * @var string $produktversion
      */
     private $produktversion = null;
 
     /**
-     * In diesem Attribut wird der Name des xinneres-basismoduls bzw. des xinneres-fachmoduls übermittelt, aus dem die Nachricht stammt. Der Name des xinneres-basismoduls bzw. des xinneres-fachmoduls wird durch das xinneres-basismodul bzw. das xinneres-fachmodul als fixed-Value auf Schemaebene festgelegt (z. B. XPersonenstand).
+     * In diesem Attribut wird der Name des XÖV-Standards angegeben, aus dem die Nachricht stammt.
      *
      * @var string $standard
      */
     private $standard = null;
 
     /**
-     * Dieses Attribut ist optional. Ist es vorhanden, so sagt dies aus, dass es sich um eine Nachricht handelt, die (aus Sicht des Autors der Nachricht) nicht im normalen Produktivbetrieb behandelt werden soll. Über den Inhalt des Attributes wird nichts weiter ausgesagt, dies kann bilateral zwischen den Kommunikationspartnern vereinbart werden.
+     * Ist dieses Attribut vorhanden, handelt es sich aus Sicht des Autors um eine Testnachricht, die nicht im normalen Produktivbetrieb verarbeitet werden darf. Autor und Leser können bilateral weitere Absprachen über den konkreten Inhalt des Attributs treffen.
      *
      * @var string $test
      */
     private $test = null;
 
     /**
-     * In diesem Attribut wird die Version des xinneres-basismoduls bzw. xinneres-fachmoduls übermittelt, aus dem die Nachricht stammt. Die Versionsbezeichnung wird durch das xinneres-basismodul bzw. xinneres-fachmodul als fixed-Value auf Schemaebene festgelegt (z. B. 1.5.0).
+     * In diesem Attribut wird die Version des XÖV-Standards eingetragen, aus dem die Nachricht stammt.
      *
      * @var string $version
      */
     private $version = null;
 
     /**
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType $nachrichtenkopf
+     * Nachrichtenkopf für Nachrichten zwischen Behörden und anderen (öffentlichen) Stellen. Der Nachrichtenkopf umfasst Angaben zur eindeutigen Identifikation des Autors und des Lesers der Nachricht sowie der Nachricht selbst.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType $nachrichtenkopfG2g
      */
-    private $nachrichtenkopf = null;
+    private $nachrichtenkopfG2g = null;
 
     /**
      * Gets as produkt
      *
-     * In diesem Attribut ist der Name des Produktes (der Software) einzutragen, mit dem diese Nachricht erstellt worden ist.
+     * In diesem Attribut ist der Name des Produktes (der Software) einzutragen, mit dem die Nachricht erstellt worden ist.
      *
      * @return string
      */
@@ -72,7 +74,7 @@ class NachrichtG2GTypeType
     /**
      * Sets a new produkt
      *
-     * In diesem Attribut ist der Name des Produktes (der Software) einzutragen, mit dem diese Nachricht erstellt worden ist.
+     * In diesem Attribut ist der Name des Produktes (der Software) einzutragen, mit dem die Nachricht erstellt worden ist.
      *
      * @param string $produkt
      * @return self
@@ -86,7 +88,7 @@ class NachrichtG2GTypeType
     /**
      * Gets as produkthersteller
      *
-     * In diesem Attribut ist der Name der Firma oder der Organisation einzutragen, die für das DV-Verfahren verantwortlich ist, mit dem diese Nachricht erstellt worden ist.
+     * In diesem Attribut wird der Name der Organisation / Firma übermittelt, die für das Produkt (die Software) verantwortlich ist, mit dem die Nachricht erstellt wurde.
      *
      * @return string
      */
@@ -98,7 +100,7 @@ class NachrichtG2GTypeType
     /**
      * Sets a new produkthersteller
      *
-     * In diesem Attribut ist der Name der Firma oder der Organisation einzutragen, die für das DV-Verfahren verantwortlich ist, mit dem diese Nachricht erstellt worden ist.
+     * In diesem Attribut wird der Name der Organisation / Firma übermittelt, die für das Produkt (die Software) verantwortlich ist, mit dem die Nachricht erstellt wurde.
      *
      * @param string $produkthersteller
      * @return self
@@ -112,7 +114,7 @@ class NachrichtG2GTypeType
     /**
      * Gets as produktversion
      *
-     * In diesem Attribut sollen ergänzende Hinweise zu dem Produkt, mit dem diese Nachricht erstellt worden ist, eingetragen werden. Dies sind Angaben, die für eine möglichst präzise Identifikation im Fehlerfall hilfreich sind, wie zum Beispiel Version und Patchlevel.
+     * In diesem Attribut werden ergänzende Hinweise zu dem Produkt eingetragen. Dies sind Angaben, die für eine möglichst präzise Identifikation im Fehlerfall hilfreich sind, wie zum Beispiel Version und Patchlevel.
      *
      * @return string
      */
@@ -124,7 +126,7 @@ class NachrichtG2GTypeType
     /**
      * Sets a new produktversion
      *
-     * In diesem Attribut sollen ergänzende Hinweise zu dem Produkt, mit dem diese Nachricht erstellt worden ist, eingetragen werden. Dies sind Angaben, die für eine möglichst präzise Identifikation im Fehlerfall hilfreich sind, wie zum Beispiel Version und Patchlevel.
+     * In diesem Attribut werden ergänzende Hinweise zu dem Produkt eingetragen. Dies sind Angaben, die für eine möglichst präzise Identifikation im Fehlerfall hilfreich sind, wie zum Beispiel Version und Patchlevel.
      *
      * @param string $produktversion
      * @return self
@@ -138,7 +140,7 @@ class NachrichtG2GTypeType
     /**
      * Gets as standard
      *
-     * In diesem Attribut wird der Name des xinneres-basismoduls bzw. des xinneres-fachmoduls übermittelt, aus dem die Nachricht stammt. Der Name des xinneres-basismoduls bzw. des xinneres-fachmoduls wird durch das xinneres-basismodul bzw. das xinneres-fachmodul als fixed-Value auf Schemaebene festgelegt (z. B. XPersonenstand).
+     * In diesem Attribut wird der Name des XÖV-Standards angegeben, aus dem die Nachricht stammt.
      *
      * @return string
      */
@@ -150,7 +152,7 @@ class NachrichtG2GTypeType
     /**
      * Sets a new standard
      *
-     * In diesem Attribut wird der Name des xinneres-basismoduls bzw. des xinneres-fachmoduls übermittelt, aus dem die Nachricht stammt. Der Name des xinneres-basismoduls bzw. des xinneres-fachmoduls wird durch das xinneres-basismodul bzw. das xinneres-fachmodul als fixed-Value auf Schemaebene festgelegt (z. B. XPersonenstand).
+     * In diesem Attribut wird der Name des XÖV-Standards angegeben, aus dem die Nachricht stammt.
      *
      * @param string $standard
      * @return self
@@ -164,7 +166,7 @@ class NachrichtG2GTypeType
     /**
      * Gets as test
      *
-     * Dieses Attribut ist optional. Ist es vorhanden, so sagt dies aus, dass es sich um eine Nachricht handelt, die (aus Sicht des Autors der Nachricht) nicht im normalen Produktivbetrieb behandelt werden soll. Über den Inhalt des Attributes wird nichts weiter ausgesagt, dies kann bilateral zwischen den Kommunikationspartnern vereinbart werden.
+     * Ist dieses Attribut vorhanden, handelt es sich aus Sicht des Autors um eine Testnachricht, die nicht im normalen Produktivbetrieb verarbeitet werden darf. Autor und Leser können bilateral weitere Absprachen über den konkreten Inhalt des Attributs treffen.
      *
      * @return string
      */
@@ -176,7 +178,7 @@ class NachrichtG2GTypeType
     /**
      * Sets a new test
      *
-     * Dieses Attribut ist optional. Ist es vorhanden, so sagt dies aus, dass es sich um eine Nachricht handelt, die (aus Sicht des Autors der Nachricht) nicht im normalen Produktivbetrieb behandelt werden soll. Über den Inhalt des Attributes wird nichts weiter ausgesagt, dies kann bilateral zwischen den Kommunikationspartnern vereinbart werden.
+     * Ist dieses Attribut vorhanden, handelt es sich aus Sicht des Autors um eine Testnachricht, die nicht im normalen Produktivbetrieb verarbeitet werden darf. Autor und Leser können bilateral weitere Absprachen über den konkreten Inhalt des Attributs treffen.
      *
      * @param string $test
      * @return self
@@ -190,7 +192,7 @@ class NachrichtG2GTypeType
     /**
      * Gets as version
      *
-     * In diesem Attribut wird die Version des xinneres-basismoduls bzw. xinneres-fachmoduls übermittelt, aus dem die Nachricht stammt. Die Versionsbezeichnung wird durch das xinneres-basismodul bzw. xinneres-fachmodul als fixed-Value auf Schemaebene festgelegt (z. B. 1.5.0).
+     * In diesem Attribut wird die Version des XÖV-Standards eingetragen, aus dem die Nachricht stammt.
      *
      * @return string
      */
@@ -202,7 +204,7 @@ class NachrichtG2GTypeType
     /**
      * Sets a new version
      *
-     * In diesem Attribut wird die Version des xinneres-basismoduls bzw. xinneres-fachmoduls übermittelt, aus dem die Nachricht stammt. Die Versionsbezeichnung wird durch das xinneres-basismodul bzw. xinneres-fachmodul als fixed-Value auf Schemaebene festgelegt (z. B. 1.5.0).
+     * In diesem Attribut wird die Version des XÖV-Standards eingetragen, aus dem die Nachricht stammt.
      *
      * @param string $version
      * @return self
@@ -214,24 +216,28 @@ class NachrichtG2GTypeType
     }
 
     /**
-     * Gets as nachrichtenkopf
+     * Gets as nachrichtenkopfG2g
+     *
+     * Nachrichtenkopf für Nachrichten zwischen Behörden und anderen (öffentlichen) Stellen. Der Nachrichtenkopf umfasst Angaben zur eindeutigen Identifikation des Autors und des Lesers der Nachricht sowie der Nachricht selbst.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType
      */
-    public function getNachrichtenkopf()
+    public function getNachrichtenkopfG2g()
     {
-        return $this->nachrichtenkopf;
+        return $this->nachrichtenkopfG2g;
     }
 
     /**
-     * Sets a new nachrichtenkopf
+     * Sets a new nachrichtenkopfG2g
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType $nachrichtenkopf
+     * Nachrichtenkopf für Nachrichten zwischen Behörden und anderen (öffentlichen) Stellen. Der Nachrichtenkopf umfasst Angaben zur eindeutigen Identifikation des Autors und des Lesers der Nachricht sowie der Nachricht selbst.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType $nachrichtenkopfG2g
      * @return self
      */
-    public function setNachrichtenkopf(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType $nachrichtenkopf)
+    public function setNachrichtenkopfG2g(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType $nachrichtenkopfG2g)
     {
-        $this->nachrichtenkopf = $nachrichtenkopf;
+        $this->nachrichtenkopfG2g = $nachrichtenkopfG2g;
         return $this;
     }
 }

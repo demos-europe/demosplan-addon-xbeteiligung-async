@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachricht:
+    xml_root_name: identifikation.nachricht
+    xml_root_namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'

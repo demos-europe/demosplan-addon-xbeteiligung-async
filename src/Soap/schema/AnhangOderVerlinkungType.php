@@ -13,16 +13,9 @@ class AnhangOderVerlinkungType
     /**
      * Das Dokument wird als Anhang mit dieser Fachnachricht übertragen. Dazu stehen unterhalb dieses Elements die passenden Metadaten.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangTypeType $anhang
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangType $anhang
      */
     private $anhang = null;
-
-    /**
-     * Hier kann das anzuhängende Dokument base64-codiert direkt innerhalb der Fachnachricht übermittelt werden, solange die Größe der Nachricht 128 MB nicht übersteigt,
-     *
-     * @var string $dokument
-     */
-    private $dokument = null;
 
     /**
      * Falls das Dokument über einen Link zugänglich gemacht werden soll, ist der Link in dieses Element einzutragen. Der Link identifiziert die Anlage (Primärdokument) in einem Quellsystem (das sich in Kontrolle der Behörde befindet) eindeutig.
@@ -36,7 +29,7 @@ class AnhangOderVerlinkungType
      *
      * Das Dokument wird als Anhang mit dieser Fachnachricht übertragen. Dazu stehen unterhalb dieses Elements die passenden Metadaten.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangType
      */
     public function getAnhang()
     {
@@ -48,38 +41,12 @@ class AnhangOderVerlinkungType
      *
      * Das Dokument wird als Anhang mit dieser Fachnachricht übertragen. Dazu stehen unterhalb dieses Elements die passenden Metadaten.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangTypeType $anhang
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangType $anhang
      * @return self
      */
-    public function setAnhang(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangTypeType $anhang = null)
+    public function setAnhang(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangType $anhang = null)
     {
         $this->anhang = $anhang;
-        return $this;
-    }
-
-    /**
-     * Gets as dokument
-     *
-     * Hier kann das anzuhängende Dokument base64-codiert direkt innerhalb der Fachnachricht übermittelt werden, solange die Größe der Nachricht 128 MB nicht übersteigt,
-     *
-     * @return string
-     */
-    public function getDokument()
-    {
-        return $this->dokument;
-    }
-
-    /**
-     * Sets a new dokument
-     *
-     * Hier kann das anzuhängende Dokument base64-codiert direkt innerhalb der Fachnachricht übermittelt werden, solange die Größe der Nachricht 128 MB nicht übersteigt,
-     *
-     * @param string $dokument
-     * @return self
-     */
-    public function setDokument($dokument)
-    {
-        $this->dokument = $dokument;
         return $this;
     }
 

@@ -20,7 +20,7 @@ class MetadatenAnlageType
     /**
      * Hier ist eine Versionsnummer einzutragen. Sie dient dazu, Anlagen zu unterscheiden, die dieselbe Bezeichnung tragen.
      *
-     * @var int $versionsnummer
+     * @var string $versionsnummer
      */
     private $versionsnummer = null;
 
@@ -41,7 +41,7 @@ class MetadatenAnlageType
     /**
      * Dieses Element nennt - analog zur Übermittlung von E-Mail-Anlagen - den MIME-Typ der angehängten oder verlinkten Anlage (z.B. text/xml, text/plain, application/gzip oder application/pdf). Die Angabe ist mandatorisch, weil eine für den Empfänger zur Verarbeitung der Daten notwendige Information.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType $mimeType
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeType $mimeType
      */
     private $mimeType = null;
 
@@ -51,6 +51,13 @@ class MetadatenAnlageType
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungType $anhangOderVerlinkung
      */
     private $anhangOderVerlinkung = null;
+
+    /**
+     * Hier kann das anzuhängende Dokument, beschrieben in anhangOderVerlinkung/anhang, base64-codiert direkt innerhalb der Fachnachricht übermittelt werden, solange die Größe der Nachricht 128 MB nicht übersteigt. Alternativ kann das Dokument als weiteres Dokument im gleichen Transportumschlag übermittelt werden. Zur Referenzierung dienen die dokumentid und dateiname aus dem Element anhangOderVerlinkung/anhang.
+     *
+     * @var string $dokument
+     */
+    private $dokument = null;
 
     /**
      * Gets as bezeichnung
@@ -83,7 +90,7 @@ class MetadatenAnlageType
      *
      * Hier ist eine Versionsnummer einzutragen. Sie dient dazu, Anlagen zu unterscheiden, die dieselbe Bezeichnung tragen.
      *
-     * @return int
+     * @return string
      */
     public function getVersionsnummer()
     {
@@ -95,7 +102,7 @@ class MetadatenAnlageType
      *
      * Hier ist eine Versionsnummer einzutragen. Sie dient dazu, Anlagen zu unterscheiden, die dieselbe Bezeichnung tragen.
      *
-     * @param int $versionsnummer
+     * @param string $versionsnummer
      * @return self
      */
     public function setVersionsnummer($versionsnummer)
@@ -161,7 +168,7 @@ class MetadatenAnlageType
      *
      * Dieses Element nennt - analog zur Übermittlung von E-Mail-Anlagen - den MIME-Typ der angehängten oder verlinkten Anlage (z.B. text/xml, text/plain, application/gzip oder application/pdf). Die Angabe ist mandatorisch, weil eine für den Empfänger zur Verarbeitung der Daten notwendige Information.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeType
      */
     public function getMimeType()
     {
@@ -173,10 +180,10 @@ class MetadatenAnlageType
      *
      * Dieses Element nennt - analog zur Übermittlung von E-Mail-Anlagen - den MIME-Typ der angehängten oder verlinkten Anlage (z.B. text/xml, text/plain, application/gzip oder application/pdf). Die Angabe ist mandatorisch, weil eine für den Empfänger zur Verarbeitung der Daten notwendige Information.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType $mimeType
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeType $mimeType
      * @return self
      */
-    public function setMimeType(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType $mimeType)
+    public function setMimeType(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeType $mimeType)
     {
         $this->mimeType = $mimeType;
         return $this;
@@ -205,6 +212,32 @@ class MetadatenAnlageType
     public function setAnhangOderVerlinkung(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungType $anhangOderVerlinkung = null)
     {
         $this->anhangOderVerlinkung = $anhangOderVerlinkung;
+        return $this;
+    }
+
+    /**
+     * Gets as dokument
+     *
+     * Hier kann das anzuhängende Dokument, beschrieben in anhangOderVerlinkung/anhang, base64-codiert direkt innerhalb der Fachnachricht übermittelt werden, solange die Größe der Nachricht 128 MB nicht übersteigt. Alternativ kann das Dokument als weiteres Dokument im gleichen Transportumschlag übermittelt werden. Zur Referenzierung dienen die dokumentid und dateiname aus dem Element anhangOderVerlinkung/anhang.
+     *
+     * @return string
+     */
+    public function getDokument()
+    {
+        return $this->dokument;
+    }
+
+    /**
+     * Sets a new dokument
+     *
+     * Hier kann das anzuhängende Dokument, beschrieben in anhangOderVerlinkung/anhang, base64-codiert direkt innerhalb der Fachnachricht übermittelt werden, solange die Größe der Nachricht 128 MB nicht übersteigt. Alternativ kann das Dokument als weiteres Dokument im gleichen Transportumschlag übermittelt werden. Zur Referenzierung dienen die dokumentid und dateiname aus dem Element anhangOderVerlinkung/anhang.
+     *
+     * @param string $dokument
+     * @return self
+     */
+    public function setDokument($dokument)
+    {
+        $this->dokument = $dokument;
         return $this;
     }
 }

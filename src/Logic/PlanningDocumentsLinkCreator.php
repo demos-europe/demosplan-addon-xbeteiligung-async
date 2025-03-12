@@ -13,7 +13,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ParagraphServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\ValueObject\FileInfoInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensunterlagetypType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -134,7 +134,7 @@ class PlanningDocumentsLinkCreator
 
     private function isDocumentScheduledForDeletion(SingleDocumentInterface $singleDocument, string $procedureId): bool
     {
-        foreach ($this->deletedSingleDocumentIds[$procedureId] as $singleDocumentToDeleteId) {
+        foreach ( $this->deletedSingleDocumentIds[$procedureId] as $singleDocumentToDeleteId) {
             if ($singleDocumentToDeleteId === $singleDocument->getId()) {
                 return true;
             }
@@ -211,7 +211,7 @@ class PlanningDocumentsLinkCreator
         string $contentType,
         string $fileUrl
     ): MetadatenAnlageType {
-        $codeXBauMimeContentType = new CodeXBauMimeTypeTypeType();
+        $codeXBauMimeContentType = new CodeXBauMimeTypeType();
         $codeXBauMimeContentType->setCode($contentType);
         $codeXBauMimeContentType->setListURI('');
         $codeXBauMimeContentType->setListVersionID('');

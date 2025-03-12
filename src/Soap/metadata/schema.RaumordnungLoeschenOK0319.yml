@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschenOK0319:
+    xml_root_name: raumordnung.Loeschen.OK.0319
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

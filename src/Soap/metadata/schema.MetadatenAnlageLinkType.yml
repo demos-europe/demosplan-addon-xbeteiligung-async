@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageLinkType:
             access_type: public_method
             serialized_name: bezeichnung
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getBezeichnung
                 setter: setBezeichnung
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageLinkType:
             access_type: public_method
             serialized_name: versionsnummer
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getVersionsnummer
                 setter: setVersionsnummer
@@ -25,7 +25,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageLinkType:
             access_type: public_method
             serialized_name: datum
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getDatum
                 setter: setDatum
@@ -35,7 +35,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageLinkType:
             access_type: public_method
             serialized_name: anlageart
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getAnlageart
                 setter: setAnlageart
@@ -45,7 +45,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageLinkType:
             access_type: public_method
             serialized_name: link
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getLink
                 setter: setLink

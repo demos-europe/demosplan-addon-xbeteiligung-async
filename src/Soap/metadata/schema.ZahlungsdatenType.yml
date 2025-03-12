@@ -1,0 +1,26 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZahlungsdatenType:
+    properties:
+        iban:
+            expose: true
+            access_type: public_method
+            serialized_name: iban
+            accessor:
+                getter: getIban
+                setter: setIban
+            type: string
+        bic:
+            expose: true
+            access_type: public_method
+            serialized_name: bic
+            accessor:
+                getter: getBic
+                setter: setBic
+            type: string
+        verwendungszweck:
+            expose: true
+            access_type: public_method
+            serialized_name: verwendungszweck
+            accessor:
+                getter: getVerwendungszweck
+                setter: setVerwendungszweck
+            type: string

@@ -1,0 +1,16 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MultiCurveTypeType:
+    properties:
+        curveMember:
+            expose: true
+            access_type: public_method
+            serialized_name: curveMember
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getCurveMember
+                setter: setCurveMember
+            xml_list:
+                inline: true
+                entry_name: curveMember
+                namespace: 'http://www.opengis.net/gml/3.2'
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveMember>

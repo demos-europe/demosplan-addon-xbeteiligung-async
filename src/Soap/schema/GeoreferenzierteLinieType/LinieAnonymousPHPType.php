@@ -1,0 +1,43 @@
+<?php
+
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierteLinieType;
+
+/**
+ * Class representing LinieAnonymousPHPType
+ */
+class LinieAnonymousPHPType
+{
+    /**
+     * Das Element (globales Element gml:CurveType) enthält die GML-Darstellung einer Linie.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeType $linie
+     */
+    private $linie = null;
+
+    /**
+     * Gets as linie
+     *
+     * Das Element (globales Element gml:CurveType) enthält die GML-Darstellung einer Linie.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeType
+     */
+    public function getLinie()
+    {
+        return $this->linie;
+    }
+
+    /**
+     * Sets a new linie
+     *
+     * Das Element (globales Element gml:CurveType) enthält die GML-Darstellung einer Linie.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeType $linie
+     * @return self
+     */
+    public function setLinie(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CurveTypeType $linie)
+    {
+        $this->linie = $linie;
+        return $this;
+    }
+}
+

@@ -4,22 +4,16 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalAktualisierenNOK0422;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalAktualisierenNOK0422\Beteiligung2PlanungBeteiligungKommunalAktualisierenNOK0422AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0422;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalAktualisierenOK0412;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalAktualisierenOK0412\Beteiligung2PlanungBeteiligungKommunalAktualisierenOK0412AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0412;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalLoeschenNOK0429;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalLoeschenNOK0429\Beteiligung2PlanungBeteiligungKommunalLoeschenNOK0429AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0429;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalLoeschenOK0419;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalLoeschenOK0419\Beteiligung2PlanungBeteiligungKommunalLoeschenOK0419AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0419;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalNeuNOK0421;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalNeuNOK0421\Beteiligung2PlanungBeteiligungKommunalNeuNOK0421AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0421;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalNeuOK0411;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungKommunalNeuOK0411\Beteiligung2PlanungBeteiligungKommunalNeuOK0411AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0411;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisierenNOK0422;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisierenOK0412;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschenNOK0429;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschenOK0419;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiierenNOK0421;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiierenOK0411;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalAktualisieren0402;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 
@@ -32,14 +26,13 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureCreatedResponse411(
         ProcedureInterface $procedure,
-        Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
+        KommunalInitiieren0401 $xmlObject401
     ): ResponseValue
     {
         return $this->buildProcedureCreatedResponse(
             $procedure,
             $xmlObject401,
-            new Beteiligung2PlanungBeteiligungKommunalNeuOK0411(),
-            new NachrichteninhaltAnonymousPHPType0411(),
+            new KommunalInitiierenOK0411(),
             '0411'
         );
     }
@@ -50,14 +43,13 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
      * @throws Exception
      */
     public function buildProcedureUpdateOKResponse412(
-        Planung2BeteiligungBeteiligungKommunalAktualisieren0402 $xmlObject402,
+        KommunalAktualisieren0402 $xmlObject402,
         ProcedureInterface                                      $procedure
     ): ResponseValue {
         return $this->buildProcedureUpdateResponse(
             $procedure,
             $xmlObject402,
-            new Beteiligung2PlanungBeteiligungKommunalAktualisierenOK0412(),
-            new NachrichteninhaltAnonymousPHPType0412(),
+            new KommunalAktualisierenOK0412(),
             '0412'
         );
     }
@@ -67,12 +59,11 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
      *
      * @throws Exception
      */
-    public function buildProcedureDeletedResponse419(Planung2BeteiligungBeteiligungKommunalLoeschen0409 $xmlObject409): ResponseValue
+    public function buildProcedureDeletedResponse419(KommunalLoeschen0409 $xmlObject409): ResponseValue
     {
         return $this->buildProcedureDeletedResponse(
             $xmlObject409,
-            new Beteiligung2PlanungBeteiligungKommunalLoeschenOK0419(),
-            new NachrichteninhaltAnonymousPHPType0419(),
+            new KommunalLoeschenOK0419(),
             '0419'
         );
     }
@@ -85,13 +76,12 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureCreatedErrorResponse421(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
+        KommunalInitiieren0401 $xmlObject401
     ): ResponseValue {
         return $this->buildErrorResponse(
             $errorTypes,
             $xmlObject401,
-            new Beteiligung2PlanungBeteiligungKommunalNeuNOK0421(),
-            new NachrichteninhaltAnonymousPHPType0421(),
+            new KommunalInitiierenNOK0421(),
             '0421'
         );
     }
@@ -105,14 +95,13 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureUpdateErrorResponse422(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungKommunalAktualisieren0402 $xmlObject402
+        KommunalAktualisieren0402 $xmlObject402
     ): ResponseValue
     {
         return $this->buildErrorResponse(
             $errorTypes,
             $xmlObject402,
-            new Beteiligung2PlanungBeteiligungKommunalAktualisierenNOK0422(),
-            new NachrichteninhaltAnonymousPHPType0422(),
+            new KommunalAktualisierenNOK0422(),
             '0422'
         );
     }
@@ -125,14 +114,13 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureDeletedErrorResponse429(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungKommunalLoeschen0409 $xmlObject409
+        KommunalLoeschen0409 $xmlObject409
     ): ResponseValue
     {
         return $this->buildErrorResponse(
             $errorTypes,
             $xmlObject409,
-            new Beteiligung2PlanungBeteiligungKommunalLoeschenNOK0429(),
-            new NachrichteninhaltAnonymousPHPType0429(),
+            new KommunalLoeschenNOK0429(),
             '0429'
         );
     }

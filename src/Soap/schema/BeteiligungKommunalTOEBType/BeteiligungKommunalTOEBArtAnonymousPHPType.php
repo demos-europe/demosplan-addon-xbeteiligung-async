@@ -17,7 +17,7 @@ class BeteiligungKommunalTOEBArtAnonymousPHPType
     /**
      * Hier kann die Art des informellen Verfahrens zur Beteiligung der Träger öffentlicher Belange übermittelt werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType\BeteiligungKommunalInformellTOEBAnonymousPHPType $beteiligungKommunalInformellTOEB
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBeteiligungKommunalInformellTOEBType $beteiligungKommunalInformellTOEB
      */
     private $beteiligungKommunalInformellTOEB = null;
 
@@ -52,7 +52,7 @@ class BeteiligungKommunalTOEBArtAnonymousPHPType
      *
      * Hier kann die Art des informellen Verfahrens zur Beteiligung der Träger öffentlicher Belange übermittelt werden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType\BeteiligungKommunalInformellTOEBAnonymousPHPType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBeteiligungKommunalInformellTOEBType
      */
     public function getBeteiligungKommunalInformellTOEB()
     {
@@ -64,10 +64,10 @@ class BeteiligungKommunalTOEBArtAnonymousPHPType
      *
      * Hier kann die Art des informellen Verfahrens zur Beteiligung der Träger öffentlicher Belange übermittelt werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType\BeteiligungKommunalInformellTOEBAnonymousPHPType $beteiligungKommunalInformellTOEB
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBeteiligungKommunalInformellTOEBType $beteiligungKommunalInformellTOEB
      * @return self
      */
-    public function setBeteiligungKommunalInformellTOEB(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType\BeteiligungKommunalInformellTOEBAnonymousPHPType $beteiligungKommunalInformellTOEB = null)
+    public function setBeteiligungKommunalInformellTOEB(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBeteiligungKommunalInformellTOEBType $beteiligungKommunalInformellTOEB = null)
     {
         $this->beteiligungKommunalInformellTOEB = $beteiligungKommunalInformellTOEB;
         return $this;

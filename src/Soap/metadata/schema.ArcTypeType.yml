@@ -1,0 +1,64 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ArcTypeType:
+    properties:
+        type:
+            expose: true
+            access_type: public_method
+            serialized_name: type
+            accessor:
+                getter: getType
+                setter: setType
+            xml_attribute: true
+            type: string
+        arcrole:
+            expose: true
+            access_type: public_method
+            serialized_name: arcrole
+            accessor:
+                getter: getArcrole
+                setter: setArcrole
+            xml_attribute: true
+            type: string
+        title:
+            expose: true
+            access_type: public_method
+            serialized_name: title
+            accessor:
+                getter: getTitle
+                setter: setTitle
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Title
+        show:
+            expose: true
+            access_type: public_method
+            serialized_name: show
+            accessor:
+                getter: getShow
+                setter: setShow
+            xml_attribute: true
+            type: string
+        actuate:
+            expose: true
+            access_type: public_method
+            serialized_name: actuate
+            accessor:
+                getter: getActuate
+                setter: setActuate
+            xml_attribute: true
+            type: string
+        from:
+            expose: true
+            access_type: public_method
+            serialized_name: from
+            accessor:
+                getter: getFrom
+                setter: setFrom
+            xml_attribute: true
+            type: string
+        to:
+            expose: true
+            access_type: public_method
+            serialized_name: to
+            accessor:
+                getter: getTo
+                setter: setTo
+            xml_attribute: true
+            type: string

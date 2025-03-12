@@ -41,7 +41,7 @@ class StellungnahmeType
     /**
      * Für die Stellungnahme verantwortliche Organisation bzw. Behörde.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType $verfasser
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfasserType $verfasser
      */
     private $verfasser = null;
 
@@ -60,6 +60,13 @@ class StellungnahmeType
     private $beschreibung = null;
 
     /**
+     * Hier ist die Nummer des Durchgangs des Verfahrensteilschritts zu übermitteln, in dem die Stellungnahme abgegeben wurde.
+     *
+     * @var int $durchgang
+     */
+    private $durchgang = null;
+
+    /**
      * Hier kann das Datum der Stellungnahme übermittelt werden.
      *
      * @var \DateTime $datum
@@ -67,13 +74,46 @@ class StellungnahmeType
     private $datum = null;
 
     /**
-     * Hier können Vormerkungen übermittelt werden.
+     * Hier ist die Art der Stellungnahme zu übermitteln.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVormerkungType[] $vormerkung
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerStellungnahmeType $artDerStellungnahme
      */
-    private $vormerkung = [
-        
-    ];
+    private $artDerStellungnahme = null;
+
+    /**
+     * Hier ist die Art der Rückmeldung zu übermitteln.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerRueckmeldungType $artDerRueckmeldung
+     */
+    private $artDerRueckmeldung = null;
+
+    /**
+     * Hier ist der Verfahrensschritt für ein Planfeststellungsverfahren zu übermitteln.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittPlanfeststellungType $verfahrensschrittPlanfeststellung
+     */
+    private $verfahrensschrittPlanfeststellung = null;
+
+    /**
+     * Hier ist der Verfahrensschritt für ein Verfahren der kommunalen Bauleitplanung zu übermitteln.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $verfahrensschrittKommunal
+     */
+    private $verfahrensschrittKommunal = null;
+
+    /**
+     * Hier ist der Verfahrensschritt für ein Raumordnungsverfahren zu übermitteln.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType $verfahrensschrittRaumordnung
+     */
+    private $verfahrensschrittRaumordnung = null;
+
+    /**
+     * Hier ist der Verfahrensteilschritt zu übermitteln, zu dem die Stellungnahme abgegeben wurde.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensteilschrittType $verfahrensteilschritt
+     */
+    private $verfahrensteilschritt = null;
 
     /**
      * Hier kann die Zuordnung zum Gegenstand der Stellungnahme erfolgen.
@@ -83,13 +123,6 @@ class StellungnahmeType
     private $zuordnung = [
         
     ];
-
-    /**
-     * Element zur Spezifizierung einer Zustimmung.
-     *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZustimmungType $zustimmung
-     */
-    private $zustimmung = null;
 
     /**
      * Hier können Georeferenzierungen übermittelt werden.
@@ -239,7 +272,7 @@ class StellungnahmeType
      *
      * Für die Stellungnahme verantwortliche Organisation bzw. Behörde.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfasserType
      */
     public function getVerfasser()
     {
@@ -251,10 +284,10 @@ class StellungnahmeType
      *
      * Für die Stellungnahme verantwortliche Organisation bzw. Behörde.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType $verfasser
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfasserType $verfasser
      * @return self
      */
-    public function setVerfasser(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType $verfasser = null)
+    public function setVerfasser(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfasserType $verfasser = null)
     {
         $this->verfasser = $verfasser;
         return $this;
@@ -313,6 +346,32 @@ class StellungnahmeType
     }
 
     /**
+     * Gets as durchgang
+     *
+     * Hier ist die Nummer des Durchgangs des Verfahrensteilschritts zu übermitteln, in dem die Stellungnahme abgegeben wurde.
+     *
+     * @return int
+     */
+    public function getDurchgang()
+    {
+        return $this->durchgang;
+    }
+
+    /**
+     * Sets a new durchgang
+     *
+     * Hier ist die Nummer des Durchgangs des Verfahrensteilschritts zu übermitteln, in dem die Stellungnahme abgegeben wurde.
+     *
+     * @param int $durchgang
+     * @return self
+     */
+    public function setDurchgang($durchgang)
+    {
+        $this->durchgang = $durchgang;
+        return $this;
+    }
+
+    /**
      * Gets as datum
      *
      * Hier kann das Datum der Stellungnahme übermittelt werden.
@@ -339,68 +398,158 @@ class StellungnahmeType
     }
 
     /**
-     * Adds as vormerkung
+     * Gets as artDerStellungnahme
      *
-     * Hier können Vormerkungen übermittelt werden.
+     * Hier ist die Art der Stellungnahme zu übermitteln.
      *
-     * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVormerkungType $vormerkung
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerStellungnahmeType
      */
-    public function addToVormerkung(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVormerkungType $vormerkung)
+    public function getArtDerStellungnahme()
     {
-        $this->vormerkung[] = $vormerkung;
+        return $this->artDerStellungnahme;
+    }
+
+    /**
+     * Sets a new artDerStellungnahme
+     *
+     * Hier ist die Art der Stellungnahme zu übermitteln.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerStellungnahmeType $artDerStellungnahme
+     * @return self
+     */
+    public function setArtDerStellungnahme(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerStellungnahmeType $artDerStellungnahme = null)
+    {
+        $this->artDerStellungnahme = $artDerStellungnahme;
         return $this;
     }
 
     /**
-     * isset vormerkung
+     * Gets as artDerRueckmeldung
      *
-     * Hier können Vormerkungen übermittelt werden.
+     * Hier ist die Art der Rückmeldung zu übermitteln.
      *
-     * @param int|string $index
-     * @return bool
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerRueckmeldungType
      */
-    public function issetVormerkung($index)
+    public function getArtDerRueckmeldung()
     {
-        return isset($this->vormerkung[$index]);
+        return $this->artDerRueckmeldung;
     }
 
     /**
-     * unset vormerkung
+     * Sets a new artDerRueckmeldung
      *
-     * Hier können Vormerkungen übermittelt werden.
+     * Hier ist die Art der Rückmeldung zu übermitteln.
      *
-     * @param int|string $index
-     * @return void
-     */
-    public function unsetVormerkung($index)
-    {
-        unset($this->vormerkung[$index]);
-    }
-
-    /**
-     * Gets as vormerkung
-     *
-     * Hier können Vormerkungen übermittelt werden.
-     *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVormerkungType[]
-     */
-    public function getVormerkung()
-    {
-        return $this->vormerkung;
-    }
-
-    /**
-     * Sets a new vormerkung
-     *
-     * Hier können Vormerkungen übermittelt werden.
-     *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVormerkungType[] $vormerkung
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerRueckmeldungType $artDerRueckmeldung
      * @return self
      */
-    public function setVormerkung(array $vormerkung = null)
+    public function setArtDerRueckmeldung(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeArtDerRueckmeldungType $artDerRueckmeldung = null)
     {
-        $this->vormerkung = $vormerkung;
+        $this->artDerRueckmeldung = $artDerRueckmeldung;
+        return $this;
+    }
+
+    /**
+     * Gets as verfahrensschrittPlanfeststellung
+     *
+     * Hier ist der Verfahrensschritt für ein Planfeststellungsverfahren zu übermitteln.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittPlanfeststellungType
+     */
+    public function getVerfahrensschrittPlanfeststellung()
+    {
+        return $this->verfahrensschrittPlanfeststellung;
+    }
+
+    /**
+     * Sets a new verfahrensschrittPlanfeststellung
+     *
+     * Hier ist der Verfahrensschritt für ein Planfeststellungsverfahren zu übermitteln.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittPlanfeststellungType $verfahrensschrittPlanfeststellung
+     * @return self
+     */
+    public function setVerfahrensschrittPlanfeststellung(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittPlanfeststellungType $verfahrensschrittPlanfeststellung = null)
+    {
+        $this->verfahrensschrittPlanfeststellung = $verfahrensschrittPlanfeststellung;
+        return $this;
+    }
+
+    /**
+     * Gets as verfahrensschrittKommunal
+     *
+     * Hier ist der Verfahrensschritt für ein Verfahren der kommunalen Bauleitplanung zu übermitteln.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType
+     */
+    public function getVerfahrensschrittKommunal()
+    {
+        return $this->verfahrensschrittKommunal;
+    }
+
+    /**
+     * Sets a new verfahrensschrittKommunal
+     *
+     * Hier ist der Verfahrensschritt für ein Verfahren der kommunalen Bauleitplanung zu übermitteln.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $verfahrensschrittKommunal
+     * @return self
+     */
+    public function setVerfahrensschrittKommunal(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType $verfahrensschrittKommunal = null)
+    {
+        $this->verfahrensschrittKommunal = $verfahrensschrittKommunal;
+        return $this;
+    }
+
+    /**
+     * Gets as verfahrensschrittRaumordnung
+     *
+     * Hier ist der Verfahrensschritt für ein Raumordnungsverfahren zu übermitteln.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType
+     */
+    public function getVerfahrensschrittRaumordnung()
+    {
+        return $this->verfahrensschrittRaumordnung;
+    }
+
+    /**
+     * Sets a new verfahrensschrittRaumordnung
+     *
+     * Hier ist der Verfahrensschritt für ein Raumordnungsverfahren zu übermitteln.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType $verfahrensschrittRaumordnung
+     * @return self
+     */
+    public function setVerfahrensschrittRaumordnung(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType $verfahrensschrittRaumordnung = null)
+    {
+        $this->verfahrensschrittRaumordnung = $verfahrensschrittRaumordnung;
+        return $this;
+    }
+
+    /**
+     * Gets as verfahrensteilschritt
+     *
+     * Hier ist der Verfahrensteilschritt zu übermitteln, zu dem die Stellungnahme abgegeben wurde.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensteilschrittType
+     */
+    public function getVerfahrensteilschritt()
+    {
+        return $this->verfahrensteilschritt;
+    }
+
+    /**
+     * Sets a new verfahrensteilschritt
+     *
+     * Hier ist der Verfahrensteilschritt zu übermitteln, zu dem die Stellungnahme abgegeben wurde.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensteilschrittType $verfahrensteilschritt
+     * @return self
+     */
+    public function setVerfahrensteilschritt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensteilschrittType $verfahrensteilschritt)
+    {
+        $this->verfahrensteilschritt = $verfahrensteilschritt;
         return $this;
     }
 
@@ -467,32 +616,6 @@ class StellungnahmeType
     public function setZuordnung(array $zuordnung = null)
     {
         $this->zuordnung = $zuordnung;
-        return $this;
-    }
-
-    /**
-     * Gets as zustimmung
-     *
-     * Element zur Spezifizierung einer Zustimmung.
-     *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZustimmungType
-     */
-    public function getZustimmung()
-    {
-        return $this->zustimmung;
-    }
-
-    /**
-     * Sets a new zustimmung
-     *
-     * Element zur Spezifizierung einer Zustimmung.
-     *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZustimmungType $zustimmung
-     * @return self
-     */
-    public function setZustimmung(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZustimmungType $zustimmung = null)
-    {
-        $this->zustimmung = $zustimmung;
         return $this;
     }
 

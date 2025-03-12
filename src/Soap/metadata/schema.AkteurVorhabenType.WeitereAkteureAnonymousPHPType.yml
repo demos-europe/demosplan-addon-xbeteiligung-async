@@ -5,18 +5,18 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType\WeitereAk
             access_type: public_method
             serialized_name: akteur
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getAkteur
                 setter: setAkteur
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType
         rolle:
             expose: true
             access_type: public_method
             serialized_name: rolle
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getRolle
                 setter: setRolle
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurRolleType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RolleType

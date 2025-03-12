@@ -5,7 +5,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use JMS\Serializer\Serializer;
@@ -46,10 +46,10 @@ class KommunaleProcedureCreatorTest extends TestCase
     public function testCreateNewProcedureFromKommunaleXbeteiligungMessage($filePath): void
     {
         $inputMsgXml = file_get_contents(AddonPath::getRootPath($filePath));
-        /** @var Planung2BeteiligungBeteiligungKommunalNeu0401 $inputMsgObj */
+        /** @var KommunalInitiieren0401 $inputMsgObj */
         $inputMsgObj = $this->serializer->deserialize(
             $inputMsgXml,
-            Planung2BeteiligungBeteiligungKommunalNeu0401::class,
+            KommunalInitiieren0401::class,
             'xml'
         );
 

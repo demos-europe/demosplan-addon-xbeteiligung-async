@@ -5,27 +5,17 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AnhangOderVerlinkungType:
             access_type: public_method
             serialized_name: anhang
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getAnhang
                 setter: setAnhang
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangTypeType
-        dokument:
-            expose: true
-            access_type: public_method
-            serialized_name: dokument
-            xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
-            accessor:
-                getter: getDokument
-                setter: setDokument
-            type: GoetasWebservices\Xsd\XsdToPhp\Jms\Base64Encoded
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnhangType
         uriVerlinkung:
             expose: true
             access_type: public_method
             serialized_name: uriVerlinkung
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getUriVerlinkung
                 setter: setUriVerlinkung

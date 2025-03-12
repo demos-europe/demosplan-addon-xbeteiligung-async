@@ -3,16 +3,16 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalAktualisieren0402;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungNeu0201;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungNeu0301;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisieren0202;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungInitiieren0201;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungLoeschen0209;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisieren0302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiieren0301;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\BaseTypesHandler;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\XmlSchemaDateHandler;
@@ -30,39 +30,39 @@ class XBeteiligungIncomingMessageParser
 
     private array $messageTypeMapping = [
         '401' => [
-            'class' => Planung2BeteiligungBeteiligungKommunalNeu0401::class,
+            'class' => KommunalInitiieren0401::class,
             'identifier' => XBeteiligungService::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
         '402' => [
-            'class' => Planung2BeteiligungBeteiligungKommunalAktualisieren0402::class,
+            'class' => KommunalAktualisieren0402::class,
             'identifier' => XBeteiligungService::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
         '409' => [
-            'class' => Planung2BeteiligungBeteiligungKommunalLoeschen0409::class,
+            'class' => KommunalLoeschen0409::class,
             'identifier' => XBeteiligungService::DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
         '301' => [
-            'class' => Planung2BeteiligungBeteiligungRaumordnungNeu0301::class,
+            'class' => RaumordnungInitiieren0301::class,
             'identifier' => XBeteiligungService::NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
         '302' => [
-            'class' => Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302::class,
+            'class' => RaumordnungAktualisieren0302::class,
             'identifier' => XBeteiligungService::UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
         '309' => [
-            'class' => Planung2BeteiligungBeteiligungRaumordnungLoeschen0309::class,
+            'class' => RaumordnungLoeschen0309::class,
             'identifier' => XBeteiligungService::DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
         '201' => [
-            'class' => Planung2BeteiligungBeteiligungPlanfeststellungNeu0201::class,
+            'class' => PlanfeststellungInitiieren0201::class,
             'identifier' => XBeteiligungService::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
         '202' => [
-            'class' => Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202::class,
+            'class' => PlanfeststellungAktualisieren0202::class,
             'identifier' => XBeteiligungService::UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
         '209' => [
-            'class' => Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209::class,
+            'class' => PlanfeststellungLoeschen0209::class,
             'identifier' => XBeteiligungService::DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
     ];
@@ -164,7 +164,7 @@ class XBeteiligungIncomingMessageParser
             'xml'
         );
 
-        if (null === $message || null === $message->getNachrichteninhalt()) {
+        if (null === $message || null === $message->getProdukt()) {
             throw new SchemaException('Incoming message is not a valid '.$className.' message');
         }
 

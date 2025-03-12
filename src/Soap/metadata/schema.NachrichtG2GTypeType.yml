@@ -54,11 +54,11 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType:
                 setter: setVersion
             xml_attribute: true
             type: string
-        nachrichtenkopf:
+        nachrichtenkopfG2g:
             expose: true
             access_type: public_method
-            serialized_name: nachrichtenkopf
+            serialized_name: nachrichtenkopf.g2g
             accessor:
-                getter: getNachrichtenkopf
-                setter: setNachrichtenkopf
+                getter: getNachrichtenkopfG2g
+                setter: setNachrichtenkopfG2g
             type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType

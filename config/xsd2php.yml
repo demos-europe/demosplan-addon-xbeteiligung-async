@@ -28,6 +28,13 @@ xsd2php:
     'http://xoev.de/schemata/code/1_0': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
     'https://www.xleitstelle.de/xbeteiligung/1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
     'urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
+    'urn:xoev-de:kosit:xoev:datentyp:din-91379_2022-08': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
+    'http://www.xleitstelle.de/xbau/kernmodul/1/2/1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
+    'http://xoev.de/schemata/basisnachricht/g2g/1_1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
+    'http://xoev.de/schemata/basisnachricht/unqualified/g2g/1_1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
+    'http://xoev.de/schemata/basisnachricht/behoerde/1_1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
+    'http://xoev.de/schemata/basisnachricht/kommunikation/1_1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
+    'https://www.xleitstelle.de/xbeteiligung/12': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
 
   destinations_php:
     'DemosEurope\DemosplanAddon\XBeteiligung\Soap': src/Soap

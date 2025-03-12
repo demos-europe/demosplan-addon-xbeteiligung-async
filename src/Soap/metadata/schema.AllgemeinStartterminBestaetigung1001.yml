@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStartterminBestaetigung1001:
+    xml_root_name: allgemein.starttermin.Bestaetigung.1001
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

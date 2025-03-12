@@ -1,0 +1,12 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeAufforderung0750\AllgemeinStellungnahmeAufforderung0750AnonymousPHPType:
+    properties:
+        nachrichteninhalt:
+            expose: true
+            access_type: public_method
+            serialized_name: nachrichteninhalt
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getNachrichteninhalt
+                setter: setNachrichteninhalt
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeAufforderung0750\AllgemeinStellungnahmeAufforderung0750AnonymousPHPType\NachrichteninhaltAnonymousPHPType
