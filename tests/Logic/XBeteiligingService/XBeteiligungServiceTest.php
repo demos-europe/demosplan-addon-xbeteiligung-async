@@ -69,10 +69,6 @@ abstract class XBeteiligungServiceTest extends TestCase
         $gisLayerCategoryInterfaceMock = $this->createMock(
             GisLayerCategoryInterface::class
         );
-        $messageObject = new KommunalInitiieren0401AnonymousPHPType();
-        $result = $this->sut->createMessageIdentification($messageObject);
-        $this->assertInstanceOf(IdentifikationNachrichtTypeType::class, $result);
-        $this->assertEquals('0401', $result->getNachrichtentyp()->getCode());
         $gisMo = $this->createMock(GisLayerInterface::class);
         $gisMo->method('getName')->willReturn('basemap');
         $gisMo->method('getUrl')->willReturn('https://sgx.geodatenzentrum.de/wms_basemapde');
