@@ -9,6 +9,7 @@ class XBeteiligungService401Test extends XBeteiligungServiceTest
     public function testPlanung2BeteiligungBeteiligungNeu0401(): void
     {
         $procedureXml = $this->sut->createProcedureNew401FromObject($this->testProcedure);
+        echo $procedureXml; // todo: remove me when Im working again :)
         $this->validateProcedureXML($procedureXml);
     }
 
