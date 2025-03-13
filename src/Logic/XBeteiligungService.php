@@ -24,6 +24,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\UnsupportedMessageTypeExcep
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinerNameType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType;
@@ -362,7 +363,9 @@ class XBeteiligungService
     {
         $actorsOfProcedure = new AkteurVorhabenType();
         $organisationType = new OrganisationType();
-        $organisationType->setName($orgaName);
+        $name = new AllgemeinerNameType();
+        $name->setName($orgaName);
+        $organisationType->setName($name); // nested element required
         $actorsOfProcedure->setVeranlasser($organisationType);
 
         return $actorsOfProcedure;
@@ -601,16 +604,17 @@ class XBeteiligungService
         $verzeichnisdienst->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
         $verzeichnisdienst->setCode(self::NON_EXISTING_CODE);
         $reader->setVerzeichnisdienst($verzeichnisdienst); // required
-        $reader->setName(self::NON_EXISTING_CODE_NAME);
+        //$reader->setName(self::NON_EXISTING_CODE_NAME); // not expected in validation
 
 
         $codeAuthorityIdentification = new KommunikationTypeType();
         $kanal = new CodeKommunikationKanalTypeType();
         $kanal->setListVersionID('');
         $kanal->setListURI(self::CODELIST_ERREICHBARKEIT);
-        $kanal->setName(self::NON_EXISTING_CODE_NAME);
+        //$kanal->setName(self::NON_EXISTING_CODE_NAME); // not expected in validation
         $kanal->setCode('work probably in progress');
         $codeAuthorityIdentification->setKanal($kanal);
+        $codeAuthorityIdentification->setKennung(''); // required
         $reader->setErreichbarkeit([$codeAuthorityIdentification]); // required
 
         return $reader;
@@ -623,7 +627,7 @@ class XBeteiligungService
         $prefixType = new CodeVerzeichnisdienstTypeType();
         $prefixType->setListVersionID('');
         $prefixType->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
-        $prefixType->setName(self::NON_EXISTING_CODE_NAME);
+        //$prefixType->setName(self::NON_EXISTING_CODE_NAME); // not expected in validation
         $prefixType->setCode(self::NON_EXISTING_CODE);
         $author->setVerzeichnisdienst($prefixType); // required
 
@@ -631,9 +635,10 @@ class XBeteiligungService
         $kanal = new CodeKommunikationKanalTypeType();
         $kanal->setListVersionID('');
         $kanal->setListURI(self::CODELIST_ERREICHBARKEIT);
-        $kanal->setName(self::NON_EXISTING_CODE_NAME);
+        //$kanal->setName(self::NON_EXISTING_CODE_NAME); // not expected in validation
         $kanal->setCode(self::NON_EXISTING_CODE);
         $codeAuthorityIdentification->setKanal($kanal);
+        $codeAuthorityIdentification->setKennung(''); // required
         $author->setErreichbarkeit([$codeAuthorityIdentification]); // required
         $author->addToErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
         $author->setName(''); // required
@@ -724,7 +729,7 @@ class XBeteiligungService
         // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger,
         // 06 -> Pager, 07 -> Sonstiges, (08 -> DE-Mail, 09 -> Web - these don't exist in validation)
         $comCode->setCode('07');
-        $comCode->setName('Sonstiges');
+        //$comCode->setName('Sonstiges'); // not expected in validation
         $comCode->setListURI(self::CODELIST_ERREICHBARKEIT);
         $comCode->setListVersionID('1');
         $communicationType->setKanal($comCode); // required

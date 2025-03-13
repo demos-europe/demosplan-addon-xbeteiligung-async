@@ -24,6 +24,8 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType:
             expose: true
             access_type: public_method
             serialized_name: autor
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
             accessor:
                 getter: getAutor
                 setter: setAutor
