@@ -342,7 +342,7 @@ class XBeteiligungResponseMessageFactory
     {
         $headerBuilder
             // identifikation.nachricht => nachrichtenUUID
-            ->setMessageIdentificationUUID($this->uuid())
+            ->setMessageIdentificationUUID($this->xBeteiligungService->uuid())
             // identifikation.nachricht => nachrichtentyp => code
             ->setMessageIdentificationTypeCode($msgType)
             // identifikation.nachricht => erstellungszeitpunkt
@@ -375,20 +375,6 @@ class XBeteiligungResponseMessageFactory
         }
 
         return $simpleXML->asXML();
-    }
-
-    public function uuid(): string
-    {
-        $uuid = '';
-        $tryAgain = true;
-        while ($tryAgain) {
-            $uuid = Uuid::uuid4()->toString();
-            if (0 !== preg_match('/[A-Za-z]/', $uuid[0])) {
-                $tryAgain = false;
-            }
-        }
-
-        return $uuid;
     }
 
 }
