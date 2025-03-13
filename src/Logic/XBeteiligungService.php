@@ -140,6 +140,7 @@ class XBeteiligungService
     private const NON_EXISTING_CODE = 'work probably in progress';
     private const NON_EXISTING_CODE_NAME =
         'Die XLeitstelle muss im Rahmen der Eintragung von Diensten in das DVDV erstellt werden';
+    public const STANDARD = 'XBeteiligung';
 
     public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Initiieren.0401';
     public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Aktualisieren.0402';
@@ -178,10 +179,12 @@ class XBeteiligungService
     /**
      * @throws Exception
      */
-    public function createProcedureNew401FromObject(ProcedureInterface $procedure): string
+    public function createProcedureNew401FromObject(
+        ProcedureInterface $procedure,
+        $procedureCreated401Object = new KommunalInitiieren0401AnonymousPHPType()
+    ): string
     {
-        $procedureCreated401Object = new KommunalInitiieren0401AnonymousPHPType();
-        $procedureCreated401Object = $this->beteiligungMessageFactory->setProductInfo($procedureCreated401Object); // required
+        $this->setProductInfo($procedureCreated401Object);
         $procedureCreated401Object->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureCreated401Object)
         ); // required
@@ -189,29 +192,33 @@ class XBeteiligungService
             $this->generateMain401MessageContent($procedure)
         ); // required
 
-        return $this->beteiligungMessageFactory->serializeData($procedureCreated401Object);
+        return $this->serializeData($procedureCreated401Object);
     }
 
-    public function createXMLFor301(ProcedureInterface $procedure)
+    public function createXMLFor301(
+        ProcedureInterface $procedure,
+        $procedureCreated301 = new RaumordnungInitiieren0301AnonymousPHPType()
+    )
     {
-        $procedureCreated301 = new RaumordnungInitiieren0301AnonymousPHPType();
-        $procedureCreated301 = $this->beteiligungMessageFactory->setProductInfo($procedureCreated301); // required
+        $this->setProductInfo($procedureCreated301);
         $procedureCreated301->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureCreated301)
         ); // required
         $procedureCreated301->setNachrichteninhalt(
             $this->generateMain301MessageContent($procedure)
         ); // required
-        return $this->beteiligungMessageFactory->serializeData($procedureCreated301);
+        return $this->serializeData($procedureCreated301);
     }
 
     /**
      * @throws Exception
      */
-    public function createProcedureUpdate402FromObject(ProcedureInterface $procedure): string
+    public function createProcedureUpdate402FromObject(
+        ProcedureInterface $procedure,
+        $procedureUpdated402Object = new KommunalAktualisieren0402AnonymousPHPType()
+    ): string
     {
-        $procedureUpdated402Object = new KommunalAktualisieren0402AnonymousPHPType();
-        $procedureUpdated402Object = $this->beteiligungMessageFactory->setProductInfo($procedureUpdated402Object); // required
+        $this->setProductInfo($procedureUpdated402Object);
         $procedureUpdated402Object->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureUpdated402Object)
         ); // required
@@ -219,13 +226,15 @@ class XBeteiligungService
             $this->generateMain402MessageContent($procedure)
         ); // required
 
-        return $this->beteiligungMessageFactory->serializeData($procedureUpdated402Object);
+        return $this->serializeData($procedureUpdated402Object);
     }
 
-    public function createXMLFor302(ProcedureInterface $procedure): string
+    public function createXMLFor302(
+        ProcedureInterface $procedure,
+        $procedureUpdated302 = new RaumordnungAktualisieren0302AnonymousPHPType(),
+    ): string
     {
-        $procedureUpdated302 = new RaumordnungAktualisieren0302AnonymousPHPType();
-        $procedureUpdated302 = $this->beteiligungMessageFactory->setProductInfo($procedureUpdated302);
+        $this->setProductInfo($procedureUpdated302);
         $procedureUpdated302->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureUpdated302)
         );
@@ -233,36 +242,55 @@ class XBeteiligungService
             $this->generateMain302MessageContent($procedure)
         );
 
-        return $this->beteiligungMessageFactory->serializeData($procedureUpdated302);
+        return $this->serializeData($procedureUpdated302);
     }
 
     /**
      * @throws Exception
      */
-    public function createProcedureDeleted409FromObject(string $procedureId): string
+    public function createProcedureDeleted409FromObject(
+        string $procedureId,
+        $procedureDeleted409Object = new KommunalLoeschen0409AnonymousPHPType()
+    ): string
     {
-        $procedureDeleted409Object = new KommunalLoeschen0409AnonymousPHPType();
-        $procedureDeleted409Object = $this->beteiligungMessageFactory->setProductInfo($procedureDeleted409Object); // required
+        $this->setProductInfo($procedureDeleted409Object);
         $procedureDeleted409Object->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureDeleted409Object)
         ); // required
         $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedureId));
 
-        return $this->beteiligungMessageFactory->serializeData($procedureDeleted409Object);
+        return $this->serializeData($procedureDeleted409Object);
     }
 
-    public function createXMLFor309(string $procedureId): string
+    public function createXMLFor309(
+        string $procedureId,
+        $procedureDeleted309 = new RaumordnungLoeschen0309AnonymousPHPType()
+    ): string
     {
-        $procedureDeleted409 = new RaumordnungLoeschen0309AnonymousPHPType();
-        $procedureDeleted409 = $this->beteiligungMessageFactory->setProductInfo($procedureDeleted409);
-        $procedureDeleted409->setNachrichtenkopfG2g(
-            $this->createMessageHeadFor($procedureDeleted409)
+        $this->setProductInfo($procedureDeleted309);
+        $procedureDeleted309->setNachrichtenkopfG2g(
+            $this->createMessageHeadFor($procedureDeleted309)
         );
-        $procedureDeleted409->setNachrichteninhalt(
+        $procedureDeleted309->setNachrichteninhalt(
             $this->generateMain309MessageContent($procedureId)
         );
 
-        return $this->beteiligungMessageFactory->serializeData($procedureDeleted409);
+        return $this->serializeData($procedureDeleted309);
+    }
+
+
+    /**
+     * Attributes in top Tag.
+     */
+    public function setProductInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
+    {
+        $messageObject->setProdukt('DiPlan Cockpit'); // required
+        $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
+        $messageObject->setProduktversion('1.1'); // optional
+        $messageObject->setStandard(self::STANDARD); // required
+        $messageObject->setVersion('1.3'); // required
+
+        return $messageObject;
     }
 
     private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
@@ -572,7 +600,7 @@ class XBeteiligungService
         $reader->setName('K3'); // required
         $verzeichnisdienst = new CodeVerzeichnisdienstTypeType();
         $verzeichnisdienst->setListVersionID('');
-        $verzeichnisdienst->setListURI('urn:xoev-de:bund:bmi:bit:codeliste:dvdv.praefix');
+        $verzeichnisdienst->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
         $verzeichnisdienst->setCode(self::NON_EXISTING_CODE);
         $reader->setVerzeichnisdienst($verzeichnisdienst); // required
         $reader->setName(self::NON_EXISTING_CODE_NAME);
@@ -581,7 +609,7 @@ class XBeteiligungService
         $codeAuthorityIdentification = new KommunikationTypeType();
         $kanal = new CodeKommunikationKanalTypeType();
         $kanal->setListVersionID('');
-        $kanal->setListURI('');
+        $kanal->setListURI('urn:de:xoev:codeliste:erreichbarkeit');
         $kanal->setName(self::NON_EXISTING_CODE_NAME);
         $kanal->setCode('work probably in progress');
         $codeAuthorityIdentification->setKanal($kanal);
@@ -593,10 +621,10 @@ class XBeteiligungService
     public function createAuthorInformation(): BehoerdeTypeType
     {
         $author = new BehoerdeTypeType();
-        $author->setKennung('psw:01003110');
+        $author->setKennung('');
         $prefixType = new CodeVerzeichnisdienstTypeType();
         $prefixType->setListVersionID('');
-        $prefixType->setListURI('urn:xoev-de:bund:bmi:bit:codeliste:dvdv.praefix');
+        $prefixType->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
         $prefixType->setName(self::NON_EXISTING_CODE_NAME);
         $prefixType->setCode(self::NON_EXISTING_CODE);
         $author->setVerzeichnisdienst($prefixType); // required
@@ -604,13 +632,13 @@ class XBeteiligungService
         $codeAuthorityIdentification = new KommunikationTypeType();
         $kanal = new CodeKommunikationKanalTypeType();
         $kanal->setListVersionID('');
-        $kanal->setListURI('');
+        $kanal->setListURI('urn:de:xoev:codeliste:erreichbarkeit');
         $kanal->setName(self::NON_EXISTING_CODE_NAME);
         $kanal->setCode(self::NON_EXISTING_CODE);
         $codeAuthorityIdentification->setKanal($kanal);
         $author->setErreichbarkeit([$codeAuthorityIdentification]); // required
         $author->addToErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
-        $author->setName('DEMOS plan GmbH'); // required
+        $author->setName(''); // required
 
         return $author;
     }
@@ -851,7 +879,7 @@ class XBeteiligungService
     private function getPublicProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittKommunalType
     {
         $codeProcedurePhase = new CodeVerfahrensschrittKommunalType();
-        $codeProcedurePhase->setListVersionID('');
+        $codeProcedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
         $codeProcedurePhase->setListVersionID('1.0');
         $codeProcedurePhase->setCode(
             self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code']
@@ -973,6 +1001,29 @@ class XBeteiligungService
         }
         */
         throw new InvalidArgumentException('Message payload not supported');
+    }
+
+    public function serializeData($data): string
+    {
+        // Serialize the data to XML with a custom root name
+        $xml =  $this->serializer->serialize($data, 'xml');
+        $this->logger->debug('Serialized XML:', [$xml]);
+
+        // Load the XML string into a SimpleXMLElement object
+        $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        if ($xml === false) {
+            $this->logger->error('Failed to load XML string.');
+            return '';
+        }
+
+        // Save the XML to a string
+        $result = $xml->saveXML();
+        if ($result === false) {
+            $this->logger->error('Error on save serialized xml.', [$xml->asXML()]);
+            return '';
+        }
+
+        return $result;
     }
 
 }

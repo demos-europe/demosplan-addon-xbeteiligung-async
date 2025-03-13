@@ -8,6 +8,7 @@ use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409;
@@ -72,6 +73,8 @@ class XBeteiligungResponseMessageFactory
     /** @var Serializer */
     protected $serializer;
 
+    protected XBeteiligungService $xBeteiligungService;
+
     public function __construct(
         LoggerInterface $dplanCockpitLogger
     ) {
@@ -92,20 +95,6 @@ class XBeteiligungResponseMessageFactory
         return $serializerBuilder->build();
     }
 
-    /**
-     * Attributes in top Tag.
-     */
-    public function setProductInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
-    {
-        $messageObject->setProdukt('DiPlan Cockpit'); // required
-        $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
-        $messageObject->setProduktversion('1.1'); // optional
-        $messageObject->setStandard(self::STANDARD); // required
-        $messageObject->setVersion('1.3'); // required
-
-        return $messageObject;
-    }
-
     private function buildHeader(string $messageType)
     {
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
@@ -124,7 +113,7 @@ class XBeteiligungResponseMessageFactory
         $response = new ResponseValue();
         $messageClass->setNachrichtenkopfG2g($header);
         $messageClass->setNachrichteninhalt($contentClass);
-        $messageXml = $this->serializeData($messageClass);
+        $messageXml = $this->xBeteiligungService->serializeData($messageClass);
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($contentClass, $messageXml);
         $response->setPayload($messageXml);
         $response->lock();
@@ -140,7 +129,7 @@ class XBeteiligungResponseMessageFactory
     ): ResponseValue {
         try {
             $procedureCreated = $this->createProcedureCreated($procedure, $xmlObject);
-            $this->setProductInfo($messageClass);
+            $this->xBeteiligungService->setProductInfo($xmlObject);
             $header = $this->buildHeader($messageType);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($procedureCreated->getProcedureId());
@@ -168,7 +157,7 @@ class XBeteiligungResponseMessageFactory
             $procedureId = $procedure->getId();
             $planId = $xmlObject->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
             $instanceId = $xmlObject->getNachrichteninhalt()?->getVorgangsID();
-            $this->setProductInfo($messageClass);
+            $this->xBeteiligungService->setProductInfo($xmlObject);
             $header = $this->buildHeader($messageType);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($procedureId);
@@ -199,7 +188,7 @@ class XBeteiligungResponseMessageFactory
         string $messageType,
     ): ResponseValue {
         try {
-            $this->setProductInfo($messageClass);
+            $this->xBeteiligungService->setProductInfo($xmlObject);
             $header = $this->buildHeader($messageType);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligungsID());
@@ -225,11 +214,11 @@ class XBeteiligungResponseMessageFactory
      */
     public function buildErrorResponse(
         array $errorTypes,
-        $xmlObject,
+        mixed $xmlObject,
         NachrichtG2GTypeType $messageClass,
         string $messageType
     ): ResponseValue {
-        $this->setProductInfo($messageClass);
+        $this->xBeteiligungService->setProductInfo($xmlObject);
         $header = $this->buildHeader($messageType);
         $contentClass = new NachrichteninhaltTemplateNOKType();
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
@@ -360,21 +349,6 @@ class XBeteiligungResponseMessageFactory
             ->setCreationTime(new DateTime());
 
         return $headerBuilder;
-    }
-
-    public function serializeData($data): string
-    {
-        // Couldn't find the way to avoid CDATA directly with serializer method
-        $xml = $this->serializer->serialize($data, 'xml');
-        // This is needed to remove cdata from the xml message
-        $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-        $result = $xml->saveXML();
-
-        if (false === $result) {
-            $this->dplanCockpitLogger->error('Error on save serialized xml.', [$xml->asXML()]);
-        }
-
-        return $xml->asXML() ?? '';
     }
 
     /**
