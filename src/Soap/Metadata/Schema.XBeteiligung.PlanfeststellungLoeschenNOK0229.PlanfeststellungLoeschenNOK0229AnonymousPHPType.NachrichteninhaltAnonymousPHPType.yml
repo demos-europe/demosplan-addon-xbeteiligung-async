@@ -1,0 +1,12 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschenNOK0229\PlanfeststellungLoeschenNOK0229AnonymousPHPType\NachrichteninhaltAnonymousPHPType:
+    properties:
+        beteiligungsID:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungsID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBeteiligungsID
+                setter: setBeteiligungsID
+            type: string

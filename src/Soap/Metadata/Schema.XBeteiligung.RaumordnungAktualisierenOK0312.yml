@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisierenOK0312:
+    xml_root_name: raumordnung.Aktualisieren.OK.0312
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
