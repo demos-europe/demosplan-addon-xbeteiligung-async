@@ -137,6 +137,33 @@ class XBeteiligungService
         ]
     ];
 
+    private array $messageTypeMapping = [
+        '400' => [
+            'xsd' => 'xbeteiligung-kommunaleBauleitplanung.xsd',
+            'classes' => [
+                KommunalInitiieren0401::class,
+                KommunalAktualisieren0402::class,
+                KommunalLoeschen0409::class,
+            ],
+        ],
+        '300' => [
+            'xsd' => 'xbeteiligung-raumordnung.xsd',
+            'classes' => [
+                RaumordnungInitiieren0301::class,
+                RaumordnungAktualisieren0302::class,
+                RaumordnungLoeschen0309::class,
+            ],
+        ],
+        '200' => [
+            'xsd' => 'xbeteiligung-planfeststellung.xsd',
+            'classes' => [
+                PlanfeststellungInitiieren0201::class,
+                PlanfeststellungAktualisieren0202::class,
+                PlanfeststellungLoeschen0209::class,
+            ],
+        ],
+    ];
+
     private const NON_EXISTING_CODE = 'work probably in progress';
     private const NON_EXISTING_CODE_NAME =
         'Die XLeitstelle muss im Rahmen der Eintragung von Diensten in das DVDV erstellt werden';
@@ -604,14 +631,12 @@ class XBeteiligungService
         $verzeichnisdienst->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
         $verzeichnisdienst->setCode(self::NON_EXISTING_CODE);
         $reader->setVerzeichnisdienst($verzeichnisdienst); // required
-        //$reader->setName(self::NON_EXISTING_CODE_NAME); // not expected in validation
 
 
         $codeAuthorityIdentification = new KommunikationTypeType();
         $kanal = new CodeKommunikationKanalTypeType();
         $kanal->setListVersionID('');
         $kanal->setListURI(self::CODELIST_ERREICHBARKEIT);
-        //$kanal->setName(self::NON_EXISTING_CODE_NAME); // not expected in validation
         $kanal->setCode('work probably in progress');
         $codeAuthorityIdentification->setKanal($kanal);
         $codeAuthorityIdentification->setKennung(''); // required
@@ -624,10 +649,10 @@ class XBeteiligungService
     {
         $author = new BehoerdeTypeType();
         $author->setKennung('');
+        $author->setName(''); // required
         $prefixType = new CodeVerzeichnisdienstTypeType();
         $prefixType->setListVersionID('');
         $prefixType->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
-        //$prefixType->setName(self::NON_EXISTING_CODE_NAME); // not expected in validation
         $prefixType->setCode(self::NON_EXISTING_CODE);
         $author->setVerzeichnisdienst($prefixType); // required
 
@@ -635,13 +660,12 @@ class XBeteiligungService
         $kanal = new CodeKommunikationKanalTypeType();
         $kanal->setListVersionID('');
         $kanal->setListURI(self::CODELIST_ERREICHBARKEIT);
-        //$kanal->setName(self::NON_EXISTING_CODE_NAME); // not expected in validation
         $kanal->setCode(self::NON_EXISTING_CODE);
         $codeAuthorityIdentification->setKanal($kanal);
         $codeAuthorityIdentification->setKennung(''); // required
         $author->setErreichbarkeit([$codeAuthorityIdentification]); // required
         $author->addToErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
-        $author->setName(''); // required
+
 
         return $author;
     }
@@ -694,28 +718,6 @@ class XBeteiligungService
 
         return $url . $serviceType . $version . $request . $format . $transparent . $layers . $width .
             $height . $crs . $styles . $bbox;
-    }
-
-    /**
-     * @return array<int, KommunikationTypeType>
-     */
-    private function addReaderCommunicationType(): array
-    {
-        $communicationType = new KommunikationTypeType();
-        $comCode = new CodeKommunikationKanalTypeType();
-        // Quelle - AdoRepo: Erreichbarkeit-3.xml
-        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger,
-        // 06 -> Pager, 07 -> Sonstiges, 08 -> DE-Mail, 09 -> Web
-        $comCode->setCode('');
-        $comCode->setName('');
-        $comCode->setListURI(self::CODELIST_ERREICHBARKEIT);
-        $comCode->setListVersionID('3');
-        $communicationType->setKanal($comCode); // required
-        // kennung: In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
-        $communicationType->setKennung(''); // required
-        $communicationType->setZusatz(''); // optional
-
-        return [$communicationType];
     }
 
     /**
@@ -794,6 +796,20 @@ class XBeteiligungService
         return $identificationMessage;
     }
 
+    private function resolveXsdFilePath(string $messageClass): string
+    {
+        foreach ($this->messageTypeMapping as $group) {
+            if (in_array($messageClass, $group['classes'], true)) {
+                return $group['xsd'];
+            }
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'No XSD file found for message class: %s',
+            $messageClass
+        ));
+    }
+
     /**
      * Validates a message against a given xsd file located in plugin xsd folder.
      */
@@ -801,32 +817,30 @@ class XBeteiligungService
         string $message,
         bool $verboseDebug = false,
         string $path = '',
-        array $xsdFiles = ['xbeteiligung-kommunaleBauleitplanung.xsd', 'xbeteiligung-raumordnung.xsd', 'xbeteiligung-planfeststellung.xsd']
+        string $messageClass = ''
     ): bool
     {
         if ('' === $path) {
             $path = AddonPath::getRootPath('Resources/xsd/');
         }
-
-        foreach ($xsdFiles as $xsdFile) {
-            $fullPath = $path . $xsdFile;
-            $document = new \DOMDocument();
-            $document->loadXML($message);
-            $isValid = $document->schemaValidate($fullPath);
-            if (!$isValid) {
-                // revalidate with error handling
-                libxml_use_internal_errors(true);
-                $document->schemaValidate($fullPath);
-                $errors = libxml_get_errors();
-                foreach ($errors as $error) {
-                    $this->logger->warning('Invalid XML message', [$error]);
-                    if ($verboseDebug) {
-                        // handle verbose debug
-                    }
+        $xsdFile = $this->resolveXsdFilePath($messageClass);
+        $fullPath = $path . $xsdFile;
+        $document = new \DOMDocument();
+        $document->loadXML($message);
+        $isValid = $document->schemaValidate($fullPath);
+        if (!$isValid) {
+            // revalidate with error handling
+            libxml_use_internal_errors(true);
+            $document->schemaValidate($fullPath);
+            $errors = libxml_get_errors();
+            foreach ($errors as $error) {
+                $this->logger->warning('Invalid XML message', [$error]);
+                if ($verboseDebug) {
+                    // handle verbose debug
                 }
-                libxml_clear_errors();
-                return false;
             }
+            libxml_clear_errors();
+            return false;
         }
         return true;
     }
