@@ -45,7 +45,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalAktualisieren0402;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalAktualisieren0402\Planung2BeteiligungBeteiligungKommunalAktualisieren0402AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402\KommunalAktualisieren0402AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409\Planung2BeteiligungBeteiligungKommunalLoeschen0409AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
@@ -65,7 +65,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBetei
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungNeu0201;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302\RaumordnungAktualisieren0302AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungNeu0301;
@@ -238,11 +238,12 @@ class XBeteiligungService
      */
     public function createProcedureUpdate402FromObject(ProcedureInterface $procedure): string
     {
-        $procedureUpdated402Object = new Planung2BeteiligungBeteiligungKommunalAktualisieren0402();
+        $procedureUpdated402Object = new KommunalAktualisieren0402();
         $procedureUpdated402Object = $this->beteiligungMessageFactory->setProductInfo($procedureUpdated402Object); // required
-        $procedureUpdated402Object->setNachrichtenkopf(
+        $procedureUpdated402Object->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureUpdated402Object)
         ); // required
+        /* @var KommunalAktualisieren0402 $procedureUpdated402Object */
         $procedureUpdated402Object->setNachrichteninhalt(
             $this->generateMain402MessageContent($procedure)
         ); // required
@@ -250,13 +251,17 @@ class XBeteiligungService
         return $this->beteiligungMessageFactory->serializeData($procedureUpdated402Object);
     }
 
+    /**
+     * @throws Exception
+     */
     public function createXMLFor302(ProcedureInterface $procedure): string
     {
-        $procedureUpdated302 = new Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302();
+        $procedureUpdated302 = new RaumordnungAktualisieren0302();
         $procedureUpdated302 = $this->beteiligungMessageFactory->setProductInfo($procedureUpdated302);
-        $procedureUpdated302->setNachrichtenkopf(
+        $procedureUpdated302->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureUpdated302)
         );
+        /* @var RaumordnungAktualisieren0302 $procedureUpdated302 */
         $procedureUpdated302->setNachrichteninhalt(
             $this->generateMain302MessageContent($procedure)
         );
