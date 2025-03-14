@@ -47,7 +47,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402\KommunalAktualisieren0402AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalLoeschen0409\Planung2BeteiligungBeteiligungKommunalLoeschen0409AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschen0409\KommunalLoeschen0409AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType;
@@ -67,7 +67,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBetei
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302\RaumordnungAktualisieren0302AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309\RaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungNeu0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301\RaumordnungInitiieren0301AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType;
@@ -274,23 +274,28 @@ class XBeteiligungService
      */
     public function createProcedureDeleted409FromObject(string $procedureId): string
     {
-        $procedureDeleted409Object = new Planung2BeteiligungBeteiligungKommunalLoeschen0409();
+        $procedureDeleted409Object = new KommunalLoeschen0409();
         $procedureDeleted409Object = $this->beteiligungMessageFactory->setProductInfo($procedureDeleted409Object); // required
-        $procedureDeleted409Object->setNachrichtenkopf(
+        $procedureDeleted409Object->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureDeleted409Object)
         ); // required
-        $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedureId));
+        /* @var KommunalLoeschen0409 $procedureDeleted409Object */
+        $procedureDeleted409Object->setNachrichteninhalt($this->generateMain409MessageContent($procedureId));
 
         return $this->beteiligungMessageFactory->serializeData($procedureDeleted409Object);
     }
 
+    /**
+     * @throws Exception
+     */
     public function createXMLFor309(string $procedureId): string
     {
-        $procedureDeleted409 = new Planung2BeteiligungBeteiligungRaumordnungLoeschen0309();
+        $procedureDeleted409 = new RaumordnungLoeschen0309();
         $procedureDeleted409 = $this->beteiligungMessageFactory->setProductInfo($procedureDeleted409);
-        $procedureDeleted409->setNachrichtenkopf(
+        $procedureDeleted409->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureDeleted409)
         );
+        /* @var RaumordnungLoeschen0309 $procedureDeleted409 */
         $procedureDeleted409->setNachrichteninhalt(
             $this->generateMain309MessageContent($procedureId)
         );
