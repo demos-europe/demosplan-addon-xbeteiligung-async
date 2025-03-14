@@ -44,6 +44,97 @@ add `xbeteiligung:` as prefix to xml_root_name in
 `schema.PlanfeststellungLoeschen0209.yml`,
 
 Example - xml_root_name: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
+Add the Following to Schemas:
+````
+src/Soap/metadata/schema.BehoerdeTypeType.yml:
+    Verzeichnisdinst:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+    kennung:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+    name:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+    erreichbarkeit:
+        xml_list:
+            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+
+src/Soap/metadata/schema.IdentifikationNachrichtTypeType.yml:
+    nachrichtenUUID:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+    nachrichtentyp:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+    erstellungszeitpunkt:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+
+src/Soap/metadata/schema.KommunikationTypeType.yml:
+    kanal:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+    kennung:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+    zusatz:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+
+src/Soap/metadata/schema.NachrichtenkopfG2GTypeType.yml:
+    identifikationNachricht:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+    leser:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+    autor:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+
+src/Soap/metadata/schema.OrganisationType.yml:
+    propertirs:
+        name:
+            #xml_element:
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+        type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinerNameType #manually changed!
+
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType:
+Change the type of name from string to AllgemeinerNameType
+    /**
+     * Hier ist der Name der Organisation zu übermitteln.
+     *
+     * @var AllgemeinerNameType $name
+     */
+    private $name = null;
+    ....
+    /**
+     * Gets as name
+     *
+     * Hier ist der Name der Organisation zu übermitteln.
+     *
+     * @return AllgemeinerNameType
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Sets a new name
+     *
+     * Hier ist der Name der Organisation zu übermitteln.
+     *
+     * @param AllgemeinerNameType $name
+     * @return self
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+````
 
 Add the following to enum in xbeteiligung-codes.xsd (search for "0401" then you should find it)
 `<xs:enumeration value="0301">
