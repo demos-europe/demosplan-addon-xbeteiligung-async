@@ -4,32 +4,20 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 
 use DateTime;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeErreichbarTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBehoerdenkennungTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePraefixTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType\HausnummernBisAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Unqualified\BehoerdeTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeXBauKernmodulNachrichtenType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\IdentifikationNachrichtType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NachrichtenkopfG2GType;
 
 class XBeteiligungMessageHeadG2GTypeBuilder
 {
-    /**
-     * @var NachrichtenkopfG2GType
-     */
     protected NachrichtenkopfG2GType $head;
 
     public function __construct()
     {
         $this->head = new NachrichtenkopfG2GType();
         $messageIdentification = new IdentifikationNachrichtType();
-        $code = new CodeType();
+        $code = new CodeXBauKernmodulNachrichtenType();
         $messageIdentification->setNachrichtentyp($code);
         $messageIdentification->setErstellungszeitpunkt(new DateTime());
         $this->head->setIdentifikationNachricht($messageIdentification);
@@ -37,13 +25,11 @@ class XBeteiligungMessageHeadG2GTypeBuilder
         // Reader
         $reader = new BehoerdeTypeType();
         $this->head->setLeser($reader);
-        $leserBehoerdenkennung = new BehoerdenkennungTypeType();
-        $reader->setBehoerdenkennung($leserBehoerdenkennung);
-        $reader->setBehoerdenname('');
+        $reader->setKennung('');
+        $reader->setName('');
         $codeBehoerdenkennung = new CodeBehoerdenkennungTypeType();
         $codeBehoerdenkennung->setListVersionID('');
         $codeBehoerdenkennung->setListURI('');
-        $leserBehoerdenkennung->setKennung($codeBehoerdenkennung);
         $readerErreichbarkeit = new KommunikationTypeType();
         $readerErreichbarkeitChannel = new CodeErreichbarkeitTypeType();
         $readerErreichbarkeit->setKanal($readerErreichbarkeitChannel);
