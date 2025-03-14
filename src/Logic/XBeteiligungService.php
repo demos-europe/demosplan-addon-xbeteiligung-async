@@ -141,15 +141,15 @@ class XBeteiligungService
     private const NON_EXISTING_CODE_NAME =
         'Die XLeitstelle muss im Rahmen der Eintragung von Diensten in das DVDV erstellt werden';
 
-    public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401';
-    public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402';
-    public const DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planung2Beteiligung.BeteiligungKommunalLoeschen.0409';
-    public const NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planung2Beteiligung.BeteiligungRaumordnungNeu.0301';
-    public const UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planung2Beteiligung.BeteiligungRaumordnungAktualisieren.0302';
-    public const DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planung2Beteiligung.BeteiligungRaumordnungLoeschen.0309';
-    public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planung2Beteiligung.BeteiligungPlanfeststellungNeu.0201';
-    public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planung2Beteiligung.BeteiligungPlanfeststellungAktualisieren.0202';
-    public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planung2Beteiligung.BeteiligungPlanfeststellungLoeschen.0209';
+    public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Initiieren.0401';
+    public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Aktualisieren.0402';
+    public const DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Loeschen.0409';
+    public const NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:raumordnung.Initiieren.0301';
+    public const UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:raumordnung.Aktualisieren.0302';
+    public const DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:raumordnung.Loeschen.0309';
+    public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planfeststellung.Initiieren.0201';
+    public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planfeststellung.Aktualisieren.0202';
+    public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planfeststellung.Loeschen.0209';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
     public const MISSING_USER_ERROR_CODE = '0300';
     public const WRONG_ATTACHMENT_FORMAT_ERROR_CODE = '0200';
