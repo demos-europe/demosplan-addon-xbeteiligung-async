@@ -73,17 +73,6 @@ use Symfony\Component\Routing\RouterInterface;
 class XBeteiligungService
 {
     private Serializer $serializer;
-
-    // code: 1000 -> Einleitungsphase -- nicht beteiligungsrelevant
-    // code: 2000 -> Frühzeitige Behördenbeteiligung
-    // code: 3000 -> Aufstellungsbeschluss -- nicht beteiligungsrelevant
-    // code: 3600 -> Einleitungszustimmung -- nicht beteiligungsrelevant
-    // code: 4000 -> Frühzeitige Öffentlichkeitsbeteiligung
-    // code: 5000 -> Beteiligung Töb
-    // code: 6000 -> öffentliche Auslegung
-    // code: 7000 -> Feststellungsverfahren -- nicht beteiligungsrelevant
-    // code: 8000 -> Schlussphase -- nicht beteiligungsrelevant
-    // code: 9998 -> kein VS // no clue what that means - but it is beteiligungsrelevant
     private const PUBLICPARTICIPATIONPHASEMAP = [
         'configuration' => [
             'code' => '1000',
@@ -95,11 +84,11 @@ class XBeteiligungService
         ],
         'participation' => [
             'code' => '6000',
-            'name' => 'öffentliche Auslegung',
+            'name' => 'Digitale Veröffentlichung',
         ],
         'anotherparticipation' => [
             'code' => '6000',
-            'name' => 'öffentliche Auslegung',
+            'name' => 'Digitale Veröffentlichung',
         ],
         'evaluating' => [
             'code' => '7000',
@@ -121,11 +110,11 @@ class XBeteiligungService
         ],
         'participation' => [
             'code' => '5000',
-            'name' => 'Beteiligung Töb',
+            'name' => 'Beteiligung der Träger öffentlicher Belange',
         ],
         'anotherparticipation' => [
             'code' => '5000',
-            'name' => 'Beteiligung Töb',
+            'name' => 'Beteiligung der Träger öffentlicher Belange',
         ],
         'evaluating' => [
             'code' => '7000',
@@ -165,8 +154,6 @@ class XBeteiligungService
     ];
 
     private const NON_EXISTING_CODE = 'work probably in progress';
-    private const NON_EXISTING_CODE_NAME =
-        'Die XLeitstelle muss im Rahmen der Eintragung von Diensten in das DVDV erstellt werden';
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
     public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Initiieren.0401';
@@ -433,17 +420,6 @@ class XBeteiligungService
         $timeSpan = new ZeitraumType();
 
         return $timeSpan->setBeginn($procedurePhase->getStartDate())->setEnde($procedurePhase->getEndDate());
-    }
-
-    private static function hasReadOrWritePermissionSet(string $permissionSet): bool
-    {
-        return in_array($permissionSet,
-            [
-                ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_READ,
-                ProcedureInterface::PROCEDURE_PHASE_PERMISSIONSET_WRITE
-            ],
-            true
-        );
     }
 
     /**
@@ -836,7 +812,7 @@ class XBeteiligungService
             foreach ($errors as $error) {
                 $this->logger->warning('Invalid XML message', [$error]);
                 if ($verboseDebug) {
-                    // handle verbose debug
+                    $this->logger->debug('XML validation error', ['error' => $error]);
                 }
             }
             libxml_clear_errors();
@@ -915,13 +891,9 @@ class XBeteiligungService
         $institutionNewsList = [];
         foreach ($procedureNewsList as $news) {
             foreach ($news['roles'] as $role) {
-                if ($role['groupCode'] === 'GPSORG'
-                ) {
-                    if (isset($news['title'], $news['text'])) {
-                        $institutionNewsList[] = strip_tags($news['title'].': '.$news['text']);
-
-                        break;
-                    }
+                if ($role['groupCode'] === 'GPSORG' && isset($news['title'], $news['text'])) {
+                    $institutionNewsList[] = strip_tags($news['title'].': '.$news['text']);
+                    break;
                 }
             }
         }
@@ -935,14 +907,11 @@ class XBeteiligungService
         $institutionNewsList = [];
         foreach ($procedureNewsList as $news) {
             foreach ($news['roles'] as $role) {
-                if ($role['code'] === RoleInterface::CITIZEN
-                    || $role['code'] === RoleInterface::GUEST
-                ) {
-                    if (isset($news['title'], $news['text'])) {
-                        $institutionNewsList[] = strip_tags($news['title'].': '.$news['text']);
-
-                        break;
-                    }
+                if (
+                    ($role['code'] === RoleInterface::CITIZEN || $role['code'] === RoleInterface::GUEST) &&
+                    isset($news['title'], $news['text'])) {
+                    $institutionNewsList[] = strip_tags($news['title'].': '.$news['text']);
+                    break;
                 }
             }
         }
