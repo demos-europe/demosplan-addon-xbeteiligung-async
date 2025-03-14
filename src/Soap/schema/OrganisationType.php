@@ -13,7 +13,7 @@ class OrganisationType
     /**
      * Hier ist der Name der Organisation zu übermitteln.
      *
-     * @var string $name
+     * @var AllgemeinerNameType $name
      */
     private $name = null;
 
@@ -29,7 +29,7 @@ class OrganisationType
      *
      * Hier ist der Name der Organisation zu übermitteln.
      *
-     * @return string
+     * @return AllgemeinerNameType
      */
     public function getName()
     {
@@ -41,7 +41,7 @@ class OrganisationType
      *
      * Hier ist der Name der Organisation zu übermitteln.
      *
-     * @param string $name
+     * @param AllgemeinerNameType $name
      * @return self
      */
     public function setName($name)
