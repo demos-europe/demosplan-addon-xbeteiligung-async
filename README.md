@@ -12,6 +12,52 @@ When you want to generate the php classes from the standard you need to copy
 the xsd files from the standard build/xsd/ folder to the Resources/xsd folder 
 within this repository.
 
+# Before creating php classes
+During the generation of the soap files for the standard update 1.3 an error occurred:
+`PHP Fatal error: 
+Uncaught TypeError: GoetasWebservices\Xsd\XsdToPhp\Php\PhpConverter::visitElement():
+Argument #3 ($element) must be of type
+GoetasWebservices\XML\XSDReader\Schema\Element\ElementSingle,
+GoetasWebservices\XML\XSDReader\Schema\Element\Choice given,
+called in /srv/www/addonDev/demosplan-addon-xbeteiligung-async/
+vendor/goetas-webservices/xsd2php/src/Php/PhpConverter.php on line 176
+and defined in /srv/www/addonDev/demosplan-addon-xbeteiligung-async/
+vendor/goetas-webservices/xsd2php/src/Php/PhpConverter.php:463`
+
+To fix this the following code was adjusted in the file
+`vendor/goetas-webservices/xsd2php/src/Php/PhpConverter.php` line 170 method `visitGroup`:
+old code:
+```
+    private function visitGroup(PHPClass $class, Schema $schema, Group $group): void
+    {
+        foreach ($this->filterElements($group) as $childGroup) {
+            if ($childGroup instanceof Group) {
+                $this->visitGroup($class, $schema, $childGroup);
+            } else {
+                $property = $this->visitElement($class, $schema, $childGroup);
+                $class->addProperty($property);
+            }
+        }
+    }
+```
+new code:
+```
+    private function visitGroup(PHPClass $class, Schema $schema, Group $group): void
+    {
+        foreach ($this->filterElements($group) as $childGroup) {
+            if ($childGroup instanceof Group) {
+                $this->visitGroup($class, $schema, $childGroup);
+            } elseif ($childGroup instanceof Choice) {
+                $this->visitChoice($class, $schema, $childGroup);
+            }
+            else {
+                $property = $this->visitElement($class, $schema, $childGroup);
+                $class->addProperty($property);
+            }
+        }
+    }
+```
+
 # Create php classes manually
 
 To manually create the php classes and metadata you need to perform 
