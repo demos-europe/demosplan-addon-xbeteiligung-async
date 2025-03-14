@@ -69,7 +69,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBetei
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungNeu0301;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungNeu0301\Planung2BeteiligungBeteiligungRaumordnungNeu0301AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt301;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301\RaumordnungInitiieren0301AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftGebaeudeanschriftTypeType\HausnummernBisAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftPostfachanschriftTypeType;
@@ -216,13 +216,17 @@ class XBeteiligungService
         return $this->beteiligungMessageFactory->serializeData($procedureCreated401Object);
     }
 
-    public function createXMLFor301(ProcedureInterface $procedure)
+    /**
+     * @throws Exception
+     */
+    public function createXMLFor301(ProcedureInterface $procedure): string
     {
-        $procedureCreated301 = new Planung2BeteiligungBeteiligungRaumordnungNeu0301();
+        $procedureCreated301 = new RaumordnungInitiieren0301();
         $procedureCreated301 = $this->beteiligungMessageFactory->setProductInfo($procedureCreated301); // required
-        $procedureCreated301->setNachrichtenkopf(
+        $procedureCreated301->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureCreated301)
         ); // required
+        /* @var RaumordnungInitiieren0301 $procedureCreated301 */
         $procedureCreated301->setNachrichteninhalt(
             $this->generateMain301MessageContent($procedure)
         ); // required
