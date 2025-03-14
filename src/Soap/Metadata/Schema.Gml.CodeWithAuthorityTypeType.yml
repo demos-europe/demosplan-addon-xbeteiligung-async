@@ -1,0 +1,11 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\CodeWithAuthorityTypeType:
+    properties:
+        codeSpace:
+            expose: true
+            access_type: public_method
+            serialized_name: codeSpace
+            accessor:
+                getter: getCodeSpace
+                setter: setCodeSpace
+            xml_attribute: true
+            type: string
