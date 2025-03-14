@@ -73,7 +73,7 @@ use Symfony\Component\Routing\RouterInterface;
 class XBeteiligungService
 {
     private Serializer $serializer;
-    private const PUBLICPARTICIPATIONPHASEMAP = [
+    private const PUBLICPARTICIPATIONPHASKOMMUNALEMAP = [
         'configuration' => [
             'code' => '1000',
             'name' => 'Einleitungsphase',
@@ -99,7 +99,8 @@ class XBeteiligungService
             'name' => 'Schlussphase',
         ]
     ];
-    private const INSTITUTIONPARTICIPATIONPHASEMAP = [
+
+    private const INSTITUTIONPARTICIPATIONPHASKOMMUNALEMAP = [
         'configuration' => [
             'code' => '1000',
             'name' => 'Einleitungsphase',
@@ -123,6 +124,58 @@ class XBeteiligungService
         'closed' => [
             'code' => '8000',
             'name' => 'Schlussphase',
+        ]
+    ];
+    private const PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP = [
+        'configuration' => [
+            'code' => '5000',
+            'name' => 'Konfiguration betroffene Öffentlichkeit',
+        ],
+        'earlyparticipation' => [
+            'code' => '5500',
+            'name' => 'Erneute Anhörung Betroffener (Öffentlichkeit) (Durchlaufnummer)',
+        ],
+        'participation' => [
+            'code' => '5300',
+            'name' => 'Erwiderung /Planänderung bzw. Auswertung',
+        ],
+        'anotherparticipation' => [
+            'code' => '5300',
+            'name' => 'Erwiderung /Planänderung bzw. Auswertung',
+        ],
+        'evaluating' => [
+            'code' => '5600',
+            'name' => 'Auswertung betroffene Öffentlichkeit',
+        ],
+        'closed' => [
+            'code' => '5700',
+            'name' => 'Beschlussfassung betroffene Öffentlichkeit',
+        ]
+    ];
+    private const INSTITUTIONPARTICIPATIONPHASRAUMORDNUNGMAP = [
+        'configuration' => [
+            'code' => '4000',
+            'name' => 'Konfiguration TöB',
+        ],
+        'earlyparticipation' => [
+            'code' => '4500',
+            'name' => 'Erneute Anhörung TöB (Durchlaufnummer)',
+        ],
+        'participation' => [
+            'code' => '4300',
+            'name' => 'Erwiderung /Planänderung bzw. Auswertung',
+        ],
+        'anotherparticipation' => [
+            'code' => '4300',
+            'name' => 'Erwiderung /Planänderung bzw. Auswertung',
+        ],
+        'evaluating' => [
+            'code' => '4600',
+            'name' => 'Auswertung TöB',
+        ],
+        'closed' => [
+            'code' => '4700',
+            'name' => 'Beschlussfassung TöB',
         ]
     ];
 
@@ -391,19 +444,42 @@ class XBeteiligungService
      * @deprecated This information is (for 0301/0302 will be) moved to another type.
      * See for 0401/0402 {@link self::getPublicProcedurePhaseCodeType()}.
      */
-    private function createCodeType(
-        CodeVerfahrensschrittKommunalType|CodeVerfahrensschrittRaumordnungType $codeType,
+    private function createCodeTypeKommunal(
         string $listUri,
         string $publicParticipationPhase
-    ): CodeVerfahrensschrittKommunalType|CodeVerfahrensschrittRaumordnungType {
+    ): CodeVerfahrensschrittKommunalType
+    {
+        $codeType = new CodeVerfahrensschrittKommunalType();
         $codeType->setListVersionID('1.0');
         $codeType->setListURI($listUri);
-        $procedurePhaseCode = '4000';
-        $procedurePhaseName = 'Frühzeitige Öffentlichkeitsbeteiligung';
-        if (array_key_exists($publicParticipationPhase, self::PUBLICPARTICIPATIONPHASEMAP)) {
-            $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASEMAP[$publicParticipationPhase]['code'];
-            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASEMAP[$publicParticipationPhase]['name'];
+        $procedurePhaseCode = '';
+        $procedurePhaseName = '';
+        if (array_key_exists($publicParticipationPhase, self::PUBLICPARTICIPATIONPHASKOMMUNALEMAP)) {
+            $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASKOMMUNALEMAP[$publicParticipationPhase]['code'];
+            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASKOMMUNALEMAP[$publicParticipationPhase]['name'];
         }
+
+        $codeType->setCode($procedurePhaseCode);
+        $codeType->setName($procedurePhaseName);
+
+        return $codeType;
+    }
+
+    private function createCodeTypeRaumordnung(
+        string $listUri,
+        string $publicParticipationPhase
+    ): CodeVerfahrensschrittRaumordnungType
+    {
+        $codeType = new  CodeVerfahrensschrittRaumordnungType();
+        $codeType->setListVersionID('1.0');
+        $codeType->setListURI($listUri);
+        $procedurePhaseCode = '';
+        $procedurePhaseName = '';
+        if (array_key_exists($publicParticipationPhase, self::PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP)) {
+            $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP[$publicParticipationPhase]['code'];
+            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP[$publicParticipationPhase]['name'];
+        }
+
         $codeType->setCode($procedurePhaseCode);
         $codeType->setName($procedurePhaseName);
 
@@ -466,8 +542,7 @@ class XBeteiligungService
     ): BeteiligungKommunalType {
         $participationType->setPlanartKommunal($this->createNewCodePlanartKommunalType()); // optional
         $participationType->setVerfahrensschrittKommunal(
-            $this->createCodeType(
-                new CodeVerfahrensschrittKommunalType(),
+            $this->createCodeTypeKommunal(
                 'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal',
                 $procedure->getPublicParticipationPhase()
             )
@@ -485,8 +560,7 @@ class XBeteiligungService
     ): BeteiligungRaumordnungType {
         $participationType->setPlanart($this->createNewCodePlanartRaumordnungType()); // optional
         $participationType->setVerfahrensschritt(
-            $this->createCodeType(
-                new  CodeVerfahrensschrittRaumordnungType(),
+            $this->createCodeTypeRaumordnung(
                 'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung',
                 $procedure->getPublicParticipationPhase()
             )
@@ -859,12 +933,11 @@ class XBeteiligungService
         $codeProcedurePhase->setListVersionID('');
         $codeProcedurePhase->setListVersionID('1.0');
         $codeProcedurePhase->setCode(
-            self::INSTITUTIONPARTICIPATIONPHASEMAP[$procedure->getPhase()]['code']
+            self::INSTITUTIONPARTICIPATIONPHASKOMMUNALEMAP[$procedure->getPhase()]['code']
         );
-        // not expected in validation
-//        $codeProcedurePhase->setName(
-//            self::INSTITUTIONPARTICIPATIONPHASEMAP[$procedure->getPhase()]['name']
-//        );
+        $codeProcedurePhase->setName(
+            self::INSTITUTIONPARTICIPATIONPHASKOMMUNALEMAP[$procedure->getPhase()]['name']
+       );
 
         return $codeProcedurePhase;
     }
@@ -875,12 +948,11 @@ class XBeteiligungService
         $codeProcedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
         $codeProcedurePhase->setListVersionID('1.0');
         $codeProcedurePhase->setCode(
-            self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['code']
+            self::PUBLICPARTICIPATIONPHASKOMMUNALEMAP[$procedure->getPublicParticipationPhase()]['code']
         );
-        // not expected in validation
-//        $codeProcedurePhase->setName(
-//            self::PUBLICPARTICIPATIONPHASEMAP[$procedure->getPublicParticipationPhase()]['name']
-//        );
+        $codeProcedurePhase->setName(
+            self::PUBLICPARTICIPATIONPHASKOMMUNALEMAP[$procedure->getPublicParticipationPhase()]['name']
+       );
 
         return $codeProcedurePhase;
     }
