@@ -1,0 +1,30 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde\CodeVerzeichnisdienstTypeType:
+    properties:
+        listURI:
+            expose: true
+            access_type: public_method
+            serialized_name: listURI
+            accessor:
+                getter: getListURI
+                setter: setListURI
+            xml_attribute: true
+            type: string
+        listVersionID:
+            expose: true
+            access_type: public_method
+            serialized_name: listVersionID
+            accessor:
+                getter: getListVersionID
+                setter: setListVersionID
+            xml_attribute: true
+            type: string
+        code:
+            expose: true
+            access_type: public_method
+            serialized_name: code
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+            accessor:
+                getter: getCode
+                setter: setCode
+            type: string
