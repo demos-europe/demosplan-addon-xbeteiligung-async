@@ -143,10 +143,9 @@ abstract class XBeteiligungServiceTest extends TestCase
         return $procedureSettingsMock;
     }
 
-    protected function validateProcedureXML(string $procedureXml): void
+    protected function validateProcedureXML(string $procedureXml, string $messageClass): void
     {
-        // todo: we have to find a way to determine which xsd file should be used for validation
-        $isValid = $this->sut->isValidMessage($procedureXml, true, '', ['xbeteiligung-kommunaleBauleitplanung.xsd']);
+        $isValid = $this->sut->isValidMessage($procedureXml, true, '', $messageClass);
         self::assertTrue($isValid);
     }
 }
