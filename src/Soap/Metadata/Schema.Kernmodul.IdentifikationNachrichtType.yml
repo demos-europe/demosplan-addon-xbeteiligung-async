@@ -1,0 +1,26 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\IdentifikationNachrichtType:
+    properties:
+        nachrichtenUUID:
+            expose: true
+            access_type: public_method
+            serialized_name: nachrichtenUUID
+            accessor:
+                getter: getNachrichtenUUID
+                setter: setNachrichtenUUID
+            type: string
+        nachrichtentyp:
+            expose: true
+            access_type: public_method
+            serialized_name: nachrichtentyp
+            accessor:
+                getter: getNachrichtentyp
+                setter: setNachrichtentyp
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeXBauKernmodulNachrichtenType
+        erstellungszeitpunkt:
+            expose: true
+            access_type: public_method
+            serialized_name: erstellungszeitpunkt
+            accessor:
+                getter: getErstellungszeitpunkt
+                setter: setErstellungszeitpunkt
+            type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\DateTime
