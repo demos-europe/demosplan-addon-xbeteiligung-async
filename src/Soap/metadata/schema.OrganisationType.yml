@@ -9,7 +9,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType:
             accessor:
                 getter: getName
                 setter: setName
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinerNameType #manually changed!
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationType #manually changed!
         organisationseinheit:
             expose: true
             access_type: public_method
