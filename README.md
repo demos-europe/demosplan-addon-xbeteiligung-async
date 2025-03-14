@@ -24,7 +24,11 @@ following steps
 XML messages could automatically be casted to php objects by using the
 JMS-Serializer-Bundle http://jmsyst.com/bundles/JMSSerializerBundle. It is
 also easily possible to cast php classes back to xml!
-
+add type to AbstractObject:
+````
+Resources/xsd/gmlProfilexplan.xsd:
+    <element name="AbstractObject" abstract="true" type="anyType"/>
+````
 # Necessary adjustments after standard update
 
 In order for generated XML messages to be successfully validated,
@@ -98,14 +102,14 @@ src/Soap/metadata/schema.OrganisationType.yml:
         name:
             #xml_element:
                 #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
-        type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinerNameType #manually changed!
+        type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationType #manually changed!
 
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType:
 Change the type of name from string to AllgemeinerNameType
     /**
      * Hier ist der Name der Organisation zu übermitteln.
      *
-     * @var AllgemeinerNameType $name
+     * @var NameOrganisationType $name
      */
     private $name = null;
     ....
@@ -114,7 +118,7 @@ Change the type of name from string to AllgemeinerNameType
      *
      * Hier ist der Name der Organisation zu übermitteln.
      *
-     * @return AllgemeinerNameType
+     * @return NameOrganisationType
      */
     public function getName()
     {
@@ -126,7 +130,7 @@ Change the type of name from string to AllgemeinerNameType
      *
      * Hier ist der Name der Organisation zu übermitteln.
      *
-     * @param AllgemeinerNameType $name
+     * @param NameOrganisationType $name
      * @return self
      */
     public function setName($name)
