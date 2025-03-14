@@ -14,7 +14,7 @@ class SerializerFactory
     public function getSerializer(): Serializer
     {
         $serializerBuilder = SerializerBuilder::create();
-        $serializerBuilder->addMetadataDir(__DIR__ . '/../Soap/metadata', 'DemosEurope\DemosplanAddon\XBeteiligung\Soap');
+        $serializerBuilder->addMetadataDir(__DIR__ . '/../Soap/Metadata', 'DemosEurope\DemosplanAddon\XBeteiligung\Soap');
         $serializerBuilder->configureHandlers(static function (HandlerRegistryInterface $handler) use ($serializerBuilder) {
             $serializerBuilder->addDefaultHandlers();
             $handler->registerSubscribingHandler(new BaseTypesHandler()); // XMLSchema List handling
