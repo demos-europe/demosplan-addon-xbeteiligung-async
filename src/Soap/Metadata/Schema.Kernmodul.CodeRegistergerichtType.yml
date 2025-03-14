@@ -1,0 +1,28 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeRegistergerichtType:
+    properties:
+        listURI:
+            expose: true
+            access_type: public_method
+            serialized_name: listURI
+            accessor:
+                getter: getListURI
+                setter: setListURI
+            xml_attribute: true
+            type: string
+        listVersionID:
+            expose: true
+            access_type: public_method
+            serialized_name: listVersionID
+            accessor:
+                getter: getListVersionID
+                setter: setListVersionID
+            xml_attribute: true
+            type: string
+        code:
+            expose: true
+            access_type: public_method
+            serialized_name: code
+            accessor:
+                getter: getCode
+                setter: setCode
+            type: string
