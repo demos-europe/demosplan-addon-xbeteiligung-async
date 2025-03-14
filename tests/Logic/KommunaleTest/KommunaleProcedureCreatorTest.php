@@ -36,13 +36,15 @@ class KommunaleProcedureCreatorTest extends TestCase
         $mockFactory = new MockFactoryTest();
         $this->mockFactory = $mockFactory;
         $this->logger = new Logger();
-        $this->serializer = new SerializerFactory();
+        $this->serializer = SerializerFactory::getSerializer();
         $procedureHandlerFactory = new KommunaleProcedureHandlerFactory($mockFactory);
         $this->sut = $procedureHandlerFactory->createProcedureHandler('creator');
 
     }
 
-    //TODO: Need Dataprovider LIKE @dataProvider getTestXmlFiles() but we don't have yet a example xml file
+    /**
+     * @dataProvider getTestXmlFiles()
+     */
     public function testCreateNewProcedureFromKommunaleXbeteiligungMessage($filePath): void
     {
         $inputMsgXml = file_get_contents(AddonPath::getRootPath($filePath));
@@ -68,6 +70,18 @@ class KommunaleProcedureCreatorTest extends TestCase
         self::assertSame($inputMsgContent->getPlanID(), $procedure->getXtaPlanId());
         self::assertSame($inputMsgContent->getBeschreibungPlanungsanlass(), $procedure->getDesc());
         self::assertSame($inputMsgContent->getVerfahrensschrittKommunal()->getCode(), $procedure->getSettings()->getTerritory());
+    }
+
+    /**
+     * A list of file paths to xml files used for testing
+     *
+     * @return string[][]
+     */
+    public function getTestXmlFiles(): array
+    {
+        return [
+            ['tests/res/xmlv14/xbeteiligung-test-kommunal.Initiieren.0401.xml'],
+        ];
     }
 
 }

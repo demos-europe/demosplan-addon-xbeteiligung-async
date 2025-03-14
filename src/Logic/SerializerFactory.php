@@ -11,7 +11,7 @@ use JMS\Serializer\SerializerBuilder;
 
 class SerializerFactory
 {
-    public function getSerializer(): Serializer
+    public static function getSerializer(): Serializer
     {
         $serializerBuilder = SerializerBuilder::create();
         $serializerBuilder->addMetadataDir(__DIR__ . '/../Soap/metadata', 'DemosEurope\DemosplanAddon\XBeteiligung\Soap');

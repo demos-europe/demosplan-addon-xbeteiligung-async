@@ -46,11 +46,9 @@ abstract class XBeteiligungServiceTest extends TestCase
         $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false));
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
 
-        $serializer = new SerializerFactory();
         $this->sut = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
             $this->createMock(LoggerInterface::class),
-            $serializer,
             $this->procedureNewsService,
             $this->procedureMessageRepository,
             $this->createMock( PlanningDocumentsLinkCreator::class),

@@ -49,6 +49,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409\Kom
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisieren0202;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungInitiieren0201;
@@ -232,7 +233,6 @@ class XBeteiligungService
     public function __construct(
         private readonly GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository,
         private readonly LoggerInterface                     $logger,
-        SerializerFactory                                    $serializerFactory,
         private readonly ProcedureNewsServiceInterface       $procedureNewsService,
         private readonly ProcedureMessageRepository          $procedureMessageRepository,
         private readonly PlanningDocumentsLinkCreator        $planningDocumentsLinkCreator,
@@ -240,7 +240,7 @@ class XBeteiligungService
         private readonly XBeteiligungIncomingMessageParser   $incomingMessageParser,
         private readonly KommunaleProcedureCreater           $kommunaleProcedureCreater,
     ) {
-        $this->serializer = $serializerFactory->getSerializer();
+        $this->serializer = SerializerFactory::getSerializer();
     }
 
     /**
@@ -431,7 +431,7 @@ class XBeteiligungService
     {
         $actorsOfProcedure = new AkteurVorhabenType();
         $organisationType = new OrganisationType();
-        $name = new AllgemeinerNameType();
+        $name = new NameOrganisationType();
         $name->setName($orgaName);
         $organisationType->setName($name); // nested element required
         $actorsOfProcedure->setVeranlasser($organisationType);

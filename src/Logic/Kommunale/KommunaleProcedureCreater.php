@@ -154,7 +154,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         BeteiligungKommunalType $messageContent,
     ): ProcedureInterface {
         // get user from message should be set, because of that userId here is not correct
-        $messageContent->
         $userId = null;
         Assert::notNull($userId, 'User not found');
         $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $userId);
