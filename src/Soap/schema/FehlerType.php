@@ -18,7 +18,7 @@ class FehlerType
     private $beschreibung = null;
 
     /**
-     * Hier kann die Art des Fehelers übermittelt werden.
+     * Hier kann die Art des Fehlers übermittelt werden.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeFehlerartType $art
      */
@@ -53,7 +53,7 @@ class FehlerType
     /**
      * Gets as art
      *
-     * Hier kann die Art des Fehelers übermittelt werden.
+     * Hier kann die Art des Fehlers übermittelt werden.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeFehlerartType
      */
@@ -65,7 +65,7 @@ class FehlerType
     /**
      * Sets a new art
      *
-     * Hier kann die Art des Fehelers übermittelt werden.
+     * Hier kann die Art des Fehlers übermittelt werden.
      *
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeFehlerartType $art
      * @return self

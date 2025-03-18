@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType:
+    properties:
+        name:
+            expose: true
+            access_type: public_method
+            serialized_name: name
+            #xml_element:
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getName
+                setter: setName
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationType #manually changed!
+        organisationseinheit:
+            expose: true
+            access_type: public_method
+            serialized_name: organisationseinheit
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getOrganisationseinheit
+                setter: setOrganisationseinheit
+            type: string

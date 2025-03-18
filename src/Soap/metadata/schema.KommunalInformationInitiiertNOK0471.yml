@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInformationInitiiertNOK0471:
+    xml_root_name: kommunal.Information.Initiiert.NOK.0471
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

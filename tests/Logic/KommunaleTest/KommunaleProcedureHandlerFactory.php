@@ -24,7 +24,9 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getProcedureTypeService(),
             $this->mockFactory->getUserHandlerMock(),
             $this->mockFactory->getEntityManagerMock(),
-            $this->mockFactory->getResponseMessageFactoryMock(),
+            $this->mockFactory->getKommunaleResponseMessageFactory(),
+            $this->mockFactory->getRaumordnungResponseMessageFactory(),
+            $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
             $this->mockFactory->getTranslatorMock(),
             $this->mockFactory->getTransActionServiceInterfaceMock()
         ];

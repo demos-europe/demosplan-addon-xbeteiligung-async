@@ -1,0 +1,32 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInformationGeloescht0359\RaumordnungInformationGeloescht0359AnonymousPHPType\NachrichteninhaltAnonymousPHPType:
+    properties:
+        vorgangsID:
+            expose: true
+            access_type: public_method
+            serialized_name: vorgangsID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVorgangsID
+                setter: setVorgangsID
+            type: string
+        beteiligungsID:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungsID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBeteiligungsID
+                setter: setBeteiligungsID
+            type: string
+        planID:
+            expose: true
+            access_type: public_method
+            serialized_name: planID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getPlanID
+                setter: setPlanID
+            type: string

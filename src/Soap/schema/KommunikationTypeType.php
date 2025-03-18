@@ -5,20 +5,20 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema;
 /**
  * Class representing KommunikationTypeType
  *
- * Angaben zur Erreichbarkeit einer Behörde oder einer Person (Telefon, Fax, E-Mail, etc.).
+ * Dieser Typ enthält Angaben zur Erreichbarkeit über elektronische Kommunikationskanäle (z. B. Telefon, E-Mail).
  * XSD Type: KommunikationType
  */
 class KommunikationTypeType
 {
     /**
-     * Es wird angegeben, über welches Kommunikationsmedium (z. B. Telefon, E-Mail) die Erreichbarkeit gegeben ist.
+     * Der 'kanal' gibt an, über welchen Kommunikationskanal eine Erreichbarkeit besteht.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType $kanal
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeKommunikationKanalTypeType $kanal
      */
     private $kanal = null;
 
     /**
-     * Je nach Kommunikationsmedium (siehe Art) werden nähere Angaben gemacht. In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
+     * Die Kennung beinhaltet die konkreten Angaben zur Erreichbarkeit über einen Kommunikationskanal, d. h. die Telefonnummer, E-Mail-Adresse oder dergleichen.
      *
      * @var string $kennung
      */
@@ -34,9 +34,9 @@ class KommunikationTypeType
     /**
      * Gets as kanal
      *
-     * Es wird angegeben, über welches Kommunikationsmedium (z. B. Telefon, E-Mail) die Erreichbarkeit gegeben ist.
+     * Der 'kanal' gibt an, über welchen Kommunikationskanal eine Erreichbarkeit besteht.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeKommunikationKanalTypeType
      */
     public function getKanal()
     {
@@ -46,12 +46,12 @@ class KommunikationTypeType
     /**
      * Sets a new kanal
      *
-     * Es wird angegeben, über welches Kommunikationsmedium (z. B. Telefon, E-Mail) die Erreichbarkeit gegeben ist.
+     * Der 'kanal' gibt an, über welchen Kommunikationskanal eine Erreichbarkeit besteht.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType $kanal
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeKommunikationKanalTypeType $kanal
      * @return self
      */
-    public function setKanal(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType $kanal)
+    public function setKanal(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeKommunikationKanalTypeType $kanal)
     {
         $this->kanal = $kanal;
         return $this;
@@ -60,7 +60,7 @@ class KommunikationTypeType
     /**
      * Gets as kennung
      *
-     * Je nach Kommunikationsmedium (siehe Art) werden nähere Angaben gemacht. In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
+     * Die Kennung beinhaltet die konkreten Angaben zur Erreichbarkeit über einen Kommunikationskanal, d. h. die Telefonnummer, E-Mail-Adresse oder dergleichen.
      *
      * @return string
      */
@@ -72,7 +72,7 @@ class KommunikationTypeType
     /**
      * Sets a new kennung
      *
-     * Je nach Kommunikationsmedium (siehe Art) werden nähere Angaben gemacht. In der Regel werden hier Adressangaben eingetragen, etwa die Telefonnummer oder die E-Mail-Adresse.
+     * Die Kennung beinhaltet die konkreten Angaben zur Erreichbarkeit über einen Kommunikationskanal, d. h. die Telefonnummer, E-Mail-Adresse oder dergleichen.
      *
      * @param string $kennung
      * @return self

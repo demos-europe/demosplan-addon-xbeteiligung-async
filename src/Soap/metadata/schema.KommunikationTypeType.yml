@@ -4,14 +4,18 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType:
             expose: true
             access_type: public_method
             serialized_name: kanal
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
             accessor:
                 getter: getKanal
                 setter: setKanal
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeErreichbarkeitTypeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeKommunikationKanalTypeType
         kennung:
             expose: true
             access_type: public_method
             serialized_name: kennung
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
             accessor:
                 getter: getKennung
                 setter: setKennung
@@ -20,6 +24,8 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType:
             expose: true
             access_type: public_method
             serialized_name: zusatz
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
             accessor:
                 getter: getZusatz
                 setter: setZusatz

@@ -1,13 +1,35 @@
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType:
     properties:
-        behoerdenkennung:
+        verzeichnisdienst:
             expose: true
             access_type: public_method
-            serialized_name: behoerdenkennung
+            serialized_name: verzeichnisdienst
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
             accessor:
-                getter: getBehoerdenkennung
-                setter: setBehoerdenkennung
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdenkennungTypeType
+                getter: getVerzeichnisdienst
+                setter: setVerzeichnisdienst
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerzeichnisdienstTypeType
+        kennung:
+            expose: true
+            access_type: public_method
+            serialized_name: kennung
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+            accessor:
+                getter: getKennung
+                setter: setKennung
+            type: string
+        name:
+            expose: true
+            access_type: public_method
+            serialized_name: name
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+            accessor:
+                getter: getName
+                setter: setName
+            type: string
         erreichbarkeit:
             expose: true
             access_type: public_method
@@ -18,20 +40,5 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType:
             xml_list:
                 inline: true
                 entry_name: erreichbarkeit
+                namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
             type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType>
-        anschrift:
-            expose: true
-            access_type: public_method
-            serialized_name: anschrift
-            accessor:
-                getter: getAnschrift
-                setter: setAnschrift
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschriftTypeType
-        behoerdenname:
-            expose: true
-            access_type: public_method
-            serialized_name: behoerdenname
-            accessor:
-                getter: getBehoerdenname
-                setter: setBehoerdenname
-            type: string

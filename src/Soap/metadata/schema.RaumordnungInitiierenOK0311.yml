@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiierenOK0311:
+    xml_root_name: raumordnung.Initiieren.OK.0311
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

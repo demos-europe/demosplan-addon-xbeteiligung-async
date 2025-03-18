@@ -17,7 +17,7 @@ class BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType
     /**
      * Hier kann die Art des informellen Verfahrens zur Beteiligung der Öffentlichkeit übermittelt werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType\BeteiligungKommunalInformellOeffentlichkeitAnonymousPHPType $beteiligungKommunalInformellOeffentlichkeit
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBeteiligungKommunalInformellOeffentlichkeitType $beteiligungKommunalInformellOeffentlichkeit
      */
     private $beteiligungKommunalInformellOeffentlichkeit = null;
 
@@ -52,7 +52,7 @@ class BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType
      *
      * Hier kann die Art des informellen Verfahrens zur Beteiligung der Öffentlichkeit übermittelt werden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType\BeteiligungKommunalInformellOeffentlichkeitAnonymousPHPType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBeteiligungKommunalInformellOeffentlichkeitType
      */
     public function getBeteiligungKommunalInformellOeffentlichkeit()
     {
@@ -64,10 +64,10 @@ class BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType
      *
      * Hier kann die Art des informellen Verfahrens zur Beteiligung der Öffentlichkeit übermittelt werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType\BeteiligungKommunalInformellOeffentlichkeitAnonymousPHPType $beteiligungKommunalInformellOeffentlichkeit
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBeteiligungKommunalInformellOeffentlichkeitType $beteiligungKommunalInformellOeffentlichkeit
      * @return self
      */
-    public function setBeteiligungKommunalInformellOeffentlichkeit(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType\BeteiligungKommunalInformellOeffentlichkeitAnonymousPHPType $beteiligungKommunalInformellOeffentlichkeit = null)
+    public function setBeteiligungKommunalInformellOeffentlichkeit(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeBeteiligungKommunalInformellOeffentlichkeitType $beteiligungKommunalInformellOeffentlichkeit = null)
     {
         $this->beteiligungKommunalInformellOeffentlichkeit = $beteiligungKommunalInformellOeffentlichkeit;
         return $this;

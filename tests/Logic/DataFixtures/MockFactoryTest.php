@@ -17,7 +17,9 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -36,9 +38,19 @@ class MockFactoryTest extends TestCase
         return $this->createMock($className);
     }
 
-    public function getResponseMessageFactoryMock(): MockObject|XBeteiligungResponseMessageFactory
+    public function getKommunaleResponseMessageFactory(): MockObject|KommunaleMessageFactory
     {
-        return $this->createMock(XBeteiligungResponseMessageFactory::class);
+        return $this->createMock(KommunaleMessageFactory::class);
+    }
+
+    public function getRaumordnungResponseMessageFactory(): MockObject|RaumordnungMessageFactory
+    {
+        return $this->createMock(RaumordnungMessageFactory::class);
+    }
+
+    public function getPlanfeststellungResponseMessageFactory(): MockObject|PlanfeststellungMessageFactory
+    {
+        return $this->createMock(PlanfeststellungMessageFactory::class);
     }
 
     public function getTranslatorMock(): MockObject|Translator

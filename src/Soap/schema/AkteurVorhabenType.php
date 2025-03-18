@@ -13,7 +13,7 @@ class AkteurVorhabenType
     /**
      * Hier wird Behörde oder Stelle genannt, die für das Verfahren rechtlich verantwortlich ist.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType $veranlasser
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType $veranlasser
      */
     private $veranlasser = null;
 
@@ -31,7 +31,7 @@ class AkteurVorhabenType
      *
      * Hier wird Behörde oder Stelle genannt, die für das Verfahren rechtlich verantwortlich ist.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType
      */
     public function getVeranlasser()
     {
@@ -43,10 +43,10 @@ class AkteurVorhabenType
      *
      * Hier wird Behörde oder Stelle genannt, die für das Verfahren rechtlich verantwortlich ist.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType $veranlasser
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType $veranlasser
      * @return self
      */
-    public function setVeranlasser(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType $veranlasser)
+    public function setVeranlasser(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType $veranlasser)
     {
         $this->veranlasser = $veranlasser;
         return $this;

@@ -4,22 +4,19 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungAktualisierenNOK0322;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungAktualisierenNOK0322\Beteiligung2PlanungBeteiligungRaumordnungAktualisierenNOK0322AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0322;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312\Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0312;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungLoeschenNOK0329;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungLoeschenNOK0329\Beteiligung2PlanungBeteiligungRaumordnungLoeschenNOK0329AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0329;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319\Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0319;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungNeuNOK0321;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungNeuNOK0321\Beteiligung2PlanungBeteiligungRaumordnungNeuNOK0321AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0321;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311\Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0311;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungLoeschen0309;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungRaumordnungNeu0301;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOKType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisierenNOK0322\RaumordnungAktualisierenNOK0322AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschenNOK0329\RaumordnungLoeschenNOK0329AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungLoeschenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisieren0302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisierenNOK0322;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisierenOK0312;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiieren0301;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiierenNOK0321;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiierenOK0311;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschenNOK0329;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschenOK0319;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 
@@ -33,14 +30,13 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureCreatedResponse311(
         ProcedureInterface $procedure,
-        Planung2BeteiligungBeteiligungRaumordnungNeu0301 $xmlObject401
+        RaumordnungInitiieren0301 $xmlObject301
     ): ResponseValue
     {
         return $this->buildProcedureCreatedResponse(
             $procedure,
-            $xmlObject401,
-            new Beteiligung2PlanungBeteiligungRaumordnungNeuOK0311(),
-            new NachrichteninhaltAnonymousPHPType0311(),
+            $xmlObject301,
+            new RaumordnungInitiierenOK0311(),
             '0311'
         );
     }
@@ -51,14 +47,13 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
      * @throws Exception
      */
     public function buildProcedureUpdateOKResponse312(
-        Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 $xmlObject302,
-        ProcedureInterface                                      $procedure
+        RaumordnungAktualisieren0302 $xmlObject302,
+        ProcedureInterface $procedure
     ): ResponseValue {
         return $this->buildProcedureUpdateResponse(
             $procedure,
             $xmlObject302,
-            new Beteiligung2PlanungBeteiligungRaumordnungAktualisierenOK0312(),
-            new NachrichteninhaltAnonymousPHPType0312(),
+            new RaumordnungAktualisierenOK0312(),
             '0312'
         );
     }
@@ -69,13 +64,12 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
      * @throws Exception
      */
     public function buildProcedureDeletedResponse319(
-        Planung2BeteiligungBeteiligungRaumordnungLoeschen0309 $xmlObject309
+        RaumordnungLoeschen0309 $xmlObject309
     ): ResponseValue
     {
         return $this->buildProcedureDeletedResponse(
             $xmlObject309,
-            new Beteiligung2PlanungBeteiligungRaumordnungLoeschenOK0319(),
-            new NachrichteninhaltAnonymousPHPType0319(),
+            new RaumordnungLoeschenOK0319(),
             '0319'
         );
     }
@@ -88,13 +82,13 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureCreatedErrorResponse321(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungRaumordnungNeu0301 $xmlObject301
+        RaumordnungInitiieren0301 $xmlObject301
     ): ResponseValue {
-        return $this->buildErrorResponse(
+        return $this->buildCreateErrorResponse(
             $errorTypes,
             $xmlObject301,
-            new Beteiligung2PlanungBeteiligungRaumordnungNeuNOK0321(),
-            new NachrichteninhaltAnonymousPHPType0321(),
+            new RaumordnungInitiierenNOK0321(),
+            new NachrichteninhaltTemplateNOKType(),
             '0321'
         );
     }
@@ -108,14 +102,14 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureUpdateErrorResponse322(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302 $xmlObject302
+        RaumordnungAktualisieren0302 $xmlObject302
     ): ResponseValue
     {
-        return $this->buildErrorResponse(
+        return $this->buildUpdateErrorResponse(
             $errorTypes,
             $xmlObject302,
-            new Beteiligung2PlanungBeteiligungRaumordnungAktualisierenNOK0322(),
-            new NachrichteninhaltAnonymousPHPType0322(),
+            new RaumordnungAktualisierenNOK0322(),
+            new RaumordnungAktualisierenNOOKAnonymousPHPType(),
             '0302'
         );
     }
@@ -128,14 +122,14 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureDeletedErrorResponse329(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungRaumordnungLoeschen0309 $xmlObject309
+        RaumordnungLoeschen0309 $xmlObject309
     ): ResponseValue
     {
-        return $this->buildErrorResponse(
+        return $this->buildDeleteErrorResponse(
             $errorTypes,
             $xmlObject309,
-            new Beteiligung2PlanungBeteiligungRaumordnungLoeschenNOK0329(),
-            new NachrichteninhaltAnonymousPHPType0329(),
+            new RaumordnungLoeschenNOK0329(),
+            new RaumordnungLoeschenNOOKAnonymousPHPType(),
             '0329'
         );
     }

@@ -15,9 +15,10 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeFehlerartType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
 use Doctrine\DBAL\ConnectionException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Exception;
@@ -35,7 +36,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * If there is any error during the process it will return a Beteiligung2PlanungBeteiligungNeuNOK0421 Object.
      */
     public function createNewProcedureFromXBeteiligungMessageOrErrorMessage(
-        Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
+        KommunalInitiieren0401 $xmlObject401
     ): ResponseValue
     {
         try {
@@ -102,7 +103,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * @throws FormatException
      */
     public function createNewKommunalProcedureFromXBeteiligungMessageWithResponse(
-        Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401
+        KommunalInitiieren0401 $xmlObject401
     ): ResponseValue
     {
         $procedure = $this->createNewKommunalProcedureFromXBeteiligungMessage($xmlObject401);
@@ -117,7 +118,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * @throws FormatException
      */
     public function createNewKommunalProcedureFromXBeteiligungMessage(
-        Planung2BeteiligungBeteiligungKommunalNeu0401 $xmlObject401,
+        KommunalInitiieren0401 $xmlObject401,
     ): ProcedureInterface
     {
         $messageContent = $xmlObject401->getNachrichteninhalt()?->getBeteiligung();
@@ -182,7 +183,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         ];
     }
 
-    private function mapToOrgaInterface(?OrganisationTypeType $organisationType): ?OrgaInterface
+    private function mapToOrgaInterface(?OrganisationType $organisationType): ?OrgaInterface
     {
         if ($organisationType === null) {
             return null;
@@ -190,7 +191,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
 
         // Implement the logic to map OrganisationTypeType to OrgaInterface
         // This is a placeholder and should be replaced with actual mapping logic
-        return $this->entityManager->getRepository(OrgaInterface::class)->find($organisationType->getId());
+        return $this->entityManager->getRepository(OrgaInterface::class)->find($organisationType->getName());
     }
 
 }

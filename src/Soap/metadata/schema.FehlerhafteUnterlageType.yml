@@ -5,27 +5,27 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerhafteUnterlageType:
             access_type: public_method
             serialized_name: fehlerbeschreibung
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getFehlerbeschreibung
                 setter: setFehlerbeschreibung
             type: string
-        fileID:
+        dokumentID:
             expose: true
             access_type: public_method
-            serialized_name: fileID
+            serialized_name: dokumentID
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
-                getter: getFileID
-                setter: setFileID
+                getter: getDokumentID
+                setter: setDokumentID
             type: string
         art:
             expose: true
             access_type: public_method
             serialized_name: art
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getArt
                 setter: setArt

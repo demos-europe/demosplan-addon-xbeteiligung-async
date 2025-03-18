@@ -18,11 +18,11 @@ class FehlerhafteUnterlageType
     private $fehlerbeschreibung = null;
 
     /**
-     * ID der Unterlage.
+     * ID der fehlerhaften Unterlage.
      *
-     * @var string $fileID
+     * @var string $dokumentID
      */
-    private $fileID = null;
+    private $dokumentID = null;
 
     /**
      * Hier kann die Art des Fehlers übermittelt werden.
@@ -58,28 +58,28 @@ class FehlerhafteUnterlageType
     }
 
     /**
-     * Gets as fileID
+     * Gets as dokumentID
      *
-     * ID der Unterlage.
+     * ID der fehlerhaften Unterlage.
      *
      * @return string
      */
-    public function getFileID()
+    public function getDokumentID()
     {
-        return $this->fileID;
+        return $this->dokumentID;
     }
 
     /**
-     * Sets a new fileID
+     * Sets a new dokumentID
      *
-     * ID der Unterlage.
+     * ID der fehlerhaften Unterlage.
      *
-     * @param string $fileID
+     * @param string $dokumentID
      * @return self
      */
-    public function setFileID($fileID)
+    public function setDokumentID($dokumentID)
     {
-        $this->fileID = $fileID;
+        $this->dokumentID = $dokumentID;
         return $this;
     }
 
