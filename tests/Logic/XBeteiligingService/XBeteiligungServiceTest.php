@@ -17,9 +17,11 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -55,6 +57,7 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(KommunaleProcedureCreater::class),
+            $this->createMock(StatementCreator::class),
         );
     }
 

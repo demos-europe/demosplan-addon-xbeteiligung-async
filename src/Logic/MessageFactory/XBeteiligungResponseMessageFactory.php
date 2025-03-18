@@ -142,14 +142,14 @@ class XBeteiligungResponseMessageFactory
     {
         $message = new AllgemeinStellungnahmeNeuabgegeben0701();
 
-        $this->setProductInfo($message);
+        $this->xBeteiligungService->setProductInfo($message);
         $header = $this->buildHeader('0701', 'LGV');
         $message->setNachrichtenkopfG2g($header);
 
         $content = $this->createBeteiligung2PlanungStellungnahmeNeu0701Content($statementCreated);
         $message->setNachrichteninhalt($content);
 
-        $messageXml = $this->serializeData($message);
+        $messageXml = $this->xBeteiligungService->serializeData($message);
 
         return $this->addNamespacesTo70xXML($messageXml);
     }

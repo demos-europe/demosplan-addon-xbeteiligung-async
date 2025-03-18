@@ -23,7 +23,6 @@ use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\UnsupportedMessageTypeException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType;
@@ -63,17 +62,20 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiieren030
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309\RaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use JMS\Serializer\Serializer;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class XBeteiligungService
 {
+    /** @var Serializer */
     private Serializer $serializer;
     private const PARTICIPATION_RAUMORDNUNG_PHASE = 'Erwiderung /Planänderung bzw. Auswertung';
     private const PUBLICPARTICIPATIONPHASKOMMUNALEMAP = [
@@ -242,7 +244,7 @@ class XBeteiligungService
         private readonly KommunaleProcedureCreater           $kommunaleProcedureCreater,
         private readonly StatementCreator                    $statementCreator,
     ) {
-        $this->serializer = SerializerFactory::getSerializer();
+        $this->serializer = (new SerializerFactory)->getSerializer();
     }
 
     /**
@@ -662,6 +664,8 @@ class XBeteiligungService
         $kanal->setListURI(self::CODELIST_ERREICHBARKEIT);
         $kanal->setCode('work probably in progress');
         $codeAuthorityIdentification->setKanal($kanal);
+        $codeAuthorityIdentification->setKennung('');
+        $codeAuthorityIdentification->setZusatz('');
         $reader->setErreichbarkeit([$codeAuthorityIdentification]); // required
 
         return $reader;
