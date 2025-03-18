@@ -230,6 +230,7 @@ class XBeteiligungResponseMessageFactory
         $header = $this->buildHeader($messageType);
         $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligung());
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
+        $contentClass->setPlanID($xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID());
         foreach ($errorTypes as $errorType) {
             $contentClass->addToFehler($errorType);
         }
@@ -256,6 +257,7 @@ class XBeteiligungResponseMessageFactory
         $header = $this->buildHeader($messageType);
         $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligungsID());
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
+        $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getPlanID());
         foreach ($errorTypes as $errorType) {
             $contentClass->addToFehler($errorType);
         }
