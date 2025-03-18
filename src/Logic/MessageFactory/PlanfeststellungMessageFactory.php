@@ -6,6 +6,9 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOKType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisierenNOK0222\PlanfeststellungAktualisierenNOK0222AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungLoeschenNOK0229\PlanfeststellungLoeschenNOK0229AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungLoeschenNOOKAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisieren0202;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisierenNOK0222;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisierenOK0212;
@@ -81,10 +84,11 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
         array $errorTypes,
         PlanfeststellungInitiieren0201 $xmlObject201
     ): ResponseValue {
-        return $this->buildErrorResponse(
+        return $this->buildCreateErrorResponse(
             $errorTypes,
             $xmlObject201,
             new PlanfeststellungInitiierenNOK0221(),
+            new NachrichteninhaltTemplateNOKType(),
             '0221'
         );
     }
@@ -101,10 +105,11 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
         PlanfeststellungAktualisieren0202 $xmlObject202
     ): ResponseValue
     {
-        return $this->buildErrorResponse(
+        return $this->buildUpdateErrorResponse(
             $errorTypes,
             $xmlObject202,
             new PlanfeststellungAktualisierenNOK0222(),
+            new PlanfeststellungAktualisierenNOOKAnonymousPHPType(),
             '0222'
         );
     }
@@ -120,10 +125,11 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
         PlanfeststellungLoeschen0209 $xmlObject209
     ): ResponseValue
     {
-        return $this->buildErrorResponse(
+        return $this->buildDeleteErrorResponse(
             $errorTypes,
             $xmlObject209,
             new PlanfeststellungLoeschenNOK0229(),
+            new PlanfeststellungLoeschenNOOKAnonymousPHPType(),
             '0229'
         );
     }

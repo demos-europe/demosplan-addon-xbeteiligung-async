@@ -10,15 +10,21 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisierenNOK0422\KommunalAktualisierenNOK0422AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschenNOK0429\KommunalLoeschenNOK0429AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalLoeschenNOOKAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOKType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateOKType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisieren0202;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisierenNOK0222\PlanfeststellungAktualisierenNOK0222AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungLoeschenNOK0229\PlanfeststellungLoeschenNOK0229AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungLoeschenNOOKAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungInitiieren0201;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungLoeschen0209;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisieren0302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisierenNOK0322\RaumordnungAktualisierenNOK0322AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschenNOK0329\RaumordnungLoeschenNOK0329AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungLoeschenNOOKAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedureCreated;
@@ -207,20 +213,73 @@ class XBeteiligungResponseMessageFactory
 
     /**
      * @param array $errorTypes
-     * @param KommunalInitiieren0401|KommunalAktualisieren0402|KommunalLoeschen0409|PlanfeststellungInitiieren0201|PlanfeststellungAktualisieren0202|PlanfeststellungLoeschen0209|RaumordnungInitiieren0301|RaumordnungAktualisieren0302|RaumordnungLoeschen0309 $xmlObject
+     * @param KommunalAktualisieren0402|PlanfeststellungAktualisieren0202|RaumordnungAktualisieren0302 $xmlObject
      * @param NachrichtG2GTypeType $messageClass
+     * @param KommunalAktualisierenNOOKAnonymousPHPType|RaumordnungAktualisierenNOOKAnonymousPHPType|PlanfeststellungAktualisierenNOOKAnonymousPHPType $contentClass
      * @param string $messageType
      * @return ResponseValue
      */
-    public function buildErrorResponse(
+    public function buildUpdateErrorResponse(
         array $errorTypes,
-        mixed $xmlObject,
+        KommunalAktualisieren0402|PlanfeststellungAktualisieren0202|RaumordnungAktualisieren0302 $xmlObject,
         NachrichtG2GTypeType $messageClass,
+        KommunalAktualisierenNOOKAnonymousPHPType|RaumordnungAktualisierenNOOKAnonymousPHPType|PlanfeststellungAktualisierenNOOKAnonymousPHPType $contentClass,
         string $messageType
     ): ResponseValue {
         $this->xBeteiligungService->setProductInfo($xmlObject);
         $header = $this->buildHeader($messageType);
-        $contentClass = new NachrichteninhaltTemplateNOKType();
+        $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligung());
+        $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
+        foreach ($errorTypes as $errorType) {
+            $contentClass->addToFehler($errorType);
+        }
+
+        return $this->setResponse($contentClass, $messageClass, $header);
+    }
+
+    /**
+     * @param array $errorTypes
+     * @param KommunalLoeschen0409|PlanfeststellungLoeschen0209|RaumordnungLoeschen0309 $xmlObject
+     * @param NachrichtG2GTypeType $messageClass
+     * @param KommunalLoeschenNOOKAnonymousPHPType|RaumordnungLoeschenNOOKAnonymousPHPType|PlanfeststellungLoeschenNOOKAnonymousPHPType $contentClass
+     * @param string $messageType
+     * @return ResponseValue
+     */
+    public function buildDeleteErrorResponse(
+        array $errorTypes,
+        KommunalLoeschen0409|PlanfeststellungLoeschen0209|RaumordnungLoeschen0309 $xmlObject,
+        NachrichtG2GTypeType $messageClass,
+        KommunalLoeschenNOOKAnonymousPHPType|RaumordnungLoeschenNOOKAnonymousPHPType|PlanfeststellungLoeschenNOOKAnonymousPHPType $contentClass,
+        string $messageType
+    ): ResponseValue {
+        $this->xBeteiligungService->setProductInfo($xmlObject);
+        $header = $this->buildHeader($messageType);
+        $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligungsID());
+        $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
+        foreach ($errorTypes as $errorType) {
+            $contentClass->addToFehler($errorType);
+        }
+
+        return $this->setResponse($contentClass, $messageClass, $header);
+    }
+
+    /**
+     * @param array $errorTypes
+     * @param KommunalInitiieren0401|PlanfeststellungInitiieren0201|RaumordnungInitiieren0301 $xmlObject
+     * @param NachrichtG2GTypeType $messageClass
+     * @param NachrichteninhaltTemplateNOKType $contentClass
+     * @param string $messageType
+     * @return ResponseValue
+     */
+    public function buildCreateErrorResponse(
+        array $errorTypes,
+        KommunalInitiieren0401|PlanfeststellungInitiieren0201|RaumordnungInitiieren0301 $xmlObject,
+        NachrichtG2GTypeType $messageClass,
+        NachrichteninhaltTemplateNOKType $contentClass,
+        string $messageType
+    ): ResponseValue {
+        $this->xBeteiligungService->setProductInfo($xmlObject);
+        $header = $this->buildHeader($messageType);
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
         $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getBeteiligung()?->getPlanID());
         foreach ($errorTypes as $errorType) {
