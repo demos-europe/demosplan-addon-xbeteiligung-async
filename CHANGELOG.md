@@ -6,7 +6,6 @@
 - Update the current addon code to be functional with the new 1.3 standard.
 - Update XBeteiligungService
 - Update ReadMe
-- UPdate alle Files in Logic base on new Standard 1.3
 
 ## v0.11 (2025-02-28)
 - add rabbitMQ package
