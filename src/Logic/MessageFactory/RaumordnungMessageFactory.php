@@ -5,6 +5,9 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOKType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisierenNOK0322\RaumordnungAktualisierenNOK0322AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschenNOK0329\RaumordnungLoeschenNOK0329AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungLoeschenNOOKAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisieren0302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisierenNOK0322;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisierenOK0312;
@@ -81,10 +84,11 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
         array $errorTypes,
         RaumordnungInitiieren0301 $xmlObject301
     ): ResponseValue {
-        return $this->buildErrorResponse(
+        return $this->buildCreateErrorResponse(
             $errorTypes,
             $xmlObject301,
             new RaumordnungInitiierenNOK0321(),
+            new NachrichteninhaltTemplateNOKType(),
             '0321'
         );
     }
@@ -101,10 +105,11 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
         RaumordnungAktualisieren0302 $xmlObject302
     ): ResponseValue
     {
-        return $this->buildErrorResponse(
+        return $this->buildUpdateErrorResponse(
             $errorTypes,
             $xmlObject302,
             new RaumordnungAktualisierenNOK0322(),
+            new RaumordnungAktualisierenNOOKAnonymousPHPType(),
             '0302'
         );
     }
@@ -120,10 +125,11 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
         RaumordnungLoeschen0309 $xmlObject309
     ): ResponseValue
     {
-        return $this->buildErrorResponse(
+        return $this->buildDeleteErrorResponse(
             $errorTypes,
             $xmlObject309,
             new RaumordnungLoeschenNOK0329(),
+            new RaumordnungLoeschenNOOKAnonymousPHPType(),
             '0329'
         );
     }

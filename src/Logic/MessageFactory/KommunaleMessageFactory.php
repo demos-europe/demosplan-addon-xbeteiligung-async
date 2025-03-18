@@ -5,6 +5,8 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisierenNOK0422;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisierenNOK0422\KommunalAktualisierenNOK0422AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschenNOK0429\KommunalLoeschenNOK0429AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalLoeschenNOOKAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisierenOK0412;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschenNOK0429;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschenOK0419;
@@ -14,6 +16,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOKType;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 
@@ -78,10 +81,11 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
         array $errorTypes,
         KommunalInitiieren0401 $xmlObject401
     ): ResponseValue {
-        return $this->buildErrorResponse(
+        return $this->buildCreateErrorResponse(
             $errorTypes,
             $xmlObject401,
             new KommunalInitiierenNOK0421(),
+            new NachrichteninhaltTemplateNOKType(),
             '0421'
         );
     }
@@ -98,10 +102,11 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
         KommunalAktualisieren0402 $xmlObject402
     ): ResponseValue
     {
-        return $this->buildErrorResponse(
+        return $this->buildUpdateErrorResponse(
             $errorTypes,
             $xmlObject402,
             new KommunalAktualisierenNOK0422(),
+            new KommunalAktualisierenNOOKAnonymousPHPType(),
             '0422'
         );
     }
@@ -117,10 +122,11 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
         KommunalLoeschen0409 $xmlObject409
     ): ResponseValue
     {
-        return $this->buildErrorResponse(
+        return $this->buildDeleteErrorResponse(
             $errorTypes,
             $xmlObject409,
             new KommunalLoeschenNOK0429(),
+            new KommunalLoeschenNOOKAnonymousPHPType(),
             '0429'
         );
     }

@@ -24,7 +24,11 @@ following steps
 XML messages could automatically be casted to php objects by using the
 JMS-Serializer-Bundle http://jmsyst.com/bundles/JMSSerializerBundle. It is
 also easily possible to cast php classes back to xml!
-
+add type to AbstractObject:
+````
+Resources/xsd/gmlProfilexplan.xsd:
+    <element name="AbstractObject" abstract="true" type="anyType"/>
+````
 # Necessary adjustments after standard update
 
 In order for generated XML messages to be successfully validated,
@@ -44,6 +48,97 @@ add `xbeteiligung:` as prefix to xml_root_name in
 `schema.PlanfeststellungLoeschen0209.yml`,
 
 Example - xml_root_name: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
+Add the Following to Schemas:
+````
+src/Soap/metadata/schema.BehoerdeTypeType.yml:
+    Verzeichnisdinst:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+    kennung:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+    name:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+    erreichbarkeit:
+        xml_list:
+            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+
+src/Soap/metadata/schema.IdentifikationNachrichtTypeType.yml:
+    nachrichtenUUID:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+    nachrichtentyp:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+    erstellungszeitpunkt:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+
+src/Soap/metadata/schema.KommunikationTypeType.yml:
+    kanal:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+    kennung:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+    zusatz:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+
+src/Soap/metadata/schema.NachrichtenkopfG2GTypeType.yml:
+    identifikationNachricht:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+    leser:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+    autor:
+        xml_element:
+            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+
+src/Soap/metadata/schema.OrganisationType.yml:
+    propertirs:
+        name:
+            #xml_element:
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+        type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationType #manually changed!
+
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType:
+Change the type of name from string to AllgemeinerNameType
+    /**
+     * Hier ist der Name der Organisation zu übermitteln.
+     *
+     * @var NameOrganisationType $name
+     */
+    private $name = null;
+    ....
+    /**
+     * Gets as name
+     *
+     * Hier ist der Name der Organisation zu übermitteln.
+     *
+     * @return NameOrganisationType
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Sets a new name
+     *
+     * Hier ist der Name der Organisation zu übermitteln.
+     *
+     * @param NameOrganisationType $name
+     * @return self
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+        return $this;
+    }
+````
 
 Add the following to enum in xbeteiligung-codes.xsd (search for "0401" then you should find it)
 `<xs:enumeration value="0301">

@@ -11,16 +11,23 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeNeuabgegeben0701;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisierenNOK0422\KommunalAktualisierenNOK0422AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschenNOK0429\KommunalLoeschenNOK0429AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalLoeschenNOOKAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOKType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateOKType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisieren0202;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisierenNOK0222\PlanfeststellungAktualisierenNOK0222AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungLoeschenNOK0229\PlanfeststellungLoeschenNOK0229AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungLoeschenNOOKAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungInitiieren0201;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungLoeschen0209;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisieren0302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisierenNOK0322\RaumordnungAktualisierenNOK0322AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschenNOK0329\RaumordnungLoeschenNOK0329AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungLoeschenNOOKAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedureCreated;
@@ -78,6 +85,8 @@ class XBeteiligungResponseMessageFactory
 
     protected GlobalConfigInterface $globalConfig;
 
+    protected XBeteiligungService $xBeteiligungService;
+
     public function __construct(
         LoggerInterface $dplanCockpitLogger
     ) {
@@ -98,24 +107,10 @@ class XBeteiligungResponseMessageFactory
         return $serializerBuilder->build();
     }
 
-    /**
-     * Attributes in top Tag.
-     */
-    public function setProductInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
-    {
-        $messageObject->setProdukt('DiPlan Cockpit'); // required
-        $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
-        $messageObject->setProduktversion('1.1'); // optional
-        $messageObject->setStandard(self::STANDARD); // required
-        $messageObject->setVersion('1.3'); // required
-
-        return $messageObject;
-    }
-
-    private function buildHeader(string $messageType, string $prefix)
+    private function buildHeader(string $messageType)
     {
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', $prefix);
+        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, $messageType);
         return $headerBuilder->build();
@@ -130,7 +125,7 @@ class XBeteiligungResponseMessageFactory
         $response = new ResponseValue();
         $messageClass->setNachrichtenkopfG2g($header);
         $messageClass->setNachrichteninhalt($contentClass);
-        $messageXml = $this->serializeData($messageClass);
+        $messageXml = $this->xBeteiligungService->serializeData($messageClass);
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($contentClass, $messageXml);
         $response->setPayload($messageXml);
         $response->lock();
@@ -167,9 +162,9 @@ class XBeteiligungResponseMessageFactory
     ): ResponseValue {
         try {
             $procedureCreated = $this->createProcedureCreated($procedure, $xmlObject);
-            $this->setProductInfo($messageClass);
+            $this->xBeteiligungService->setProductInfo($xmlObject);
+            $header = $this->buildHeader($messageType);
             $contentClass = new NachrichteninhaltTemplateOKType();
-            $header = $this->buildHeader($messageType, 'K1');
             $contentClass->setBeteiligungsID($procedureCreated->getProcedureId());
             $contentClass->setPlanID($procedureCreated->getPlanId());
             $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
@@ -195,8 +190,8 @@ class XBeteiligungResponseMessageFactory
             $procedureId = $procedure->getId();
             $planId = $xmlObject->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
             $instanceId = $xmlObject->getNachrichteninhalt()?->getVorgangsID();
-            $this->setProductInfo($messageClass);
-            $header = $this->buildHeader($messageType, 'K1');
+            $this->xBeteiligungService->setProductInfo($xmlObject);
+            $header = $this->buildHeader($messageType);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($procedureId);
             $contentClass->setPlanID($planId);
@@ -226,8 +221,8 @@ class XBeteiligungResponseMessageFactory
         string $messageType,
     ): ResponseValue {
         try {
-            $this->setProductInfo($messageClass);
-            $header = $this->buildHeader($messageType, 'K1');
+            $this->xBeteiligungService->setProductInfo($xmlObject);
+            $header = $this->buildHeader($messageType);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligungsID());
             $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getPlanID());
@@ -245,20 +240,75 @@ class XBeteiligungResponseMessageFactory
 
     /**
      * @param array $errorTypes
-     * @param KommunalInitiieren0401|KommunalAktualisieren0402|KommunalLoeschen0409|PlanfeststellungInitiieren0201|PlanfeststellungAktualisieren0202|PlanfeststellungLoeschen0209|RaumordnungInitiieren0301|RaumordnungAktualisieren0302|RaumordnungLoeschen0309 $xmlObject
+     * @param KommunalAktualisieren0402|PlanfeststellungAktualisieren0202|RaumordnungAktualisieren0302 $xmlObject
      * @param NachrichtG2GTypeType $messageClass
+     * @param KommunalAktualisierenNOOKAnonymousPHPType|RaumordnungAktualisierenNOOKAnonymousPHPType|PlanfeststellungAktualisierenNOOKAnonymousPHPType $contentClass
      * @param string $messageType
      * @return ResponseValue
      */
-    public function buildErrorResponse(
+    public function buildUpdateErrorResponse(
         array $errorTypes,
-        $xmlObject,
+        KommunalAktualisieren0402|PlanfeststellungAktualisieren0202|RaumordnungAktualisieren0302 $xmlObject,
         NachrichtG2GTypeType $messageClass,
+        KommunalAktualisierenNOOKAnonymousPHPType|RaumordnungAktualisierenNOOKAnonymousPHPType|PlanfeststellungAktualisierenNOOKAnonymousPHPType $contentClass,
         string $messageType
     ): ResponseValue {
-        $this->setProductInfo($messageClass);
-        $header = $this->buildHeader($messageType, 'K1');
-        $contentClass = new NachrichteninhaltTemplateNOKType();
+        $this->xBeteiligungService->setProductInfo($xmlObject);
+        $header = $this->buildHeader($messageType);
+        $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligung());
+        $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
+        $contentClass->setPlanID($xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID());
+        foreach ($errorTypes as $errorType) {
+            $contentClass->addToFehler($errorType);
+        }
+
+        return $this->setResponse($contentClass, $messageClass, $header);
+    }
+
+    /**
+     * @param array $errorTypes
+     * @param KommunalLoeschen0409|PlanfeststellungLoeschen0209|RaumordnungLoeschen0309 $xmlObject
+     * @param NachrichtG2GTypeType $messageClass
+     * @param KommunalLoeschenNOOKAnonymousPHPType|RaumordnungLoeschenNOOKAnonymousPHPType|PlanfeststellungLoeschenNOOKAnonymousPHPType $contentClass
+     * @param string $messageType
+     * @return ResponseValue
+     */
+    public function buildDeleteErrorResponse(
+        array $errorTypes,
+        KommunalLoeschen0409|PlanfeststellungLoeschen0209|RaumordnungLoeschen0309 $xmlObject,
+        NachrichtG2GTypeType $messageClass,
+        KommunalLoeschenNOOKAnonymousPHPType|RaumordnungLoeschenNOOKAnonymousPHPType|PlanfeststellungLoeschenNOOKAnonymousPHPType $contentClass,
+        string $messageType
+    ): ResponseValue {
+        $this->xBeteiligungService->setProductInfo($xmlObject);
+        $header = $this->buildHeader($messageType);
+        $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligungsID());
+        $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
+        $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getPlanID());
+        foreach ($errorTypes as $errorType) {
+            $contentClass->addToFehler($errorType);
+        }
+
+        return $this->setResponse($contentClass, $messageClass, $header);
+    }
+
+    /**
+     * @param array $errorTypes
+     * @param KommunalInitiieren0401|PlanfeststellungInitiieren0201|RaumordnungInitiieren0301 $xmlObject
+     * @param NachrichtG2GTypeType $messageClass
+     * @param NachrichteninhaltTemplateNOKType $contentClass
+     * @param string $messageType
+     * @return ResponseValue
+     */
+    public function buildCreateErrorResponse(
+        array $errorTypes,
+        KommunalInitiieren0401|PlanfeststellungInitiieren0201|RaumordnungInitiieren0301 $xmlObject,
+        NachrichtG2GTypeType $messageClass,
+        NachrichteninhaltTemplateNOKType $contentClass,
+        string $messageType
+    ): ResponseValue {
+        $this->xBeteiligungService->setProductInfo($xmlObject);
+        $header = $this->buildHeader($messageType);
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
         $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getBeteiligung()?->getPlanID());
         foreach ($errorTypes as $errorType) {
@@ -380,28 +430,13 @@ class XBeteiligungResponseMessageFactory
     {
         $headerBuilder
             // identifikation.nachricht => nachrichtenUUID
-            ->setMessageIdentificationUUID($this->uuid())
+            ->setMessageIdentificationUUID($this->xBeteiligungService->uuid())
             // identifikation.nachricht => nachrichtentyp => code
             ->setMessageIdentificationTypeCode($msgType)
             // identifikation.nachricht => erstellungszeitpunkt
             ->setCreationTime(new DateTime());
 
         return $headerBuilder;
-    }
-
-    public function serializeData($data): string
-    {
-        // Couldn't find the way to avoid CDATA directly with serializer method
-        $xml = $this->serializer->serialize($data, 'xml');
-        // This is needed to remove cdata from the xml message
-        $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-        $result = $xml->saveXML();
-
-        if (false === $result) {
-            $this->dplanCockpitLogger->error('Error on save serialized xml.', [$xml->asXML()]);
-        }
-
-        return $xml->asXML() ?? '';
     }
 
     /**
