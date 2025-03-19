@@ -1,0 +1,36 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeAktualisiertNOK0722\AllgemeinStellungnahmeAktualisiertNOK0722AnonymousPHPType\NachrichteninhaltAnonymousPHPType:
+    properties:
+        vorgangsID:
+            expose: true
+            access_type: public_method
+            serialized_name: vorgangsID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVorgangsID
+                setter: setVorgangsID
+            type: string
+        stellungnahmeID:
+            expose: true
+            access_type: public_method
+            serialized_name: stellungnahmeID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getStellungnahmeID
+                setter: setStellungnahmeID
+            type: string
+        fehler:
+            expose: true
+            access_type: public_method
+            serialized_name: fehler
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getFehler
+                setter: setFehler
+            xml_list:
+                inline: true
+                entry_name: fehler
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType>

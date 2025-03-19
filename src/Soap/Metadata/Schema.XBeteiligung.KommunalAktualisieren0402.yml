@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402:
+    xml_root_name: kommunal.Aktualisieren.0402
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

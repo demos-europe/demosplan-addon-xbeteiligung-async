@@ -1,0 +1,51 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\AbstractGMLTypeType:
+    properties:
+        id:
+            expose: true
+            access_type: public_method
+            serialized_name: id
+            accessor:
+                getter: getId
+                setter: setId
+            xml_attribute: true
+            type: string
+        description:
+            expose: true
+            access_type: public_method
+            serialized_name: description
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getDescription
+                setter: setDescription
+            type: string
+        descriptionReference:
+            expose: true
+            access_type: public_method
+            serialized_name: descriptionReference
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getDescriptionReference
+                setter: setDescriptionReference
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\DescriptionReference
+        identifier:
+            expose: true
+            access_type: public_method
+            serialized_name: identifier
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getIdentifier
+                setter: setIdentifier
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\Identifier
+        name:
+            expose: true
+            access_type: public_method
+            serialized_name: name
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getName
+                setter: setName
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\Name
