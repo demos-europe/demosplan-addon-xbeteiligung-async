@@ -11,10 +11,13 @@ use JMS\Serializer\SerializerBuilder;
 
 class SerializerFactory
 {
+    private const METADATA_DIR = __DIR__ . '/../Soap/Metadata';
+    private const NAMESPACE_PREFIX = 'DemosEurope\DemosplanAddon\XBeteiligung\Soap';
+
     public static function getSerializer(): Serializer
     {
         $serializerBuilder = SerializerBuilder::create();
-        $serializerBuilder->addMetadataDir(__DIR__ . '/../Soap/metadata', 'DemosEurope\DemosplanAddon\XBeteiligung\Soap');
+        $serializerBuilder->addMetadataDir(self::METADATA_DIR, self::NAMESPACE_PREFIX);
         $serializerBuilder->configureHandlers(static function (HandlerRegistryInterface $handler) use ($serializerBuilder) {
             $serializerBuilder->addDefaultHandlers();
             $handler->registerSubscribingHandler(new BaseTypesHandler()); // XMLSchema List handling
