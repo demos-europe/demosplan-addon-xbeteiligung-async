@@ -1,18 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisieren0202;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungInitiieren0201;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungLoeschen0209;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisieren0302;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiieren0301;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschen0409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschen0209;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\BaseTypesHandler;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\XmlSchemaDateHandler;
@@ -86,13 +96,9 @@ class XBeteiligungIncomingMessageParser
     }
 
     /**
-     * @template T of NachrichtG2GType
-     * @param string $messageType
-     * @param string $incomingMessage
-     * @return T
      * @throws SchemaException
      */
-    public function getXmlObject(string $messageType, string $incomingMessage): NachrichtG2GType
+    public function getXmlObject(string $messageType, string $incomingMessage): NachrichtG2GTypeType
     {
         if (!isset($this->messageTypeMapping[$messageType])) {
             throw new SchemaException("Invalid message type: $messageType");
@@ -149,15 +155,11 @@ class XBeteiligungIncomingMessageParser
     }
 
     /**
-     * @template T of NachrichtG2GType
-     * @param string $incomingMessage
-     * @param class-string<T> $className
-     * @return T
      * @throws SchemaException
      */
-    private function deserializeMessageWithCertainty(string $incomingMessage, string $className): NachrichtG2GType
+    private function deserializeMessageWithCertainty(string $incomingMessage, string $className): NachrichtG2GTypeType
     {
-        /** @var NachrichtG2GType $message */
+        /** @var NachrichtG2GTypeType $message */
         $message = $this->serializer->deserialize(
             $incomingMessage,
             $className,
