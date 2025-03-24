@@ -3,6 +3,8 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -10,14 +12,12 @@ use Symfony\Component\Routing\RouterInterface;
 
 class StatementCreator
 {
-    /**
-     * @var RouterInterface
-     * @readonly
-     */
-    private $router;
+    protected RouterInterface $router;
+    protected UserInterface $user;
+    protected ProcedureInterface $procedure;
     public function getStatementCreatedFromEvent(StatementCreatedEventInterface $event): StatementCreated
     {
-        $statementCreated = new StatementCreated();
+        $statementCreated = new StatementCreated($this->user, $this->procedure);
 
         $eventStatement = $event->getStatement();
 
@@ -47,7 +47,6 @@ class StatementCreator
         $statementCreated->setStatus($eventStatement->getStatus());
         $statementCreated->setTitle($eventStatement->getTitle());
         $statementCreated->setFeedback($eventStatement->getFeedback());
-        $statementCreated->setPolygon($eventStatement->getPolygon());
         $statementCreated->setPriority($eventStatement->getPriority());
         $statementCreated->setVotes($eventStatement->getVotes());
         $statementCreated->setTags($eventStatement->getTags());
