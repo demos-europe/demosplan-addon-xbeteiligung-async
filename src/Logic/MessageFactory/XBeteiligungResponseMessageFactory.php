@@ -7,10 +7,8 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeNeuabgegeben0701;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisierenNOK0422\KommunalAktualisierenNOK0422AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalAktualisierenNOOKAnonymousPHPType;
@@ -31,7 +29,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschenNOK03
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedureCreated;
-use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use Exception;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\BaseTypesHandler;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\XmlSchemaDateHandler;
@@ -39,14 +36,12 @@ use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
 use Psr\Log\LoggerInterface;
-use Ramsey\Uuid\Uuid;
-use const LIBXML_NOCDATA;
 
 class XBeteiligungResponseMessageFactory
 {
     public const XBETEILIGUNG_VERSION = 'V14';
-    public const STANDARD = 'XBeteiligung';
 
+    protected const K1 = 'K1';
     private const SCHEMALOCATION = 'xmlsn:xsi:schemaLocation';
     private const ERROR_TEXT = 'A Procedure with id';
     private array $messageTypeMapping = [
@@ -74,23 +69,20 @@ class XBeteiligungResponseMessageFactory
         ],
     ];
 
-    /**
-     * @var LoggerInterface
-     */
-    private $dplanCockpitLogger;
+    protected LoggerInterface $dplanCockpitLogger;
 
-
-    /** @var Serializer */
-    protected $serializer;
-
+    protected Serializer $serializer;
     protected GlobalConfigInterface $globalConfig;
-
     protected XBeteiligungService $xBeteiligungService;
 
     public function __construct(
-        LoggerInterface $dplanCockpitLogger
+        LoggerInterface $dplanCockpitLogger,
+        XBeteiligungService $xBeteiligungService,
+        GlobalConfigInterface $globalConfig,
     ) {
         $this->dplanCockpitLogger = $dplanCockpitLogger;
+        $this->xBeteiligungService = $xBeteiligungService;
+        $this->globalConfig = $globalConfig;
         $this->serializer = $this->getSerializerBuild();
     }
 
@@ -107,10 +99,13 @@ class XBeteiligungResponseMessageFactory
         return $serializerBuilder->build();
     }
 
-    private function buildHeader(string $messageType)
+    public function buildHeader(
+        string $messageType,
+        string $headerType,
+    )
     {
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
+        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', $headerType);
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, $messageType);
         return $headerBuilder->build();
@@ -132,28 +127,6 @@ class XBeteiligungResponseMessageFactory
 
         return $response;
     }
-
-    /**
-     * Builds a valid XBeteiligungsmessage as a response of creating a statement.
-     *
-     * @throws Exception
-     */
-    public function createBeteiligung2PlanungStellungnahmeNeu0701(StatementCreated $statementCreated): string
-    {
-        $message = new AllgemeinStellungnahmeNeuabgegeben0701();
-
-        $this->xBeteiligungService->setProductInfo($message);
-        $header = $this->buildHeader('0701', 'LGV');
-        $message->setNachrichtenkopfG2g($header);
-
-        $content = $this->createBeteiligung2PlanungStellungnahmeNeu0701Content($statementCreated);
-        $message->setNachrichteninhalt($content);
-
-        $messageXml = $this->xBeteiligungService->serializeData($message);
-
-        return $this->addNamespacesTo70xXML($messageXml);
-    }
-
     public function buildProcedureCreatedResponse(
         ProcedureInterface $procedure,
         KommunalInitiieren0401|RaumordnungInitiieren0301|PlanfeststellungInitiieren0201 $xmlObject,
@@ -163,7 +136,7 @@ class XBeteiligungResponseMessageFactory
         try {
             $procedureCreated = $this->createProcedureCreated($procedure, $xmlObject);
             $this->xBeteiligungService->setProductInfo($xmlObject);
-            $header = $this->buildHeader($messageType);
+            $header = $this->buildHeader($messageType, self::K1);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($procedureCreated->getProcedureId());
             $contentClass->setPlanID($procedureCreated->getPlanId());
@@ -191,7 +164,7 @@ class XBeteiligungResponseMessageFactory
             $planId = $xmlObject->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
             $instanceId = $xmlObject->getNachrichteninhalt()?->getVorgangsID();
             $this->xBeteiligungService->setProductInfo($xmlObject);
-            $header = $this->buildHeader($messageType);
+            $header = $this->buildHeader($messageType, self::K1);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($procedureId);
             $contentClass->setPlanID($planId);
@@ -222,7 +195,7 @@ class XBeteiligungResponseMessageFactory
     ): ResponseValue {
         try {
             $this->xBeteiligungService->setProductInfo($xmlObject);
-            $header = $this->buildHeader($messageType);
+            $header = $this->buildHeader($messageType, self::K1);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligungsID());
             $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getPlanID());
@@ -254,7 +227,7 @@ class XBeteiligungResponseMessageFactory
         string $messageType
     ): ResponseValue {
         $this->xBeteiligungService->setProductInfo($xmlObject);
-        $header = $this->buildHeader($messageType);
+        $header = $this->buildHeader($messageType, self::K1);
         $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligung());
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
         $contentClass->setPlanID($xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID());
@@ -281,7 +254,7 @@ class XBeteiligungResponseMessageFactory
         string $messageType
     ): ResponseValue {
         $this->xBeteiligungService->setProductInfo($xmlObject);
-        $header = $this->buildHeader($messageType);
+        $header = $this->buildHeader($messageType, self::K1);
         $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligungsID());
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
         $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getPlanID());
@@ -308,7 +281,7 @@ class XBeteiligungResponseMessageFactory
         string $messageType
     ): ResponseValue {
         $this->xBeteiligungService->setProductInfo($xmlObject);
-        $header = $this->buildHeader($messageType);
+        $header = $this->buildHeader($messageType, self::K1);
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
         $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getBeteiligung()?->getPlanID());
         foreach ($errorTypes as $errorType) {
@@ -341,35 +314,14 @@ class XBeteiligungResponseMessageFactory
         string $prefixName
     ): XBeteiligungMessageHeadG2GTypeBuilder
     {
-        $headerBuilder->setAgentAgencyIdentificationPrefixListVersionId('', $agentType)
-            // Reader => Behoerdenkennung => praefix
+        $headerBuilder->setAgentAgencyIdentificationPrefixListVersionId('3', $agentType)
             ->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
             ->setAgentAgencyIdentificationPrefixName($prefixName, $agentType)
-            // Reader => Behoerdenkennung => Kennung
-            ->setAgentAgencyIdentificationLabelListURI('', $agentType)
-            ->setAgentAgencyIdentificationLabelListVersionID('', $agentType)
-            ->setAgentAgencyIdentificationLabelCode('0200', $agentType)
-            ->setAgentAgencyIdentificationLabelName($prefixName, $agentType)
-            ->setAgentAgencyName('BSW Hamburg', $agentType)
-            // Reader => Erreichbarkeit[0] (Contact[0]) => Kennung (Label)
+            ->setAgentAgencyIdentificationLabelListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst', $agentType)
             ->setAgentContactChannelCode('01', $agentType)
-            ->setAgentContactChannelName('E-Mail', $agentType)
+            ->setAgentContactChannelListVersion('3', $agentType)
             ->setAgentContactLabel('info@gv.hamburg.de', $agentType)
-            ->setAgentAddition('', $agentType)
-            ->setAgentAddressBuildingNumber('19', $agentType)
-            ->setAgentAddressBuildingAdditionalLetter('b', $agentType)
-            ->setAgentAddressBuildingZipcode('21109', $agentType)
-            ->setAgentAddressBuildingFloorNumber('3', $agentType)
-            ->setAgentAddressStreet('Neuenfelder Straße', $agentType)
-            ->setAgentAddressBuildingApartmentNumber('4', $agentType)
-            ->setAgentAddressMunicipal('Freie und Hansestadt Hamburg', $agentType)
-            ->setAgentMunicipalPreviousCorporation('', $agentType)
-            ->setAgentApartmentOwner('', $agentType)
-            ->setAgentAddressBuildingAdditionalInfo('Hinterhaus', $agentType)
-            // Reader => Anschrift => Gebaude => Hausnummer.bis
-            ->setAgentAddressBuildingNumberBis('22', $agentType)
-            ->setAgentAddressBuildingAdditionalLetterBis('c', $agentType)
-            ->setAgentAddressBuildingApartmentNumberBis('3', $agentType);
+            ->setAgentAddition('', $agentType);
 
         return $headerBuilder;
     }
@@ -383,40 +335,16 @@ class XBeteiligungResponseMessageFactory
     ): XBeteiligungMessageHeadG2GTypeBuilder
     {
         $headerBuilder
-            // Autor => Behoerdenkennung => Prefix
-            ->setAgentAgencyIdentificationPrefixListVersionId('', $agentType)
-            //->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
-            ->setAgentAgencyIdentificationPrefixName('DEMOS plan GmbH', $agentType)
-            // Autor => Behoerdenkennung => Kennung (Label)
-            ->setAgentAgencyIdentificationLabelListURI('', $agentType)
-            ->setAgentAgencyIdentificationLabelListVersionID('', $agentType)
-            ->setAgentAgencyIdentificationLabelCode('0400', $agentType)
-            ->setAgentAgencyIdentificationLabelName('', $agentType)
-
-            // Autor => Erreichbarkeit[0] (Contact[0]) => Kennung (Label)
+            ->setAgentAgencyIdentificationPrefixListVersionId('3', $agentType)
+            ->setAgentAgencyIdentificationPrefixCode('DEMOS plan GmbH', $agentType)
+            ->setAgentAgencyIdentificationLabelListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst', $agentType)
             ->setAgentContactChannelCode('02', $agentType)
-            ->setAgentContactChannelName('Telefon', $agentType)
+            ->setAgentContactChannelListVersion('3', $agentType)
             ->setAgentContactLabel('0049 40 22 86 73 57 0', $agentType)
             ->setAgentAddition('', $agentType)
-            // Autor => Erreichbarkeit[1] (Contact[1) => Kennung (Label, $agentType)
             ->setAgentContactChannelCode('01', $agentType, 1)
-            ->setAgentContactChannelName('E-Mail', $agentType, 1)
-            ->setAgentContactLabel('officehamburg@demos-international.com', $agentType, 1)
-            // Autor => Anschrift => Gebaude
-            ->setAgentAddressBuildingNumber('43', $agentType)
-            ->setAgentAddressBuildingAdditionalLetter('', $agentType)
-            ->setAgentAddressBuildingZipcode('22769', $agentType)
-            ->setAgentAddressBuildingFloorNumber('', $agentType)
-            ->setAgentAddressStreet('Eifflerstraße', $agentType)
-            ->setAgentAddressBuildingApartmentNumber('4', $agentType)
-            //->setAgentAddressMunicipal('Freie und Hansestadt Hamburg', $agentType)
-            ->setAgentMunicipalPreviousCorporation('', $agentType)
-            ->setAgentApartmentOwner('', $agentType)
-            ->setAgentAddressBuildingAdditionalInfo('', $agentType)
-            // Autor => Anschrift => Gebaude => Hausnummer.bis
-            ->setAgentAddressBuildingNumberBis('', $agentType)
-            ->setAgentAddressBuildingAdditionalLetterBis('', $agentType)
-            ->setAgentAddressBuildingApartmentNumberBis('', $agentType);
+            ->setAgentContactChannelListVersion('3', $agentType)
+            ->setAgentContactLabel('officehamburg@demos-international.com', $agentType, 1);
 
         return $headerBuilder;
     }
@@ -463,36 +391,6 @@ class XBeteiligungResponseMessageFactory
         }
 
         return $simpleXML->asXML();
-    }
-
-    private function addNamespacesTo70xXML(string $xml): string
-    {
-        $simpleXML = simplexml_load_string($xml);
-
-        $simpleXML->addAttribute('xmlns:xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        $simpleXML->addAttribute('xmlns:xmlns:gml', 'http://www.opengis.net/gml/3.2');
-
-        $result = $simpleXML->asXML();
-        if (!is_string($result)) {
-            $this->dplanCockpitLogger->error('Failed to add namespaces to XML.');
-            throw new NamespaceAdditionException('Failed to add namespaces');
-        }
-
-        return $result;
-    }
-
-    public function uuid(): string
-    {
-        $uuid = '';
-        $tryAgain = true;
-        while ($tryAgain) {
-            $uuid = Uuid::uuid4()->toString();
-            if (0 !== preg_match('/[A-Za-z]/', $uuid[0])) {
-                $tryAgain = false;
-            }
-        }
-
-        return $uuid;
     }
 
 }
