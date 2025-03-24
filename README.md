@@ -46,6 +46,7 @@ add `xbeteiligung:` as prefix to xml_root_name in
 `schema.PlanfeststellungAktualisieren0202.yml`,
 `schema.PlanfeststellungInitiieren0201.yml`,
 `schema.PlanfeststellungLoeschen0209.yml`,
+`schema.AllgemeinStellungnahmeNeuabgegeben0701.yml`,
 
 Example - xml_root_name: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
 Add the Following to Schemas:
