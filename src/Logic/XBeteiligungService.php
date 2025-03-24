@@ -244,7 +244,7 @@ class XBeteiligungService
         private readonly KommunaleProcedureCreater           $kommunaleProcedureCreater,
         private readonly StatementCreator                    $statementCreator,
     ) {
-        $this->serializer = (new SerializerFactory)->getSerializer();
+        $this->serializer = SerializerFactory::getSerializer();
     }
 
     /**
@@ -357,7 +357,7 @@ class XBeteiligungService
     {
         $messageObject->setProdukt('DiPlan Cockpit'); // required
         $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
-        $messageObject->setProduktversion('1.1'); // optional
+        $messageObject->setProduktversion('1.3'); // optional
         $messageObject->setStandard(self::STANDARD); // required
         $messageObject->setVersion('1.3'); // required
 
@@ -1045,7 +1045,7 @@ class XBeteiligungService
     public function serializeData($data): string
     {
         // Serialize the data to XML with a custom root name
-        $xml =  $this->serializer->serialize($data, 'xml');
+        $xml = $this->serializer->serialize($data, 'xml');
         $this->logger->debug('Serialized XML:', [$xml]);
 
         // Load the XML string into a SimpleXMLElement object
