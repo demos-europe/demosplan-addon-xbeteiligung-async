@@ -6,6 +6,7 @@ use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
@@ -17,6 +18,10 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,11 +35,6 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class MockFactoryTest extends TestCase
 {
     private ProcedureInterface|MockObject|null $procedure;
-
-    public function createNewMock(string $className): MockObject
-    {
-        return $this->createMock($className);
-    }
 
     public function getTranslatorMock(): MockObject|Translator
     {
@@ -51,9 +51,19 @@ class MockFactoryTest extends TestCase
         return $this->createMock(TransactionServiceInterface::class);
     }
 
-    public function getStatementCreatorMock(): StatementCreator
+    public function getKommunaleResponseMessageFactory()
     {
-        return $this->createMock(StatementCreator::class);
+        return $this->createMock(KommunaleMessageFactory::class);
+    }
+
+    public function getPlanfeststellungResponseMessageFactory()
+    {
+        return $this->createMock(PlanfeststellungMessageFactory::class);
+    }
+
+    public function getRaumordnungResponseMessageFactory()
+    {
+        return $this->createMock(RaumordnungMessageFactory::class);
     }
 
     public function getProcedureMock(): MockObject|ProcedureInterface
@@ -76,35 +86,6 @@ class MockFactoryTest extends TestCase
         return $this->createMock(UserHandlerInterface::class);
     }
 
-    public function getTranslatorInterfaceMock(): TranslatorInterface
-    {
-        return $this->createMock(TranslatorInterface::class);
-    }
-
-    public function getUser1(string $cockpitUserId = ''): UserInterface
-    {
-        $userMock = $this->createMock(UserInterface::class);
-        $userMock->method('getId')->willReturnCallback(
-            function () use ($cockpitUserId): string
-            {
-                return '' === $cockpitUserId ? 'a2780f23-160b-4a8b-a48b-f9351dc1bc24' : $cockpitUserId;
-            }
-        );
-        $userMock->method('getOrga')->willReturn($this->getOrgaMock());
-        $userMock->method('getOrganisationId')->willReturn('a2734f23-175b-4a8b-a48b-f9351dc1bc24');
-        $userMock->method('getEmail')->willReturn('user1@test.de');
-        $userMock->method('getLogin')->willReturn('FHHNET\\ZinkDav');
-        $userMock->method('getLastname')->willReturn('Tester user1');
-        $userMock->method('getFirstname')->willReturn('another FP');
-        $userMock->method('getNewsletter')->willReturn(false);
-        $userMock->method('getNoPiwik')->willReturn(true);
-        $userMock->method('getForumNotification')->willReturn(false);
-        $userMock->method('getDplanroles')->willReturn(new ArrayCollection([$this->getRoleFP()]));
-        $userMock->method('getCurrentCustomer')->willReturn($this->getCustomerMock());
-
-        return $userMock;
-    }
-
     public function getOrgaMock()
     {
         $orga = $this->createMock(OrgaInterface::class);
@@ -112,32 +93,6 @@ class MockFactoryTest extends TestCase
         $orga->method('getName')->willReturn('Test Orga');
 
         return $orga;
-    }
-
-    public function getRoleFP(): RoleInterface
-    {
-        $role = $this->createMock(RoleInterface::class);
-        $role->method('getName')->willReturn('Fachplaner-Admin');
-        $role->method('getCode')->willReturn(RoleInterface::PLANNING_AGENCY_ADMIN);
-        $role->method('getGroupCode')->willReturn(RoleInterface::GLAUTH);
-        $role->method('getGroupName')->willReturn('Kommune');
-
-        return $role;
-    }
-
-    public function getCustomerMock(): CustomerInterface
-    {
-        $customerMock = $this->createMock(CustomerInterface::class);
-        $customerMock->method('getId')->willReturn('1');
-        $customerMock->method('getName')->willReturn('Test Customer');
-
-        return $customerMock;
-    }
-
-    public function getKommunaleProcedureCreatorMock(): KommunaleProcedureCreater
-    {
-        return $this->createMock(KommunaleProcedureCreater::class);
-
     }
 
     public function getProcedureType(): MockObject|ProcedureTypeInterface
@@ -204,15 +159,6 @@ class MockFactoryTest extends TestCase
         );
 
         return $procedureServiceInterfaceMock;
-    }
-
-    public function getProcedureTypeServiceInterfaceMock(): ProcedureTypeServiceInterface
-    {
-        $procedureTypeServiceInterfaceMock = $this->createMock(ProcedureTypeServiceInterface::class);
-        $procedureTypeServiceInterfaceMock->method('getProcedureTypeByName')
-            ->willReturn($this->getProcedureType());
-
-        return $procedureTypeServiceInterfaceMock;
     }
 
     public function getEntityManagerMock(): EntityManagerInterface|MockObject
