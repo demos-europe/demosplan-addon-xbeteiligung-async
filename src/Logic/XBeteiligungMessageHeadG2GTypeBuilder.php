@@ -109,7 +109,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      */
     public function setAgentAgencyIdentificationPrefixCode($code, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()?->getPraefix()?->setCode($code);
+        $this->getAgent($agentType)->getVerzeichnisdienst()?->setCode($code);
 
         return $this;
     }
@@ -121,19 +121,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      */
     public function setAgentAgencyIdentificationPrefixName($name, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()?->getPraefix()?->setName($name);
-
-        return $this;
-    }
-
-    /**
-     * @param $code
-     *
-     * @return $this
-     */
-    public function setAgentAgencyIdentificationLabelCode($code, string $agentType): static
-    {
-        $this->getAgent($agentType)->getBehoerdenkennung()?->getKennung()?->setCode($code);
+        $this->getAgent($agentType)->setName($name);
 
         return $this;
     }
@@ -155,17 +143,17 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     }
 
     /**
-     * @param $name
+     * @param $listVersion
      * @param int $index
      *
      * @return $this
      */
-    public function setAgentContactChannelName($name, string $agentType, int $index = 0): static
+    public function setAgentContactChannelListVersion($listVersion, string $agentType, int $index = 0): static
     {
         if (!isset($this->getAgent($agentType)->getErreichbarkeit()[$index])) {
             $this->newAgentKommunikationType($index, $agentType);
         }
-        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()?->setName($name);
+        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()?->setListVersionID($listVersion);
 
         return $this;
     }
@@ -187,133 +175,13 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     }
 
     /**
-     * @param $number
-     *
-     * @return $this
-     */
-    public function setAgentAddressBuildingNumber($number, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setHausnummer($number);
-
-        return $this;
-    }
-
-    /**
-     * @param $zipcode
-     *
-     * @return $this
-     */
-    public function setAgentAddressBuildingZipcode($zipcode, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setPostleitzahl($zipcode);
-
-        return $this;
-    }
-
-    /**
-     * @param $street
-     *
-     * @return $this
-     */
-    public function setAgentAddressStreet($street, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setStrasse($street);
-
-        return $this;
-    }
-
-    /**
-     * @param $municipal
-     *
-     * @return $this
-     */
-    public function setAgentAddressMunicipal($municipal, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setWohnort($municipal);
-
-        return $this;
-    }
-
-    /**
-     * @param $name
-     *
-     * @return $this
-     */
-    public function setAgentAgencyName($name, string $agentType): static
-    {
-        $this->getAgent($agentType)->setBehoerdenname($name);
-
-        return $this;
-    }
-
-    /**
-     * @param $letter
-     *
-     * @return $this
-     */
-    public function setAgentAddressBuildingAdditionalLetter($letter, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setHausnummerBuchstabeZusatzziffer($letter);
-
-        return $this;
-    }
-
-    /**
-     * @param $number
-     *
-     * @return $this
-     */
-    public function setAgentAddressBuildingApartmentNumber($number, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setTeilnummerDerHausnummer($number);
-
-        return $this;
-    }
-
-    /**
-     * @param $number
-     *
-     * @return $this
-     */
-    public function setAgentAddressBuildingFloorNumber($number, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setStockwerkswohnungsnummer($number);
-
-        return $this;
-    }
-
-    /**
-     * @param $info
-     *
-     * @return $this
-     */
-    public function setAgentAddressBuildingAdditionalInfo($info, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setZusatzangaben($info);
-
-        return $this;
-    }
-
-    /**
      * @param $versionId
      *
      * @return $this
      */
     public function setAgentAgencyIdentificationPrefixListVersionId($versionId, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()?->getPraefix()?->setCode($versionId);
-
-        return $this;
-    }
-
-    /**
-     * @param $versionId
-     *
-     * @return $this
-     */
-    public function setAgentAgencyIdentificationLabelListVersionID($versionId, string $agentType): static
-    {
-        $this->getAgent($agentType)->getBehoerdenkennung()?->getKennung()?->setCode($versionId);
+        $this->getAgent($agentType)->getVerzeichnisdienst()?->setListVersionID($versionId);
 
         return $this;
     }
@@ -325,19 +193,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
      */
     public function setAgentAgencyIdentificationLabelListURI($uri, string $agentType): static
     {
-        $this->getAgent($agentType)->getBehoerdenkennung()?->getKennung()?->setCode($uri);
-
-        return $this;
-    }
-
-    /**
-     * @param $name
-     *
-     * @return $this
-     */
-    public function setAgentAgencyIdentificationLabelName($name, string $agentType): static
-    {
-        $this->getAgent($agentType)->getBehoerdenkennung()?->getKennung()?->setName($name);
+        $this->getAgent($agentType)->getVerzeichnisdienst()?->setListURI($uri);
 
         return $this;
     }
@@ -356,42 +212,6 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     }
 
     /**
-     * @param $number
-     *
-     * @return $this
-     */
-    public function setAgentAddressBuildingNumberBis($number, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->getHausnummernBis()?->setHausnummerBis($number);
-
-        return $this;
-    }
-
-    /**
-     * @param $letter
-     *
-     * @return $this
-     */
-    public function setAgentAddressBuildingAdditionalLetterBis($letter, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->getHausnummernBis()?->setHausnummerbuchstabezusatzzifferBis($letter);
-
-        return $this;
-    }
-
-    /**
-     * @param $number
-     *
-     * @return $this
-     */
-    public function setAgentAddressBuildingApartmentNumberBis($number, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->getHausnummernBis()?->setTeilnummerderhausnummerBis($number);
-
-        return $this;
-    }
-
-    /**
      * Initializes new Author CommmunicationType.
      *
      * @param $index
@@ -400,7 +220,7 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     {
         $authorCommunicationTypes = $this->getAgent($agentType)->getErreichbarkeit();
         $communicationType = new KommunikationTypeType();
-        $communicationType->setKanal(new CodeErreichbarkeitTypeType());
+        $communicationType->setKanal(new CodeKommunikationKanalTypeType());
         $authorCommunicationTypes[$index] = $communicationType;
         $this->getAgent($agentType)->setErreichbarkeit($authorCommunicationTypes);
     }
@@ -413,26 +233,4 @@ class XBeteiligungMessageHeadG2GTypeBuilder
         return 'reader' === $agentType ? $this->head->getLeser() : $this->head->getAutor();
     }
 
-    /**
-     * @return $this
-     */
-    public function setAgentApartmentOwner(string $owner, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setWohnungsinhaber($owner);
-
-        return $this;
-    }
-
-    /**
-     * @param $corporation
-     * @param string $agentType - reader|author
-     *
-     * @return $this
-     */
-    public function setAgentMunicipalPreviousCorporation($corporation, string $agentType): static
-    {
-        $this->getAgent($agentType)->getAnschrift()?->getGebaeude()?->setWohnortFruehererGemeindename($corporation);
-
-        return $this;
-    }
 }
