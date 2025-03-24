@@ -3,20 +3,10 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\ValueObject;
 
 use DateTime;
-use DemosEurope\DemosplanAddon\Contracts\Entities\CountyInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\GdprConsentInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\MunicipalityInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\OriginalStatementAnonymizationInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\PriorityAreaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\SingleDocumentInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementAttachmentInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\StatementVersionFieldInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\StatementVoteInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use Doctrine\Common\Collections\Collection;
 
 class StatementAction extends ValueObject
@@ -24,41 +14,35 @@ class StatementAction extends ValueObject
     protected string $publicId;
     protected string $description;
     protected string $planId;
-    protected ProcedureInterface $procedure;
     protected string $procedureName;
     protected string $procedureId;
+    protected ProcedureInterface $procedure;
     protected DateTime $createdAt;
     protected string $plannerDetailViewUrl;
-    protected string $phaseKey;
+    protected string $phaseKey = '';
     protected bool $publicUseName = false;
     protected string $priority;
-    protected OrgaInterface $organization;
     protected string $organizationName;
-    protected string $departmentName;
     protected string $phase;
     protected string $status;
     protected string $title;
-    protected string $text;
     protected string $feedback;
     protected  string $file;
-    protected string $mapFile;
-    protected SingleDocumentInterface $document;
-    protected ElementsInterface $element;
-    protected string $polygon = '';
-    protected StatementMetaInterface $meta;
-    protected StatementVersionFieldInterface $version;
-    /**
-     * @var Collection<int,StatementVoteInterface>
-     */
     protected Collection $votes;
-    protected Collection $tags;
-    protected array $files;
-    protected string $publicStatement;
+    protected array $tags;
+    protected string $publicStatement = '';
+    protected UserInterface $user;
 
     /**
      * @var Collection<int, StatementAttachmentInterface>
      */
     protected Collection $attachments;
+
+    public function __construct(UserInterface $user, ProcedureInterface $procedure)
+    {
+        $this->user = $user;
+        $this->procedure = $procedure;
+    }
 
 
     public function getPublicId(): string
@@ -81,16 +65,6 @@ class StatementAction extends ValueObject
         $this->description = $description;
     }
 
-    public function getProcedure(): ProcedureInterface
-    {
-        return $this->procedure;
-    }
-
-    public function setProcedure(ProcedureInterface $procedure): void
-    {
-        $this->procedure = $procedure;
-    }
-
     public function getProcedureId(): string
     {
         return $this->procedureId;
@@ -99,6 +73,11 @@ class StatementAction extends ValueObject
     public function setProcedureId(string $procedureId): void
     {
         $this->procedureId = $procedureId;
+    }
+
+    public function getProcedure(): ProcedureInterface
+    {
+        return $this->procedure;
     }
 
     public function getPlanId(): string
@@ -111,7 +90,7 @@ class StatementAction extends ValueObject
         $this->planId = $planId;
     }
 
-    public function getPublicUseName(): bool
+    public function getPublicUseName(): string
     {
         return $this->publicUseName ? 'anonym' : 'namentlich';
     }
@@ -119,11 +98,6 @@ class StatementAction extends ValueObject
     public function setPublicUseName(bool $publicUseName): void
     {
         $this->publicUseName = $publicUseName;
-    }
-
-    public function getProcedureName(): string
-    {
-        return $this->procedureName;
     }
 
     public function setProcedureName(string $procedureName): void
@@ -139,11 +113,6 @@ class StatementAction extends ValueObject
     public function setCreatedAt(DateTime $createdAt): void
     {
         $this->createdAt = $createdAt;
-    }
-
-    public function getPlannerDetailViewUrl(): string
-    {
-        return $this->plannerDetailViewUrl;
     }
 
     public function setPlannerDetailViewUrl(string $plannerDetailViewUrl): void
@@ -169,16 +138,6 @@ class StatementAction extends ValueObject
     public function setPriority(string $priority): void
     {
         $this->priority = $priority;
-    }
-
-    public function getOrganization(): OrgaInterface
-    {
-        return $this->organization;
-    }
-
-    public function setOrganization(OrgaInterface $organization): void
-    {
-        $this->organization = $organization;
     }
 
     public function getPhase(): string
@@ -211,16 +170,6 @@ class StatementAction extends ValueObject
         $this->title = $title;
     }
 
-    public function getText(): string
-    {
-        return $this->text;
-    }
-
-    public function setText(string $text): void
-    {
-        $this->text = $text;
-    }
-
     public function getFeedback(): string
     {
         return $this->feedback;
@@ -241,36 +190,6 @@ class StatementAction extends ValueObject
         $this->file = $file;
     }
 
-    public function getDocument(): SingleDocumentInterface
-    {
-        return $this->document;
-    }
-
-    public function setDocument(SingleDocumentInterface $document): void
-    {
-        $this->document = $document;
-    }
-
-    public function getElement(): ElementsInterface
-    {
-        return $this->element;
-    }
-
-    public function setElement(ElementsInterface $element): void
-    {
-        $this->element = $element;
-    }
-
-    public function getPolygon(): string
-    {
-        return $this->polygon;
-    }
-
-    public function setPolygon(string $polygon): void
-    {
-        $this->polygon = $polygon;
-    }
-
     public function getPublicStatement(): string
     {
         return $this->publicStatement;
@@ -279,26 +198,6 @@ class StatementAction extends ValueObject
     public function setPublicStatement(string $publicStatement): void
     {
         $this->publicStatement = $publicStatement;
-    }
-
-    public function getMeta(): StatementMetaInterface
-    {
-        return $this->meta;
-    }
-
-    public function setMeta(StatementMetaInterface $meta): void
-    {
-        $this->meta = $meta;
-    }
-
-    public function getVersion(): StatementVersionFieldInterface
-    {
-        return $this->version;
-    }
-
-    public function setVersion(StatementVersionFieldInterface $version): void
-    {
-        $this->version = $version;
     }
 
     public function getVotes(): Collection
@@ -311,52 +210,85 @@ class StatementAction extends ValueObject
         $this->votes = $votes;
     }
 
-    public function getTags(): Collection
+    public function getTags(): array
     {
         return $this->tags;
     }
 
-    public function setTags(Collection $tags): void
+    public function setTags($tags=[]): void
     {
         $this->tags = $tags;
     }
 
-    public function getFiles(): array
+    public function getUser(): UserInterface
     {
-        return $this->files;
+        return $this->user;
     }
 
-    public function setFiles(array $files): void
-    {
-        $this->files = $files;
-    }
-
-    /*
-     * Verfahrenteilschritt
-     * verfahrenteilschritt:
-     * 'Frühzeitige Beteiligung der Behörden und TöB'  => '0300',
-       'Frühzeitige Öffentlichkeitsbeteiligung'        => '0600',
-       'Beteiligung der Behörden und TöB'              => '0800',
-       'Öffentlichkeitsbeteiligung'                    => '1200',
-       'kein VS'                                       => '9998',
+    /**
+     * Frühzeitige Beteiligung der Behörden und TöB => 0300
+     * Frühzeitige Öffentlichkeitsbeteiligung       => 0600
+     * Beteiligung der Behörden und TöB             => 0800
+     * Öffentlichkeitsbeteiligung                   => 1200
+     * kein VS                                      => 9998
      */
 
-    /*
-     * Verfahrenschritt
-     * 'Vorplanung'                                    => '0000',
-       'Einleitungsphase'                              => '1000',
-       'Frühzeitige Behördenbeteiligung'               => '2000',
-       'Aufstellungsbeschluss'                         => '3000',
-       'Einleitungszustimmung'                         => '3600',
-       'Frühzeitige Öffentlichkeitsbeteiligung'        => '4000',
-       'Beteiligung der Träger öffentlicher Belange'   => '5000',
-       'Digitale Veröffentlichung'                     => '6000',
-       'Feststellungsverfahren'                        => '7000',
-       'Schlussphase'                                  => '8000',
-       'kein VS'                                       => '9998',
+    public static function mapPartPhaseKey($phaseKey, $publicStatement): ?string
+    {
+        $mappedPartPhaseCode = '9998';
+        if ($publicStatement === StatementInterface::INTERNAL) {
+            switch ($phaseKey) {
+                case 'earlyparticipation': // Frühzeitige Behördenbeteiligung
+                case 'participation':
+                    $mappedPartPhaseCode = '0300';
+                    break;
+                case 'anotherparticipation': // Beteiligung der Behörden und TöB
+                    $mappedPartPhaseCode = '0800';
+                    break;
+                default:
+                    $mappedPartPhaseCode = '9998';
+            }
+        } elseif ($publicStatement === StatementInterface::EXTERNAL) {
+            switch ($phaseKey) {
+                case 'earlyparticipation': // Frühzeitige Öffentlichkeitsbeteiligung
+                    $mappedPartPhaseCode = '0600';
+                    break;
+                case 'anotherparticipation': // Öffentlichkeitsbeteiligung
+                case 'participation':
+                    $mappedPartPhaseCode = '1200';
+                    break;
+                default:
+                    $mappedPartPhaseCode = '9998';
+            }
+        }
+
+        return $mappedPartPhaseCode;
+    }
+
+    /**
+     *  'Frühzeitige Beteiligung der Behörden und TöB'  => '0300',
+     *  'Frühzeitige Öffentlichkeitsbeteiligung'        => '0600',
+     *  'Beteiligung der Behörden und TöB'              => '0800',
+     *  'Öffentlichkeitsbeteiligung'                    => '1200',
+     *  'kein VS'                                       => '9998',
+     */
+
+    /**
+     *  'Vorplanung'                                    => '0000',
+     *  'Einleitungsphase'                              => '1000',
+     *  'Frühzeitige Behördenbeteiligung'               => '2000',
+     *  'Aufstellungsbeschluss'                         => '3000',
+     *  'Einleitungszustimmung'                         => '3600',
+     *  'Frühzeitige Öffentlichkeitsbeteiligung'        => '4000',
+     *  'Beteiligung der Träger öffentlicher Belange'   => '5000',
+     *  'Digitale Veröffentlichung'                     => '6000',
+     *  'Feststellungsverfahren'                        => '7000',
+     *  'Schlussphase'                                  => '8000',
+     *  'kein VS'                                       => '9998',
      */
     public static function mapPhaseKeyKommunale($phaseKey, $publicStatement): ?string
     {
+        $mappedPhaseCode = '';
         if ($publicStatement === StatementInterface::INTERNAL) {
             switch ($phaseKey) {
                 case 'configuration': // Einleitungsphase
@@ -369,8 +301,6 @@ class StatementAction extends ValueObject
                 case 'participation':
                     $mappedPhaseCode = '5000';
                     break;
-                default:
-                    $mappedPhaseCode = '';
             }
         } elseif ($publicStatement === StatementInterface::EXTERNAL) {
             switch ($phaseKey) {
@@ -390,35 +320,6 @@ class StatementAction extends ValueObject
         }
 
         return $mappedPhaseCode;
-    }
-
-    public static function mapPartPhaseKeyKommunale($phaseKey, $publicStatement): ?string
-    {
-        if ($publicStatement === StatementInterface::INTERNAL) {
-            switch ($phaseKey) {
-                case 'earlyparticipation': // Frühzeitige Behördenbeteiligung
-                case 'anotherparticipation': // Beteiligung der Behörden und TöB
-                case 'participation':
-                    $mappedPartPhaseCode = '0300';
-                    break;
-                default:
-                    $mappedPartPhaseCode = '';
-            }
-        } elseif ($publicStatement === StatementInterface::EXTERNAL) {
-            switch ($phaseKey) {
-                case 'earlyparticipation': // Frühzeitige Öffentlichkeitsbeteiligung
-                    $mappedPartPhaseCode = '0600';
-                    break;
-                case 'anotherparticipation': // Öffentlichkeitsbeteiligung
-                case 'participation':
-                $mappedPartPhaseCode = '1200';
-                    break;
-                default:
-                    $mappedPartPhaseCode = '';
-            }
-        }
-
-        return $mappedPartPhaseCode;
     }
 
     /**
@@ -445,7 +346,7 @@ class StatementAction extends ValueObject
     {
         switch ($phaseKey) {
             case 'configuration': // Konfiguration TöB Konfiguration betroffene Öffentlichkeit
-                $mappedPhaseCode = '0000'; // ?
+                $mappedPhaseCode = '0000';
                 break;
             case 'earlyparticipation': // Frühzeitige Beteiligung Öffentlichkeit
                 $mappedPhaseCode = '0600';
@@ -453,10 +354,8 @@ class StatementAction extends ValueObject
             case 'participation': // Öffentlichkeitsbeteiligung
                 $mappedPhaseCode = '1200';
                 break;
-            case 'discussiondate': //
-                $mappedPhaseCode =  '0200';
-                break;
-            case 'renewparticipation': //
+            case 'discussiondate':
+            case 'renewparticipation':
                 $mappedPhaseCode =  '0200';
                 break;
             default:
@@ -466,7 +365,7 @@ class StatementAction extends ValueObject
         return $mappedPhaseCode;
     }
 
-    /*
+    /**
      * 'kein VS' => '9998',
      */
     public static function mapPhaseKeyPlanfeststellung($phaseKey): ?string
@@ -475,19 +374,19 @@ class StatementAction extends ValueObject
             case 'configuration': // Konfiguration = Vorplanung
                 $mappedPhaseCode = '0000';
                 break;
-            case 'affectedmunicipalities': // Frühzeitige Beteiligung Öffentlichkeit
+            case 'affectedmunicipalities':
                 $mappedPhaseCode = '0600';
                 break;
-            case 'consultation': // Öffentlichkeitsbeteiligung
+            case 'consultation':
                 $mappedPhaseCode = '1200';
                 break;
-            case 'replayevaluating': // Grobabstimmung
+            case 'replayevaluating':
                 $mappedPhaseCode =  '0200';
                 break;
-            case 'discussionmeeting': // Grobabstimmung
+            case 'discussionmeeting':
                 $mappedPhaseCode =  '0200';
                 break;
-            case 'reconsultation': // Grobabstimmung
+            case 'reconsultation':
                 $mappedPhaseCode =  '0200';
                 break;
             default:
@@ -497,13 +396,13 @@ class StatementAction extends ValueObject
         return $mappedPhaseCode;
     }
 
-    public function getPhaseCodeKommunale(): ?string
+    public function getPhaseCodeKommunale($phaseKey, $publicStatement): ?string
     {
-        return self::mapPhaseKeyKommunale($this->phaseKey, $this->getPublicStatement());
+        return self::mapPhaseKeyKommunale($phaseKey, $publicStatement);
     }
-    public function getPartPhaseCodeKommunale(): ?string
+    public function getPartPhaseCode($publicStatement): ?string
     {
-        return self::mapPartPhaseKeyKommunale($this->phaseKey, $this->getPublicStatement());
+        return self::mapPartPhaseKey($this->phaseKey, $publicStatement);
     }
 
     public function getPhaseCodeRaumordnung(): ?string
