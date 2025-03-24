@@ -2,6 +2,10 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ProcedureMessageTyp;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinerNameType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeNeuabgegeben0701;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeNeuabgegeben0701\AllgemeinStellungnahmeNeuabgegeben0701AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungPlanfeststellungType;
@@ -15,14 +19,11 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKom
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensteilschrittType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBauMimeTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\GeoreferenzierungType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\MetadatenAnlageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameNatuerlichePersonType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\VerfasserType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
+use Exception;
 use JsonException;
 
 class StatementMessageFactory extends XBeteiligungResponseMessageFactory
@@ -32,57 +33,96 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     public const PROJECT_PREFIX_DIPLANFEST = 'diplanfest';
 
     /**
+     * Builds a valid XBeteiligungsmessage as a response of creating a statement.
+     *
+     * @throws Exception
+     */
+    public function createBeteiligung2PlanungStellungnahmeNeu0701(StatementCreated $statementCreated): string
+    {
+        $message = new AllgemeinStellungnahmeNeuabgegeben0701();
+
+        $this->xBeteiligungService->setProductInfo($message);
+        $header = $this->buildHeader('0701', 'LGV');
+        $message->setNachrichtenkopfG2g($header);
+
+        $content = $this->createXBeteiligungStellungnahmeNeu0701Content($statementCreated);
+        $message->setNachrichteninhalt($content);
+
+        $messageXml = $this->xBeteiligungService->serializeData($message);
+
+        return $this->addNamespacesTo70xXML($messageXml);
+    }
+
+
+    /**
      * @throws JsonException
      */
-    public function createBeteiligung2PlanungStellungnahmeNeu0701Content(StatementCreated $statementCreated): NachrichteninhaltAnonymousPHPType
+    public function createXBeteiligungStellungnahmeNeu0701Content(StatementCreated $statementCreated): NachrichteninhaltAnonymousPHPType
     {
         $statement = new StellungnahmeType();
         // create message content
         $statement->setStellungnahmeID($statementCreated->getPublicId());
         $statement->setPlanID($statementCreated->getPlanId());
         $statement->setBeteiligungsID($statementCreated->getProcedureId());
+        // set status
         $status = new CodeStatusDerStellungnahmeType();
         $status->setCode($this->statusDerStellungnahme($statementCreated->getStatus()));
         $statement->setStatus($status);
+        // set Verfasser --> user data
         $verfasser = new VerfasserType();
-        $orga = new OrganisationType();
-        $orga->setName($statementCreated->getOrganizationName());
-        $verfasser->setOrganisation($orga);
+        $verfasser->setPrivatperson(true);
         $natuerlichePerson = new NameNatuerlichePersonType();
+        $natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
+        $fname = new AllgemeinerNameType();
+        $lname = new AllgemeinerNameType();
+        $fname->setName($statementCreated->getUser()->getFirstName());
+        $lname->setName($statementCreated->getUser()->getLastName());
+        $natuerlichePerson->setFamilienname($lname);
+        $natuerlichePerson->setVorname($fname);
+        $natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
         $verfasser->setName($natuerlichePerson);
         $statement->setVerfasser($verfasser);
+        // set title
         $statement->setTitel($statementCreated->getTitle());
+        // set beschreibung
         $statement->setBeschreibung($statementCreated->getDescription());
-        $this->getDurchgang($statementCreated);
+        //set durchgang
+        $this->getIteration($statement, $statementCreated);
+        // set datum
         $statement->setDatum($statementCreated->getCreatedAt());
-        $artDerRueckmeldung = new CodeArtDerRueckmeldungType();
-        $artDerRueckmeldung->setCode($this->getArtDerRueckmeldung($statementCreated->getFeedback()));
-        $statement->setArtDerRueckmeldung($artDerRueckmeldung);
+        // set art der rueckmeldung
+        $feedbackArt = new CodeArtDerRueckmeldungType();
+        $feedbackArt->setCode($this->getArtOfFeedback($statementCreated->getFeedback()));
+        $statement->setArtDerRueckmeldung($feedbackArt);
+        // set art der stellungnahme
         $artDerStellungnahme = new CodeArtDerStellungnahmeType();
-        $artDerStellungnahme->setCode($this->getArtDerStellungnahme($statementCreated->getPublicUseName()));
+        $artDerStellungnahme->setCode($this->getArtOfStatement($statementCreated->getPublicUseName()));
         $statement->setArtDerStellungnahme($artDerStellungnahme);
-        $this->getVerfahrenSchritt($statementCreated, $statement);
-        $this->getVerfahrenTeilSchritt($statementCreated, $statement);
-        $geoReferenzierung = $this->getGeoReferenzierung($statementCreated);
-        $statement->setGeoreferenzierung([$geoReferenzierung]);
-        $prioritaet = new CodePrioritaetDerStellungnahmeType();
-        $prioritaet->setCode($this->getPrioritaet($statementCreated->getPriority()));
+        // set verfahrenschritt
+        $this->getProcedurePhase($statementCreated, $statement);
+        // set verfahrensteilschritt
+        $partParticipationType = new CodeVerfahrensteilschrittType();
+        $phaseCode = $statementCreated->getPartPhaseCode($statementCreated->getPublicStatement());
+        $partParticipationType->setCode($phaseCode);
+        $partParticipationType->setListVersionID('3');
+        $statement->setVerfahrensteilschritt($partParticipationType);
+        // set priority
+        $priority = new CodePrioritaetDerStellungnahmeType();
+        $priority->setCode($this->getPriority($statementCreated->getPriority()));
+        $statement->setPrioritaet($priority);
+        // set Abwaegungsvorschlag
         $abwaegungVorschlag = new CodeAbwaegungsvorschlagType();
-        $statement->setAbwaegungsvorschlag($abwaegungVorschlag->setCode($this->getAbwaegungVorschlag($statementCreated->getVotes())));
+        $statement->setAbwaegungsvorschlag($abwaegungVorschlag->setCode($this->getAbwaegungVorschlag($statementCreated->getVotes()->first())));
+        // set Schlagwort
         $statement->setSchlagwort($statementCreated->getTags());
-        $anlagen = new MetadatenAnlageType();
-        $mime = new CodeXBauMimeTypeType();
-        $mime->setCode(explode(':', $statementCreated->getFile())[3]);
-        $anlagen->setMimeType($mime);
-        $statement->setAnlagen([$anlagen]);
         $nachricht = new NachrichteninhaltAnonymousPHPType();
         $nachricht->setStellungnahme($statement);
-        $nachricht->setVorgangsID($this->uuid());
+        $nachricht->setVorgangsID($this->xBeteiligungService->uuid());
 
         return $nachricht;
     }
 
-    private function statusDerStellungnahme($statusDerStellungnahme)
+    private function statusDerStellungnahme($statusDerStellungnahme): string
     {
         $statusDerStellungnahmeCode = '';
         $statusDerStellungnahmeMapping = [
@@ -97,51 +137,51 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         return $statusDerStellungnahmeCode;
     }
 
-    private function getArtDerStellungnahme($artDerStellungnahme)
+    private function getArtOfStatement($artOfStatement): string
     {
-        $artDerStellungnahmeCode = '';
-        $artDerStellungnahmeMapping = [
+        $artOfStatementCode = '';
+        $artOfStatementMapping = [
             'anonym'     => '1000',
             'namentlich' => '2000',
             'sonstiges'  => '9999',
         ];
-        if (array_key_exists($artDerStellungnahme, $artDerStellungnahmeMapping)) {
-            $artDerStellungnahmeCode = $artDerStellungnahmeMapping[$artDerStellungnahme];
+        if (array_key_exists($artOfStatement, $artOfStatementMapping)) {
+            $artOfStatementCode = $artOfStatementMapping[$artOfStatement];
         }
-        return $artDerStellungnahmeCode;
+        return $artOfStatementCode;
     }
 
-    private function getArtDerRueckmeldung($artDerRueckmeldung)
+    private function getArtOfFeedback($artOfFeedback): string
     {
-        $artDerRueckmeldungCode = '';
-        $artDerRueckmeldungMapping = [
+        $artOfFeedbackCode = '';
+        $artOfFeedbackMapping = [
             'E-Mail' => '1000',
             'Post' => '2000',
         ];
-        if (array_key_exists($artDerRueckmeldung, $artDerRueckmeldungMapping)) {
-            $artDerRueckmeldungCode = $artDerRueckmeldungMapping[$artDerRueckmeldung];
+        if (array_key_exists($artOfFeedback, $artOfFeedbackMapping)) {
+            $artOfFeedbackCode = $artOfFeedbackMapping[$artOfFeedback];
         }
-        return $artDerRueckmeldungCode;
+        return $artOfFeedbackCode;
     }
 
-    private function getPrioritaet($prioritaet)
+    private function getPriority($priority): string
     {
-        $prioritaetCode = '';
-        $prioritaetMapping = [
+        $priorityCode = '';
+        $priorityMapping = [
             'A-Punkt'        => '1',
             'B-Punkt'        => '2',
             'nicht vergeben' => '3',
         ];
-        if (array_key_exists($prioritaet, $prioritaetMapping)) {
-            $prioritaetCode = $prioritaetMapping[$prioritaet];
+        if (array_key_exists($priority, $priorityMapping)) {
+            $priorityCode = $priorityMapping[$priority];
         }
-        return $prioritaetCode;
+        return $priorityCode;
     }
 
-    private function getDurchgang(StatementCreated $statementCreated)
+    private function getIteration(StellungnahmeType $statement, StatementCreated $statementCreated): StellungnahmeType
     {
-        $durchgang = 1;
         $projectPrefix = $this->globalConfig->getProjectPrefix();
+        $procedure = null;
         switch ($projectPrefix) {
             case self::PROJECT_PREFIX_DIPLANBAU:
                 $procedure = new BeteiligungKommunalTOEBType();
@@ -152,104 +192,43 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
             case self::PROJECT_PREFIX_DIPLANFEST:
                 $procedure = new BeteiligungPlanfeststellungType();
                 break;
-            default:
-                $procedure = null;
         }
-
-        if ($procedure !== null) {
-            $durchgang = $procedure->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
+        if ($procedure === null) {
+            return $statement;
         }
-        return $durchgang;
+        $procedure->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
+        return $statement->setDurchgang($procedure->getDurchgang());
     }
 
-    private function getVerfahrenSchritt(StatementCreated $statementCreated, StellungnahmeType $statement)
+    private function getProcedurePhase(StatementCreated $statementCreated, StellungnahmeType $statement): StellungnahmeType
     {
-        $participationType = null;
         $projectPrefix = $this->globalConfig->getProjectPrefix();
-
         switch ($projectPrefix) {
             case self::PROJECT_PREFIX_DIPLANBAU:
                 $participationType = new CodeVerfahrensschrittKommunalType();
-                $phaseCode = $statementCreated->getPhaseCodeKommunale();
+                $phaseCode = $statementCreated->getPhaseCodeKommunale($statementCreated->getPhase(), $statementCreated->getPublicStatement());
                 $participationType->setCode($phaseCode);
+                $participationType->setListVersionID('3');
+                $statement->setVerfahrensschrittKommunal($participationType);
                 break;
-            case self::PROJECT_PREFIX_DIPLANROG:
+            case ProcedureMessageTyp::RAUMORDNUNG:
                 $participationType = new CodeVerfahrensschrittRaumordnungType();
-                $phaseCode = $statementCreated->getPhaseCodeRaumordnung();
+                $phaseCode = $statementCreated->getPhaseCodeRaumordnung() ?? 'configuration';
                 $participationType->setCode($phaseCode);
+                $statement->setVerfahrensschrittRaumordnung($participationType);
                 break;
-            case self::PROJECT_PREFIX_DIPLANFEST:
+            case ProcedureMessageTyp::PLANFESTSTELLUNG:
                 $participationType = new CodeVerfahrensschrittPlanfeststellungType();
-                $phaseCode = $statementCreated->getPhaseCodePlanfeststellung();
+                $phaseCode = $statementCreated->getPhaseCodePlanfeststellung() ?? 'configuration';
                 $participationType->setCode($phaseCode);
+                $statement->setVerfahrensschrittPlanfeststellung($participationType);
                 break;
         }
 
-        return $statement->setVerfahrensschrittRaumordnung($participationType);
+        return $statement;
     }
 
-    private function getVerfahrenTeilSchritt(StatementCreated $statementCreated, StellungnahmeType $statement)
-    {
-
-        $participationType = new CodeVerfahrensteilschrittType();
-        $projectPrefix = $this->globalConfig->getProjectPrefix();
-
-        switch ($projectPrefix) {
-            case self::PROJECT_PREFIX_DIPLANBAU:
-                $phaseCode = $statementCreated->getPartPhaseCodeKommunale();
-                $participationType->setCode($phaseCode);
-                break;
-            case self::PROJECT_PREFIX_DIPLANROG:
-                //$phaseCode = $statementCreated->getPhaseCodeRaumordnung();
-                //$statement->setVerfahrensschrittRaumordnung($phaseCode);
-                break;
-            case self::PROJECT_PREFIX_DIPLANFEST:
-                //$phaseCode = $statementCreated->getPhaseCodePlanfeststellung();
-                //$statement->setVerfahrensschrittPlanfeststellung($phaseCode);
-                break;
-        }
-
-        return $statement->setVerfahrensteilschritt($participationType);
-    }
-
-    /**
-     * @throws JsonException
-     */
-    private function getGeoReferenzierung(StatementCreated $statementCreated)
-    {
-        $polygon = json_decode($statementCreated->getPolygon(), true, 512, JSON_THROW_ON_ERROR);
-        $georeferenzierung = new GeoreferenzierungType();
-        $features = [];
-
-        foreach ($polygon['features'] as $feature) {
-            $geometryType = $feature['geometry']['type'];
-            switch ($geometryType) {
-                case 'Polygon':
-                    $features['flaeche'][] = $feature;
-                    break;
-                case 'LineString':
-                    $features['linie'][] = $feature;
-                    break;
-                case 'Point':
-                    $features['punkt'][] = $feature;
-                    break;
-            }
-        }
-
-        if (isset($features['flaeche'])) {
-            $georeferenzierung->setFlaeche($features['flaeche']);
-        }
-        if (isset($features['linie'])) {
-            $georeferenzierung->setLinie($features['linie']);
-        }
-        if (isset($features['punkt'])) {
-            $georeferenzierung->setPunkt($features['punkt']);
-        }
-
-        return $georeferenzierung;
-    }
-
-    private function getAbwaegungVorschlag($abwaegungVorschlag)
+    private function getAbwaegungVorschlag($abwaegungVorschlag): string
     {
         $abwaegungVorschlagCode = '';
         $abwaegungVorschlagMapping = [
@@ -263,5 +242,21 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
             $abwaegungVorschlagCode = $abwaegungVorschlagMapping[$abwaegungVorschlag];
         }
         return $abwaegungVorschlagCode;
+    }
+
+    private function addNamespacesTo70xXML(string $xml): string
+    {
+        $simpleXML = simplexml_load_string($xml);
+
+        $simpleXML->addAttribute('xmlns:xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        $simpleXML->addAttribute('xmlns:xmlns:gml', 'http://www.opengis.net/gml/3.2');
+
+        $result = $simpleXML->asXML();
+        if (!is_string($result)) {
+            $this->dplanCockpitLogger->error('Failed to add namespaces to XML.');
+            throw new NamespaceAdditionException('Failed to add namespaces');
+        }
+
+        return $result;
     }
 }
