@@ -980,6 +980,7 @@ class XBeteiligungService
         $messageTypeCode = array_key_exists('messageTypeCode', $message) ? $message['messageTypeCode'] : '';
         $this->logger->info('Incoming message type', [$messageTypeCode]);
         if (self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
+            /** @var KommunalInitiieren0401 $xmlObject401 */
             $xmlObject401 = $this->incomingMessageParser->getXmlObject($payload, '401');
             return $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
         }
