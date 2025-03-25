@@ -244,6 +244,9 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         return $abwaegungVorschlagCode;
     }
 
+    /**
+     * @throws NamespaceAdditionException
+     */
     private function addNamespacesTo70xXML(string $xml): string
     {
         $simpleXML = simplexml_load_string($xml);
