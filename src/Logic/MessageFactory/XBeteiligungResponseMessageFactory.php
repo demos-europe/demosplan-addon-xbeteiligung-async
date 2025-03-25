@@ -2,6 +2,14 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
 use DateTime;
@@ -10,24 +18,24 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisierenNOK0422\KommunalAktualisierenNOK0422AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalAktualisierenNOOKAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschenNOK0429\KommunalLoeschenNOK0429AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalLoeschenNOOKAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateNOKType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichteninhaltTemplateOKType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisieren0202;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisierenNOK0222\PlanfeststellungAktualisierenNOK0222AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungAktualisierenNOOKAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungLoeschenNOK0229\PlanfeststellungLoeschenNOK0229AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungLoeschenNOOKAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungInitiieren0201;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungLoeschen0209;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisieren0302;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisierenNOK0322\RaumordnungAktualisierenNOK0322AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungAktualisierenNOOKAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschenNOK0329\RaumordnungLoeschenNOK0329AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungLoeschenNOOKAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiieren0301;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisierenNOK0422\KommunalAktualisierenNOK0422AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschenNOK0429\KommunalLoeschenNOK0429AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalLoeschenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisierenNOK0222\PlanfeststellungAktualisierenNOK0222AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschenNOK0229\PlanfeststellungLoeschenNOK0229AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungLoeschenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisierenNOK0322\RaumordnungAktualisierenNOK0322AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschenNOK0329\RaumordnungLoeschenNOK0329AnonymousPHPType\NachrichteninhaltAnonymousPHPType as RaumordnungLoeschenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschen0409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\NachrichteninhaltTemplateNOKType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\NachrichteninhaltTemplateOKType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschen0209;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedureCreated;
 use Exception;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\BaseTypesHandler;
@@ -182,12 +190,6 @@ class XBeteiligungResponseMessageFactory
         }
     }
 
-    /**
-     * @param KommunalLoeschen0409|PlanfeststellungLoeschen0209|RaumordnungLoeschen0309 $xmlObject
-     * @param NachrichtG2GTypeType $messageClass
-     * @param string $messageType
-     * @return ResponseValue
-     */
     public function buildProcedureDeletedResponse(
         KommunalLoeschen0409|PlanfeststellungLoeschen0209|RaumordnungLoeschen0309 $xmlObject,
         NachrichtG2GTypeType $messageClass,
@@ -211,14 +213,6 @@ class XBeteiligungResponseMessageFactory
         }
     }
 
-    /**
-     * @param array $errorTypes
-     * @param KommunalAktualisieren0402|PlanfeststellungAktualisieren0202|RaumordnungAktualisieren0302 $xmlObject
-     * @param NachrichtG2GTypeType $messageClass
-     * @param KommunalAktualisierenNOOKAnonymousPHPType|RaumordnungAktualisierenNOOKAnonymousPHPType|PlanfeststellungAktualisierenNOOKAnonymousPHPType $contentClass
-     * @param string $messageType
-     * @return ResponseValue
-     */
     public function buildUpdateErrorResponse(
         array $errorTypes,
         KommunalAktualisieren0402|PlanfeststellungAktualisieren0202|RaumordnungAktualisieren0302 $xmlObject,
@@ -238,14 +232,6 @@ class XBeteiligungResponseMessageFactory
         return $this->setResponse($contentClass, $messageClass, $header);
     }
 
-    /**
-     * @param array $errorTypes
-     * @param KommunalLoeschen0409|PlanfeststellungLoeschen0209|RaumordnungLoeschen0309 $xmlObject
-     * @param NachrichtG2GTypeType $messageClass
-     * @param KommunalLoeschenNOOKAnonymousPHPType|RaumordnungLoeschenNOOKAnonymousPHPType|PlanfeststellungLoeschenNOOKAnonymousPHPType $contentClass
-     * @param string $messageType
-     * @return ResponseValue
-     */
     public function buildDeleteErrorResponse(
         array $errorTypes,
         KommunalLoeschen0409|PlanfeststellungLoeschen0209|RaumordnungLoeschen0309 $xmlObject,
@@ -265,14 +251,6 @@ class XBeteiligungResponseMessageFactory
         return $this->setResponse($contentClass, $messageClass, $header);
     }
 
-    /**
-     * @param array $errorTypes
-     * @param KommunalInitiieren0401|PlanfeststellungInitiieren0201|RaumordnungInitiieren0301 $xmlObject
-     * @param NachrichtG2GTypeType $messageClass
-     * @param NachrichteninhaltTemplateNOKType $contentClass
-     * @param string $messageType
-     * @return ResponseValue
-     */
     public function buildCreateErrorResponse(
         array $errorTypes,
         KommunalInitiieren0401|PlanfeststellungInitiieren0201|RaumordnungInitiieren0301 $xmlObject,
@@ -318,10 +296,32 @@ class XBeteiligungResponseMessageFactory
             ->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
             ->setAgentAgencyIdentificationPrefixName($prefixName, $agentType)
             ->setAgentAgencyIdentificationLabelListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst', $agentType)
+            // Reader => Behoerdenkennung => Kennung
+            ->setAgentAgencyIdentificationLabelListURI('', $agentType)
+            ->setAgentAgencyIdentificationLabelListVersionID('', $agentType)
+            ->setAgentAgencyIdentificationLabelCode('0200', $agentType)
+            ->setAgentAgencyIdentificationLabelName($prefixName, $agentType)
+            //->setAgentAgencyName('BSW Hamburg', $agentType)
+            // Reader => Erreichbarkeit[0] (Contact[0]) => Kennung (Label)
             ->setAgentContactChannelCode('01', $agentType)
             ->setAgentContactChannelListVersion('3', $agentType)
             ->setAgentContactLabel('info@gv.hamburg.de', $agentType)
             ->setAgentAddition('', $agentType);
+            ->setAgentAddition('', $agentType);
+            //->setAgentAddressBuildingNumber('19', $agentType)
+            //->setAgentAddressBuildingAdditionalLetter('b', $agentType)
+            //->setAgentAddressBuildingZipcode('21109', $agentType)
+            //->setAgentAddressBuildingFloorNumber('3', $agentType)
+            //->setAgentAddressStreet('Neuenfelder Straße', $agentType)
+            //->setAgentAddressBuildingApartmentNumber('4', $agentType)
+            //->setAgentAddressMunicipal('Freie und Hansestadt Hamburg', $agentType)
+            //->setAgentMunicipalPreviousCorporation('', $agentType)
+            //->setAgentApartmentOwner('', $agentType)
+            //->setAgentAddressBuildingAdditionalInfo('Hinterhaus', $agentType)
+            // Reader => Anschrift => Gebaude => Hausnummer.bis
+            //->setAgentAddressBuildingNumberBis('22', $agentType)
+            //->setAgentAddressBuildingAdditionalLetterBis('c', $agentType)
+            //->setAgentAddressBuildingApartmentNumberBis('3', $agentType);
 
         return $headerBuilder;
     }
@@ -345,6 +345,23 @@ class XBeteiligungResponseMessageFactory
             ->setAgentContactChannelCode('01', $agentType, 1)
             ->setAgentContactChannelListVersion('3', $agentType)
             ->setAgentContactLabel('officehamburg@demos-international.com', $agentType, 1);
+            ->setAgentContactChannelName('E-Mail', $agentType, 1)
+            ->setAgentContactLabel('officehamburg@demos-international.com', $agentType, 1);
+            // Autor => Anschrift => Gebaude
+            //->setAgentAddressBuildingNumber('43', $agentType)
+            //->setAgentAddressBuildingAdditionalLetter('', $agentType)
+            //->setAgentAddressBuildingZipcode('22769', $agentType)
+            //->setAgentAddressBuildingFloorNumber('', $agentType)
+            //->setAgentAddressStreet('Eifflerstraße', $agentType)
+            //->setAgentAddressBuildingApartmentNumber('4', $agentType)
+            //->setAgentAddressMunicipal('Freie und Hansestadt Hamburg', $agentType)
+            //->setAgentMunicipalPreviousCorporation('', $agentType)
+            //->setAgentApartmentOwner('', $agentType)
+            //->setAgentAddressBuildingAdditionalInfo('', $agentType)
+            // Autor => Anschrift => Gebaude => Hausnummer.bis
+            //->setAgentAddressBuildingNumberBis('', $agentType)
+            //->setAgentAddressBuildingAdditionalLetterBis('', $agentType)
+            //->setAgentAddressBuildingApartmentNumberBis('', $agentType);
 
         return $headerBuilder;
     }

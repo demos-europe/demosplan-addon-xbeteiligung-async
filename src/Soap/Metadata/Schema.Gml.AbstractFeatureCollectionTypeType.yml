@@ -1,0 +1,16 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\AbstractFeatureCollectionTypeType:
+    properties:
+        featureMember:
+            expose: true
+            access_type: public_method
+            serialized_name: featureMember
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getFeatureMember
+                setter: setFeatureMember
+            xml_list:
+                inline: true
+                entry_name: featureMember
+                namespace: 'http://www.opengis.net/gml/3.2'
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\FeatureMember>
