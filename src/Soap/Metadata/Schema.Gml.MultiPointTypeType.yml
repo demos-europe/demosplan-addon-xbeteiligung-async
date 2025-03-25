@@ -1,0 +1,16 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\MultiPointTypeType:
+    properties:
+        pointMember:
+            expose: true
+            access_type: public_method
+            serialized_name: pointMember
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getPointMember
+                setter: setPointMember
+            xml_list:
+                inline: true
+                entry_name: pointMember
+                namespace: 'http://www.opengis.net/gml/3.2'
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\PointMember>

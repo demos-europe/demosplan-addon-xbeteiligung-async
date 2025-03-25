@@ -35,144 +35,80 @@ In order for generated XML messages to be successfully validated,
 the following adjustments must be made after generating the classes and
 Yml files:
 
-add `xbeteiligung:` as prefix to xml_root_name in
+Add `xbeteiligung:` as prefix to xml_root_name in
 
-`schema.KommunalInitiieren0401.yml`,
-`schema.KommunalAktualisieren0402.yml`,
-`schema.KommunalLoeschen0409.yml`,
-`schema.RaumordnungInitiieren0301.yml`,
-`schema.RaumordnungAktualisieren0302.yml`,
-`schema.RaumordnungLoeschen0309.yml`,
-`schema.PlanfeststellungAktualisieren0202.yml`,
-`schema.PlanfeststellungInitiieren0201.yml`,
-`schema.PlanfeststellungLoeschen0209.yml`,
+[`Schema.XBeteiligung.KommunalInitiieren0401.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalInitiieren0401.yml),
+[`Schema.XBeteiligung.KommunalAktualisieren0402.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalAktualisieren0402.yml),
+[`Schema.XBeteiligung.KommunalLoeschen0409.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalLoeschen0409.yml),
+[`Schema.XBeteiligung.RaumordnungInitiieren0301.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungInitiieren0301.yml),
+[`Schema.XBeteiligung.RaumordnungAktualisieren0302.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungAktualisieren0302.yml),
+[`Schema.XBeteiligung.RaumordnungLoeschen0309.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungLoeschen0309.yml),
+[`Schema.XBeteiligung.PlanfeststellungAktualisieren0202.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungAktualisieren0202.yml),
+[`Schema.XBeteiligung.PlanfeststellungInitiieren0201.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungInitiieren0201.yml),
+[`Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml)
 
-Example - xml_root_name: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
+Example - `xml_root_name`: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
+
 Add the Following to Schemas:
-````
-src/Soap/metadata/schema.BehoerdeTypeType.yml:
-    Verzeichnisdinst:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
-    kennung:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
-    name:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
-    erreichbarkeit:
-        xml_list:
-            namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
 
-src/Soap/metadata/schema.IdentifikationNachrichtTypeType.yml:
-    nachrichtenUUID:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
-    nachrichtentyp:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
-    erstellungszeitpunkt:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+[`src/Soap/Metadata/Schema.Basisnachricht.Behoerde.BehoerdeTypeType.yml`](src/Soap/Metadata/Schema.Basisnachricht.Behoerde.BehoerdeTypeType.yml):
+```yaml
+Verzeichnisdienst:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+kennung:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+name:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+erreichbarkeit:
+    xml_list:
+        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+```
 
-src/Soap/metadata/schema.KommunikationTypeType.yml:
-    kanal:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
-    kennung:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
-    zusatz:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+[`src/Soap/Metadata/Schema.Basisnachricht.G2g.IdentifikationNachrichtTypeType.yml`](src/Soap/Metadata/Schema.Basisnachricht.G2g.IdentifikationNachrichtTypeType.yml):
+```yaml
+nachrichtenUUID:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+nachrichtentyp:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+erstellungszeitpunkt:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+```
 
-src/Soap/metadata/schema.NachrichtenkopfG2GTypeType.yml:
-    identifikationNachricht:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
-    leser:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
-    autor:
-        xml_element:
-            namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+[`src/Soap/Metadata/Schema.Basisnachricht.Kommunikation.KommunikationTypeType.yml`](src/Soap/Metadata/Schema.Basisnachricht.Kommunikation.KommunikationTypeType.yml):
+```yaml
+kanal:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+kennung:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+zusatz:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+```
 
-src/Soap/metadata/schema.OrganisationType.yml:
-    propertirs:
-        name:
-            #xml_element:
-                #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
-        type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationType #manually changed!
+[`src/Soap/Metadata/Schema.Basisnachricht.G2g.NachrichtenkopfG2GTypeType.yml`](src/Soap/Metadata/Schema.Basisnachricht.G2g.NachrichtenkopfG2GTypeType.yml):
+```yaml
+identifikationNachricht:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+leser:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+autor:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+```
 
-DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType:
-Change the type of name from string to AllgemeinerNameType
-    /**
-     * Hier ist der Name der Organisation zu übermitteln.
-     *
-     * @var NameOrganisationType $name
-     */
-    private $name = null;
-    ....
-    /**
-     * Gets as name
-     *
-     * Hier ist der Name der Organisation zu übermitteln.
-     *
-     * @return NameOrganisationType
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
 
-    /**
-     * Sets a new name
-     *
-     * Hier ist der Name der Organisation zu übermitteln.
-     *
-     * @param NameOrganisationType $name
-     * @return self
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-        return $this;
-    }
-````
-
-Add the following to enum in xbeteiligung-codes.xsd (search for "0401" then you should find it)
-`<xs:enumeration value="0301">
-    <xs:annotation>
-        <xs:appinfo>
-            <beschreibung>planung2Beteiligung.RaumordnungNeu.0301</beschreibung>
-        </xs:appinfo>
-    </xs:annotation>
-</xs:enumeration>
-<xs:enumeration value="0302">
-    <xs:annotation>
-        <xs:appinfo>
-            <beschreibung>planung2Beteiligung.RaumordnungAktualisieren.0302</beschreibung>
-        </xs:appinfo>
-    </xs:annotation>
-</xs:enumeration>
-<xs:enumeration value="0309">
-    <xs:annotation>
-        <xs:appinfo>
-            <beschreibung>planung2Beteiligung.RaumordnungLoeschen.0309</beschreibung>
-        </xs:appinfo>
-    </xs:annotation>
-</xs:enumeration>`
-
-comment out `namespace: ...` in `schema.CodeType.yml` for
-`code` and `name`
-
-comment out `namespace: ...` in `src/Soap/metadata/schema.BeteiligungKommunalOeffentlichkeitType.yml`
-for `anlagen`->`xml_list`
-comment out `namespace: ...` in `src/Soap/metadata/schema.BeteiligungRaumordnungType.yml`
-for `anlagen`->`xml_list`
-
-comment out `namespace: ...` in `src/Soap/metadata/schema.MetadatenAnlageType.yml`
-for `bezeichnung` and `anlageart` and `mimeType` and `anhangOderVerlinkung`.
+comment out `namespace: ...` in [`Schema.Code.CodeType.yml`](src/Soap/metadata/Schema.Code.CodeType.yml)
+for the fiels `code` and `name`.
 
 Run the unit tests XBeteiligungServiceTest- (401, 402, 409) and fix any bugs that appear.
 Update what is documented here if there are any changes to be aware of.

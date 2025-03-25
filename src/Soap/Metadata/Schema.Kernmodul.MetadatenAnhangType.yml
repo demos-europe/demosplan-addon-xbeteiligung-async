@@ -1,0 +1,36 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\MetadatenAnhangType:
+    properties:
+        filesize:
+            expose: true
+            access_type: public_method
+            serialized_name: filesize
+            accessor:
+                getter: getFilesize
+                setter: setFilesize
+            xml_attribute: true
+            type: int
+        hashValue:
+            expose: true
+            access_type: public_method
+            serialized_name: hashValue
+            accessor:
+                getter: getHashValue
+                setter: setHashValue
+            xml_attribute: true
+            type: string
+        dokumentid:
+            expose: true
+            access_type: public_method
+            serialized_name: dokumentid
+            accessor:
+                getter: getDokumentid
+                setter: setDokumentid
+            type: string
+        dateiname:
+            expose: true
+            access_type: public_method
+            serialized_name: dateiname
+            accessor:
+                getter: getDateiname
+                setter: setDateiname
+            type: string

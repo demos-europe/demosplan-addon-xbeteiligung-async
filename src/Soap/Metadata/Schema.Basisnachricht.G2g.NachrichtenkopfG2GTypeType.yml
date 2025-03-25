@@ -1,0 +1,32 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtenkopfG2GTypeType:
+    properties:
+        identifikationNachricht:
+            expose: true
+            access_type: public_method
+            serialized_name: identifikation.nachricht
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+            accessor:
+                getter: getIdentifikationNachricht
+                setter: setIdentifikationNachricht
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\IdentifikationNachricht
+        leser:
+            expose: true
+            access_type: public_method
+            serialized_name: leser
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+            accessor:
+                getter: getLeser
+                setter: setLeser
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\Leser
+        autor:
+            expose: true
+            access_type: public_method
+            serialized_name: autor
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+            accessor:
+                getter: getAutor
+                setter: setAutor
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\Autor

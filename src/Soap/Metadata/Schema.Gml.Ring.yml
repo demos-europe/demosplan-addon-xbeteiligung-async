@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\Ring:
+    xml_root_name: Ring
+    xml_root_namespace: 'http://www.opengis.net/gml/3.2'

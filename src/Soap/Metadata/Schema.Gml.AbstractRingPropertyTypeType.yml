@@ -1,0 +1,12 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\AbstractRingPropertyTypeType:
+    properties:
+        abstractRing:
+            expose: true
+            access_type: public_method
+            serialized_name: AbstractRing
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getAbstractRing
+                setter: setAbstractRing
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\AbstractRing

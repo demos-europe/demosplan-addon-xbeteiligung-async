@@ -1,0 +1,42 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZuordnungType:
+    properties:
+        zuordnungID:
+            expose: true
+            access_type: public_method
+            serialized_name: zuordnungID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getZuordnungID
+                setter: setZuordnungID
+            type: string
+        zuordnungCode:
+            expose: true
+            access_type: public_method
+            serialized_name: zuordnungCode
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getZuordnungCode
+                setter: setZuordnungCode
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeZuordnungType
+        vonCharNr:
+            expose: true
+            access_type: public_method
+            serialized_name: vonCharNr
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVonCharNr
+                setter: setVonCharNr
+            type: int
+        bisCharNr:
+            expose: true
+            access_type: public_method
+            serialized_name: bisCharNr
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBisCharNr
+                setter: setBisCharNr
+            type: int

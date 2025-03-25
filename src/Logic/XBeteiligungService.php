@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of the package demosplan.
  *
@@ -23,44 +25,44 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\UnsupportedMessageTypeException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AkteurVorhabenType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinerNameType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungKommunalType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BeteiligungRaumordnungType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeKommunikationKanalTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartKommunalType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodePlanartRaumordnungType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittKommunalType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerfahrensschrittRaumordnungType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeVerzeichnisdienstTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\CodeXBeteiligungNachrichtenType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\IdentifikationNachrichtTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalAktualisieren0402\KommunalAktualisieren0402AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt402;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalInitiieren0401\KommunalInitiieren0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunalLoeschen0409\KommunalLoeschen0409AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt409;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NameOrganisationType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\OrganisationType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungAktualisieren0202;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungInitiieren0201;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PlanfeststellungLoeschen0209;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisieren0302;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungAktualisieren0302\RaumordnungAktualisieren0302AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt302;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiieren0301;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungInitiieren0301\RaumordnungInitiieren0301AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt301;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\RaumordnungLoeschen0309\RaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde\CodeVerzeichnisdienstTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\Autor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\IdentifikationNachricht;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\Leser;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtenkopfG2g;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation\CodeKommunikationKanalTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation\Erreichbarkeit;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalTOEBType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartRaumordnungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeXBeteiligungNachrichtenType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402\KommunalAktualisieren0402AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401\KommunalInitiieren0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschen0409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschen0409\KommunalLoeschen0409AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschen0209;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302\RaumordnungAktualisieren0302AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301\RaumordnungInitiieren0301AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt301;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309\RaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -247,10 +249,10 @@ class XBeteiligungService
      * @throws Exception
      */
     public function createProcedureNew401FromObject(
-        ProcedureInterface $procedure,
-        $procedureCreated401Object = new KommunalInitiieren0401()
+        ProcedureInterface $procedure
     ): string
     {
+        $procedureCreated401Object = new KommunalInitiieren0401();
         $this->setProductInfo($procedureCreated401Object);
         $procedureCreated401Object->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureCreated401Object)
@@ -263,10 +265,10 @@ class XBeteiligungService
     }
 
     public function createXMLFor301(
-        ProcedureInterface $procedure,
-        $procedureCreated301 = new RaumordnungInitiieren0301()
+        ProcedureInterface $procedure
     )
     {
+        $procedureCreated301 = new RaumordnungInitiieren0301();
         $this->setProductInfo($procedureCreated301);
         $procedureCreated301->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureCreated301)
@@ -298,9 +300,9 @@ class XBeteiligungService
 
     public function createXMLFor302(
         ProcedureInterface $procedure,
-        $procedureUpdated302 = new RaumordnungAktualisieren0302(),
     ): string
     {
+        $procedureUpdated302 = new RaumordnungAktualisieren0302();
         $this->setProductInfo($procedureUpdated302);
         $procedureUpdated302->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureUpdated302)
@@ -316,10 +318,10 @@ class XBeteiligungService
      * @throws Exception
      */
     public function createProcedureDeleted409FromObject(
-        string $procedureId,
-        $procedureDeleted409Object = new KommunalLoeschen0409()
+        string $procedureId
     ): string
     {
+        $procedureDeleted409Object = new KommunalLoeschen0409();
         $this->setProductInfo($procedureDeleted409Object);
         $procedureDeleted409Object->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureDeleted409Object)
@@ -330,10 +332,10 @@ class XBeteiligungService
     }
 
     public function createXMLFor309(
-        string $procedureId,
-        $procedureDeleted309 = new RaumordnungLoeschen0309()
+        string $procedureId
     ): string
     {
+        $procedureDeleted309 = new RaumordnungLoeschen0309();
         $this->setProductInfo($procedureDeleted309);
         $procedureDeleted309->setNachrichtenkopfG2g(
             $this->createMessageHeadFor($procedureDeleted309)
@@ -632,9 +634,9 @@ class XBeteiligungService
     /**
      * @throws Exception
      */
-    public function createMessageHeadFor(NachrichtG2GTypeType $messageObject): NachrichtenkopfG2GTypeType
+    public function createMessageHeadFor(NachrichtG2GTypeType $messageObject): NachrichtenkopfG2g
     {
-        $messageHead = new NachrichtenkopfG2GTypeType();
+        $messageHead = new NachrichtenkopfG2g();
         $messageHead->setIdentifikationNachricht($this->createMessageIdentification($messageObject)); // required
         $messageHead->setLeser($this->createReaderInformation()); // required
         $messageHead->setAutor($this->createAuthorInformation()); // required
@@ -642,9 +644,9 @@ class XBeteiligungService
         return $messageHead;
     }
 
-    public function createReaderInformation(): BehoerdeTypeType
+    public function createReaderInformation(): Leser
     {
-        $reader = new BehoerdeTypeType();
+        $reader = new Leser();
         $reader->setKennung(''); // required
         $reader->setName('K3'); // required
         $verzeichnisdienst = new CodeVerzeichnisdienstTypeType();
@@ -654,7 +656,7 @@ class XBeteiligungService
         $reader->setVerzeichnisdienst($verzeichnisdienst); // required
 
 
-        $codeAuthorityIdentification = new KommunikationTypeType();
+        $codeAuthorityIdentification = new Erreichbarkeit();
         $kanal = new CodeKommunikationKanalTypeType();
         $kanal->setListVersionID('');
         $kanal->setListURI(self::CODELIST_ERREICHBARKEIT);
@@ -666,9 +668,9 @@ class XBeteiligungService
         return $reader;
     }
 
-    public function createAuthorInformation(): BehoerdeTypeType
+    public function createAuthorInformation(): Autor
     {
-        $author = new BehoerdeTypeType();
+        $author = new Autor();
         $author->setKennung('');
         $author->setName(''); // required
         $prefixType = new CodeVerzeichnisdienstTypeType();
@@ -677,7 +679,7 @@ class XBeteiligungService
         $prefixType->setCode(self::NON_EXISTING_CODE);
         $author->setVerzeichnisdienst($prefixType); // required
 
-        $codeAuthorityIdentification = new KommunikationTypeType();
+        $codeAuthorityIdentification = new Erreichbarkeit();
         $kanal = new CodeKommunikationKanalTypeType();
         $kanal->setListVersionID('');
         $kanal->setListURI(self::CODELIST_ERREICHBARKEIT);
@@ -741,12 +743,9 @@ class XBeteiligungService
             $height . $crs . $styles . $bbox;
     }
 
-    /**
-     * @return KommunikationTypeType
-     */
-    private function addAuthorCommunicationType(): KommunikationTypeType
+    private function addAuthorCommunicationType(): Erreichbarkeit
     {
-        $communicationType = new KommunikationTypeType();
+        $communicationType = new Erreichbarkeit();
         $comCode = new CodeKommunikationKanalTypeType();
         // Quelle - AdoRepo: Erreichbarkeit-3.xml
         // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger,
@@ -765,7 +764,7 @@ class XBeteiligungService
     /**
      * @throws Exception
      */
-    public function createMessageIdentification(NachrichtG2GTypeType $messageObject): IdentifikationNachrichtTypeType
+    public function createMessageIdentification(NachrichtG2GTypeType $messageObject): IdentifikationNachricht
     {
         if ($messageObject instanceof KommunalInitiieren0401) {
             $code = '0401';
@@ -801,7 +800,7 @@ class XBeteiligungService
             );
         }
 
-        $identificationMessage = new IdentifikationNachrichtTypeType();
+        $identificationMessage = new IdentifikationNachricht();
 
         $messageTypeCode = new CodeXBeteiligungNachrichtenType();
         $messageTypeCode->setListURI('urn:xoev-de:xleitstelle:codeliste:xbeteiligung-nachrichten');
@@ -883,7 +882,7 @@ class XBeteiligungService
             $xml,
             false,
             $error,
-            0,
+            false,
             $procedureId
         );
     }
@@ -981,7 +980,8 @@ class XBeteiligungService
         $messageTypeCode = array_key_exists('messageTypeCode', $message) ? $message['messageTypeCode'] : '';
         $this->logger->info('Incoming message type', [$messageTypeCode]);
         if (self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
-            $xmlObject401 = $this->incomingMessageParser->getXmlObject($payload, 401);
+            /** @var KommunalInitiieren0401 $xmlObject401 */
+            $xmlObject401 = $this->incomingMessageParser->getXmlObject($payload, '401');
             return $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
         }
         /*
