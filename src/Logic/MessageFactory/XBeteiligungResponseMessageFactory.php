@@ -16,6 +16,7 @@ use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
@@ -47,8 +48,9 @@ use Psr\Log\LoggerInterface;
 
 class XBeteiligungResponseMessageFactory
 {
+    private const METADATA_DIR = __DIR__ . '/../../Soap/Metadata';
+    private const NAMESPACE_PREFIX = 'DemosEurope\DemosplanAddon\XBeteiligung\Soap';
     public const XBETEILIGUNG_VERSION = 'V14';
-
     protected const K1 = 'K1';
     private const SCHEMALOCATION = 'xmlsn:xsi:schemaLocation';
     private const ERROR_TEXT = 'A Procedure with id';
@@ -97,7 +99,7 @@ class XBeteiligungResponseMessageFactory
     public function getSerializerBuild(): Serializer
     {
         $serializerBuilder = SerializerBuilder::create();
-        $serializerBuilder->addMetadataDir(__DIR__ . '/../../Soap/metadata', 'DemosEurope\DemosplanAddon\XBeteiligung\Soap');
+        $serializerBuilder->addMetadataDir(self::METADATA_DIR, self::NAMESPACE_PREFIX);
         $serializerBuilder->configureHandlers(static function (HandlerRegistryInterface $handler) use ($serializerBuilder) {
             $serializerBuilder->addDefaultHandlers();
             $handler->registerSubscribingHandler(new BaseTypesHandler()); // XMLSchema List handling
@@ -294,13 +296,11 @@ class XBeteiligungResponseMessageFactory
     {
         $headerBuilder->setAgentAgencyIdentificationPrefixListVersionId('3', $agentType)
             ->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
-            ->setAgentAgencyIdentificationPrefixName($prefixName, $agentType)
             ->setAgentAgencyIdentificationLabelListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst', $agentType)
             // Reader => Behoerdenkennung => Kennung
-            ->setAgentAgencyIdentificationLabelListURI('', $agentType)
-            ->setAgentAgencyIdentificationLabelListVersionID('', $agentType)
+            //->setAgentAgencyIdentificationLabelListURI('', $agentType)
+            ->setAgentAgencyIdentificationLabelListVersionID('3', $agentType)
             ->setAgentAgencyIdentificationLabelCode('0200', $agentType)
-            ->setAgentAgencyIdentificationLabelName($prefixName, $agentType)
             //->setAgentAgencyName('BSW Hamburg', $agentType)
             // Reader => Erreichbarkeit[0] (Contact[0]) => Kennung (Label)
             ->setAgentContactChannelCode('01', $agentType)
@@ -342,7 +342,6 @@ class XBeteiligungResponseMessageFactory
             ->setAgentContactLabel('0049 40 22 86 73 57 0', $agentType)
             ->setAgentAddition('', $agentType)
             ->setAgentContactChannelCode('01', $agentType, 1)
-            ->setAgentContactChannelListVersion('3', $agentType)
             ->setAgentContactLabel('officehamburg@demos-international.com', $agentType, 1);
             // Autor => Anschrift => Gebaude
             //->setAgentAddressBuildingNumber('43', $agentType)

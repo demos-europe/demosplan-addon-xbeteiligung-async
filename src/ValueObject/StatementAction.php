@@ -433,5 +433,4 @@ class StatementAction extends ValueObject
     {
         return self::mapPhaseKeyPlanfeststellung($this->phaseKey);
     }
-
 }

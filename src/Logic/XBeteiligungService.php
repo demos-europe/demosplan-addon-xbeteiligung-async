@@ -63,6 +63,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309\RaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;

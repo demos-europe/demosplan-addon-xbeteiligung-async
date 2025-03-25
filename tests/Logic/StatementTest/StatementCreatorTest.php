@@ -20,12 +20,12 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCre
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeNeuabgegeben0701;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\BehoerdeTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\KommunikationTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtenkopfG2GTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\NachrichtG2GTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\StellungnahmeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Basisnachricht\Behoerde\BehoerdeTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Basisnachricht\Kommunikation\KommunikationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Basisnachricht\G2g\NachrichtenkopfG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Basisnachricht\G2g\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\XBeteiligung\StellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -217,7 +217,7 @@ class StatementCreatorTest extends TestCase
             self::assertSame('info@gv.hamburg.de', $emailComm->getKennung());
             self::assertEmpty($emailComm->getZusatz());
         }
-        self::assertSame('diplanfhh', $agency->getVerzeichnisdienst()->getCode());
+        self::assertSame('0200', $agency->getVerzeichnisdienst()->getCode());
         self::assertSame('3', $agency->getVerzeichnisdienst()->getListVersionID());
         self::assertSame('urn:xoev-de:kosit:codeliste:verzeichnisdienst', $agency->getVerzeichnisdienst()->getListURI());
 
