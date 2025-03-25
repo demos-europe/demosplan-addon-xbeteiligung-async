@@ -143,6 +143,10 @@ class StatementCreatorTest extends TestCase
             $date = new \DateTime('2019-05-01');
             $feedback = 'E-Mail';
             $priority = 'A-Punkt';
+            $firstName = 'Max';
+            $lastName = 'Mustermann';
+            $gender = 'männlich';
+            $userTitle = 'Dr.';
             $vote = new ArrayCollection(['Der Stellungnahme wird gefolgt.']);
             $tags = ['Radverkehr', 'Straßenbau', 'Straßenbäume', 'Städtebaulicher Vertrag'];
             $file = 'Legende.pdf:dc855abd-c8df-11e5-8550-005056ae0004:119994:application/pdf';
@@ -153,13 +157,18 @@ class StatementCreatorTest extends TestCase
         $phaseObject = $this->createMock(ProcedurePhaseInterface::class);
         $phaseObject->method('getIteration')->willReturn($iteration);
         $phaseObject->method('setIteration')->with($iteration);
-
+        // Configure the procedure mock to return the phase object
+        $this->procedure->method('getPhaseObject')->willReturn($phaseObject);
+        // Configure the meta mock to return the organization name
         $meta = $this->createMock(StatementMetaInterface::class);
         $meta->method('getOrgaName')->willReturn('Privatperson');
         $meta->method('setOrgaName')->with('Privatperson');
-
-        // Configure the procedure mock to return the phase object
-        $this->procedure->method('getPhaseObject')->willReturn($phaseObject);
+        $this->meta->method('getOrgaName')->willReturn('Privatperson');
+        //configure the user mock to return the user data
+        $this->user->method('getFirstName')->willReturn($firstName);
+        $this->user->method('getLastName')->willReturn($lastName);
+        $this->user->method('getGender')->willReturn($gender);
+        $this->user->method('getTitle')->willReturn($userTitle);
 
         $statementCreated = new StatementCreated($this->user, $this->procedure, $this->meta);
         $statementCreated->setPublicId($statementId);
