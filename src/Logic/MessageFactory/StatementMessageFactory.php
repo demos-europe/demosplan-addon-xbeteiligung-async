@@ -189,7 +189,10 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         return $priorityCode;
     }
 
-    private function getIteration(StellungnahmeType $statement, StatementCreated $statementCreated): StellungnahmeType
+    /**
+     * @throws ProjectPrefixNotFoundException
+     */
+    private function getIteration(StellungnahmeType $statement, StatementCreated $statementCreated): void
     {
         $projectPrefix = $this->globalConfig->getProjectPrefix();
         $procedure = null;
@@ -203,6 +206,9 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
             case self::PROJECT_PREFIX_DIPLANFEST:
                 $procedure = new BeteiligungPlanfeststellungType();
                 break;
+            default:
+                $this->dplanCockpitLogger->error('No project prefix found.');
+                throw new ProjectPrefixNotFoundException();
         }
         if ($procedure === null) {
             return $statement;
@@ -234,6 +240,9 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
                 $participationType->setCode($phaseCode);
                 $statement->setVerfahrensschrittPlanfeststellung($participationType);
                 break;
+            default:
+                $this->dplanCockpitLogger->error('No project prefix found.');
+                throw new ProjectPrefixNotFoundException();
         }
 
         return $statement;
