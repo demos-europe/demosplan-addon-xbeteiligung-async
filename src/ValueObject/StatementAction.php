@@ -4,7 +4,6 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\ValueObject;
 
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\StatementAttachmentInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
@@ -34,11 +33,6 @@ class StatementAction extends ValueObject
     protected string $publicStatement = '';
     protected UserInterface $user;
     protected StatementMetaInterface $meta;
-
-    /**
-     * @var Collection<int, StatementAttachmentInterface>
-     */
-    protected Collection $attachments;
 
     public function __construct(UserInterface $user, ProcedureInterface $procedure, StatementMetaInterface $meta)
     {
@@ -123,11 +117,6 @@ class StatementAction extends ValueObject
         $this->plannerDetailViewUrl = $plannerDetailViewUrl;
     }
 
-    public function getOrganizationName(): string
-    {
-        return $this->organizationName;
-    }
-
     public function setOrganizationName(string $organizationName): void
     {
         $this->organizationName = $organizationName;
@@ -181,11 +170,6 @@ class StatementAction extends ValueObject
     public function setFeedback(string $feedback): void
     {
         $this->feedback = $feedback;
-    }
-
-    public function getFile(): string
-    {
-        return $this->file;
     }
 
     public function setFile(string $file): void
