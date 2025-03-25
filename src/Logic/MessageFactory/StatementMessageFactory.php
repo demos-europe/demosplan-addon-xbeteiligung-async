@@ -104,7 +104,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $this->getProcedurePhase($statementCreated, $statement);
         // set verfahrensteilschritt
         $partParticipationType = new CodeVerfahrensteilschrittType();
-        $phaseCode = $statementCreated->getPartPhaseCode($statementCreated->getPublicStatement());
+        $phaseCode = $statementCreated->getPartPhaseCode($statementCreated->getPhase(), $statementCreated->getPublicStatement());
         $partParticipationType->setCode($phaseCode);
         $partParticipationType->setListVersionID('3');
         $statement->setVerfahrensteilschritt($partParticipationType);
@@ -230,8 +230,9 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
                 break;
             case ProcedureMessageTyp::RAUMORDNUNG:
                 $participationType = new CodeVerfahrensschrittRaumordnungType();
-                $phaseCode = $statementCreated->getPhaseCodeRaumordnung() ?? 'configuration';
+                $phaseCode = $statementCreated->getPhaseCodeRaumordnung($statementCreated->getPhase(), $statementCreated->getPublicStatement());
                 $participationType->setCode($phaseCode);
+                $participationType->setListVersionID('3');
                 $statement->setVerfahrensschrittRaumordnung($participationType);
                 break;
             case ProcedureMessageTyp::PLANFESTSTELLUNG:
