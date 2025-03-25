@@ -6,6 +6,7 @@ use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementAttachmentInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use Doctrine\Common\Collections\Collection;
 
@@ -32,16 +33,18 @@ class StatementAction extends ValueObject
     protected array $tags;
     protected string $publicStatement = '';
     protected UserInterface $user;
+    protected StatementMetaInterface $meta;
 
     /**
      * @var Collection<int, StatementAttachmentInterface>
      */
     protected Collection $attachments;
 
-    public function __construct(UserInterface $user, ProcedureInterface $procedure)
+    public function __construct(UserInterface $user, ProcedureInterface $procedure, StatementMetaInterface $meta)
     {
         $this->user = $user;
         $this->procedure = $procedure;
+        $this->meta = $meta;
     }
 
 
@@ -223,6 +226,11 @@ class StatementAction extends ValueObject
     public function getUser(): UserInterface
     {
         return $this->user;
+    }
+
+    public function getMeta(): StatementMetaInterface
+    {
+        return $this->meta;
     }
 
     /**

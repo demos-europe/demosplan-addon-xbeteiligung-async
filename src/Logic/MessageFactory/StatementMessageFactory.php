@@ -69,19 +69,21 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $status->setCode($this->statusDerStellungnahme($statementCreated->getStatus()));
         $statement->setStatus($status);
         // set Verfasser --> user data
-        $verfasser = new VerfasserType();
-        $verfasser->setPrivatperson(true);
-        $natuerlichePerson = new NameNatuerlichePersonType();
-        $natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
-        $fname = new AllgemeinerNameType();
-        $lname = new AllgemeinerNameType();
-        $fname->setName($statementCreated->getUser()->getFirstName());
-        $lname->setName($statementCreated->getUser()->getLastName());
-        $natuerlichePerson->setFamilienname($lname);
-        $natuerlichePerson->setVorname($fname);
-        $natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
-        $verfasser->setName($natuerlichePerson);
-        $statement->setVerfasser($verfasser);
+        if ($this->getTypeOfPerson($statementCreated) === true) {
+            $verfasser = new VerfasserType();
+            $verfasser->setPrivatperson(true);
+            $natuerlichePerson = new NameNatuerlichePersonType();
+            $natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
+            $fname = new AllgemeinerNameType();
+            $lname = new AllgemeinerNameType();
+            $fname->setName($statementCreated->getUser()->getFirstName());
+            $lname->setName($statementCreated->getUser()->getLastName());
+            $natuerlichePerson->setFamilienname($lname);
+            $natuerlichePerson->setVorname($fname);
+            $natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
+            $verfasser->setName($natuerlichePerson);
+            $statement->setVerfasser($verfasser);
+        }
         // set title
         $statement->setTitel($statementCreated->getTitle());
         // set beschreibung
@@ -120,6 +122,15 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $nachricht->setVorgangsID($this->xBeteiligungService->uuid());
 
         return $nachricht;
+    }
+
+    private function getTypeOfPerson($statementCreated): bool
+    {
+        $privatPerson = true;
+        if ($statementCreated->getMeta()->getOrgaName() !== 'Privatperson') {
+            $privatPerson = false;
+        }
+        return $privatPerson;
     }
 
     private function statusDerStellungnahme($statusDerStellungnahme): string

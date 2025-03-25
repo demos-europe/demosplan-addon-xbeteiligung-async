@@ -4,6 +4,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
@@ -15,9 +16,10 @@ class StatementCreator
     protected RouterInterface $router;
     protected UserInterface $user;
     protected ProcedureInterface $procedure;
+    protected StatementMetaInterface $meta;
     public function getStatementCreatedFromEvent(StatementCreatedEventInterface $event): StatementCreated
     {
-        $statementCreated = new StatementCreated($this->user, $this->procedure);
+        $statementCreated = new StatementCreated($this->user, $this->procedure, $this->meta);
 
         $eventStatement = $event->getStatement();
 

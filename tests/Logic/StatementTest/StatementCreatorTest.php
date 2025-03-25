@@ -6,6 +6,7 @@ use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
@@ -59,6 +60,7 @@ class StatementCreatorTest extends TestCase
     protected MockObject $procedureMessageRepository;
     protected MockObject $user;
     protected MockObject $procedure;
+    protected MockObject $meta;
 
     protected function setUp(): void
     {
@@ -69,6 +71,7 @@ class StatementCreatorTest extends TestCase
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->user = $this->createMock(UserInterface::class);
         $this->procedure = $this->createMock(ProcedureInterface::class);
+        $this->meta = $this->createMock(StatementMetaInterface::class);
         $this->procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
         $xbeteiligungService = new XBeteiligungService(
@@ -150,10 +153,14 @@ class StatementCreatorTest extends TestCase
         $phaseObject->method('getIteration')->willReturn($iteration);
         $phaseObject->method('setIteration')->with($iteration);
 
+        $meta = $this->createMock(StatementMetaInterface::class);
+        $meta->method('getOrgaName')->willReturn('Privatperson');
+        $meta->method('setOrgaName')->with('Privatperson');
+
         // Configure the procedure mock to return the phase object
         $this->procedure->method('getPhaseObject')->willReturn($phaseObject);
 
-        $statementCreated = new StatementCreated($this->user, $this->procedure);
+        $statementCreated = new StatementCreated($this->user, $this->procedure, $this->meta);
         $statementCreated->setPublicId($statementId);
         $statementCreated->setPlanId($planId);
         $statementCreated->setProcedureId($procedureId);
