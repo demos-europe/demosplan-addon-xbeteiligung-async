@@ -120,7 +120,8 @@ class StatementCreatorTest extends TestCase
 
         $stellungnahme = $content->getStellungnahme();
         $this->validateStatement($statementCreated, $stellungnahme);
-        self::assertSame('9998', $stellungnahme->getVerfahrensteilschritt()->getCode());
+        self::assertSame('0300', $stellungnahme->getVerfahrensteilschritt()->getCode());
+        self::assertSame('2000', $stellungnahme->getVerfahrensschrittKommunal()->getCode());
     }
 
     private function createStatement0701(int $version): StatementCreated
@@ -173,7 +174,7 @@ class StatementCreatorTest extends TestCase
         $statementCreated->setFeedback($feedback);
         $statementCreated->setPublicUseName(true);
         $statementCreated->setPublicStatement(StatementInterface::INTERNAL);
-        $statementCreated->setPhase('configuration');
+        $statementCreated->setPhase('earlyparticipation');
         $statementCreated->setPriority($priority);
         $statementCreated->setVotes($vote);
         $statementCreated->setTags($tags);
