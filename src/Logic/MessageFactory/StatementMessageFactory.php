@@ -4,6 +4,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ProcedureMessageTyp;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinerNameType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeNeuabgegeben0701;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\AllgemeinStellungnahmeNeuabgegeben0701\AllgemeinStellungnahmeNeuabgegeben0701AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
@@ -124,7 +125,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         return $nachricht;
     }
 
-    private function getTypeOfPerson($statementCreated): bool
+    private function getTypeOfPerson(StatementCreated $statementCreated): bool
     {
         $privatPerson = true;
         if ($statementCreated->getMeta()->getOrgaName() !== 'Privatperson') {
@@ -195,7 +196,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     private function getIteration(StellungnahmeType $statement, StatementCreated $statementCreated): void
     {
         $projectPrefix = $this->globalConfig->getProjectPrefix();
-        $procedure = null;
         switch ($projectPrefix) {
             case self::PROJECT_PREFIX_DIPLANBAU:
                 $procedure = new BeteiligungKommunalTOEBType();
@@ -210,14 +210,14 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
                 $this->dplanCockpitLogger->error('No project prefix found.');
                 throw new ProjectPrefixNotFoundException();
         }
-        if ($procedure === null) {
-            return $statement;
-        }
         $procedure->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
-        return $statement->setDurchgang($procedure->getDurchgang());
+        $statement->setDurchgang($procedure->getDurchgang());
     }
 
-    private function getProcedurePhase(StatementCreated $statementCreated, StellungnahmeType $statement): StellungnahmeType
+    /**
+     * @throws ProjectPrefixNotFoundException
+     */
+    private function getProcedurePhase(StatementCreated $statementCreated, StellungnahmeType $statement): void
     {
         $projectPrefix = $this->globalConfig->getProjectPrefix();
         switch ($projectPrefix) {
@@ -246,7 +246,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
                 throw new ProjectPrefixNotFoundException();
         }
 
-        return $statement;
     }
 
     private function getAbwaegungVorschlag($abwaegungVorschlag): string
