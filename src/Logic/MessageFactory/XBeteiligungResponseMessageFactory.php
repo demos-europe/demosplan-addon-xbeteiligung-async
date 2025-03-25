@@ -307,7 +307,6 @@ class XBeteiligungResponseMessageFactory
             ->setAgentContactChannelListVersion('3', $agentType)
             ->setAgentContactLabel('info@gv.hamburg.de', $agentType)
             ->setAgentAddition('', $agentType);
-            ->setAgentAddition('', $agentType);
             //->setAgentAddressBuildingNumber('19', $agentType)
             //->setAgentAddressBuildingAdditionalLetter('b', $agentType)
             //->setAgentAddressBuildingZipcode('21109', $agentType)
@@ -344,8 +343,6 @@ class XBeteiligungResponseMessageFactory
             ->setAgentAddition('', $agentType)
             ->setAgentContactChannelCode('01', $agentType, 1)
             ->setAgentContactChannelListVersion('3', $agentType)
-            ->setAgentContactLabel('officehamburg@demos-international.com', $agentType, 1);
-            ->setAgentContactChannelName('E-Mail', $agentType, 1)
             ->setAgentContactLabel('officehamburg@demos-international.com', $agentType, 1);
             // Autor => Anschrift => Gebaude
             //->setAgentAddressBuildingNumber('43', $agentType)
