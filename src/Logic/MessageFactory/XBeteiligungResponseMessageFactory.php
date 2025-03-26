@@ -13,10 +13,9 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
 use DateTime;
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
@@ -82,17 +81,17 @@ class XBeteiligungResponseMessageFactory
     protected LoggerInterface $dplanCockpitLogger;
 
     protected Serializer $serializer;
-    protected GlobalConfigInterface $globalConfig;
+    protected PermissionEvaluatorInterface $permissionEvaluator;
     protected XBeteiligungService $xBeteiligungService;
 
     public function __construct(
         LoggerInterface $dplanCockpitLogger,
         XBeteiligungService $xBeteiligungService,
-        GlobalConfigInterface $globalConfig,
+        PermissionEvaluatorInterface $permissionEvaluator,
     ) {
         $this->dplanCockpitLogger = $dplanCockpitLogger;
         $this->xBeteiligungService = $xBeteiligungService;
-        $this->globalConfig = $globalConfig;
+        $this->permissionEvaluator = $permissionEvaluator;
         $this->serializer = $this->getSerializerBuild();
     }
 

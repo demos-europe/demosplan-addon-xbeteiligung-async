@@ -2,7 +2,7 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ProcedureMessageTyp;
+use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AllgemeinerNameType;
@@ -29,10 +29,6 @@ use JsonException;
 
 class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 {
-    public const PROJECT_PREFIX_DIPLANBAU = 'diplanbau';
-    public const PROJECT_PREFIX_DIPLANROG = 'diplanrog';
-    public const PROJECT_PREFIX_DIPLANFEST = 'diplanfest';
-
     /**
      * Builds a valid XBeteiligungsmessage as a response of creating a statement.
      *
@@ -195,20 +191,16 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
      */
     private function getIteration(StellungnahmeType $statement, StatementCreated $statementCreated): void
     {
-        $projectPrefix = $this->globalConfig->getProjectPrefix();
-        switch ($projectPrefix) {
-            case self::PROJECT_PREFIX_DIPLANBAU:
-                $procedure = new BeteiligungKommunalTOEBType();
-                break;
-            case self::PROJECT_PREFIX_DIPLANROG:
-                $procedure = new BeteiligungRaumordnungType();
-                break;
-            case self::PROJECT_PREFIX_DIPLANFEST:
-                $procedure = new BeteiligungPlanfeststellungType();
-                break;
-            default:
-                $this->dplanCockpitLogger->error('No project prefix found.');
-                throw new ProjectPrefixNotFoundException();
+        $procedure = null;
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
+            $procedure = new BeteiligungKommunalTOEBType();
+        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
+            $procedure = new BeteiligungRaumordnungType();
+        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
+            $procedure = new BeteiligungPlanfeststellungType();
+        }elseif ($procedure === null) {
+            $this->dplanCockpitLogger->error('No procedure found.');
+            throw new ProjectPrefixNotFoundException();
         }
         $procedure->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
         $statement->setDurchgang($procedure->getDurchgang());
@@ -219,33 +211,24 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
      */
     private function getProcedurePhase(StatementCreated $statementCreated, StellungnahmeType $statement): void
     {
-        $projectPrefix = $this->globalConfig->getProjectPrefix();
-        switch ($projectPrefix) {
-            case self::PROJECT_PREFIX_DIPLANBAU:
-                $participationType = new CodeVerfahrensschrittKommunalType();
-                $phaseCode = $statementCreated->getPhaseCodeKommunale($statementCreated->getPhase(), $statementCreated->getPublicStatement());
-                $participationType->setCode($phaseCode);
-                $participationType->setListVersionID('3');
-                $statement->setVerfahrensschrittKommunal($participationType);
-                break;
-            case ProcedureMessageTyp::RAUMORDNUNG:
-                $participationType = new CodeVerfahrensschrittRaumordnungType();
-                $phaseCode = $statementCreated->getPhaseCodeRaumordnung($statementCreated->getPhase(), $statementCreated->getPublicStatement());
-                $participationType->setCode($phaseCode);
-                $participationType->setListVersionID('3');
-                $statement->setVerfahrensschrittRaumordnung($participationType);
-                break;
-            case ProcedureMessageTyp::PLANFESTSTELLUNG:
-                $participationType = new CodeVerfahrensschrittPlanfeststellungType();
-                $phaseCode = $statementCreated->getPhaseCodePlanfeststellung() ?? 'configuration';
-                $participationType->setCode($phaseCode);
-                $statement->setVerfahrensschrittPlanfeststellung($participationType);
-                break;
-            default:
-                $this->dplanCockpitLogger->error('No project prefix found.');
-                throw new ProjectPrefixNotFoundException();
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
+            $participationType = new CodeVerfahrensschrittKommunalType();
+            $phaseCode = $statementCreated->getPhaseCodeKommunale($statementCreated->getPhase(), $statementCreated->getPublicStatement());
+            $participationType->setCode($phaseCode);
+            $participationType->setListVersionID('3');
+            $statement->setVerfahrensschrittKommunal($participationType);
+        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
+            $participationType = new CodeVerfahrensschrittRaumordnungType();
+            $phaseCode = $statementCreated->getPhaseCodeRaumordnung($statementCreated->getPhase(), $statementCreated->getPublicStatement());
+            $participationType->setCode($phaseCode);
+            $participationType->setListVersionID('3');
+            $statement->setVerfahrensschrittRaumordnung($participationType);
+        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
+            $participationType = new CodeVerfahrensschrittPlanfeststellungType();
+            $phaseCode = $statementCreated->getPhaseCodePlanfeststellung() ?? 'configuration';
+            $participationType->setCode($phaseCode);
+            $statement->setVerfahrensschrittPlanfeststellung($participationType);
         }
-
     }
 
     private function getAbwaegungVorschlag($abwaegungVorschlag): string

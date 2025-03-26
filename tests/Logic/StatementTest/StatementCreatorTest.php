@@ -2,7 +2,6 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\StatementTest;
 
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
@@ -10,6 +9,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
+use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
@@ -54,7 +54,7 @@ class StatementCreatorTest extends TestCase
     protected $serializer;
 
     private MockFactoryTest $mockFactory;
-    protected MockObject $globalConfig;
+    protected MockObject $permissionEvaluator;
     protected MockObject $gisLayerCategoryRepository;
     protected MockObject $procedureNewsService;
     protected MockObject $procedureMessageRepository;
@@ -66,8 +66,8 @@ class StatementCreatorTest extends TestCase
     {
         $mockFactory = new MockFactoryTest();
         $this->mockFactory = $mockFactory;
-        $this->globalConfig = $this->createMock(GlobalConfigInterface::class);
-        $this->globalConfig->method('getProjectPrefix')->willReturn('diplanbau');
+        $this->permissionEvaluator = $this->createMock(PermissionEvaluatorInterface::class);
+        $this->permissionEvaluator->method('isPermissionEnabled')->willReturn(true);
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->user = $this->createMock(UserInterface::class);
         $this->procedure = $this->createMock(ProcedureInterface::class);
@@ -91,7 +91,7 @@ class StatementCreatorTest extends TestCase
         $this->sut = new StatementMessageFactory(
             $this->mockFactory->getLoggerInterfaceMock(),
             $xbeteiligungService,
-            $this->globalConfig,
+            $this->permissionEvaluator,
         );
     }
 
