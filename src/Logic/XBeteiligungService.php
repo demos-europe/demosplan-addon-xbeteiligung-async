@@ -36,6 +36,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunika
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeAktualisiert0702;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeGeloescht0709;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalTOEBType;
@@ -210,6 +213,14 @@ class XBeteiligungService
                 PlanfeststellungLoeschen0209::class,
             ],
         ],
+        '700' => [
+            'xsd' => 'xbeteiligung-allgemein.xsd',
+            'classes' => [
+                AllgemeinStellungnahmeNeuabgegeben0701::class,
+                AllgemeinStellungnahmeAktualisiert0702::class,
+                AllgemeinStellungnahmeGeloescht0709::class
+            ]
+        ]
     ];
 
     private const NON_EXISTING_CODE = 'work probably in progress';

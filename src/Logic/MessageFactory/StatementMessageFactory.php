@@ -53,6 +53,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
     /**
      * @throws JsonException
+     * @throws ProjectPrefixNotFoundException
      */
     public function createXBeteiligungStellungnahmeNeu0701Content(StatementCreated $statementCreated): NachrichteninhaltAnonymousPHPType
     {
@@ -264,5 +265,15 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         }
 
         return $result;
+    }
+
+    public function isValidCreatedStatementMessage (string $message): bool
+    {
+        return $this->xBeteiligungService->isValidMessage(
+            $message,
+            true,
+            '',
+            AllgemeinStellungnahmeNeuabgegeben0701::class
+        );
     }
 }

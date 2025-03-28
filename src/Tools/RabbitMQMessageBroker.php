@@ -95,17 +95,20 @@ class RabbitMQMessageBroker
         return Json::decodeToMatchingType($replies['XBeteiligung_Send']);
     }
 
+    /**
+     * @throws Exception
+     */
     public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): StatementCreatedEventInterface
     {
         $statementCreated = $this->xBeteiligungService->getStatementCreatedFromEvent($event);
 
         // this technically returns a response which is currently unused
-        try {
-            $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
-            $this->sendRabbitMq($xmlString);
-        } catch (\Exception $e) {
-            $this->logger->warning('could not send statementCreated message', [$e]);
-        }
+
+        $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
+        $this->statementMessageFactory->isValidCreatedStatementMessage($xmlString);
+        $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
+        $this->sendRabbitMq($xmlString);
+
 
         return $event;
     }
