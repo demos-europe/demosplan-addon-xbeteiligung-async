@@ -23,6 +23,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
@@ -153,7 +154,13 @@ abstract class XBeteiligungServiceTest extends TestCase
 
     protected function validateProcedureXML(string $procedureXml, string $messageClass): void
     {
-        $isValid = $this->sut->isValidMessage($procedureXml, true, '', $messageClass);
+        $isValid = CommonHelpers::isValidMessage(
+            $procedureXml,
+            true,
+            '',
+            $messageClass,
+            $this->createMock(LoggerInterface::class)
+        );
         self::assertTrue($isValid);
     }
 }

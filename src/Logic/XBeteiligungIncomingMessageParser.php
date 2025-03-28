@@ -24,19 +24,12 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
-use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\BaseTypesHandler;
-use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\XmlSchemaDateHandler;
-use JMS\Serializer\Handler\HandlerRegistryInterface;
-use JMS\Serializer\Serializer;
-use JMS\Serializer\SerializerBuilder;
 use SimpleXMLElement;
 
 class XBeteiligungIncomingMessageParser
 {
     public const INCOMING_MESSAGE = 'Incoming Message could not be validated';
     public const UNEXPECTED_NAME = 'Unexpected name, won’t continue';
-
-    protected Serializer $serializer;
 
     private array $messageTypeMapping = [
         '401' => [
@@ -76,24 +69,6 @@ class XBeteiligungIncomingMessageParser
             'identifier' => XBeteiligungService::DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
     ];
-
-    public function __construct()
-    {
-        $this->serializer = $this->getSerializerBuild();
-    }
-
-    private function getSerializerBuild(): Serializer
-    {
-        $serializerBuilder = SerializerBuilder::create();
-        $serializerBuilder->addMetadataDir(__DIR__ . '/../Soap/metadata', 'DemosEurope\DemosplanAddon\XBeteiligung\Soap');
-        $serializerBuilder->configureHandlers(static function (HandlerRegistryInterface $handler) use ($serializerBuilder) {
-            $serializerBuilder->addDefaultHandlers();
-            $handler->registerSubscribingHandler(new BaseTypesHandler());
-            $handler->registerSubscribingHandler(new XmlSchemaDateHandler());
-        });
-
-        return $serializerBuilder->build();
-    }
 
     /**
      * @throws SchemaException
@@ -160,7 +135,7 @@ class XBeteiligungIncomingMessageParser
     private function deserializeMessageWithCertainty(string $incomingMessage, string $className): NachrichtG2GTypeType
     {
         /** @var NachrichtG2GTypeType $message */
-        $message = $this->serializer->deserialize(
+        $message = SerializerFactory::getSerializer()->deserialize(
             $incomingMessage,
             $className,
             'xml'

@@ -73,14 +73,11 @@ use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use JMS\Serializer\Serializer;
 use Psr\Log\LoggerInterface;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class XBeteiligungService
 {
-    /** @var Serializer */
-    private Serializer $serializer;
     private const PARTICIPATION_RAUMORDNUNG_PHASE = 'Erwiderung /Planänderung bzw. Auswertung';
     private const PUBLICPARTICIPATIONPHASKOMMUNALEMAP = [
         'configuration' => [
@@ -188,41 +185,6 @@ class XBeteiligungService
         ]
     ];
 
-    private array $messageTypeMapping = [
-        '400' => [
-            'xsd' => 'xbeteiligung-kommunaleBauleitplanung.xsd',
-            'classes' => [
-                KommunalInitiieren0401::class,
-                KommunalAktualisieren0402::class,
-                KommunalLoeschen0409::class,
-            ],
-        ],
-        '300' => [
-            'xsd' => 'xbeteiligung-raumordnung.xsd',
-            'classes' => [
-                RaumordnungInitiieren0301::class,
-                RaumordnungAktualisieren0302::class,
-                RaumordnungLoeschen0309::class,
-            ],
-        ],
-        '200' => [
-            'xsd' => 'xbeteiligung-planfeststellung.xsd',
-            'classes' => [
-                PlanfeststellungInitiieren0201::class,
-                PlanfeststellungAktualisieren0202::class,
-                PlanfeststellungLoeschen0209::class,
-            ],
-        ],
-        '700' => [
-            'xsd' => 'xbeteiligung-allgemein.xsd',
-            'classes' => [
-                AllgemeinStellungnahmeNeuabgegeben0701::class,
-                AllgemeinStellungnahmeAktualisiert0702::class,
-                AllgemeinStellungnahmeGeloescht0709::class
-            ]
-        ]
-    ];
-
     private const NON_EXISTING_CODE = 'work probably in progress';
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
@@ -256,7 +218,6 @@ class XBeteiligungService
         private readonly KommunaleProcedureCreater           $kommunaleProcedureCreater,
         private readonly StatementCreator                    $statementCreator,
     ) {
-        $this->serializer = SerializerFactory::getSerializer();
     }
 
     /**
@@ -275,7 +236,7 @@ class XBeteiligungService
             $this->generateMain401MessageContent($procedure)
         ); // required
 
-        return $this->serializeData($procedureCreated401Object);
+        return SerializerFactory::serializeData($procedureCreated401Object, $this->logger);
     }
 
     public function createXMLFor301(
@@ -290,7 +251,7 @@ class XBeteiligungService
         $procedureCreated301->setNachrichteninhalt(
             $this->generateMain301MessageContent($procedure)
         ); // required
-        return $this->serializeData($procedureCreated301);
+        return SerializerFactory::serializeData($procedureCreated301, $this->logger);
     }
 
     /**
@@ -309,7 +270,7 @@ class XBeteiligungService
             $this->generateMain402MessageContent($procedure)
         ); // required
 
-        return $this->serializeData($procedureUpdated402Object);
+        return SerializerFactory::serializeData($procedureUpdated402Object, $this->logger);
     }
 
     public function createXMLFor302(
@@ -325,7 +286,7 @@ class XBeteiligungService
             $this->generateMain302MessageContent($procedure)
         );
 
-        return $this->serializeData($procedureUpdated302);
+        return SerializerFactory::serializeData($procedureUpdated302, $this->logger);
     }
 
     /**
@@ -342,7 +303,7 @@ class XBeteiligungService
         ); // required
         $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedureId));
 
-        return $this->serializeData($procedureDeleted409Object);
+        return SerializerFactory::serializeData($procedureDeleted409Object, $this->logger);
     }
 
     public function createXMLFor309(
@@ -358,7 +319,7 @@ class XBeteiligungService
             $this->generateMain309MessageContent($procedureId)
         );
 
-        return $this->serializeData($procedureDeleted309);
+        return SerializerFactory::serializeData($procedureDeleted309, $this->logger);
     }
 
 
@@ -379,7 +340,7 @@ class XBeteiligungService
     private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
     {
         $messageContent = new Nachrichteninhalt401();
-        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setVorgangsID(CommonHelpers::uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungKommunalType())
         );
@@ -390,7 +351,7 @@ class XBeteiligungService
     private function generateMain301MessageContent(ProcedureInterface $procedure): Nachrichteninhalt301
     {
         $messageContent = new Nachrichteninhalt301();
-        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setVorgangsID(CommonHelpers::uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungRaumordnungType())
         );
@@ -401,7 +362,7 @@ class XBeteiligungService
     private function generateMain402MessageContent(ProcedureInterface $procedure): Nachrichteninhalt402
     {
         $messageContent = new Nachrichteninhalt402();
-        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setVorgangsID(CommonHelpers::uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungKommunalType())
         );
@@ -412,7 +373,7 @@ class XBeteiligungService
     private function generateMain302MessageContent(ProcedureInterface $procedure): Nachrichteninhalt302
     {
         $messageContent = new Nachrichteninhalt302();
-        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setVorgangsID(CommonHelpers::uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungRaumordnungType())
         );
@@ -423,7 +384,7 @@ class XBeteiligungService
     private function generateMain409MessageContent(string $procedureId): Nachrichteninhalt409
     {
         $messageContent = new Nachrichteninhalt409();
-        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setVorgangsID(CommonHelpers::uuid());
         $messageContent->setPlanID($procedureId);
         $messageContent->setBeteiligungsID($procedureId); // why does only a 409 Message still has this property?
 
@@ -433,7 +394,7 @@ class XBeteiligungService
     public function generateMain309MessageContent(string $procedureId): Nachrichteninhalt309
     {
         $messageContent = new Nachrichteninhalt309();
-        $messageContent->setVorgangsID($this->uuid());
+        $messageContent->setVorgangsID(CommonHelpers::uuid());
         $messageContent->setPlanID($procedureId);
         $messageContent->setBeteiligungsID($procedureId);
 
@@ -602,7 +563,7 @@ class XBeteiligungService
         $institutionParticipationType = new BeteiligungKommunalTOEBType();
 
         // we as demos think this id is useless - did not win the discussion as it seems :(
-        $institutionParticipationType->setBeteiligungsID($this->uuid());
+        $institutionParticipationType->setBeteiligungsID(CommonHelpers::uuid());
         // this MetadatenAnlageType should support a base64 container to dump files into, but it does not - S.C. is informed
         //$publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
         $institutionParticipationType->setZeitraum($this->createTimeSpanOfProcedurePhase($procedure->getPhaseObject()));
@@ -623,7 +584,7 @@ class XBeteiligungService
     {
         $publicParticipationType = new BeteiligungKommunalOeffentlichkeitType();
         // we as demos think this id is useless - did not win the discussion as it seems :(
-        $publicParticipationType->setBeteiligungsID($this->uuid());
+        $publicParticipationType->setBeteiligungsID(CommonHelpers::uuid());
         // this MetadatenAnlageType should support a base64 container to dump files into but it does not - S.C. is informed
         // $publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
         $publicParticipationType->setZeitraum(
@@ -824,60 +785,11 @@ class XBeteiligungService
         $messageTypeCode->setCode($code);
 
         // id has to match pattern: '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
-        $identificationMessage->setNachrichtenUUID($this->uuid()); // required
+        $identificationMessage->setNachrichtenUUID(CommonHelpers::uuid()); // required
         $identificationMessage->setErstellungszeitpunkt(new DateTime()); // required
         $identificationMessage->setNachrichtentyp($messageTypeCode); // required
 
         return $identificationMessage;
-    }
-
-    private function resolveXsdFilePath(string $messageClass): string
-    {
-        foreach ($this->messageTypeMapping as $group) {
-            if (in_array($messageClass, $group['classes'], true)) {
-                return $group['xsd'];
-            }
-        }
-
-        throw new InvalidArgumentException(sprintf(
-            'No XSD file found for message class: %s',
-            $messageClass
-        ));
-    }
-
-    /**
-     * Validates a message against a given xsd file located in plugin xsd folder.
-     */
-    public function isValidMessage(
-        string $message,
-        bool $verboseDebug = false,
-        string $path = '',
-        string $messageClass = ''
-    ): bool
-    {
-        if ('' === $path) {
-            $path = AddonPath::getRootPath('Resources/xsd/');
-        }
-        $xsdFile = $this->resolveXsdFilePath($messageClass);
-        $fullPath = $path . $xsdFile;
-        $document = new \DOMDocument();
-        $document->loadXML($message);
-        $isValid = $document->schemaValidate($fullPath);
-        if (!$isValid) {
-            // revalidate with error handling
-            libxml_use_internal_errors(true);
-            $document->schemaValidate($fullPath);
-            $errors = libxml_get_errors();
-            foreach ($errors as $error) {
-                $this->logger->warning('Invalid XML message', [$error]);
-                if ($verboseDebug) {
-                    $this->logger->debug('XML validation error', ['error' => $error]);
-                }
-            }
-            libxml_clear_errors();
-            return false;
-        }
-        return true;
     }
 
     public function createProcedureMessage(string $xml, string $procedureId): ProcedureMessage
@@ -885,7 +797,7 @@ class XBeteiligungService
         $error = false;
         $path = AddonPath::getRootPath('addons/vendor/' .
             XBeteiligungAsyncAddon::ADDON_NAME . '/Resources/xsd/');
-        if (false === $this->isValidMessage($xml, path: $path))
+        if (false === CommonHelpers::isValidMessage($xml, false,  $path, '', $this->logger))
         {
             $this->logger->warning('The generated XML is not valid.', [
                 'procedureId' => $procedureId,
@@ -1050,29 +962,6 @@ class XBeteiligungService
         }
         */
         throw new InvalidArgumentException('Message payload not supported');
-    }
-
-    public function serializeData($data): string
-    {
-        // Serialize the data to XML with a custom root name
-        $xml =  $this->serializer->serialize($data, 'xml');
-        $this->logger->debug('Serialized XML:', [$xml]);
-
-        // Load the XML string into a SimpleXMLElement object
-        $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
-        if ($xml === false) {
-            $this->logger->error('Failed to load XML string.');
-            return '';
-        }
-
-        // Save the XML to a string
-        $result = $xml->saveXML();
-        if ($result === false) {
-            $this->logger->error('Error on save serialized xml.', [$xml->asXML()]);
-            return '';
-        }
-
-        return $result;
     }
 
     public function uuid(): string

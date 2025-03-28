@@ -5,6 +5,8 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AllgemeinerNameType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameNatuerlichePersonType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701\AllgemeinStellungnahmeNeuabgegeben0701AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
@@ -38,14 +40,14 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         $message = new AllgemeinStellungnahmeNeuabgegeben0701();
 
-        $this->xBeteiligungService->setProductInfo($message);
+        $this->setProductInfo($message);
         $header = $this->buildHeader('0701', 'LGV');
         $message->setNachrichtenkopfG2g($header);
 
         $content = $this->createXBeteiligungStellungnahmeNeu0701Content($statementCreated);
         $message->setNachrichteninhalt($content);
 
-        $messageXml = $this->xBeteiligungService->serializeData($message);
+        $messageXml = SerializerFactory::serializeData($message, $this->dplanCockpitLogger);
 
         return $this->addNamespacesTo70xXML($messageXml);
     }
@@ -117,7 +119,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $statement->setSchlagwort($statementCreated->getTags());
         $nachricht = new NachrichteninhaltAnonymousPHPType();
         $nachricht->setStellungnahme($statement);
-        $nachricht->setVorgangsID($this->xBeteiligungService->uuid());
+        $nachricht->setVorgangsID(CommonHelpers::uuid());
 
         return $nachricht;
     }
@@ -269,11 +271,12 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
     public function isValidCreatedStatementMessage (string $message): bool
     {
-        return $this->xBeteiligungService->isValidMessage(
+        return CommonHelpers::isValidMessage(
             $message,
             true,
             '',
-            AllgemeinStellungnahmeNeuabgegeben0701::class
+            AllgemeinStellungnahmeNeuabgegeben0701::class,
+            $this->dplanCockpitLogger
         );
     }
 }
