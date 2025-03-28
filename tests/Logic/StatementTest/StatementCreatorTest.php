@@ -90,7 +90,6 @@ class StatementCreatorTest extends TestCase
         $this->serializer = SerializerFactory::getSerializer();
         $this->sut = new StatementMessageFactory(
             $this->mockFactory->getLoggerInterfaceMock(),
-            $xbeteiligungService,
             $this->permissionEvaluator,
         );
     }
