@@ -245,31 +245,9 @@ class StatementCreatorTest extends TestCase
         self::assertSame('officehamburg@demos-international.com', $communication2->getKennung());
     }
 
-    private function isValidMessage(string $message, bool $verboseDebug = false, string $xsdFile = 'xbeteiligung-allgemein.xsd'): bool
+    private function isValidMessage(string $message): bool
     {
-        $path = AddonPath::getRootPath('/Resources/xsd/'.$xsdFile);
-        $document = new \DOMDocument();
-        $document->loadXML($message);
-        $isValid = $document->schemaValidate($path);
-        if ($isValid) {
-            return true;
-        }
-        // revalidate with error handling
-        libxml_use_internal_errors(true);
-        $document->schemaValidate($path);
-        $errors = libxml_get_errors();
-        foreach ($errors as $error) {
-            if ($verboseDebug) {
-                print_r($error);
-            }
-        }
-        libxml_clear_errors();
-        libxml_use_internal_errors(false);
-        if ($verboseDebug) {
-            print_r($message);
-        }
-
-        return false;
+        return $this->sut->isValidCreatedStatementMessage($message);
     }
 
 }
