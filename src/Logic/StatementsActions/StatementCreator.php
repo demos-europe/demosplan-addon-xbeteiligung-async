@@ -4,6 +4,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
@@ -21,6 +22,7 @@ class StatementCreator
     {
         $statementCreated = new StatementCreated($this->user, $this->procedure, $this->meta);
 
+        /** @var StatementInterface $eventStatement */
         $eventStatement = $event->getStatement();
 
         $statementCreated->setPublicId($eventStatement->getId());
@@ -52,7 +54,6 @@ class StatementCreator
         $statementCreated->setPriority($eventStatement->getPriority());
         $statementCreated->setVotes($eventStatement->getVotes());
         $statementCreated->setTags($eventStatement->getTags());
-        $statementCreated->setFile($eventStatement->getFile());
         $statementCreated->lock();
 
         return $statementCreated;
