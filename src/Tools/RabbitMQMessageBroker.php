@@ -105,9 +105,12 @@ class RabbitMQMessageBroker
         // this technically returns a response which is currently unused
 
         $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
-        $this->statementMessageFactory->isValidCreatedStatementMessage($xmlString);
-        $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
-        $this->sendRabbitMq($xmlString);
+        if ($this->statementMessageFactory->isValidCreatedStatementMessage($xmlString)){
+            $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
+            $this->sendRabbitMq($xmlString);
+        } else {
+            $this->logger->error('StatementCreated message is not valid', [$xmlString]);
+        }
 
 
         return $event;
