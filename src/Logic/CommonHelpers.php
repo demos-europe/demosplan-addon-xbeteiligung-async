@@ -89,10 +89,10 @@ class CommonHelpers
      */
     public static function isValidMessage(
         string $message,
+        LoggerInterface $logger,
         bool $verboseDebug = false,
         string $path = '',
         string $messageClass = '',
-        LoggerInterface $logger
     ): bool
     {
         if ('' === $path) {
