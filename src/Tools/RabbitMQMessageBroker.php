@@ -98,20 +98,18 @@ class RabbitMQMessageBroker
     /**
      * @throws Exception
      */
-    public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): StatementCreatedEventInterface
+    public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): ?StatementCreatedEventInterface
     {
         $statementCreated = $this->xBeteiligungService->getStatementCreatedFromEvent($event);
-
+        if ($statementCreated->getPlanId() === null) {
+            $this->logger->error('StatementCreatedEvent has no planId', [$statementCreated]);
+            return null;
+        }
         // this technically returns a response which is currently unused
 
         $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
-        if ($this->statementMessageFactory->isValidCreatedStatementMessage($xmlString)){
-            $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
-            $this->sendRabbitMq($xmlString);
-        } else {
-            $this->logger->error('StatementCreated message is not valid', [$xmlString]);
-        }
-
+        $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
+        $this->sendRabbitMq($xmlString);
 
         return $event;
     }
