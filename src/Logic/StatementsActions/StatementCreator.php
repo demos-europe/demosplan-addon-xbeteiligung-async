@@ -18,12 +18,19 @@ class StatementCreator
     protected UserInterface $user;
     protected ProcedureInterface $procedure;
     protected StatementMetaInterface $meta;
+
+    public function __construct(RouterInterface $router)
+    {
+        $this->router = $router;
+    }
     public function getStatementCreatedFromEvent(StatementCreatedEventInterface $event): StatementCreated
     {
-        $statementCreated = new StatementCreated($this->user, $this->procedure, $this->meta);
-
         /** @var StatementInterface $eventStatement */
         $eventStatement = $event->getStatement();
+        $meta = $eventStatement->getMeta();
+        $user = $eventStatement->getUser();
+        $procedure = $eventStatement->getProcedure();
+        $statementCreated = new StatementCreated($user, $procedure, $meta);
 
         $statementCreated->setPublicId($eventStatement->getId());
         $statementCreated->setCreatedAt($eventStatement->getCreated());
@@ -53,7 +60,7 @@ class StatementCreator
         $statementCreated->setFeedback($eventStatement->getFeedback());
         $statementCreated->setPriority($eventStatement->getPriority());
         $statementCreated->setVotes($eventStatement->getVotes());
-        $statementCreated->setTags($eventStatement->getTags());
+        $statementCreated->setTags($eventStatement->getTags()->toArray());
         $statementCreated->lock();
 
         return $statementCreated;
