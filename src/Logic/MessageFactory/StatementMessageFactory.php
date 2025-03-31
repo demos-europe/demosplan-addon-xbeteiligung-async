@@ -273,10 +273,10 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         return CommonHelpers::isValidMessage(
             $message,
+            $this->dplanCockpitLogger,
             true,
             '',
             AllgemeinStellungnahmeNeuabgegeben0701::class,
-            $this->dplanCockpitLogger
         );
     }
 }

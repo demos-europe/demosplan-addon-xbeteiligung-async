@@ -797,7 +797,7 @@ class XBeteiligungService
         $error = false;
         $path = AddonPath::getRootPath('addons/vendor/' .
             XBeteiligungAsyncAddon::ADDON_NAME . '/Resources/xsd/');
-        if (false === CommonHelpers::isValidMessage($xml, false,  $path, '', $this->logger))
+        if (false === CommonHelpers::isValidMessage($xml, $this->logger, false,  $path, ''))
         {
             $this->logger->warning('The generated XML is not valid.', [
                 'procedureId' => $procedureId,

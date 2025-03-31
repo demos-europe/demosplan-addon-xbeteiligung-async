@@ -156,10 +156,10 @@ abstract class XBeteiligungServiceTest extends TestCase
     {
         $isValid = CommonHelpers::isValidMessage(
             $procedureXml,
+            $this->createMock(LoggerInterface::class),
             true,
             '',
             $messageClass,
-            $this->createMock(LoggerInterface::class)
         );
         self::assertTrue($isValid);
     }
