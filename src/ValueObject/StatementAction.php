@@ -31,10 +31,10 @@ class StatementAction extends ValueObject
     protected Collection $votes;
     protected array $tags;
     protected string $publicStatement = '';
-    protected UserInterface $user;
+    protected ?UserInterface $user;
     protected StatementMetaInterface $meta;
 
-    public function __construct(UserInterface $user, ProcedureInterface $procedure, StatementMetaInterface $meta)
+    public function __construct(?UserInterface $user, ProcedureInterface $procedure, StatementMetaInterface $meta)
     {
         $this->user = $user;
         $this->procedure = $procedure;
@@ -240,7 +240,8 @@ class StatementAction extends ValueObject
                 default:
                     $mappedPartPhaseCode = '9998';
             }
-        } elseif ($publicStatement === StatementInterface::EXTERNAL) {
+        }
+        if ($publicStatement === StatementInterface::EXTERNAL) {
             switch ($phaseKey) {
                 case 'earlyparticipation': // Frühzeitige Öffentlichkeitsbeteiligung
                     $mappedPartPhaseCode = '0600';
@@ -299,7 +300,8 @@ class StatementAction extends ValueObject
                 default:
                     $mappedPhaseCode = '9998';
             }
-        } elseif ($publicStatement === StatementInterface::EXTERNAL) {
+        }
+        if ($publicStatement === StatementInterface::EXTERNAL) {
             switch ($phaseKey) {
                 case 'configuration': // Einleitungsphase
                     $mappedPhaseCode = '1000';
@@ -363,7 +365,8 @@ class StatementAction extends ValueObject
                 default:
                     $mappedPhaseCode = '9998';
             }
-        } elseif ($publicStatement === StatementInterface::EXTERNAL) {
+        }
+        if ($publicStatement === StatementInterface::EXTERNAL) {
             switch ($phaseKey) {
                 case 'configuration': // Konfiguration betroffene Öffentlichkeit
                     $mappedPhaseCode = '5000';

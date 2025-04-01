@@ -137,10 +137,10 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         $statusDerStellungnahmeCode = '';
         $statusDerStellungnahmeMapping = [
-            'neue Stellungnahme'                                    => '1000',
-            'in Bearbeitung befindliche Stellungnahme'              => '2000',
-            'Stellungnahme wurde bearbeitet'                        => '3000',
-            'Schlussmitteilung einer Stellungnahme wurde versendet' => '4000',
+            'new'                => '1000', //neue Stellungnahme
+            'processing'         => '2000', //in Bearbeitung befindliche Stellungnahme
+            'processed'          => '3000', //Stellungnahme wurde bearbeitet
+            'statementFinalSent' => '4000', //Schlussmitteilung einer Stellungnahme wurde versendet
         ];
         if (array_key_exists($statusDerStellungnahme, $statusDerStellungnahmeMapping)) {
             $statusDerStellungnahmeCode = $statusDerStellungnahmeMapping[$statusDerStellungnahme];
@@ -166,8 +166,8 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         $artOfFeedbackCode = '';
         $artOfFeedbackMapping = [
-            'E-Mail' => '1000',
-            'Post' => '2000',
+            'email' => '1000',
+            'post' => '2000',
         ];
         if (array_key_exists($artOfFeedback, $artOfFeedbackMapping)) {
             $artOfFeedbackCode = $artOfFeedbackMapping[$artOfFeedback];
