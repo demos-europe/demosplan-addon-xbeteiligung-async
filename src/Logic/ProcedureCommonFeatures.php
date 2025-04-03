@@ -29,17 +29,17 @@ abstract class ProcedureCommonFeatures
 {
     public function __construct(
         protected readonly CurrentUserProviderInterface       $currentUserProvider,
+        protected readonly EntityManagerInterface             $entityManager,
+        protected readonly KommunaleMessageFactory            $kommunaleMessageFactory,
         protected readonly LoggerInterface                    $logger,
+        protected readonly PlanfeststellungMessageFactory     $planfeststellungMessageFactory,
         protected readonly ProcedureServiceInterface          $procedureService,
         protected readonly ProcedureServiceStorageInterface   $procedureServiceStorage,
         protected readonly ProcedureTypeServiceInterface      $procedureTypeService,
-        protected readonly UserHandlerInterface               $userHandler,
-        protected readonly EntityManagerInterface             $entityManager,
-        protected readonly KommunaleMessageFactory            $kommunaleMessageFactory,
         protected readonly RaumordnungMessageFactory          $raumordnungMessageFactory,
-        protected readonly PlanfeststellungMessageFactory     $planfeststellungMessageFactory,
-        protected readonly TranslatorInterface                $translator,
         protected readonly TransactionServiceInterface        $transactionService,
+        protected readonly TranslatorInterface                $translator,
+        protected readonly UserHandlerInterface               $userHandler,
     )
     {
     }
