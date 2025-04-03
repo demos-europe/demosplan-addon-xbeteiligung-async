@@ -85,7 +85,7 @@ class CoordinateTransformationTest extends TestCase
      * and visually ckecking the drawn-polygon.
      * The same was done for the derived bbox and the mapextent.
      */
-    public function testTheRealThing()
+    public function testVerifiedCorrectOutcome()
     {
         $boundingBox = ['1122283.0888018', '7071358.9416223', '1122490.3573963', '7071606.5585396'];
         $mapExtent = ['1121972.185910', '7070987.516246' ,'1122801.260288' ,'7071977.983916'];
