@@ -23,14 +23,30 @@ enum PublicParticipationPhase
 
     public static function fromKey(string $key): ?self {
         return match($key) {
-            'configuration' => self::CONFIGURATION,
-            'earlyparticipation' => self::EARLY_PARTICIPATION,
-            'participation' => self::PARTICIPATION,
-            'anotherparticipation' => self::ANOTHER_PARTICIPATION,
-            'evaluating' => self::EVALUATING,
-            'closed' => self::CLOSED,
+            ProcedurePhaseKey::CONFIGURATION->value => self::CONFIGURATION,
+            ProcedurePhaseKey::EARLY_PARTICIPATION->value => self::EARLY_PARTICIPATION,
+            ProcedurePhaseKey::PARTICIPATION->value => self::PARTICIPATION,
+            ProcedurePhaseKey::ANOTHER_PARTICIPATION->value => self::ANOTHER_PARTICIPATION,
+            ProcedurePhaseKey::EVALUATING->value => self::EVALUATING,
+            ProcedurePhaseKey::CLOSED->value => self::CLOSED,
             default => null,
         };
+    }
+
+    public static function getKeyFromCode(string $code): ?string {
+        foreach (self::cases() as $case) {
+            if ($case->getCode() === $code) {
+                return match ($case) {
+                    self::CONFIGURATION => ProcedurePhaseKey::CONFIGURATION->value,
+                    self::EARLY_PARTICIPATION => ProcedurePhaseKey::EARLY_PARTICIPATION->value,
+                    self::PARTICIPATION => ProcedurePhaseKey::PARTICIPATION->value,
+                    self::EVALUATING => ProcedurePhaseKey::EVALUATING->value,
+                    self::CLOSED => ProcedurePhaseKey::CLOSED->value,
+                };
+            }
+        }
+
+        return null;
     }
 
     public function getCode(): string {

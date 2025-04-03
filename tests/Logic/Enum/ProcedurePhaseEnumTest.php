@@ -14,15 +14,30 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\Enum;
 
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ProcedurePhaseKey;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use PHPUnit\Framework\TestCase;
 
 class ProcedurePhaseEnumTest extends TestCase
 {
-    public function testFromKeyReturnsCorrectEnum(): void
-    {
-        $this->assertionsForPublicParticipationPhase();
-        $this->assertionsForInstitutionParticipationPhase();
+    /**
+     * @dataProvider publicKeyToParticipationPhaseProvider
+     */
+    public function testFromKeyReturnsCorrectEnumForPublicParticipationPhase(
+        string $key,
+        PublicParticipationPhase $expectedPhase
+    ): void {
+        self::assertSame($expectedPhase, PublicParticipationPhase::fromKey($key));
+    }
+
+    /**
+     * @dataProvider institutionKeyToParticipationPhaseProvider
+     */
+    public function testFromKeyReturnsCorrectEnumForInstitutionParticipationPhase(
+        string $key,
+        InstitutionParticipationPhase $expectedPhase
+    ): void {
+        self::assertSame($expectedPhase, InstitutionParticipationPhase::fromKey($key));
     }
 
     public function testFromKeyReturnsNullForInvalidKey(): void
@@ -31,69 +46,83 @@ class ProcedurePhaseEnumTest extends TestCase
         self::assertNull(PublicParticipationPhase::fromKey(''));
     }
 
-    private function assertionsForPublicParticipationPhase(): void
+    /**
+     * @dataProvider publicParticipationPhaseCodeToKeyProvider
+     */
+    public function testGetKeyFromCodeReturnsCorrectKey(string $expectedKey, string $phaseCode): void
     {
-        self::assertSame(
-            PublicParticipationPhase::CONFIGURATION,
-            PublicParticipationPhase::fromKey('configuration')
-        );
-
-        self::assertSame(
-            PublicParticipationPhase::EARLY_PARTICIPATION,
-            PublicParticipationPhase::fromKey('earlyparticipation')
-        );
-
-        self::assertSame(
-            PublicParticipationPhase::PARTICIPATION,
-            PublicParticipationPhase::fromKey('participation')
-        );
-
-        self::assertSame(
-            PublicParticipationPhase::ANOTHER_PARTICIPATION,
-            PublicParticipationPhase::fromKey('anotherparticipation')
-        );
-
-        self::assertSame(
-            PublicParticipationPhase::EVALUATING,
-            PublicParticipationPhase::fromKey('evaluating')
-        );
-
-        self::assertSame(
-            PublicParticipationPhase::CLOSED,
-            PublicParticipationPhase::fromKey('closed')
-        );
+        self::assertSame($expectedKey, PublicParticipationPhase::getKeyFromCode($phaseCode));
     }
 
-    private function assertionsForInstitutionParticipationPhase(): void
+    /**
+     * @dataProvider institutionParticipationPhaseCodeToKeyProvider
+     */
+    public function testGetKeyFromCodeReturnsCorrectKeyForInstitution(string $expectedKey, string $phaseCode): void
     {
-        self::assertSame(
-            InstitutionParticipationPhase::CONFIGURATION,
-            InstitutionParticipationPhase::fromKey('configuration')
-        );
+        self::assertSame($expectedKey, InstitutionParticipationPhase::getKeyFromCode($phaseCode));
+    }
 
-        self::assertSame(
-            InstitutionParticipationPhase::EARLY_PARTICIPATION,
-            InstitutionParticipationPhase::fromKey('earlyparticipation')
-        );
+    public function testGetKeyFromCodeReturnsNullForUnknownCode(): void
+    {
+        self::assertNull(PublicParticipationPhase::getKeyFromCode('unknowncode'));
+        self::assertNull(InstitutionParticipationPhase::getKeyFromCode(''));
+    }
 
-        self::assertSame(
-            InstitutionParticipationPhase::PARTICIPATION,
-            InstitutionParticipationPhase::fromKey('participation')
-        );
+    /**
+     * @return array<int, array<string, string>>
+     */
+    public function publicParticipationPhaseCodeToKeyProvider(): array
+    {
+        return [
+            [ProcedurePhaseKey::CONFIGURATION->value, PublicParticipationPhase::CONFIGURATION->getCode()],
+            [ProcedurePhaseKey::EARLY_PARTICIPATION->value, PublicParticipationPhase::EARLY_PARTICIPATION->getCode()],
+            [ProcedurePhaseKey::PARTICIPATION->value, PublicParticipationPhase::PARTICIPATION->getCode()],
+            [ProcedurePhaseKey::EVALUATING->value, PublicParticipationPhase::EVALUATING->getCode()],
+            [ProcedurePhaseKey::CLOSED->value, PublicParticipationPhase::CLOSED->getCode()],
+        ];
+    }
 
-        self::assertSame(
-            InstitutionParticipationPhase::ANOTHER_PARTICIPATION,
-            InstitutionParticipationPhase::fromKey('anotherparticipation')
-        );
+    /**
+     * @return array<int, array<string, string>>
+     */
+    public function institutionParticipationPhaseCodeToKeyProvider(): array
+    {
+        return [
+            [ProcedurePhaseKey::CONFIGURATION->value, InstitutionParticipationPhase::CONFIGURATION->getCode()],
+            [ProcedurePhaseKey::EARLY_PARTICIPATION->value, InstitutionParticipationPhase::EARLY_PARTICIPATION->getCode()],
+            [ProcedurePhaseKey::PARTICIPATION->value, InstitutionParticipationPhase::PARTICIPATION->getCode()],
+            [ProcedurePhaseKey::EVALUATING->value, InstitutionParticipationPhase::EVALUATING->getCode()],
+            [ProcedurePhaseKey::CLOSED->value, InstitutionParticipationPhase::CLOSED->getCode()],
+        ];
+    }
 
-        self::assertSame(
-            InstitutionParticipationPhase::EVALUATING,
-            InstitutionParticipationPhase::fromKey('evaluating')
-        );
+    /**
+     * @return array<array{string, PublicParticipationPhase}>
+     */
+    public function publicKeyToParticipationPhaseProvider(): array
+    {
+        return [
+            [ProcedurePhaseKey::CONFIGURATION->value, PublicParticipationPhase::CONFIGURATION],
+            [ProcedurePhaseKey::EARLY_PARTICIPATION->value, PublicParticipationPhase::EARLY_PARTICIPATION],
+            [ProcedurePhaseKey::PARTICIPATION->value, PublicParticipationPhase::PARTICIPATION],
+            [ProcedurePhaseKey::ANOTHER_PARTICIPATION->value, PublicParticipationPhase::ANOTHER_PARTICIPATION],
+            [ProcedurePhaseKey::EVALUATING->value, PublicParticipationPhase::EVALUATING],
+            [ProcedurePhaseKey::CLOSED->value, PublicParticipationPhase::CLOSED],
+        ];
+    }
 
-        self::assertSame(
-            InstitutionParticipationPhase::CLOSED,
-            InstitutionParticipationPhase::fromKey('closed')
-        );
+    /**
+     * @return array<array{string, InstitutionParticipationPhase}>
+     */
+    public function institutionKeyToParticipationPhaseProvider(): array
+    {
+        return [
+            [ProcedurePhaseKey::CONFIGURATION->value, InstitutionParticipationPhase::CONFIGURATION],
+            [ProcedurePhaseKey::EARLY_PARTICIPATION->value, InstitutionParticipationPhase::EARLY_PARTICIPATION],
+            [ProcedurePhaseKey::PARTICIPATION->value, InstitutionParticipationPhase::PARTICIPATION],
+            [ProcedurePhaseKey::ANOTHER_PARTICIPATION->value, InstitutionParticipationPhase::ANOTHER_PARTICIPATION],
+            [ProcedurePhaseKey::EVALUATING->value, InstitutionParticipationPhase::EVALUATING],
+            [ProcedurePhaseKey::CLOSED->value, InstitutionParticipationPhase::CLOSED],
+        ];
     }
 }
