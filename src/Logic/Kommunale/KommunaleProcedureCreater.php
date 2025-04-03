@@ -139,7 +139,10 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                     [$phase]
                 );
                 $procedure->setPhase($phase);
-                $procedure->getSettings()->setTerritory($messageContent->getGeltungsbereich());
+                $mapData = $this->xbeteiligungMapService->setMapData($messageContent->getGeltungsbereich());
+                $procedure->getSettings()->setTerritory($mapData->getTerritory());
+                $procedure->getSettings()->setBoundingBox($mapData->getBbox());
+                $procedure->getSettings()->setMapExtent($mapData->getMapExtent());
                 $akteur = $messageContent->getAkteurVorhaben();
                 $procedure->setOrga($this->mapToOrgaInterface($akteur?->getVeranlasser()));
                 return $procedure;

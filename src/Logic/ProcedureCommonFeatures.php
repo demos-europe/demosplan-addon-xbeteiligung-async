@@ -32,6 +32,7 @@ abstract class ProcedureCommonFeatures
         protected readonly PlanfeststellungMessageFactory     $planfeststellungMessageFactory,
         protected readonly TranslatorInterface                $translator,
         protected readonly TransactionServiceInterface        $transactionService,
+        protected readonly XBeteiligungMapService             $xbeteiligungMapService,
     )
     {
     }
