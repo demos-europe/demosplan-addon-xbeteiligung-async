@@ -7,14 +7,13 @@
 - Update the current addon code to be functional with the new 1.3 standard.
 - Update XBeteiligungService
 - Update ReadMe
+- extract map data from given epsg:4326 territory-polygon and introduce fitting tests.
 
 ## v0.11 (2025-02-28)
 - add rabbitMQ package
 - implement rabbitMQ in services.yml
 - adjust AddonMaintenanceEventInterface in eventSubscriber
 - create some classes to restructure xbeteiligung-async to can to work on comming stories in future
-
-- extract map data from given epsg:4326 territory-polygon and introduce fitting tests.
 
 ## v0.10 (2025-01-13)
 - refactor XBeteiligungProcedureChanged Event Listener and PlanningDocumentsLinkCreator
