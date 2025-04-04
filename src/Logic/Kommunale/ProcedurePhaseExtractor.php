@@ -43,7 +43,7 @@ class ProcedurePhaseExtractor
         $codeBeteiligungOeffentlichkeit = $beteiligungKommunalFormalOeffentlichkeit?->getCode();
 
         $beteiligungKommunalTOEB = $beteiligungKommunal->getBeteiligungTOEB();
-        $durchgangTOEB = $beteiligungKommunalTOEB?->getDurchgang();
+        $durchgangTOEB = $beteiligungKommunalTOEB?->getDurchgang() ?? 1;;
         $zeitraumTOEB = $beteiligungKommunalTOEB?->getZeitraum();
         $beginnTOEB = $zeitraumTOEB?->getBeginn();
         $endeTOEB = $zeitraumTOEB?->getEnde();
@@ -66,6 +66,12 @@ class ProcedurePhaseExtractor
             ? InstitutionParticipationPhase::fromCode($codeBeteiligungTOEB)
             : $institutionParticipationPhase;
 
+        $this->logWarningsForMissingCodes(
+            $codeVerfahrensschrittKommunal,
+            $codeBeteiligungOeffentlichkeit,
+            $codeBeteiligungTOEB
+        );
+
         return new ProcedurePhaseData(
             $publicParticipationPhase,
             $institutionParticipationPhase,
@@ -76,5 +82,21 @@ class ProcedurePhaseExtractor
             $durchgangOeffentlichkeit,
             $durchgangTOEB
         );
+    }
+
+    private function logWarningsForMissingCodes(
+        ?string $codeVerfahrensschrittKommunal,
+        ?string $codeBeteiligungOeffentlichkeit,
+        ?string $codeBeteiligungTOEB
+    ): void {
+        if (null === $codeVerfahrensschrittKommunal) {
+            $this->logger->warning('Code Verfahrensschritt Kommunal is null');
+        }
+        if (null === $codeBeteiligungOeffentlichkeit) {
+            $this->logger->warning('Code Beteiligung Oeffentlichkeit is null');
+        }
+        if (null === $codeBeteiligungTOEB) {
+            $this->logger->warning('Code Beteiligung TOEB is null');
+        }
     }
 }
