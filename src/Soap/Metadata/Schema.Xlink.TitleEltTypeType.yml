@@ -1,0 +1,20 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink\TitleEltTypeType:
+    properties:
+        type:
+            expose: true
+            access_type: public_method
+            serialized_name: type
+            accessor:
+                getter: getType
+                setter: setType
+            xml_attribute: true
+            type: string
+        lang:
+            expose: true
+            access_type: public_method
+            serialized_name: lang
+            accessor:
+                getter: getLang
+                setter: setLang
+            xml_attribute: true
+            type: string

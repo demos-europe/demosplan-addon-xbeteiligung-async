@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\AbstractRing:
+    xml_root_name: AbstractRing
+    xml_root_namespace: 'http://www.opengis.net/gml/3.2'

@@ -1,5 +1,14 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\XBeteiligingService;
 
@@ -15,9 +24,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
@@ -47,17 +54,14 @@ abstract class XBeteiligungServiceTest extends TestCase
         $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false));
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
 
-        $serializer = new SerializerFactory();
         $this->sut = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
             $this->createMock(LoggerInterface::class),
-            $serializer,
             $this->procedureNewsService,
             $this->procedureMessageRepository,
             $this->createMock( PlanningDocumentsLinkCreator::class),
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
-            $this->createMock(XBeteiligungResponseMessageFactory::class),
             $this->createMock(KommunaleProcedureCreater::class),
         );
     }
@@ -145,9 +149,9 @@ abstract class XBeteiligungServiceTest extends TestCase
         return $procedureSettingsMock;
     }
 
-    protected function validateProcedureXML(string $procedureXml): void
+    protected function validateProcedureXML(string $procedureXml, string $messageClass): void
     {
-        $isValid = $this->sut->isValidMessage($procedureXml, true);
+        $isValid = $this->sut->isValidMessage($procedureXml, true, '', $messageClass);
         self::assertTrue($isValid);
     }
 }

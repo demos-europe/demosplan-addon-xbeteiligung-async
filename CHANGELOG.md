@@ -1,6 +1,18 @@
 # Changelog
 
 ## UNRELEASED
+- update the standard to 1.3 (new xsd files), mapping of every xsd namespace to
+ on php namespace
+- generate new schema yml files and php classes from xsd files
+- Update the current addon code to be functional with the new 1.3 standard.
+- Update XBeteiligungService
+- Update ReadMe
+
+## v0.11 (2025-02-28)
+- add rabbitMQ package
+- implement rabbitMQ in services.yml
+- adjust AddonMaintenanceEventInterface in eventSubscriber
+- create some classes to restructure xbeteiligung-async to can to work on comming stories in future
 
 - extract map data from given epsg:4326 territory-polygon and introduce fitting tests.
 

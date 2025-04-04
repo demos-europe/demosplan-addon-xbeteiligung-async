@@ -1,26 +1,33 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222\Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0222;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenOK0212;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenOK0212\Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenOK0212AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0212;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenNOK0229;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenNOK0229\Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenNOK0229AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0229;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219\Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0219;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungNeuNOK0221;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungNeuNOK0221\Beteiligung2PlanungBeteiligungPlanfeststellungNeuNOK0221AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0221;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211\Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NachrichteninhaltAnonymousPHPType0211;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\FehlerType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungPlanfeststellungNeu0201;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\NachrichteninhaltTemplateNOKType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisierenNOK0222;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisierenNOK0222\PlanfeststellungAktualisierenNOK0222AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungAktualisierenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisierenOK0212;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiierenNOK0221;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiierenOK0211;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschen0209;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschenNOK0229;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschenNOK0229\PlanfeststellungLoeschenNOK0229AnonymousPHPType\NachrichteninhaltAnonymousPHPType as PlanfeststellungLoeschenNOOKAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschenOK0219;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 
@@ -33,14 +40,13 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureCreatedResponse211(
         ProcedureInterface $procedure,
-        Planung2BeteiligungBeteiligungPlanfeststellungNeu0201 $xmlObject401
+        PlanfeststellungInitiieren0201 $xmlObject201
     ): ResponseValue
     {
         return $this->buildProcedureCreatedResponse(
             $procedure,
-            $xmlObject401,
-            new Beteiligung2PlanungBeteiligungPlanfeststellungNeuOK0211(),
-            new NachrichteninhaltAnonymousPHPType0211(),
+            $xmlObject201,
+            new PlanfeststellungInitiierenOK0211(),
             '0211'
         );
     }
@@ -51,14 +57,13 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
      * @throws Exception
      */
     public function buildProcedureUpdateOKResponse212(
-        Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202 $xmlObject202,
-        ProcedureInterface                                              $procedure
+        PlanfeststellungAktualisieren0202 $xmlObject202,
+        ProcedureInterface $procedure
     ): ResponseValue {
         return $this->buildProcedureUpdateResponse(
             $procedure,
             $xmlObject202,
-            new Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenOK0212(),
-            new NachrichteninhaltAnonymousPHPType0212(),
+            new PlanfeststellungAktualisierenOK0212(),
             '0212'
         );
     }
@@ -69,13 +74,12 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
      * @throws Exception
      */
     public function buildProcedureDeletedResponse219(
-        Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209 $xmlObject209
+        PlanfeststellungLoeschen0209 $xmlObject209
     ): ResponseValue
     {
         return $this->buildProcedureDeletedResponse(
             $xmlObject209,
-            new Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenOK0219(),
-            new NachrichteninhaltAnonymousPHPType0219(),
+            new PlanfeststellungLoeschenOK0219(),
             '0219'
         );
     }
@@ -88,13 +92,13 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureCreatedErrorResponse221(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungPlanfeststellungNeu0201 $xmlObject201
+        PlanfeststellungInitiieren0201 $xmlObject201
     ): ResponseValue {
-        return $this->buildErrorResponse(
+        return $this->buildCreateErrorResponse(
             $errorTypes,
             $xmlObject201,
-            new Beteiligung2PlanungBeteiligungPlanfeststellungNeuNOK0221(),
-            new NachrichteninhaltAnonymousPHPType0221(),
+            new PlanfeststellungInitiierenNOK0221(),
+            new NachrichteninhaltTemplateNOKType(),
             '0221'
         );
     }
@@ -108,14 +112,14 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureUpdateErrorResponse222(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungPlanfeststellungAktualisieren0202 $xmlObject202
+        PlanfeststellungAktualisieren0202 $xmlObject202
     ): ResponseValue
     {
-        return $this->buildErrorResponse(
+        return $this->buildUpdateErrorResponse(
             $errorTypes,
             $xmlObject202,
-            new Beteiligung2PlanungBeteiligungPlanfeststellungAktualisierenNOK0222(),
-            new NachrichteninhaltAnonymousPHPType0222(),
+            new PlanfeststellungAktualisierenNOK0222(),
+            new PlanfeststellungAktualisierenNOOKAnonymousPHPType(),
             '0222'
         );
     }
@@ -128,14 +132,14 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureDeletedErrorResponse229(
         array $errorTypes,
-        Planung2BeteiligungBeteiligungPlanfeststellungLoeschen0209 $xmlObject209
+        PlanfeststellungLoeschen0209 $xmlObject209
     ): ResponseValue
     {
-        return $this->buildErrorResponse(
+        return $this->buildDeleteErrorResponse(
             $errorTypes,
             $xmlObject209,
-            new Beteiligung2PlanungBeteiligungPlanfeststellungLoeschenNOK0229(),
-            new NachrichteninhaltAnonymousPHPType0229(),
+            new PlanfeststellungLoeschenNOK0229(),
+            new PlanfeststellungLoeschenNOOKAnonymousPHPType(),
             '0229'
         );
     }

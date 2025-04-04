@@ -1,0 +1,26 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\KostenberechnungType\GebuehrenpositionAnonymousPHPType:
+    properties:
+        gebuehrenordnung:
+            expose: true
+            access_type: public_method
+            serialized_name: gebuehrenordnung
+            accessor:
+                getter: getGebuehrenordnung
+                setter: setGebuehrenordnung
+            type: string
+        gebuehrentatbestand:
+            expose: true
+            access_type: public_method
+            serialized_name: gebuehrentatbestand
+            accessor:
+                getter: getGebuehrentatbestand
+                setter: setGebuehrentatbestand
+            type: string
+        position:
+            expose: true
+            access_type: public_method
+            serialized_name: position
+            accessor:
+                getter: getPosition
+                setter: setPosition
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\PositionType

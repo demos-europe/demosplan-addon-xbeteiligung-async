@@ -1,11 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Planung2BeteiligungBeteiligungKommunalNeu0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use JMS\Serializer\Serializer;
@@ -36,20 +46,22 @@ class KommunaleProcedureCreatorTest extends TestCase
         $mockFactory = new MockFactoryTest();
         $this->mockFactory = $mockFactory;
         $this->logger = new Logger();
-        $this->serializer = new SerializerFactory();
+        $this->serializer = SerializerFactory::getSerializer();
         $procedureHandlerFactory = new KommunaleProcedureHandlerFactory($mockFactory);
         $this->sut = $procedureHandlerFactory->createProcedureHandler('creator');
 
     }
 
-    //TODO: Need Dataprovider LIKE @dataProvider getTestXmlFiles() but we don't have yet a example xml file
+    /**
+     * @dataProvider getTestXmlFiles()
+     */
     public function testCreateNewProcedureFromKommunaleXbeteiligungMessage($filePath): void
     {
         $inputMsgXml = file_get_contents(AddonPath::getRootPath($filePath));
-        /** @var Planung2BeteiligungBeteiligungKommunalNeu0401 $inputMsgObj */
+        /** @var KommunalInitiieren0401 $inputMsgObj */
         $inputMsgObj = $this->serializer->deserialize(
             $inputMsgXml,
-            Planung2BeteiligungBeteiligungKommunalNeu0401::class,
+            KommunalInitiieren0401::class,
             'xml'
         );
 
@@ -68,6 +80,18 @@ class KommunaleProcedureCreatorTest extends TestCase
         self::assertSame($inputMsgContent->getPlanID(), $procedure->getXtaPlanId());
         self::assertSame($inputMsgContent->getBeschreibungPlanungsanlass(), $procedure->getDesc());
         self::assertSame($inputMsgContent->getVerfahrensschrittKommunal()->getCode(), $procedure->getSettings()->getTerritory());
+    }
+
+    /**
+     * A list of file paths to xml files used for testing
+     *
+     * @return string[][]
+     */
+    public function getTestXmlFiles(): array
+    {
+        return [
+            ['tests/res/xmlv14/xbeteiligung-test-kommunal.Initiieren.0401.xml'],
+        ];
     }
 
 }
