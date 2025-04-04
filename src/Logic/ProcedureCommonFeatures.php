@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
@@ -42,6 +43,7 @@ abstract class ProcedureCommonFeatures
         protected readonly TransactionServiceInterface        $transactionService,
         protected readonly TranslatorInterface                $translator,
         protected readonly UserHandlerInterface               $userHandler,
+        protected readonly OrgaServiceInterface               $orgaService,
     )
     {
     }
