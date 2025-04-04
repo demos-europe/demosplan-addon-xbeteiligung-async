@@ -44,6 +44,7 @@ abstract class ProcedureCommonFeatures
         protected readonly TranslatorInterface                $translator,
         protected readonly UserHandlerInterface               $userHandler,
         protected readonly OrgaServiceInterface               $orgaService,
+        protected readonly XBeteiligungMapService             $xbeteiligungMapService,
     )
     {
     }

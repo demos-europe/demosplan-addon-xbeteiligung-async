@@ -29,7 +29,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
 use Doctrine\DBAL\ConnectionException;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Exception;
@@ -148,9 +147,10 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 $procedure = $this->createProcedureEntity($messageContent);
                 $procedureData =  $this->procedurePhaseExtractor->extract($messageContent);
                 $this->setProcedurePhase($procedure, $procedureData);
-                $procedure->getSettings()->setTerritory($messageContent->getGeltungsbereich());
-                $akteur = $messageContent->getAkteurVorhaben();
-                $procedure->setOrga($this->mapToOrgaInterface($akteur?->getVeranlasser()));
+                $mapData = $this->xbeteiligungMapService->setMapData($messageContent->getGeltungsbereich());
+                $procedure->getSettings()->setTerritory($mapData->getTerritory());
+                $procedure->getSettings()->setBoundingBox($mapData->getBbox());
+                $procedure->getSettings()->setMapExtent($mapData->getMapExtent());
                 return $procedure;
             }
         );
@@ -228,6 +228,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $orga);
         $procedure = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
         $procedure->setAuthorizedUsers($usersToAllowAccessToProcedure);
+        $procedure->setOrga($orga);
 
         return $procedure;
     }
@@ -249,16 +250,4 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'xtaPlanId'                                                     => $procedureObject->getPlanID(),
         ];
     }
-
-    private function mapToOrgaInterface(?OrganisationType $organisationType): ?OrgaInterface
-    {
-        if ($organisationType === null) {
-            return null;
-        }
-
-        // Implement the logic to map OrganisationTypeType to OrgaInterface
-        // This is a placeholder and should be replaced with actual mapping logic
-        return $this->entityManager->getRepository(OrgaInterface::class)->find($organisationType->getName());
-    }
-
 }

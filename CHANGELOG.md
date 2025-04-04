@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- bumped required demosplan-addon version to v0.51
 - fetch orga by 401 included name and set its planners as authorized
 - update the standard to 1.3 (new xsd files), mapping of every xsd namespace to
  on php namespace
@@ -9,7 +10,8 @@
 - Update XBeteiligungService
 - Update ReadMe
 - Add handling of public participation procedure phases and institution procedure phases
-for incoming 401 messages
+  for incoming 401 messages
+- extract map data from given epsg:4326 territory-polygon and introduce fitting tests.
 
 ## v0.11 (2025-02-28)
 - add rabbitMQ package
