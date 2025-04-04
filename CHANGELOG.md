@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- bumped required demosplan-addon version to v0.51
 - fetch orga by 401 included name and set its planners as authorized
 - update the standard to 1.3 (new xsd files), mapping of every xsd namespace to
  on php namespace
