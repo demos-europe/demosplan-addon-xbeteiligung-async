@@ -151,8 +151,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 $procedure->getSettings()->setTerritory($mapData->getTerritory());
                 $procedure->getSettings()->setBoundingBox($mapData->getBbox());
                 $procedure->getSettings()->setMapExtent($mapData->getMapExtent());
-                $akteur = $messageContent->getAkteurVorhaben();
-                $procedure->setOrga($this->mapToOrgaInterface($akteur?->getVeranlasser()));
                 return $procedure;
             }
         );
@@ -230,6 +228,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $orga);
         $procedure = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
         $procedure->setAuthorizedUsers($usersToAllowAccessToProcedure);
+        $procedure->setOrga($orga);
 
         return $procedure;
     }
@@ -251,16 +250,4 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'xtaPlanId'                                                     => $procedureObject->getPlanID(),
         ];
     }
-
-    private function mapToOrgaInterface(?OrganisationType $organisationType): ?OrgaInterface
-    {
-        if ($organisationType === null) {
-            return null;
-        }
-
-        // Implement the logic to map OrganisationTypeType to OrgaInterface
-        // This is a placeholder and should be replaced with actual mapping logic
-        return $this->entityManager->getRepository(OrgaInterface::class)->find($organisationType->getName());
-    }
-
 }
