@@ -27,6 +27,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Beteiligung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeFehlerartType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
 use Doctrine\DBAL\ConnectionException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -110,6 +111,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
 
     /**
      * @throws FormatException
+     * @throws Exception
      */
     public function createNewKommunalProcedureFromXBeteiligungMessageWithResponse(
         KommunalInitiieren0401 $xmlObject401
@@ -125,6 +127,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * @throws ConnectionException
      * @throws ORMException
      * @throws FormatException
+     * @throws AddonOrgaNotFoundException
      */
     public function createNewKommunalProcedureFromXBeteiligungMessage(
         KommunalInitiieren0401 $xmlObject401,
@@ -142,13 +145,8 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         return $this->transactionService->executeAndFlushInTransaction(
             function () use ($messageContent) {
                 $procedure = $this->createProcedureEntity($messageContent);
-                $phase = $messageContent->getVerfahrensschrittKommunal();
-                $phase = $phase === null ? '' : $phase->getCode();
-                $this->logger->info(
-                    'Procedure phase from XML message',
-                    [$phase]
-                );
-                $procedure->setPhase($phase);
+                $procedureData =  $this->procedurePhaseExtractor->extract($messageContent);
+                $this->setProcedurePhase($procedure, $procedureData);
                 $mapData = $this->xbeteiligungMapService->setMapData($messageContent->getGeltungsbereich());
                 $procedure->getSettings()->setTerritory($mapData->getTerritory());
                 $procedure->getSettings()->setBoundingBox($mapData->getBbox());
@@ -158,29 +156,88 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 return $procedure;
             }
         );
-
-
     }
 
+    private function setProcedurePhase(
+        ProcedureInterface $procedure,
+        ProcedurePhaseData $procedurePhaseData,
+    ): void {
+        if (null !== $procedurePhaseData->getPublicParticipationPhase()) {
+            $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhase()->getKey());
+        }
+        if (null !== $procedurePhaseData->getInstitutionParticipationPhase()) {
+            $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhase()->getKey());
+        }
+        if (null !== $procedurePhaseData->getPublicParticipationStartDate()) {
+            $procedure->setPublicParticipationStartDate($procedurePhaseData->getPublicParticipationStartDate());
+        }
+        if (null !== $procedurePhaseData->getPublicParticipationEndDate()) {
+            $procedure->setPublicParticipationEndDate($procedurePhaseData->getPublicParticipationEndDate());
+        }
+        if (null !== $procedurePhaseData->getInstitutionParticipationStartDate()) {
+            $procedure->setStartDate($procedurePhaseData->getInstitutionParticipationStartDate());
+        }
+        if (null !== $procedurePhaseData->getInstitutionParticipationEndDate()) {
+            $procedure->setEndDate($procedurePhaseData->getInstitutionParticipationEndDate());
+        }
+        if (null !== $procedurePhaseData->getPublicParticipationIteration()) {
+            $procedure->getPublicParticipationPhaseObject()->setIteration(
+                $procedurePhaseData->getPublicParticipationIteration()
+            );
+        }
+        if (null !== $procedurePhaseData->getInstitutionParticipationIteration()) {
+            $procedure->getPhaseObject()->setIteration(
+                $procedurePhaseData->getInstitutionParticipationIteration()
+            );
+        }
+    }
+
+    /**
+     * @throws AddonOrgaNotFoundException
+     */
     private function createProcedureEntity(
         BeteiligungKommunalType $messageContent,
     ): ProcedureInterface {
         // get user from message should be set, because of that userId here is not correct
-        $userId = null;
-        Assert::notNull($userId, 'User not found');
-        $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $userId);
-        $procedureData = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
-        return $this->procedureService->getProcedure($procedureData?->getId());
+        try {
+            $orgaName = $messageContent->getAkteurVorhaben()->getVeranlasser()->getName();
+            $orgaList = $this->orgaService->getOrgaByFields(['name' => $orgaName, 'deleted' => false]);
+            Assert::count($orgaList, 1);
+            /** @var OrgaInterface $orga */
+            $orga = array_pop($orgaList);
+            Assert::isInstanceOf($orga, OrgaInterface::class);
+            $usersToAllowAccessToProcedure = $orga->getUsers();
+            $usersToAllowAccessToProcedure = $usersToAllowAccessToProcedure->filter(
+                fn (UserInterface $user): bool => $user->isPlanner()
+            )->toArray();
+            Assert::greaterThanEq(count($usersToAllowAccessToProcedure), 1);
+            /** @var UserInterface $rndPlannerAsProcedureCreator */
+            $rndPlannerAsProcedureCreator = reset($usersToAllowAccessToProcedure);
+            $userId = $rndPlannerAsProcedureCreator->getId();
+            Assert::notNull($userId, 'User Id could not be fetched');
+        } catch (Exception $exception) {
+            $this->logger->error(
+                'Terminating 401 procedure create attempt as no valid orga with at leas one
+                active planner could be found for administration',
+                ['exceptionMessage' => $exception->getMessage(), 'exception' => $exception]
+            );
+            throw new AddonOrgaNotFoundException(
+                'unable to fetch an orga by name with at least one planner active in the current customer',
+                0,
+                $exception
+            );
+        }
+        $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $orga);
+        $procedure = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
+        $procedure->setAuthorizedUsers($usersToAllowAccessToProcedure);
+
+        return $procedure;
     }
 
     protected function createProcedureArrayFormatFromBeteiligungType(
         BeteiligungKommunalType $procedureObject,
-        UserInterface $user,
+        OrgaInterface $orga
     ): array {
-        $orga = $user->getOrga();
-        if (null === $orga) {
-            throw new InvalidArgumentException("Organisation not set");
-        }
         return [
             'r_name'                                                        => $procedureObject->getPlanname(),
             'r_desc'                                                        => $procedureObject->getBeschreibungPlanungsanlass(),
@@ -190,7 +247,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'action'                                                        => 'new',
             'r_master'                                                      => 'false',
             'r_copymaster'                                                  => $this->procedureService->getMasterTemplateId(),
-            'r_procedure_type'                                              => $this->procedureTypeService->getProcedureTypeByName('Beteiligung')?->getId(),
+            'r_procedure_type'                                              => $this->procedureTypeService->getProcedureTypeByName('Bauleitplanung')?->getId(),
             'xtaPlanId'                                                     => $procedureObject->getPlanID(),
         ];
     }
