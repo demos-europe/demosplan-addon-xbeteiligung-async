@@ -8,6 +8,8 @@
 - Update the current addon code to be functional with the new 1.3 standard.
 - Update XBeteiligungService
 - Update ReadMe
+- Add handling of public participation procedure phases and institution procedure phases
+for incoming 401 messages
 
 ## v0.11 (2025-02-28)
 - add rabbitMQ package

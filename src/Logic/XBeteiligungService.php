@@ -22,6 +22,8 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\UnsupportedMessageTypeException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
@@ -77,59 +79,7 @@ class XBeteiligungService
 {
     private Serializer $serializer;
     private const PARTICIPATION_RAUMORDNUNG_PHASE = 'Erwiderung /Planänderung bzw. Auswertung';
-    private const PUBLICPARTICIPATIONPHASKOMMUNALEMAP = [
-        'configuration' => [
-            'code' => '1000',
-            'name' => 'Einleitungsphase',
-        ],
-        'earlyparticipation' => [
-            'code' => '4000',
-            'name' => 'Frühzeitige Öffentlichkeitsbeteiligung',
-        ],
-        'participation' => [
-            'code' => '6000',
-            'name' => 'Digitale Veröffentlichung',
-        ],
-        'anotherparticipation' => [
-            'code' => '6000',
-            'name' => 'Digitale Veröffentlichung',
-        ],
-        'evaluating' => [
-            'code' => '7000',
-            'name' => 'Feststellungsverfahren',
-        ],
-        'closed' => [
-            'code' => '8000',
-            'name' => 'Schlussphase',
-        ]
-    ];
 
-    private const INSTITUTIONPARTICIPATIONPHASKOMMUNALEMAP = [
-        'configuration' => [
-            'code' => '1000',
-            'name' => 'Einleitungsphase',
-        ],
-        'earlyparticipation' => [
-            'code' => '2000',
-            'name' => 'Frühzeitige Behördenbeteiligung',
-        ],
-        'participation' => [
-            'code' => '5000',
-            'name' => 'Beteiligung der Träger öffentlicher Belange',
-        ],
-        'anotherparticipation' => [
-            'code' => '5000',
-            'name' => 'Beteiligung der Träger öffentlicher Belange',
-        ],
-        'evaluating' => [
-            'code' => '7000',
-            'name' => 'Feststellungsverfahren',
-        ],
-        'closed' => [
-            'code' => '8000',
-            'name' => 'Schlussphase',
-        ]
-    ];
     private const PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP = [
         'configuration' => [
             'code' => '5000',
@@ -901,13 +851,13 @@ class XBeteiligungService
     {
         $codeProcedurePhase = new CodeVerfahrensschrittKommunalType();
         $codeProcedurePhase->setListVersionID('1.0');
-        $procedurePhase = $procedure->getPhase();
-        if(array_key_exists($procedurePhase, self::INSTITUTIONPARTICIPATIONPHASKOMMUNALEMAP)) {
+        $procedurePhase = InstitutionParticipationPhase::fromKey($procedure->getPhase());
+        if(null !== $procedurePhase) {
             $codeProcedurePhase->setCode(
-                self::INSTITUTIONPARTICIPATIONPHASKOMMUNALEMAP[$procedure->getPhase()]['code']
+                $procedurePhase->getCode()
             );
             $codeProcedurePhase->setName(
-                self::INSTITUTIONPARTICIPATIONPHASKOMMUNALEMAP[$procedure->getPhase()]['name']
+                $procedurePhase->getName()
             );
         }
 
@@ -919,13 +869,13 @@ class XBeteiligungService
         $codeProcedurePhase = new CodeVerfahrensschrittKommunalType();
         $codeProcedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
         $codeProcedurePhase->setListVersionID('1.0');
-        $publicParticipationPhase = $procedure->getPublicParticipationPhase();
-        if (array_key_exists($publicParticipationPhase, self::PUBLICPARTICIPATIONPHASKOMMUNALEMAP)) {
+        $publicParticipationPhase = PublicParticipationPhase::fromKey($procedure->getPublicParticipationPhase());
+        if (null !== $publicParticipationPhase) {
             $codeProcedurePhase->setCode(
-                self::PUBLICPARTICIPATIONPHASKOMMUNALEMAP[$procedure->getPublicParticipationPhase()]['code']
+                $publicParticipationPhase->getCode()
             );
             $codeProcedurePhase->setName(
-                self::PUBLICPARTICIPATIONPHASKOMMUNALEMAP[$procedure->getPublicParticipationPhase()]['name']
+                $publicParticipationPhase->getName()
             );
         }
 
