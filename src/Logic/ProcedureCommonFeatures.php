@@ -12,7 +12,9 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
+use DemosEurope\DemosplanAddon\Contracts\CurrentContextProviderInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
@@ -40,6 +42,7 @@ abstract class ProcedureCommonFeatures
         protected readonly PlanfeststellungMessageFactory     $planfeststellungMessageFactory,
         protected readonly TranslatorInterface                $translator,
         protected readonly TransactionServiceInterface        $transactionService,
+        protected readonly OrgaServiceInterface               $orgaService,
     )
     {
     }

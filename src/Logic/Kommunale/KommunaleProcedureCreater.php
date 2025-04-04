@@ -110,6 +110,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
 
     /**
      * @throws FormatException
+     * @throws Exception
      */
     public function createNewKommunalProcedureFromXBeteiligungMessageWithResponse(
         KommunalInitiieren0401 $xmlObject401
@@ -125,6 +126,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * @throws ConnectionException
      * @throws ORMException
      * @throws FormatException
+     * @throws AddonOrgaNotFoundException
      */
     public function createNewKommunalProcedureFromXBeteiligungMessage(
         KommunalInitiieren0401 $xmlObject401,
@@ -159,25 +161,52 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
 
     }
 
+    /**
+     * @throws AddonOrgaNotFoundException
+     */
     private function createProcedureEntity(
         BeteiligungKommunalType $messageContent,
     ): ProcedureInterface {
         // get user from message should be set, because of that userId here is not correct
-        $userId = null;
-        Assert::notNull($userId, 'User not found');
-        $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $userId);
-        $procedureData = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
-        return $this->procedureService->getProcedure($procedureData?->getId());
+        try {
+            $orgaName = $messageContent->getAkteurVorhaben()->getVeranlasser()->getName();
+            $orgaList = $this->orgaService->getOrgaByFields(['name' => $orgaName, 'deleted' => false]);
+            Assert::count($orgaList, 1);
+            /** @var OrgaInterface $orga */
+            $orga = array_pop($orgaList);
+            Assert::isInstanceOf($orga, OrgaInterface::class);
+            $usersToAllowAccessToProcedure = $orga->getUsers();
+            $usersToAllowAccessToProcedure = $usersToAllowAccessToProcedure->filter(
+                fn (UserInterface $user): bool => $user->isPlanner()
+            )->toArray();
+            Assert::greaterThanEq(count($usersToAllowAccessToProcedure), 1);
+            /** @var UserInterface $rndPlannerAsProcedureCreator */
+            $rndPlannerAsProcedureCreator = reset($usersToAllowAccessToProcedure);
+            $userId = $rndPlannerAsProcedureCreator->getId();
+            Assert::notNull($userId, 'User Id could not be fetched');
+        } catch (Exception $exception) {
+            $this->logger->error(
+                'Terminating 401 procedure create attempt as no valid orga with at leas one
+                active planner could be found for administration',
+                ['exceptionMessage' => $exception->getMessage(), 'exception' => $exception]
+            );
+            throw new AddonOrgaNotFoundException(
+                'unable to fetch an orga by name with at least one planner active in the current customer',
+                0,
+                $exception
+            );
+        }
+        $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $orga);
+        $procedure = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
+        $procedure->setAuthorizedUsers($usersToAllowAccessToProcedure);
+
+        return $procedure;
     }
 
     protected function createProcedureArrayFormatFromBeteiligungType(
         BeteiligungKommunalType $procedureObject,
-        UserInterface $user,
+        OrgaInterface $orga
     ): array {
-        $orga = $user->getOrga();
-        if (null === $orga) {
-            throw new InvalidArgumentException("Organisation not set");
-        }
         return [
             'r_name'                                                        => $procedureObject->getPlanname(),
             'r_desc'                                                        => $procedureObject->getBeschreibungPlanungsanlass(),
