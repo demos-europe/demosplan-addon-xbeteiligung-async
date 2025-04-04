@@ -18,6 +18,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterfa
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
@@ -33,6 +34,7 @@ abstract class ProcedureCommonFeatures
         protected readonly KommunaleMessageFactory            $kommunaleMessageFactory,
         protected readonly LoggerInterface                    $logger,
         protected readonly PlanfeststellungMessageFactory     $planfeststellungMessageFactory,
+        protected readonly ProcedurePhaseExtractor            $procedurePhaseExtractor,
         protected readonly ProcedureServiceInterface          $procedureService,
         protected readonly ProcedureServiceStorageInterface   $procedureServiceStorage,
         protected readonly ProcedureTypeServiceInterface      $procedureTypeService,
