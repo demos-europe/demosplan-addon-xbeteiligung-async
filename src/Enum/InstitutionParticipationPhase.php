@@ -33,18 +33,19 @@ enum InstitutionParticipationPhase
         };
     }
 
-    public static function getKeyFromCode(string $code): ?string {
+    public static function fromCode(string $code): ?self {
         foreach (self::cases() as $case) {
             if ($case->getCode() === $code) {
                 return match ($case) {
-                    self::CONFIGURATION => ProcedurePhaseKey::CONFIGURATION->value,
-                    self::EARLY_PARTICIPATION => ProcedurePhaseKey::EARLY_PARTICIPATION->value,
-                    self::PARTICIPATION => ProcedurePhaseKey::PARTICIPATION->value,
-                    self::EVALUATING => ProcedurePhaseKey::EVALUATING->value,
-                    self::CLOSED => ProcedurePhaseKey::CLOSED->value,
+                    self::CONFIGURATION => self::CONFIGURATION,
+                    self::EARLY_PARTICIPATION => self::EARLY_PARTICIPATION,
+                    self::PARTICIPATION => self::PARTICIPATION,
+                    self::EVALUATING => self::EVALUATING,
+                    self::CLOSED => self::CLOSED,
                 };
             }
         }
+
         return null;
     }
 
@@ -66,6 +67,17 @@ enum InstitutionParticipationPhase
             self::PARTICIPATION, self::ANOTHER_PARTICIPATION => 'Beteiligung der Träger öffentlicher Belange',
             self::EVALUATING => 'Feststellungsverfahren',
             self::CLOSED => 'Schlussphase',
+        };
+    }
+
+    public function getKey(): string {
+        return match($this) {
+            self::CONFIGURATION => ProcedurePhaseKey::CONFIGURATION->value,
+            self::EARLY_PARTICIPATION => ProcedurePhaseKey::EARLY_PARTICIPATION->value,
+            self::PARTICIPATION => ProcedurePhaseKey::PARTICIPATION->value,
+            self::ANOTHER_PARTICIPATION => ProcedurePhaseKey::ANOTHER_PARTICIPATION->value,
+            self::EVALUATING => ProcedurePhaseKey::EVALUATING->value,
+            self::CLOSED => ProcedurePhaseKey::CLOSED->value,
         };
     }
 }

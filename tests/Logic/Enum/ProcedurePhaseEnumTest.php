@@ -51,7 +51,7 @@ class ProcedurePhaseEnumTest extends TestCase
      */
     public function testGetKeyFromCodeReturnsCorrectKey(string $expectedKey, string $phaseCode): void
     {
-        self::assertSame($expectedKey, PublicParticipationPhase::getKeyFromCode($phaseCode));
+        self::assertSame($expectedKey, PublicParticipationPhase::fromCode($phaseCode)->getKey());
     }
 
     /**
@@ -59,13 +59,13 @@ class ProcedurePhaseEnumTest extends TestCase
      */
     public function testGetKeyFromCodeReturnsCorrectKeyForInstitution(string $expectedKey, string $phaseCode): void
     {
-        self::assertSame($expectedKey, InstitutionParticipationPhase::getKeyFromCode($phaseCode));
+        self::assertSame($expectedKey, InstitutionParticipationPhase::fromCode($phaseCode)->getKey());
     }
 
     public function testGetKeyFromCodeReturnsNullForUnknownCode(): void
     {
-        self::assertNull(PublicParticipationPhase::getKeyFromCode('unknowncode'));
-        self::assertNull(InstitutionParticipationPhase::getKeyFromCode(''));
+        self::assertNull(PublicParticipationPhase::fromCode('unknowncode'));
+        self::assertNull(InstitutionParticipationPhase::fromCode(''));
     }
 
     /**
