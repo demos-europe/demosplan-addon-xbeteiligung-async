@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * This file is part of the package demosplan.
  *
@@ -16,7 +18,6 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
-use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
@@ -25,7 +26,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\UnsupportedMessageTypeException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde\CodeVerzeichnisdienstTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\Autor;
@@ -38,9 +38,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunika
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeAktualisiert0702;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeGeloescht0709;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalTOEBType;
@@ -68,18 +65,20 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309\RaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType;
-use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
+use DOMDocument;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use JMS\Serializer\Serializer;
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class XBeteiligungService
 {
+    private Serializer $serializer;
     private const PARTICIPATION_RAUMORDNUNG_PHASE = 'Erwiderung /Planänderung bzw. Auswertung';
 
     private const PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP = [
@@ -135,18 +134,45 @@ class XBeteiligungService
         ]
     ];
 
+    private array $messageTypeMapping = [
+        '400' => [
+            'xsd' => 'xbeteiligung-kommunaleBauleitplanung.xsd',
+            'classes' => [
+                KommunalInitiieren0401::class,
+                KommunalAktualisieren0402::class,
+                KommunalLoeschen0409::class,
+            ],
+        ],
+        '300' => [
+            'xsd' => 'xbeteiligung-raumordnung.xsd',
+            'classes' => [
+                RaumordnungInitiieren0301::class,
+                RaumordnungAktualisieren0302::class,
+                RaumordnungLoeschen0309::class,
+            ],
+        ],
+        '200' => [
+            'xsd' => 'xbeteiligung-planfeststellung.xsd',
+            'classes' => [
+                PlanfeststellungInitiieren0201::class,
+                PlanfeststellungAktualisieren0202::class,
+                PlanfeststellungLoeschen0209::class,
+            ],
+        ],
+    ];
+
     private const NON_EXISTING_CODE = 'work probably in progress';
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
-    public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Initiieren.0401';
-    public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Aktualisieren.0402';
-    public const DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Loeschen.0409';
-    public const NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:raumordnung.Initiieren.0301';
-    public const UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:raumordnung.Aktualisieren.0302';
-    public const DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:raumordnung.Loeschen.0309';
-    public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planfeststellung.Initiieren.0201';
-    public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planfeststellung.Aktualisieren.0202';
-    public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planfeststellung.Loeschen.0209';
+    public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.0401';
+    public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Aktualisieren.0402';
+    public const DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Loeschen.0409';
+    public const NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'raumordnung.Initiieren.0301';
+    public const UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'raumordnung.Aktualisieren.0302';
+    public const DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'raumordnung.Loeschen.0309';
+    public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Initiieren.0201';
+    public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Aktualisieren.0202';
+    public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Loeschen.0209';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
     public const MISSING_USER_ERROR_CODE = '0300';
     public const WRONG_ATTACHMENT_FORMAT_ERROR_CODE = '0200';
@@ -166,8 +192,8 @@ class XBeteiligungService
         private readonly RouterInterface                     $router,
         private readonly XBeteiligungIncomingMessageParser   $incomingMessageParser,
         private readonly KommunaleProcedureCreater           $kommunaleProcedureCreater,
-        private readonly StatementCreator                    $statementCreator,
     ) {
+        $this->serializer = SerializerFactory::getSerializer();
     }
 
     /**
@@ -186,7 +212,7 @@ class XBeteiligungService
             $this->generateMain401MessageContent($procedure)
         ); // required
 
-        return SerializerFactory::serializeData($procedureCreated401Object, $this->logger);
+        return $this->serializeData($procedureCreated401Object);
     }
 
     public function createXMLFor301(
@@ -201,7 +227,7 @@ class XBeteiligungService
         $procedureCreated301->setNachrichteninhalt(
             $this->generateMain301MessageContent($procedure)
         ); // required
-        return SerializerFactory::serializeData($procedureCreated301, $this->logger);
+        return $this->serializeData($procedureCreated301);
     }
 
     /**
@@ -220,7 +246,7 @@ class XBeteiligungService
             $this->generateMain402MessageContent($procedure)
         ); // required
 
-        return SerializerFactory::serializeData($procedureUpdated402Object, $this->logger);
+        return $this->serializeData($procedureUpdated402Object);
     }
 
     public function createXMLFor302(
@@ -236,7 +262,7 @@ class XBeteiligungService
             $this->generateMain302MessageContent($procedure)
         );
 
-        return SerializerFactory::serializeData($procedureUpdated302, $this->logger);
+        return $this->serializeData($procedureUpdated302);
     }
 
     /**
@@ -253,7 +279,7 @@ class XBeteiligungService
         ); // required
         $procedureDeleted409Object->setNachrichtenInhalt($this->generateMain409MessageContent($procedureId));
 
-        return SerializerFactory::serializeData($procedureDeleted409Object, $this->logger);
+        return $this->serializeData($procedureDeleted409Object);
     }
 
     public function createXMLFor309(
@@ -269,7 +295,7 @@ class XBeteiligungService
             $this->generateMain309MessageContent($procedureId)
         );
 
-        return SerializerFactory::serializeData($procedureDeleted309, $this->logger);
+        return $this->serializeData($procedureDeleted309);
     }
 
 
@@ -280,7 +306,7 @@ class XBeteiligungService
     {
         $messageObject->setProdukt('DiPlan Cockpit'); // required
         $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
-        $messageObject->setProduktversion('1.3'); // optional
+        $messageObject->setProduktversion('1.1'); // optional
         $messageObject->setStandard(self::STANDARD); // required
         $messageObject->setVersion('1.3'); // required
 
@@ -290,7 +316,7 @@ class XBeteiligungService
     private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
     {
         $messageContent = new Nachrichteninhalt401();
-        $messageContent->setVorgangsID(CommonHelpers::uuid());
+        $messageContent->setVorgangsID($this->uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungKommunalType())
         );
@@ -301,7 +327,7 @@ class XBeteiligungService
     private function generateMain301MessageContent(ProcedureInterface $procedure): Nachrichteninhalt301
     {
         $messageContent = new Nachrichteninhalt301();
-        $messageContent->setVorgangsID(CommonHelpers::uuid());
+        $messageContent->setVorgangsID($this->uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungRaumordnungType())
         );
@@ -312,7 +338,7 @@ class XBeteiligungService
     private function generateMain402MessageContent(ProcedureInterface $procedure): Nachrichteninhalt402
     {
         $messageContent = new Nachrichteninhalt402();
-        $messageContent->setVorgangsID(CommonHelpers::uuid());
+        $messageContent->setVorgangsID($this->uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungKommunalType())
         );
@@ -323,7 +349,7 @@ class XBeteiligungService
     private function generateMain302MessageContent(ProcedureInterface $procedure): Nachrichteninhalt302
     {
         $messageContent = new Nachrichteninhalt302();
-        $messageContent->setVorgangsID(CommonHelpers::uuid());
+        $messageContent->setVorgangsID($this->uuid());
         $messageContent->setBeteiligung(
             $this->generateParticipationContentForX01OrX02Message($procedure, new BeteiligungRaumordnungType())
         );
@@ -334,7 +360,7 @@ class XBeteiligungService
     private function generateMain409MessageContent(string $procedureId): Nachrichteninhalt409
     {
         $messageContent = new Nachrichteninhalt409();
-        $messageContent->setVorgangsID(CommonHelpers::uuid());
+        $messageContent->setVorgangsID($this->uuid());
         $messageContent->setPlanID($procedureId);
         $messageContent->setBeteiligungsID($procedureId); // why does only a 409 Message still has this property?
 
@@ -344,7 +370,7 @@ class XBeteiligungService
     public function generateMain309MessageContent(string $procedureId): Nachrichteninhalt309
     {
         $messageContent = new Nachrichteninhalt309();
-        $messageContent->setVorgangsID(CommonHelpers::uuid());
+        $messageContent->setVorgangsID($this->uuid());
         $messageContent->setPlanID($procedureId);
         $messageContent->setBeteiligungsID($procedureId);
 
@@ -472,7 +498,7 @@ class XBeteiligungService
         $participationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         );
-        $participationType->setDurchgang(1);
+        $participationType->setDurchgang($procedure->getPublicParticipationPhaseObject()->getIteration());
         $participationType->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
 
         // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
@@ -513,14 +539,14 @@ class XBeteiligungService
         $institutionParticipationType = new BeteiligungKommunalTOEBType();
 
         // we as demos think this id is useless - did not win the discussion as it seems :(
-        $institutionParticipationType->setBeteiligungsID(CommonHelpers::uuid());
+        $institutionParticipationType->setBeteiligungsID($this->uuid());
         // this MetadatenAnlageType should support a base64 container to dump files into, but it does not - S.C. is informed
         //$publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
         $institutionParticipationType->setZeitraum($this->createTimeSpanOfProcedurePhase($procedure->getPhaseObject()));
         $institutionParticipationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
-        $institutionParticipationType->setDurchgang(1); // required not documented not wanted
+        $institutionParticipationType->setDurchgang($procedure->getPhaseObject()->getIteration());
         $bkTOEBaaType = new BeteiligungKommunalTOEBArtAnonymousPHPType();
         $bkTOEBaaType->setBeteiligungKommunalFormalTOEB($this->getInstitutionProcedurePhaseCodeType($procedure));
         $institutionParticipationType->setBeteiligungKommunalTOEBArt($bkTOEBaaType);
@@ -534,16 +560,14 @@ class XBeteiligungService
     {
         $publicParticipationType = new BeteiligungKommunalOeffentlichkeitType();
         // we as demos think this id is useless - did not win the discussion as it seems :(
-        $publicParticipationType->setBeteiligungsID(CommonHelpers::uuid());
-        // this MetadatenAnlageType should support a base64 container to dump files into but it does not - S.C. is informed
-        // $publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
+        $publicParticipationType->setBeteiligungsID($this->uuid());
         $publicParticipationType->setZeitraum(
             $this->createTimeSpanOfProcedurePhase($procedure->getPublicParticipationPhaseObject())
         );
         $publicParticipationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
-        $publicParticipationType->setDurchgang(1); // required not documented not wanted
+        $publicParticipationType->setDurchgang($procedure->getPublicParticipationPhaseObject()->getIteration());
         $bkoeaaType = new BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType();
         $bkoeaaType->setBeteiligungKommunalFormalOeffentlichkeit(
             $this->getPublicProcedurePhaseCodeType($procedure)
@@ -587,8 +611,7 @@ class XBeteiligungService
         $kanal->setListURI(self::CODELIST_ERREICHBARKEIT);
         $kanal->setCode('work probably in progress');
         $codeAuthorityIdentification->setKanal($kanal);
-        $codeAuthorityIdentification->setKennung('');
-        $codeAuthorityIdentification->setZusatz('');
+        $codeAuthorityIdentification->setKennung(''); // required
         $reader->setErreichbarkeit([$codeAuthorityIdentification]); // required
 
         return $reader;
@@ -735,26 +758,89 @@ class XBeteiligungService
         $messageTypeCode->setCode($code);
 
         // id has to match pattern: '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
-        $identificationMessage->setNachrichtenUUID(CommonHelpers::uuid()); // required
+        $identificationMessage->setNachrichtenUUID($this->uuid()); // required
         $identificationMessage->setErstellungszeitpunkt(new DateTime()); // required
         $identificationMessage->setNachrichtentyp($messageTypeCode); // required
 
         return $identificationMessage;
     }
 
-    public function createProcedureMessage(string $xml, string $procedureId): ProcedureMessage
+    private function resolveXsdFilePath(string $messageClass): string
+    {
+        foreach ($this->messageTypeMapping as $group) {
+            if (in_array($messageClass, $group['classes'], true)) {
+                return $group['xsd'];
+            }
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'No XSD file found for message class: %s',
+            $messageClass
+        ));
+    }
+
+    /**
+     * Validates a message against a given xsd file located in plugin xsd folder.
+     */
+    public function isValidMessage(
+        string $message,
+        bool $verboseDebug = false,
+        string $path = '',
+        string $messageClass = ''
+    ): bool
+    {
+        if ('' === $path) {
+            $path = AddonPath::getRootPath('Resources/xsd/');
+        }
+        $xsdFile = $this->resolveXsdFilePath($messageClass);
+        $fullPath = $path . $xsdFile;
+        $document = new DOMDocument();
+        // Suppress errors and allow internal error handling
+        libxml_use_internal_errors(true);
+        if (!$document->loadXML($message)) {
+            $errors = libxml_get_errors();
+            $this->logger->error('Failed to load XML, probably invalid',
+                [
+                'message' => $message,
+                'errors' => $errors
+                ]
+            );
+
+            return false;
+        }
+        $isValid = $document->schemaValidate($fullPath);
+        if (!$isValid) {
+            $errors = libxml_get_errors();
+            foreach ($errors as $error) {
+                $this->logger->warning('Invalid XML message', [$error]);
+                if ($verboseDebug) {
+                    $this->logger->debug('XML validation error', ['error' => $error]);
+                }
+            }
+            libxml_clear_errors();
+
+            return false;
+        }
+        return true;
+    }
+
+    public function createProcedureMessage(string $xml, string $procedureId, string $messageClass): ProcedureMessage
     {
         $error = false;
         $path = AddonPath::getRootPath('addons/vendor/' .
             XBeteiligungAsyncAddon::ADDON_NAME . '/Resources/xsd/');
-        if (false === CommonHelpers::isValidMessage($xml, $this->logger, false,  $path, ''))
-        {
+        if (false === $this->isValidMessage($xml, path: $path, messageClass: $messageClass)) {
             $this->logger->warning('The generated XML is not valid.', [
                 'procedureId' => $procedureId,
                 'generatedXML' => $xml
             ]);
             $error = true;
         }
+
+        if (false === $error) {
+            $this->logger->info('Created XML Message is valid.', ['procedureId' => $procedureId]);
+        }
+
         return new ProcedureMessage(
             $xml,
             false,
@@ -914,6 +1000,29 @@ class XBeteiligungService
         throw new InvalidArgumentException('Message payload not supported');
     }
 
+    public function serializeData($data): string
+    {
+        // Serialize the data to XML with a custom root name
+        $xml =  $this->serializer->serialize($data, 'xml');
+        $this->logger->debug('Serialized XML:', [$xml]);
+
+        // Load the XML string into a SimpleXMLElement object
+        $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        if ($xml === false) {
+            $this->logger->error('Failed to load XML string.');
+            return '';
+        }
+
+        // Save the XML to a string
+        $result = $xml->saveXML();
+        if ($result === false) {
+            $this->logger->error('Error on save serialized xml.', [$xml->asXML()]);
+            return '';
+        }
+
+        return $result;
+    }
+
     public function uuid(): string
     {
         $uuid = '';
@@ -926,11 +1035,6 @@ class XBeteiligungService
         }
 
         return $uuid;
-    }
-
-    public function getStatementCreatedFromEvent(StatementCreatedEventInterface $event): StatementCreated
-    {
-        return $this->statementCreator->getStatementCreatedFromEvent($event);
     }
 
 }

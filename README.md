@@ -108,8 +108,12 @@ autor:
 ```
 
 
-comment out `namespace: ...` in [`Schema.Code.CodeType.yml`](src/Soap/metadata/Schema.Code.CodeType.yml)
-for the fiels `code` and `name`.
+comment out `namespace: ...` in [`Schema.Code.CodeType.yml`](src/Soap/Metadata/Schema.Code.CodeType.yml)
+for the fields `code` and `name`.
+comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml)
+for the fields: `anlagen.xml_list`
+comment out `namespace: ...` in [`Schema.XBeteiligung.MetadatenAnlageType.yml`](src/Soap/Metadata/Schema.XBeteiligung.MetadatenAnlageType.yml)
+for the fields: `bezeichnung`, `versionsnummer`, `datum`, `anlageart`, `mimeType` and `anhangOderVerlinkung`
 
 Run the unit tests XBeteiligungServiceTest- (401, 402, 409) and fix any bugs that appear.
 Update what is documented here if there are any changes to be aware of.

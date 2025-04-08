@@ -21,6 +21,8 @@ use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -95,18 +97,19 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     {
         if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
             $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
-            $this->createProcedureMessage($xml, $event->getProcedure());
+            $this->createProcedureMessage($xml, $event->getProcedure(), KommunalInitiieren0401::class);
         }
 
         if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
             $xml = $this->xBeteiligungService->createXMLFor301($event->getProcedure());
-            $this->createProcedureMessage($xml, $event->getProcedure());
+            $this->createProcedureMessage($xml, $event->getProcedure(), RaumordnungInitiieren0301::class);
         }
     }
 
-    private function createProcedureMessage(string $xml, ProcedureInterface $procedure): void
+    private function createProcedureMessage(string $xml, ProcedureInterface $procedure, string $messageClass): void
     {
-        $procedureMessage = $this->xBeteiligungService->createProcedureMessage($xml, $procedure->getId());
+        $procedureMessage =
+            $this->xBeteiligungService->createProcedureMessage($xml, $procedure->getId(), $messageClass);
         $this->xBeteiligungService->saveProcedureMessage($procedureMessage);
         $this->xBeteiligungDebugger->createDebugMessageForCreatedXML(
             $procedure,

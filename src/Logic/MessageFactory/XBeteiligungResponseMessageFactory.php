@@ -14,10 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMessageHeadG2GTypeBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
@@ -40,13 +37,18 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedureCreated;
 use Exception;
+use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\BaseTypesHandler;
+use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\XmlSchemaDateHandler;
+use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\Serializer;
+use JMS\Serializer\SerializerBuilder;
 use Psr\Log\LoggerInterface;
 
 class XBeteiligungResponseMessageFactory
 {
     public const XBETEILIGUNG_VERSION = 'V14';
-    protected const K1 = 'K1';
+    public const STANDARD = 'XBeteiligung';
+
     private const SCHEMALOCATION = 'xmlsn:xsi:schemaLocation';
     private const ERROR_TEXT = 'A Procedure with id';
     private array $messageTypeMapping = [
@@ -74,26 +76,41 @@ class XBeteiligungResponseMessageFactory
         ],
     ];
 
-    protected LoggerInterface $dplanCockpitLogger;
+    /**
+     * @var LoggerInterface
+     */
+    private $dplanCockpitLogger;
 
-    protected Serializer $serializer;
-    protected PermissionEvaluatorInterface $permissionEvaluator;
+
+    /** @var Serializer */
+    protected $serializer;
+
+    protected XBeteiligungService $xBeteiligungService;
 
     public function __construct(
-        LoggerInterface $dplanCockpitLogger,
-        PermissionEvaluatorInterface $permissionEvaluator,
+        LoggerInterface $dplanCockpitLogger
     ) {
         $this->dplanCockpitLogger = $dplanCockpitLogger;
-        $this->permissionEvaluator = $permissionEvaluator;
+        $this->serializer = $this->getSerializerBuild();
     }
 
-    public function buildHeader(
-        string $messageType,
-        string $headerType,
-    )
+    public function getSerializerBuild(): Serializer
+    {
+        $serializerBuilder = SerializerBuilder::create();
+        $serializerBuilder->addMetadataDir(__DIR__ . '/../../Soap/Metadata', 'DemosEurope\DemosplanAddon\XBeteiligung\Soap');
+        $serializerBuilder->configureHandlers(static function (HandlerRegistryInterface $handler) use ($serializerBuilder) {
+            $serializerBuilder->addDefaultHandlers();
+            $handler->registerSubscribingHandler(new BaseTypesHandler()); // XMLSchema List handling
+            $handler->registerSubscribingHandler(new XmlSchemaDateHandler()); // XMLSchema date handling
+        });
+
+        return $serializerBuilder->build();
+    }
+
+    private function buildHeader(string $messageType)
     {
         $headerBuilder = new XBeteiligungMessageHeadG2GTypeBuilder();
-        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', $headerType);
+        $headerBuilder = $this->setK1Info($headerBuilder, 'reader', 'K1');
         $headerBuilder = $this->setDemosInfo($headerBuilder, 'author');
         $headerBuilder = $this->setMessageInfo($headerBuilder, $messageType);
         return $headerBuilder->build();
@@ -108,13 +125,14 @@ class XBeteiligungResponseMessageFactory
         $response = new ResponseValue();
         $messageClass->setNachrichtenkopfG2g($header);
         $messageClass->setNachrichteninhalt($contentClass);
-        $messageXml = SerializerFactory::serializeData($messageClass, $this->dplanCockpitLogger);
+        $messageXml = $this->xBeteiligungService->serializeData($messageClass);
         $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($contentClass, $messageXml);
         $response->setPayload($messageXml);
         $response->lock();
 
         return $response;
     }
+
     public function buildProcedureCreatedResponse(
         ProcedureInterface $procedure,
         KommunalInitiieren0401|RaumordnungInitiieren0301|PlanfeststellungInitiieren0201 $xmlObject,
@@ -123,8 +141,8 @@ class XBeteiligungResponseMessageFactory
     ): ResponseValue {
         try {
             $procedureCreated = $this->createProcedureCreated($procedure, $xmlObject);
-            $this->setProductInfo($xmlObject);
-            $header = $this->buildHeader($messageType, self::K1);
+            $this->xBeteiligungService->setProductInfo($xmlObject);
+            $header = $this->buildHeader($messageType);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($procedureCreated->getProcedureId());
             $contentClass->setPlanID($procedureCreated->getPlanId());
@@ -151,8 +169,8 @@ class XBeteiligungResponseMessageFactory
             $procedureId = $procedure->getId();
             $planId = $xmlObject->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
             $instanceId = $xmlObject->getNachrichteninhalt()?->getVorgangsID();
-            $this->setProductInfo($xmlObject);
-            $header = $this->buildHeader($messageType, self::K1);
+            $this->xBeteiligungService->setProductInfo($xmlObject);
+            $header = $this->buildHeader($messageType);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($procedureId);
             $contentClass->setPlanID($planId);
@@ -176,8 +194,8 @@ class XBeteiligungResponseMessageFactory
         string $messageType,
     ): ResponseValue {
         try {
-            $this->setProductInfo($xmlObject);
-            $header = $this->buildHeader($messageType, self::K1);
+            $this->xBeteiligungService->setProductInfo($xmlObject);
+            $header = $this->buildHeader($messageType);
             $contentClass = new NachrichteninhaltTemplateOKType();
             $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligungsID());
             $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getPlanID());
@@ -200,8 +218,8 @@ class XBeteiligungResponseMessageFactory
         KommunalAktualisierenNOOKAnonymousPHPType|RaumordnungAktualisierenNOOKAnonymousPHPType|PlanfeststellungAktualisierenNOOKAnonymousPHPType $contentClass,
         string $messageType
     ): ResponseValue {
-        $this->setProductInfo($xmlObject);
-        $header = $this->buildHeader($messageType, self::K1);
+        $this->xBeteiligungService->setProductInfo($xmlObject);
+        $header = $this->buildHeader($messageType);
         $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligung());
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
         $contentClass->setPlanID($xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID());
@@ -219,8 +237,8 @@ class XBeteiligungResponseMessageFactory
         KommunalLoeschenNOOKAnonymousPHPType|RaumordnungLoeschenNOOKAnonymousPHPType|PlanfeststellungLoeschenNOOKAnonymousPHPType $contentClass,
         string $messageType
     ): ResponseValue {
-        $this->setProductInfo($xmlObject);
-        $header = $this->buildHeader($messageType, self::K1);
+        $this->xBeteiligungService->setProductInfo($xmlObject);
+        $header = $this->buildHeader($messageType);
         $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligungsID());
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
         $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getPlanID());
@@ -238,8 +256,8 @@ class XBeteiligungResponseMessageFactory
         NachrichteninhaltTemplateNOKType $contentClass,
         string $messageType
     ): ResponseValue {
-        $this->setProductInfo($xmlObject);
-        $header = $this->buildHeader($messageType, self::K1);
+        $this->xBeteiligungService->setProductInfo($xmlObject);
+        $header = $this->buildHeader($messageType);
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
         $contentClass->setPlanID($xmlObject->getNachrichteninhalt()?->getBeteiligung()?->getPlanID());
         foreach ($errorTypes as $errorType) {
@@ -272,17 +290,19 @@ class XBeteiligungResponseMessageFactory
         string $prefixName
     ): XBeteiligungMessageHeadG2GTypeBuilder
     {
-        $headerBuilder->setAgentAgencyIdentificationPrefixListVersionId('3', $agentType)
+        $headerBuilder->setAgentAgencyIdentificationPrefixListVersionId('', $agentType)
+            // Reader => Behoerdenkennung => praefix
             ->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
-            ->setAgentAgencyIdentificationLabelListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst', $agentType)
+            ->setAgentAgencyIdentificationPrefixName($prefixName, $agentType)
             // Reader => Behoerdenkennung => Kennung
-            //->setAgentAgencyIdentificationLabelListURI('', $agentType)
-            ->setAgentAgencyIdentificationLabelListVersionID('3', $agentType)
+            ->setAgentAgencyIdentificationLabelListURI('', $agentType)
+            ->setAgentAgencyIdentificationLabelListVersionID('', $agentType)
             ->setAgentAgencyIdentificationLabelCode('0200', $agentType)
+            ->setAgentAgencyIdentificationLabelName($prefixName, $agentType)
             //->setAgentAgencyName('BSW Hamburg', $agentType)
             // Reader => Erreichbarkeit[0] (Contact[0]) => Kennung (Label)
             ->setAgentContactChannelCode('01', $agentType)
-            ->setAgentContactChannelListVersion('3', $agentType)
+            ->setAgentContactChannelName('E-Mail', $agentType)
             ->setAgentContactLabel('info@gv.hamburg.de', $agentType)
             ->setAgentAddition('', $agentType);
             //->setAgentAddressBuildingNumber('19', $agentType)
@@ -312,14 +332,24 @@ class XBeteiligungResponseMessageFactory
     ): XBeteiligungMessageHeadG2GTypeBuilder
     {
         $headerBuilder
-            ->setAgentAgencyIdentificationPrefixListVersionId('3', $agentType)
-            ->setAgentAgencyIdentificationPrefixCode('DEMOS plan GmbH', $agentType)
-            ->setAgentAgencyIdentificationLabelListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst', $agentType)
+            // Autor => Behoerdenkennung => Prefix
+            ->setAgentAgencyIdentificationPrefixListVersionId('', $agentType)
+            //->setAgentAgencyIdentificationPrefixCode('diplanfhh', $agentType)
+            ->setAgentAgencyIdentificationPrefixName('DEMOS plan GmbH', $agentType)
+            // Autor => Behoerdenkennung => Kennung (Label)
+            ->setAgentAgencyIdentificationLabelListURI('', $agentType)
+            ->setAgentAgencyIdentificationLabelListVersionID('', $agentType)
+            ->setAgentAgencyIdentificationLabelCode('0400', $agentType)
+            ->setAgentAgencyIdentificationLabelName('', $agentType)
+
+            // Autor => Erreichbarkeit[0] (Contact[0]) => Kennung (Label)
             ->setAgentContactChannelCode('02', $agentType)
-            ->setAgentContactChannelListVersion('3', $agentType)
+            ->setAgentContactChannelName('Telefon', $agentType)
             ->setAgentContactLabel('0049 40 22 86 73 57 0', $agentType)
             ->setAgentAddition('', $agentType)
+            // Autor => Erreichbarkeit[1] (Contact[1) => Kennung (Label, $agentType)
             ->setAgentContactChannelCode('01', $agentType, 1)
+            ->setAgentContactChannelName('E-Mail', $agentType, 1)
             ->setAgentContactLabel('officehamburg@demos-international.com', $agentType, 1);
             // Autor => Anschrift => Gebaude
             //->setAgentAddressBuildingNumber('43', $agentType)
@@ -349,7 +379,7 @@ class XBeteiligungResponseMessageFactory
     {
         $headerBuilder
             // identifikation.nachricht => nachrichtenUUID
-            ->setMessageIdentificationUUID(CommonHelpers::uuid())
+            ->setMessageIdentificationUUID($this->xBeteiligungService->uuid())
             // identifikation.nachricht => nachrichtentyp => code
             ->setMessageIdentificationTypeCode($msgType)
             // identifikation.nachricht => erstellungszeitpunkt
@@ -384,17 +414,4 @@ class XBeteiligungResponseMessageFactory
         return $simpleXML->asXML();
     }
 
-    /**
-     * Attributes in top Tag.
-     */
-    protected function setProductInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
-    {
-        $messageObject->setProdukt('DiPlan Cockpit'); // required
-        $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
-        $messageObject->setProduktversion('1.3'); // optional
-        $messageObject->setStandard(XBeteiligungService::STANDARD); // required
-        $messageObject->setVersion('1.3'); // required
-
-        return $messageObject;
-    }
 }
