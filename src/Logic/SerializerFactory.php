@@ -21,7 +21,7 @@ use Psr\Log\LoggerInterface;
 
 class SerializerFactory
 {
-    private const METADATA_DIR = __DIR__ . '/../../Soap/Metadata';
+    private const METADATA_DIR = __DIR__ . '/../Soap/Metadata';
     private const NAMESPACE_PREFIX = 'DemosEurope\DemosplanAddon\XBeteiligung\Soap';
 
     public static function getSerializer(): Serializer
