@@ -108,7 +108,7 @@ autor:
 
 
 comment out `namespace: ...` in [`Schema.Code.CodeType.yml`](src/Soap/Metadata/Schema.Code.CodeType.yml)
-for the fiels `code` and `name`.
+for the fields `code` and `name`.
 comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml)
 for the fields: `anlagen.xml_list`
 comment out `namespace: ...` in [`Schema.XBeteiligung.MetadatenAnlageType.yml`](src/Soap/Metadata/Schema.XBeteiligung.MetadatenAnlageType.yml)
