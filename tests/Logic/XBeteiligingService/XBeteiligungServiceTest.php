@@ -65,7 +65,7 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(KommunaleProcedureCreater::class),
-            $this->createMock(StatementCreator::class),
+            $this->createMock(CommonHelpers::class),
         );
     }
 
