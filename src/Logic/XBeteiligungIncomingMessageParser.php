@@ -29,7 +29,9 @@ use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\XmlSchemaDateHandler;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
+use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
+use function in_array;
 
 class XBeteiligungIncomingMessageParser
 {
@@ -77,7 +79,7 @@ class XBeteiligungIncomingMessageParser
         ],
     ];
 
-    public function __construct()
+    public function __construct(private readonly LoggerInterface $logger)
     {
         $this->serializer = $this->getSerializerBuild();
     }
@@ -85,7 +87,7 @@ class XBeteiligungIncomingMessageParser
     private function getSerializerBuild(): Serializer
     {
         $serializerBuilder = SerializerBuilder::create();
-        $serializerBuilder->addMetadataDir(__DIR__ . '/../Soap/metadata', 'DemosEurope\DemosplanAddon\XBeteiligung\Soap');
+        $serializerBuilder->addMetadataDir(__DIR__ . '/../Soap/Metadata', 'DemosEurope\DemosplanAddon\XBeteiligung\Soap');
         $serializerBuilder->configureHandlers(static function (HandlerRegistryInterface $handler) use ($serializerBuilder) {
             $serializerBuilder->addDefaultHandlers();
             $handler->registerSubscribingHandler(new BaseTypesHandler());
@@ -98,7 +100,7 @@ class XBeteiligungIncomingMessageParser
     /**
      * @throws SchemaException
      */
-    public function getXmlObject(string $messageType, string $incomingMessage): NachrichtG2GTypeType
+    public function getXmlObject(string $incomingMessage, string $messageType): NachrichtG2GTypeType
     {
         if (!isset($this->messageTypeMapping[$messageType])) {
             throw new SchemaException("Invalid message type: $messageType");
@@ -107,7 +109,7 @@ class XBeteiligungIncomingMessageParser
         $messageClass = $this->messageTypeMapping[$messageType]['class'];
         $expectedXmlName = $this->messageTypeMapping[$messageType]['identifier'];
 
-        $simpleXML = $this->getSimpleXmlElementWithCertainty($incomingMessage);
+        $simpleXML = $this->getSimpleXmlElementWithCertainty($incomingMessage, $messageType);
         $this->validateRequiredNamespace($simpleXML);
         $this->validateXmlName($simpleXML, $expectedXmlName);
 
@@ -124,6 +126,9 @@ class XBeteiligungIncomingMessageParser
     private function validateXmlName(SimpleXMLElement $simpleXML, string $expectedXmlName): void
     {
         if ($expectedXmlName !== $simpleXML->getName()) {
+            $this->logger->error('Unexpected message type name in XML', [
+                'Unexpected name' => $simpleXML->getName(),
+            ]);
             throw new SchemaException(self::UNEXPECTED_NAME);
         }
     }
@@ -132,25 +137,34 @@ class XBeteiligungIncomingMessageParser
     /**
      * @throws SchemaException
      */
-    private function getSimpleXmlElementWithCertainty(string $incomingMessage): SimpleXMLElement
+    private function getSimpleXmlElementWithCertainty(string $incomingMessage, string $messageType): SimpleXMLElement
     {
         libxml_use_internal_errors(true);
         $simpleXML = simplexml_load_string($incomingMessage);
         if (false === $simpleXML) {
+            $errors = libxml_get_errors();
+            foreach ($errors as $error) {
+                $this->logger->error('XML parsing error', [
+                    'messageType' => $messageType,
+                    'message' => $error->message,
+                    'line' => $error->line,
+                    'column' => $error->column,
+                ]);
+            }
             libxml_clear_errors();
-            throw new SchemaException('Could not parse payload as XML');
+            throw new SchemaException('Could not parse incoming message as XML');
         }
         return $simpleXML;
     }
 
-    /**
-     * @throws SchemaException
-     */
     private function validateRequiredNamespace(SimpleXMLElement $simpleXML): void
     {
         $namespaces = $simpleXML->getNamespaces();
         if (!in_array('http://xplanverfahren.de/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION, $namespaces, true)) {
-            throw new SchemaException('Unexpected namespace, won’t continue');
+            $this->logger->warning('Probably missing relevant namespace?', [
+                'namespace' => 'http://xplanverfahren.de/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION
+                ]
+            );
         }
     }
 
