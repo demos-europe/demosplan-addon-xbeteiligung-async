@@ -15,14 +15,14 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Planfestste
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
+use DOMDocument;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 
 class CommonHelpers
 {
-
-    private const MessageTypeMapping = [
+    public const MESSAGE_TYPE_MAPPING = [
         '400' => [
             'xsd' => 'xbeteiligung-kommunaleBauleitplanung.xsd',
             'classes' => [
@@ -56,7 +56,12 @@ class CommonHelpers
             ]
         ]
     ];
-    public static function uuid(): string
+
+    public function __construct(private readonly LoggerInterface $logger)
+    {
+    }
+
+    public function uuid(): string
     {
         $uuid = '';
         $tryAgain = true;
@@ -70,9 +75,9 @@ class CommonHelpers
         return $uuid;
     }
 
-    private static function resolveXsdFilePath(string $messageClass): string
+    private function resolveXsdFilePath(string $messageClass): string
     {
-        foreach (self::MessageTypeMapping as $group) {
+        foreach (self::MESSAGE_TYPE_MAPPING as $group) {
             if (in_array($messageClass, $group['classes'], true)) {
                 return $group['xsd'];
             }
@@ -87,34 +92,43 @@ class CommonHelpers
     /**
      * Validates a message against a given xsd file located in plugin xsd folder.
      */
-    public static function isValidMessage(
+    public function isValidMessage(
         string $message,
-        LoggerInterface $logger,
         bool $verboseDebug = false,
         string $path = '',
-        string $messageClass = '',
+        string $messageClass = ''
     ): bool
     {
         if ('' === $path) {
             $path = AddonPath::getRootPath('Resources/xsd/');
         }
-        $xsdFile = self::resolveXsdFilePath($messageClass);
+        $xsdFile = $this->resolveXsdFilePath($messageClass);
         $fullPath = $path . $xsdFile;
-        $document = new \DOMDocument();
-        $document->loadXML($message);
+        $document = new DOMDocument();
+        // Suppress errors and allow internal error handling
+        libxml_use_internal_errors(true);
+        if (!$document->loadXML($message)) {
+            $errors = libxml_get_errors();
+            $this->logger->error('Failed to load XML, probably invalid',
+                [
+                    'message' => $message,
+                    'errors' => $errors
+                ]
+            );
+
+            return false;
+        }
         $isValid = $document->schemaValidate($fullPath);
         if (!$isValid) {
-            // revalidate with error handling
-            libxml_use_internal_errors(true);
-            $document->schemaValidate($fullPath);
             $errors = libxml_get_errors();
             foreach ($errors as $error) {
-                $logger->warning('Invalid XML message', [$error]);
+                $this->logger->warning('Invalid XML message', [$error]);
                 if ($verboseDebug) {
-                    $logger->debug('XML validation error', ['error' => $error]);
+                    $this->logger->debug('XML validation error', ['error' => $error]);
                 }
             }
             libxml_clear_errors();
+
             return false;
         }
         return true;

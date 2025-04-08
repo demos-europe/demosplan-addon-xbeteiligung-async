@@ -40,14 +40,14 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         $message = new AllgemeinStellungnahmeNeuabgegeben0701();
 
-        $this->setProductInfo($message);
+        $this->xBeteiligungService->setProductInfo($message);
         $header = $this->buildHeader('0701', 'LGV');
         $message->setNachrichtenkopfG2g($header);
 
         $content = $this->createXBeteiligungStellungnahmeNeu0701Content($statementCreated);
         $message->setNachrichteninhalt($content);
 
-        $messageXml = SerializerFactory::serializeData($message, $this->dplanCockpitLogger);
+        $messageXml = SerializerFactory::serializeData($message, $this->logger);
 
         return $this->addNamespacesTo70xXML($messageXml);
     }
@@ -76,8 +76,8 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
             $natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
             $fname = new AllgemeinerNameType();
             $lname = new AllgemeinerNameType();
-            $fname->setName($statementCreated->getUser()->getFirstName());
-            $lname->setName($statementCreated->getUser()->getLastName());
+            $fname->setName($statementCreated->getUser()->getFirstname());
+            $lname->setName($statementCreated->getUser()->getLastname());
             $natuerlichePerson->setFamilienname($lname);
             $natuerlichePerson->setVorname($fname);
             $natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
@@ -104,7 +104,10 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $this->getProcedurePhase($statementCreated, $statement);
         // set verfahrensteilschritt
         $partParticipationType = new CodeVerfahrensteilschrittType();
-        $phaseCode = $statementCreated->getPartPhaseCode($statementCreated->getPhase(), $statementCreated->getPublicStatement());
+        $phaseCode = $statementCreated->getPartPhaseCode(
+            $statementCreated->getPhase(),
+            $statementCreated->getPublicStatement()
+        );
         $partParticipationType->setCode($phaseCode);
         $partParticipationType->setListVersionID('3');
         $statement->setVerfahrensteilschritt($partParticipationType);
@@ -114,12 +117,16 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $statement->setPrioritaet($priority);
         // set Abwaegungsvorschlag
         $abwaegungVorschlag = new CodeAbwaegungsvorschlagType();
-        $statement->setAbwaegungsvorschlag($abwaegungVorschlag->setCode($this->getAbwaegungVorschlag($statementCreated->getVotes()->first())));
+        $statement->setAbwaegungsvorschlag(
+            $abwaegungVorschlag->setCode(
+                $this->getAbwaegungVorschlag($statementCreated->getVotes()->first())
+            )
+        );
         // set Schlagwort
         $statement->setSchlagwort($statementCreated->getTags());
         $nachricht = new NachrichteninhaltAnonymousPHPType();
         $nachricht->setStellungnahme($statement);
-        $nachricht->setVorgangsID(CommonHelpers::uuid());
+        $nachricht->setVorgangsID($this->commonHelpers->uuid());
 
         return $nachricht;
     }
@@ -202,7 +209,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
             $procedure = new BeteiligungPlanfeststellungType();
         }elseif ($procedure === null) {
-            $this->dplanCockpitLogger->error('No procedure found.');
+            $this->logger->error('No procedure found.');
             throw new ProjectPrefixNotFoundException();
         }
         $procedure->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
@@ -262,7 +269,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
         $result = $simpleXML->asXML();
         if (!is_string($result)) {
-            $this->dplanCockpitLogger->error('Failed to add namespaces to XML.');
+            $this->logger->error('Failed to add namespaces to XML.');
             throw new NamespaceAdditionException('Failed to add namespaces');
         }
 
@@ -271,9 +278,8 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
     public function isValidCreatedStatementMessage (string $message): bool
     {
-        return CommonHelpers::isValidMessage(
+        return $this->commonHelpers->isValidMessage(
             $message,
-            $this->dplanCockpitLogger,
             true,
             '',
             AllgemeinStellungnahmeNeuabgegeben0701::class,

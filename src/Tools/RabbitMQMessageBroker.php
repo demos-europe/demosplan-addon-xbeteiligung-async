@@ -17,6 +17,7 @@ use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Exception\JsonException;
 use DemosEurope\DemosplanAddon\Utilities\Json;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -34,7 +35,8 @@ class RabbitMQMessageBroker
         private readonly LoggerInterface $logger,
         private readonly string $rabbitMqQueueName,
         private readonly XBeteiligungService $xBeteiligungService,
-        private readonly StatementMessageFactory $statementMessageFactory
+        private readonly StatementMessageFactory $statementMessageFactory,
+        private readonly StatementCreator $statementCreator,
     ) {
     }
 
@@ -100,7 +102,7 @@ class RabbitMQMessageBroker
      */
     public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): ?StatementCreatedEventInterface
     {
-        $statementCreated = $this->xBeteiligungService->getStatementCreatedFromEvent($event);
+        $statementCreated = $this->statementCreator->getStatementCreatedFromEvent($event);
         if ($statementCreated->getPlanId() === null) {
             $this->logger->error('StatementCreatedEvent has no planId', [$statementCreated]);
             return null;
