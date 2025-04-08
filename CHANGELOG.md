@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+
+## v0.13 (2025-04-08)
 - enhance logging
 - set the iteration (Durchgangsnummer) by getting it from the procedure
 - fix bugs (namespace errors, wrong paths, 409 was not created, $messageClass was missing
