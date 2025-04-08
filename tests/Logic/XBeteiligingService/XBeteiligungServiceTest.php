@@ -154,9 +154,10 @@ abstract class XBeteiligungServiceTest extends TestCase
 
     protected function validateProcedureXML(string $procedureXml, string $messageClass): void
     {
-        $isValid = CommonHelpers::isValidMessage(
+        $commonHelpers = new CommonHelpers($this->createMock(LoggerInterface::class));
+
+        $isValid = $commonHelpers->isValidMessage(
             $procedureXml,
-            $this->createMock(LoggerInterface::class),
             true,
             '',
             $messageClass,
