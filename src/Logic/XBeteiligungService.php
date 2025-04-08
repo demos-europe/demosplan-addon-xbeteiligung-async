@@ -66,6 +66,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309\RaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
+use DOMDocument;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
@@ -163,15 +164,15 @@ class XBeteiligungService
     private const NON_EXISTING_CODE = 'work probably in progress';
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
-    public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Initiieren.0401';
-    public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Aktualisieren.0402';
-    public const DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:kommunal.Loeschen.0409';
-    public const NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:raumordnung.Initiieren.0301';
-    public const UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:raumordnung.Aktualisieren.0302';
-    public const DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:raumordnung.Loeschen.0309';
-    public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planfeststellung.Initiieren.0201';
-    public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planfeststellung.Aktualisieren.0202';
-    public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'xbeteiligung:planfeststellung.Loeschen.0209';
+    public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.0401';
+    public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Aktualisieren.0402';
+    public const DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Loeschen.0409';
+    public const NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'raumordnung.Initiieren.0301';
+    public const UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'raumordnung.Aktualisieren.0302';
+    public const DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'raumordnung.Loeschen.0309';
+    public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Initiieren.0201';
+    public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Aktualisieren.0202';
+    public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Loeschen.0209';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
     public const MISSING_USER_ERROR_CODE = '0300';
     public const WRONG_ATTACHMENT_FORMAT_ERROR_CODE = '0200';
@@ -497,7 +498,7 @@ class XBeteiligungService
         $participationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         );
-        $participationType->setDurchgang(1);
+        $participationType->setDurchgang($procedure->getPublicParticipationPhaseObject()->getIteration());
         $participationType->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
 
         // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
@@ -545,7 +546,7 @@ class XBeteiligungService
         $institutionParticipationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
-        $institutionParticipationType->setDurchgang(1); // required not documented not wanted
+        $institutionParticipationType->setDurchgang($procedure->getPhaseObject()->getIteration());
         $bkTOEBaaType = new BeteiligungKommunalTOEBArtAnonymousPHPType();
         $bkTOEBaaType->setBeteiligungKommunalFormalTOEB($this->getInstitutionProcedurePhaseCodeType($procedure));
         $institutionParticipationType->setBeteiligungKommunalTOEBArt($bkTOEBaaType);
@@ -560,15 +561,13 @@ class XBeteiligungService
         $publicParticipationType = new BeteiligungKommunalOeffentlichkeitType();
         // we as demos think this id is useless - did not win the discussion as it seems :(
         $publicParticipationType->setBeteiligungsID($this->uuid());
-        // this MetadatenAnlageType should support a base64 container to dump files into but it does not - S.C. is informed
-        // $publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
         $publicParticipationType->setZeitraum(
             $this->createTimeSpanOfProcedurePhase($procedure->getPublicParticipationPhaseObject())
         );
         $publicParticipationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
-        $publicParticipationType->setDurchgang(1); // required not documented not wanted
+        $publicParticipationType->setDurchgang($procedure->getPublicParticipationPhaseObject()->getIteration());
         $bkoeaaType = new BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType();
         $bkoeaaType->setBeteiligungKommunalFormalOeffentlichkeit(
             $this->getPublicProcedurePhaseCodeType($procedure)
@@ -795,13 +794,22 @@ class XBeteiligungService
         }
         $xsdFile = $this->resolveXsdFilePath($messageClass);
         $fullPath = $path . $xsdFile;
-        $document = new \DOMDocument();
-        $document->loadXML($message);
+        $document = new DOMDocument();
+        // Suppress errors and allow internal error handling
+        libxml_use_internal_errors(true);
+        if (!$document->loadXML($message)) {
+            $errors = libxml_get_errors();
+            $this->logger->error('Failed to load XML, probably invalid',
+                [
+                'message' => $message,
+                'errors' => $errors
+                ]
+            );
+
+            return false;
+        }
         $isValid = $document->schemaValidate($fullPath);
         if (!$isValid) {
-            // revalidate with error handling
-            libxml_use_internal_errors(true);
-            $document->schemaValidate($fullPath);
             $errors = libxml_get_errors();
             foreach ($errors as $error) {
                 $this->logger->warning('Invalid XML message', [$error]);
@@ -810,24 +818,29 @@ class XBeteiligungService
                 }
             }
             libxml_clear_errors();
+
             return false;
         }
         return true;
     }
 
-    public function createProcedureMessage(string $xml, string $procedureId): ProcedureMessage
+    public function createProcedureMessage(string $xml, string $procedureId, string $messageClass): ProcedureMessage
     {
         $error = false;
         $path = AddonPath::getRootPath('addons/vendor/' .
             XBeteiligungAsyncAddon::ADDON_NAME . '/Resources/xsd/');
-        if (false === $this->isValidMessage($xml, path: $path))
-        {
+        if (false === $this->isValidMessage($xml, path: $path, messageClass: $messageClass)) {
             $this->logger->warning('The generated XML is not valid.', [
                 'procedureId' => $procedureId,
                 'generatedXML' => $xml
             ]);
             $error = true;
         }
+
+        if (false === $error) {
+            $this->logger->info('Created XML Message is valid.', ['procedureId' => $procedureId]);
+        }
+
         return new ProcedureMessage(
             $xml,
             false,

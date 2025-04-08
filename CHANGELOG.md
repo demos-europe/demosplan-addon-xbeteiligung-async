@@ -1,6 +1,10 @@
 # Changelog
 
 ## UNRELEASED
+- enhance logging
+- set the iteration (Durchgangsnummer) by getting it from the procedure
+- fix bugs (namespace errors, wrong paths, 409 was not created, $messageClass was missing
+  for 401, 402, 409, 301, 302 and 309)
 
 ## v0.12 (2025-04-04)
 - bumped required demosplan-addon version to v0.51
