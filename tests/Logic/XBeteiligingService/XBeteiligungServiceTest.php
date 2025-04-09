@@ -56,6 +56,9 @@ abstract class XBeteiligungServiceTest extends TestCase
         $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false));
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
 
+        $reusableMessageBlocks =
+            new ReusableMessageBlocks(new CommonHelpers($this->createMock(LoggerInterface::class)));
+
         $this->sut = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
             $this->createMock(LoggerInterface::class),
@@ -66,7 +69,7 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(KommunaleProcedureCreater::class),
             $this->createMock(CommonHelpers::class),
-            $this->createMock(ReusableMessageBlocks::class)
+            $reusableMessageBlocks
         );
     }
 
@@ -98,6 +101,7 @@ abstract class XBeteiligungServiceTest extends TestCase
         $procedurePhaseMock = $this->createMock(ProcedurePhaseInterface::class);
         $procedurePhaseMock->method('getStartDate')->willReturn($startDate);
         $procedurePhaseMock->method('getEndDate')->willReturn($endDate);
+        $procedurePhaseMock->method('getIteration')->willReturn(1);
         $procedure->method('getPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
