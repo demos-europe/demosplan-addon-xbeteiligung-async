@@ -35,7 +35,7 @@ class ReusableMessageBlocks
 
     public function setProductInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
     {
-        $messageObject->setProdukt('DiPlan Cockpit'); // required
+        $messageObject->setProdukt('DiPlanCockpit'); // required
         $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
         $messageObject->setProduktversion('1.1'); // optional
         $messageObject->setStandard(XBeteiligungService::STANDARD); // required
