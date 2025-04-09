@@ -33,9 +33,13 @@ class ReusableMessageBlocks
     {
     }
 
+    /**
+     * @throws UnsupportedMessageTypeException
+     */
     public function setProductInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
     {
-        $messageObject->setProdukt('DiPlanCockpit'); // required
+        $author = $this->commonHelpers->mapClassToMessageIndentifier($messageObject)['author'];
+        $messageObject->setProdukt($author); // required
         $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
         $messageObject->setProduktversion('1.1'); // optional
         $messageObject->setStandard(XBeteiligungService::STANDARD); // required
