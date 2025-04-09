@@ -1,8 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\UnsupportedMessageTypeException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeAktualisiert0702;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeGeloescht0709;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
@@ -55,6 +67,79 @@ class CommonHelpers
                 AllgemeinStellungnahmeGeloescht0709::class
             ]
         ]
+    ];
+
+    public const CLASS_TO_MESSAGE_TYPE_MAPPING = [
+        KommunalInitiieren0401::class =>
+            [
+                'code' => '0401',
+                'name' => 'kommunal.Initiieren.0401',
+                'author' => 'Demosplan',
+                'recipient' => 'K3',
+            ],
+        KommunalAktualisieren0402::class =>
+            [
+                'code' => '0402',
+                'name' => 'kommunal.Aktualisieren.0402',
+                'author' => 'Demosplan',
+                'recipient' => 'K3',
+            ],
+        KommunalLoeschen0409::class =>
+            [
+                'code' => '0409',
+                'name' => 'kommunal.Loeschen.0409',
+                'author' => 'Demosplan',
+                'recipient' => 'K3',
+            ],
+        AllgemeinStellungnahmeNeuabgegeben0701::class =>
+            [
+                'code' => '0701',
+                'name' => 'allgemein.stellungnahme.Neuabgegeben.0701',
+                'author' => 'Demosplan',
+                'recipient' => 'DiPlanCockpit',
+            ],
+        RaumordnungInitiieren0301::class =>
+            [
+                'code' => '0301',
+                'name' => 'raumordnung.Initiieren.0301',
+                'author' => 'Demosplan',
+                'recipient' => 'K3',
+            ],
+        RaumordnungAktualisieren0302::class =>
+            [
+                'code' => '0302',
+                'name' => 'raumordnung.Aktualisieren.0302',
+                'author' => 'Demosplan',
+                'recipient' => 'K3',
+            ],
+        RaumordnungLoeschen0309::class =>
+            [
+                'code' => '0309',
+                'name' => 'raumordnung.Loeschen.0309',
+                'author' => 'Demosplan',
+                'recipient' => 'K3',
+            ],
+        PlanfeststellungInitiieren0201::class =>
+            [
+                'code' => '0201',
+                'name' => 'planfeststellung.Initiieren.0201',
+                'author' => 'Demosplan',
+                'recipient' => 'K3',
+            ],
+        PlanfeststellungAktualisieren0202::class =>
+            [
+                'code' => '0202',
+                'name' => 'planfeststellung.Aktualisieren.0202',
+                'author' => 'Demosplan',
+                'recipient' => 'K3',
+            ],
+        PlanfeststellungLoeschen0209::class =>
+            [
+                'code' => '0209',
+                'name' => 'planfeststellung.Loeschen.0209',
+                'author' => 'Demosplan',
+                'recipient' => 'K3',
+            ],
     ];
 
     public function __construct(private readonly LoggerInterface $logger)
@@ -132,5 +217,26 @@ class CommonHelpers
             return false;
         }
         return true;
+    }
+
+    /**
+     * @throws UnsupportedMessageTypeException
+     *
+     * @return array{ 'code' : string, 'name' : string, 'author' : string, 'recipient' : string }
+     */
+    public function mapClassToMessageIndentifier(NachrichtG2GTypeType $messageObject): array
+    {
+        $className = $messageObject::class;
+        if (in_array($className, self::CLASS_TO_MESSAGE_TYPE_MAPPING, true)) {
+
+            return self::CLASS_TO_MESSAGE_TYPE_MAPPING[$className];
+        }
+
+        $this->logger->error(
+            'Class '.$messageObject::class.' does not match a supported message head identifier'
+        );
+        throw new UnsupportedMessageTypeException(
+            $messageObject::class . ' is not supported - unable to set messageIdentification code'
+        );
     }
 }

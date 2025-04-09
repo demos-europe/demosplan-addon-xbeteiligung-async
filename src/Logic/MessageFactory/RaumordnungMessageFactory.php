@@ -46,8 +46,7 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
         return $this->buildProcedureCreatedResponse(
             $procedure,
             $xmlObject301,
-            new RaumordnungInitiierenOK0311(),
-            '0311'
+            new RaumordnungInitiierenOK0311()
         );
     }
 
@@ -63,8 +62,7 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
         return $this->buildProcedureUpdateResponse(
             $procedure,
             $xmlObject302,
-            new RaumordnungAktualisierenOK0312(),
-            '0312'
+            new RaumordnungAktualisierenOK0312()
         );
     }
 
@@ -79,8 +77,7 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
     {
         return $this->buildProcedureDeletedResponse(
             $xmlObject309,
-            new RaumordnungLoeschenOK0319(),
-            '0319'
+            new RaumordnungLoeschenOK0319()
         );
     }
 
@@ -98,8 +95,7 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
             $errorTypes,
             $xmlObject301,
             new RaumordnungInitiierenNOK0321(),
-            new NachrichteninhaltTemplateNOKType(),
-            '0321'
+            new NachrichteninhaltTemplateNOKType()
         );
     }
 
@@ -119,8 +115,7 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
             $errorTypes,
             $xmlObject302,
             new RaumordnungAktualisierenNOK0322(),
-            new RaumordnungAktualisierenNOOKAnonymousPHPType(),
-            '0302'
+            new RaumordnungAktualisierenNOOKAnonymousPHPType()
         );
     }
 
@@ -139,8 +134,7 @@ class RaumordnungMessageFactory extends XBeteiligungResponseMessageFactory
             $errorTypes,
             $xmlObject309,
             new RaumordnungLoeschenNOK0329(),
-            new RaumordnungLoeschenNOOKAnonymousPHPType(),
-            '0329'
+            new RaumordnungLoeschenNOOKAnonymousPHPType()
         );
     }
 }

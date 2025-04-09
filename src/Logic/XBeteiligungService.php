@@ -24,17 +24,9 @@ use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
-use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\UnsupportedMessageTypeException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde\CodeVerzeichnisdienstTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\Autor;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\IdentifikationNachricht;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\Leser;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtenkopfG2g;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation\CodeKommunikationKanalTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation\Erreichbarkeit;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType;
@@ -48,16 +40,12 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanart
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeXBeteiligungNachrichtenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402\KommunalAktualisieren0402AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401\KommunalInitiieren0401AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschen0409;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschen0409\KommunalLoeschen0409AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt409;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschen0209;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302\RaumordnungAktualisieren0302AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
@@ -66,13 +54,10 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309\RaumordnungLoeschen0309AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt309;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
-use DOMDocument;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
-use JMS\Serializer\Serializer;
 use Psr\Log\LoggerInterface;
-use Ramsey\Uuid\Uuid;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -133,7 +118,7 @@ class XBeteiligungService
         ]
     ];
 
-    private const NON_EXISTING_CODE = 'work probably in progress';
+    public const NON_EXISTING_CODE = 'work probably in progress';
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
     public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.0401';
@@ -165,6 +150,7 @@ class XBeteiligungService
         private readonly XBeteiligungIncomingMessageParser   $incomingMessageParser,
         private readonly KommunaleProcedureCreater           $kommunaleProcedureCreater,
         private readonly CommonHelpers                       $commonHelpers,
+        private readonly ReusableMessageBlocks               $reusableMessageBlocks,
     ) {
     }
 
@@ -176,9 +162,9 @@ class XBeteiligungService
     ): string
     {
         $procedureCreated401Object = new KommunalInitiieren0401();
-        $this->setProductInfo($procedureCreated401Object);
+        $this->reusableMessageBlocks->setProductInfo($procedureCreated401Object);
         $procedureCreated401Object->setNachrichtenkopfG2g(
-            $this->createMessageHeadFor($procedureCreated401Object)
+            $this->reusableMessageBlocks->createMessageHeadFor($procedureCreated401Object)
         ); // required
         $procedureCreated401Object->setNachrichteninhalt(
             $this->generateMain401MessageContent($procedure)
@@ -195,9 +181,9 @@ class XBeteiligungService
     ): string
     {
         $procedureCreated301 = new RaumordnungInitiieren0301();
-        $this->setProductInfo($procedureCreated301);
+        $this->reusableMessageBlocks->setProductInfo($procedureCreated301);
         $procedureCreated301->setNachrichtenkopfG2g(
-            $this->createMessageHeadFor($procedureCreated301)
+            $this->reusableMessageBlocks->createMessageHeadFor($procedureCreated301)
         ); // required
         $procedureCreated301->setNachrichteninhalt(
             $this->generateMain301MessageContent($procedure)
@@ -214,9 +200,9 @@ class XBeteiligungService
         $procedureUpdated402Object = new KommunalAktualisieren0402()
     ): string
     {
-        $this->setProductInfo($procedureUpdated402Object);
+        $this->reusableMessageBlocks->setProductInfo($procedureUpdated402Object);
         $procedureUpdated402Object->setNachrichtenkopfG2g(
-            $this->createMessageHeadFor($procedureUpdated402Object)
+            $this->reusableMessageBlocks->createMessageHeadFor($procedureUpdated402Object)
         ); // required
         $procedureUpdated402Object->setNachrichteninhalt(
             $this->generateMain402MessageContent($procedure)
@@ -233,9 +219,9 @@ class XBeteiligungService
     ): string
     {
         $procedureUpdated302 = new RaumordnungAktualisieren0302();
-        $this->setProductInfo($procedureUpdated302);
+        $this->reusableMessageBlocks->setProductInfo($procedureUpdated302);
         $procedureUpdated302->setNachrichtenkopfG2g(
-            $this->createMessageHeadFor($procedureUpdated302)
+            $this->reusableMessageBlocks->createMessageHeadFor($procedureUpdated302)
         );
         $procedureUpdated302->setNachrichteninhalt(
             $this->generateMain302MessageContent($procedure)
@@ -252,9 +238,9 @@ class XBeteiligungService
     ): string
     {
         $procedureDeleted409Object = new KommunalLoeschen0409();
-        $this->setProductInfo($procedureDeleted409Object);
+        $this->reusableMessageBlocks->setProductInfo($procedureDeleted409Object);
         $procedureDeleted409Object->setNachrichtenkopfG2g(
-            $this->createMessageHeadFor($procedureDeleted409Object)
+            $this->reusableMessageBlocks->createMessageHeadFor($procedureDeleted409Object)
         ); // required
         $procedureDeleted409Object->setNachrichteninhalt($this->generateMain409MessageContent($procedureId));
 
@@ -269,30 +255,15 @@ class XBeteiligungService
     ): string
     {
         $procedureDeleted309 = new RaumordnungLoeschen0309();
-        $this->setProductInfo($procedureDeleted309);
+        $this->reusableMessageBlocks->setProductInfo($procedureDeleted309);
         $procedureDeleted309->setNachrichtenkopfG2g(
-            $this->createMessageHeadFor($procedureDeleted309)
+            $this->reusableMessageBlocks->createMessageHeadFor($procedureDeleted309)
         );
         $procedureDeleted309->setNachrichteninhalt(
             $this->generateMain309MessageContent($procedureId)
         );
 
         return SerializerFactory::serializeData($procedureDeleted309, $this->logger);
-    }
-
-
-    /**
-     * Attributes in top Tag.
-     */
-    public function setProductInfo(NachrichtG2GTypeType $messageObject): NachrichtG2GTypeType
-    {
-        $messageObject->setProdukt('DiPlan Cockpit'); // required
-        $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
-        $messageObject->setProduktversion('1.1'); // optional
-        $messageObject->setStandard(self::STANDARD); // required
-        $messageObject->setVersion('1.3'); // required
-
-        return $messageObject;
     }
 
     private function generateMain401MessageContent(ProcedureInterface $procedure): Nachrichteninhalt401
@@ -562,68 +533,6 @@ class XBeteiligungService
         return $publicParticipationType;
     }
 
-    /**
-     * @throws Exception
-     */
-    public function createMessageHeadFor(NachrichtG2GTypeType $messageObject): NachrichtenkopfG2g
-    {
-        $messageHead = new NachrichtenkopfG2g();
-        $messageHead->setIdentifikationNachricht($this->createMessageIdentification($messageObject)); // required
-        $messageHead->setLeser($this->createReaderInformation()); // required
-        $messageHead->setAutor($this->createAuthorInformation()); // required
-
-        return $messageHead;
-    }
-
-    public function createReaderInformation(): Leser
-    {
-        $reader = new Leser();
-        $reader->setKennung(''); // required
-        $reader->setName('K3'); // required
-        $verzeichnisdienst = new CodeVerzeichnisdienstTypeType();
-        $verzeichnisdienst->setListVersionID('');
-        $verzeichnisdienst->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
-        $verzeichnisdienst->setCode(self::NON_EXISTING_CODE);
-        $reader->setVerzeichnisdienst($verzeichnisdienst); // required
-
-
-        $codeAuthorityIdentification = new Erreichbarkeit();
-        $kanal = new CodeKommunikationKanalTypeType();
-        $kanal->setListVersionID('');
-        $kanal->setListURI(self::CODELIST_ERREICHBARKEIT);
-        $kanal->setCode('work probably in progress');
-        $codeAuthorityIdentification->setKanal($kanal);
-        $codeAuthorityIdentification->setKennung(''); // required
-        $reader->setErreichbarkeit([$codeAuthorityIdentification]); // required
-
-        return $reader;
-    }
-
-    public function createAuthorInformation(): Autor
-    {
-        $author = new Autor();
-        $author->setKennung('');
-        $author->setName(''); // required
-        $prefixType = new CodeVerzeichnisdienstTypeType();
-        $prefixType->setListVersionID('');
-        $prefixType->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
-        $prefixType->setCode(self::NON_EXISTING_CODE);
-        $author->setVerzeichnisdienst($prefixType); // required
-
-        $codeAuthorityIdentification = new Erreichbarkeit();
-        $kanal = new CodeKommunikationKanalTypeType();
-        $kanal->setListVersionID('');
-        $kanal->setListURI(self::CODELIST_ERREICHBARKEIT);
-        $kanal->setCode(self::NON_EXISTING_CODE);
-        $codeAuthorityIdentification->setKanal($kanal);
-        $codeAuthorityIdentification->setKennung(''); // required
-        $author->setErreichbarkeit([$codeAuthorityIdentification]); // required
-        $author->addToErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
-
-
-        return $author;
-    }
-
     private function generateFaceBoundaryWMSUrl(ProcedureInterface $procedure): string
     {
         $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
@@ -673,81 +582,6 @@ class XBeteiligungService
         return $url . $serviceType . $version . $request . $format . $transparent . $layers . $width .
             $height . $crs . $styles . $bbox;
     }
-
-    private function addAuthorCommunicationType(): Erreichbarkeit
-    {
-        $communicationType = new Erreichbarkeit();
-        $comCode = new CodeKommunikationKanalTypeType();
-        // Quelle - AdoRepo: Erreichbarkeit-3.xml
-        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger,
-        // 06 -> Pager, 07 -> Sonstiges, (08 -> DE-Mail, 09 -> Web - these don't exist in validation)
-        $comCode->setCode('07');
-        //$comCode->setName('Sonstiges'); // not expected in validation
-        $comCode->setListURI(self::CODELIST_ERREICHBARKEIT);
-        $comCode->setListVersionID('1');
-        $communicationType->setKanal($comCode); // required
-        $communicationType->setKennung('https://demosplan.com/impressum.html'); // required
-        $communicationType->setZusatz(''); // optional
-
-        return $communicationType;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function createMessageIdentification(NachrichtG2GTypeType $messageObject): IdentifikationNachricht
-    {
-        if ($messageObject instanceof KommunalInitiieren0401) {
-            $code = '0401';
-            $name = 'kommunal.Initiieren.0401';
-        } elseif ($messageObject instanceof KommunalAktualisieren0402) {
-            $code = '0402';
-            $name = 'kommunal.Aktualisieren.0402';
-        } elseif ($messageObject instanceof  KommunalLoeschen0409) {
-            $code = '0409';
-            $name = 'kommunal.Loeschen.0409';
-        } elseif ($messageObject instanceof RaumordnungInitiieren0301 ) {
-            $code = '0301'; // 0301
-            $name = 'raumordnung.Initiieren.0301';
-        } elseif ($messageObject instanceof RaumordnungAktualisieren0302 ) {
-            $code = '0302'; // 0302
-            $name = 'raumordnung.Aktualisieren.0302';
-        } elseif ($messageObject instanceof RaumordnungLoeschen0309 ) {
-            $code = '0309'; // 0309
-            $name = 'raumordnung.Loeschen.0309';
-        } elseif ($messageObject instanceof PlanfeststellungInitiieren0201 ) {
-            $code = '0201'; // 0201
-            $name = 'planfeststellung.Initiieren.0201';
-        } elseif ($messageObject instanceof PlanfeststellungAktualisieren0202 ) {
-            $code = '0202'; // 0202
-            $name = 'planfeststellung.Aktualisieren.0202';
-        } elseif ($messageObject instanceof PlanfeststellungLoeschen0209 ) {
-            $code = '0209'; // 0209
-            $name = 'planfeststellung.Loeschen.0209';
-        } else {
-            $this->logger->error('Class '.$messageObject::class.' not supported yet');
-            throw new UnsupportedMessageTypeException(
-                $messageObject::class . ' is not supported - unable to set messageIdentification code'
-            );
-        }
-
-        $identificationMessage = new IdentifikationNachricht();
-
-        $messageTypeCode = new CodeXBeteiligungNachrichtenType();
-        $messageTypeCode->setListURI('urn:xoev-de:xleitstelle:codeliste:xbeteiligung-nachrichten');
-        $messageTypeCode->setListVersionID('1.3');
-        $messageTypeCode->setName($name);
-        $messageTypeCode->setCode($code);
-
-        // id has to match pattern: '[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'
-        $identificationMessage->setNachrichtenUUID($this->commonHelpers->uuid()); // required
-        $identificationMessage->setErstellungszeitpunkt(new DateTime()); // required
-        $identificationMessage->setNachrichtentyp($messageTypeCode); // required
-
-        return $identificationMessage;
-    }
-
-
 
     public function createProcedureMessage(string $xml, string $procedureId, string $messageClass): ProcedureMessage
     {

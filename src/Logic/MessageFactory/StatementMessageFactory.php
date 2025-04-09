@@ -5,7 +5,6 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AllgemeinerNameType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameNatuerlichePersonType;
@@ -40,16 +39,19 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         $message = new AllgemeinStellungnahmeNeuabgegeben0701();
 
-        $this->xBeteiligungService->setProductInfo($message);
-        $header = $this->buildHeader('0701', 'LGV');
+        /** @var AllgemeinStellungnahmeNeuabgegeben0701 $message */
+        $message = $this->reusableMessageBlocks->setProductInfo($message);
+        $header = $this->reusableMessageBlocks->createMessageHeadFor($message);
         $message->setNachrichtenkopfG2g($header);
-
         $content = $this->createXBeteiligungStellungnahmeNeu0701Content($statementCreated);
         $message->setNachrichteninhalt($content);
 
         $messageXml = SerializerFactory::serializeData($message, $this->logger);
+        $messageXml = $this->addNamespacesTo70xXML($messageXml);
 
-        return $this->addNamespacesTo70xXML($messageXml);
+        $this->commonHelpers->isValidMessage($messageXml, messageClass: $message::class);
+
+        return $messageXml;
     }
 
 
