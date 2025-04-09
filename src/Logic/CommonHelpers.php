@@ -346,6 +346,8 @@ class CommonHelpers
                 ]
             );
 
+            var_dump($errors); // todo: remove when tests fixed
+
             return false;
         }
         $isValid = $document->schemaValidate($fullPath);
@@ -357,6 +359,7 @@ class CommonHelpers
                     $this->logger->debug('XML validation error', ['error' => $error]);
                 }
             }
+            var_dump($errors); // todo: remove when tests fixed
             libxml_clear_errors();
 
             return false;

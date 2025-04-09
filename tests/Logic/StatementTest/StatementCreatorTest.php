@@ -1,5 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\StatementTest;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
@@ -10,22 +20,22 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
-use DemosEurope\DemosplanAddon\Utilities\AddonPath;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Basisnachricht\Behoerde\BehoerdeTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Basisnachricht\Kommunikation\KommunikationTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Basisnachricht\G2g\NachrichtenkopfG2GTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\Basisnachricht\G2g\NachrichtG2GTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\XBeteiligung\StellungnahmeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde\BehoerdeTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation\KommunikationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtenkopfG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\StellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -74,6 +84,8 @@ class StatementCreatorTest extends TestCase
         $this->meta = $this->createMock(StatementMetaInterface::class);
         $this->procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
+        $reusableMessageBlocks =
+            new ReusableMessageBlocks(new CommonHelpers($this->createMock(LoggerInterface::class)));
         $xbeteiligungService = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
             $this->createMock(LoggerInterface::class),
@@ -83,14 +95,17 @@ class StatementCreatorTest extends TestCase
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(KommunaleProcedureCreater::class),
-            $this->createMock(StatementCreator::class),
+            $this->createMock(CommonHelpers::class),
+            $reusableMessageBlocks
         );
         $this->XBeteiligungService = $xbeteiligungService;
         $this->logger = new Logger();
         $this->serializer = SerializerFactory::getSerializer();
         $this->sut = new StatementMessageFactory(
+            $this->createMock(CommonHelpers::class),
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->permissionEvaluator,
+            $reusableMessageBlocks
         );
     }
 
@@ -98,8 +113,8 @@ class StatementCreatorTest extends TestCase
     {
         $statementCreated = $this->createStatement0701(3);
         $xmlMessageString = $this->sut->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
-        $isValid = $this->isValidMessage($xmlMessageString, true);
-        self::assertTrue($isValid);
+        echo $xmlMessageString; // todo: remove when tests fixed
+        $this->validateProcedureXML($xmlMessageString);
         /** @var AllgemeinStellungnahmeNeuabgegeben0701 $xmlMessage */
         $xmlMessage = $this->serializer->deserialize(
             $xmlMessageString,
@@ -129,7 +144,7 @@ class StatementCreatorTest extends TestCase
             $statementId = 'S34992191-830d-4d1d-a136-f38d322b521d';
             $planId = 'P9fd5b777-d02b-4340-81dc-89cb0a86029f';
             $procedureId = 'r20a6413-6c48-11eb-aaea-00505697774f';
-            $status = 'neue Stellungnahme';
+            $status = 'new';
             $organization = 'Testorganisation';
             $title = 'Stellungnahme zum Bebauungsplan';
             $description = 'Aus Sicht des Radverkehrs ist eine zügige und geradlinige Verbindung am Weidenbaumsweg entsprechend der aktuellen Erfordernisse anzustreben. In der vorliegenden Planung ist das nicht zu erkennen.
@@ -140,7 +155,7 @@ class StatementCreatorTest extends TestCase
                 Im Städtebaulichen Vertrag wird in § 14 Öffentlicher Kinderspielplatz geregelt, dass der Investor sich verpflichtet, einen bestimmten Betrag für die Ausstattung der Grün- und Parkanlagen mit Spielgeräten im Nahbereich des Vorhabens zur Verfügung stellt. In der Begründung zum Bebauungsplan unter Punkt 4.1.2 wird innerhalb der Parkanlage ein ca. 4.500 m² großer öffentlicher Spielplatz festgelegt. Hier geht nicht deutlich hervor, ob es in dem Gebiet einen Spielplatz geben wird bzw. ob die zur Verfügung gestellte Summe für diesen Spielplatz zur Verfügung steht oder es für einen beliebigen anderen Spielplatz gilt, der in der näheren Umgebung liegt. Hier sollte klar dargestellt werden, wo der Spielplatz liegen soll. Dies sollte ebenfalls in der Planzeichnung dargestellt werden.';
             $iteration = 1;
             $date = new \DateTime('2019-05-01');
-            $feedback = 'E-Mail';
+            $feedback = 'email';
             $priority = 'A-Punkt';
             $firstName = 'Max';
             $lastName = 'Mustermann';
@@ -204,7 +219,7 @@ class StatementCreatorTest extends TestCase
     private function validateProductInfo(NachrichtG2GTypeType $xmlMessage): void
     {
         // message tests
-        self::assertSame('DiPlan Cockpit', $xmlMessage->getProdukt());
+        self::assertSame('Demosplan', $xmlMessage->getProdukt());
         self::assertSame('DEMOS plan GmbH', $xmlMessage->getProdukthersteller());
         self::assertSame('XBeteiligung', $xmlMessage->getStandard());
         self::assertSame('1.3', $xmlMessage->getVersion());
@@ -247,6 +262,19 @@ class StatementCreatorTest extends TestCase
     private function isValidMessage(string $message): bool
     {
         return $this->sut->isValidCreatedStatementMessage($message);
+    }
+
+    protected function validateProcedureXML(string $procedureXml): void
+    {
+        $commonHelpers = new CommonHelpers($this->createMock(LoggerInterface::class));
+
+        $isValid = $commonHelpers->isValidMessage(
+            $procedureXml,
+            true,
+            '',
+            AllgemeinStellungnahmeNeuabgegeben0701::class,
+        );
+        self::assertTrue($isValid);
     }
 
 }
