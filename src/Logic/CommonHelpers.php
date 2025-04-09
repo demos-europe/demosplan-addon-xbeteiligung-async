@@ -49,6 +49,7 @@ use DOMDocument;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
+use function array_key_exists;
 
 class CommonHelpers
 {
@@ -371,7 +372,7 @@ class CommonHelpers
     public function mapClassToMessageIndentifier(NachrichtG2GTypeType $messageObject): array
     {
         $className = $messageObject::class;
-        if (in_array($className, self::CLASS_TO_MESSAGE_TYPE_MAPPING, true)) {
+        if (array_key_exists($className, self::CLASS_TO_MESSAGE_TYPE_MAPPING)) {
 
             return self::CLASS_TO_MESSAGE_TYPE_MAPPING[$className];
         }
