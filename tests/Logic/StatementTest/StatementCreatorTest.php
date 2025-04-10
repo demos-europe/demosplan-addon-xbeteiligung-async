@@ -259,11 +259,6 @@ class StatementCreatorTest extends TestCase
         self::assertSame('officehamburg@demos-international.com', $communication2->getKennung());
     }
 
-    private function isValidMessage(string $message): bool
-    {
-        return $this->sut->isValidCreatedStatementMessage($message);
-    }
-
     protected function validateProcedureXML(string $procedureXml): void
     {
         $commonHelpers = new CommonHelpers($this->createMock(LoggerInterface::class));

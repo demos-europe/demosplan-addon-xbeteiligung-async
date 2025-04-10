@@ -2,6 +2,7 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
+use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
@@ -25,6 +26,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahr
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\StellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\VerfasserType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
+use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
 use JsonException;
 
@@ -48,8 +50,10 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
         $messageXml = SerializerFactory::serializeData($message, $this->logger);
         $messageXml = $this->addNamespacesTo70xXML($messageXml);
-
-        $this->commonHelpers->isValidMessage($messageXml, messageClass: $message::class);
+        $path = AddonPath::getRootPath(
+            'addons/vendor/'.XBeteiligungAsyncAddon::ADDON_NAME.'/Resources/xsd/'
+        );
+        $this->commonHelpers->isValidMessage($messageXml, path: $path, messageClass: $message::class);
 
         return $messageXml;
     }
@@ -190,11 +194,17 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $priorityMapping = [
             'A-Punkt'        => '1',
             'B-Punkt'        => '2',
-            'nicht vergeben' => '3',
+            '' => '3', // means not assigned
         ];
         if (array_key_exists($priority, $priorityMapping)) {
             $priorityCode = $priorityMapping[$priority];
+        } else {
+            $this->logger->warning(
+                'tried to map a statement-priority that could not be mapped.',
+                ['givenPriority' => $priority]
+            );
         }
+
         return $priorityCode;
     }
 
@@ -276,15 +286,5 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         }
 
         return $result;
-    }
-
-    public function isValidCreatedStatementMessage (string $message): bool
-    {
-        return $this->commonHelpers->isValidMessage(
-            $message,
-            true,
-            '',
-            AllgemeinStellungnahmeNeuabgegeben0701::class,
-        );
     }
 }
