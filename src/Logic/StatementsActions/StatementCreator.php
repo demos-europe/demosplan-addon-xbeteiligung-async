@@ -59,7 +59,7 @@ class StatementCreator
         $statementCreated->setTitle($eventStatement->getTitle());
         $statementCreated->setFeedback($eventStatement->getFeedback());
         $statementCreated->setPriority($eventStatement->getPriority());
-        $statementCreated->setVotes($eventStatement->getVotes());
+        $statementCreated->setVotePla($eventStatement->getVotePla());
         $statementCreated->setPublicStatement($eventStatement->getPublicStatement());
         $statementCreated->setTags($eventStatement->getTags()->toArray());
         $statementCreated->lock();

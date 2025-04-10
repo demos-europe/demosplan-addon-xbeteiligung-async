@@ -161,7 +161,7 @@ class StatementCreatorTest extends TestCase
             $lastName = 'Mustermann';
             $gender = 'männlich';
             $userTitle = 'Dr.';
-            $vote = new ArrayCollection(['Der Stellungnahme wird gefolgt.']);
+            $vote = 'acknowledge';
             $tags = ['Radverkehr', 'Straßenbau', 'Straßenbäume', 'Städtebaulicher Vertrag'];
             $file = 'Legende.pdf:dc855abd-c8df-11e5-8550-005056ae0004:119994:application/pdf';
             $accessUrl = 'http://bob.beispiel.de?stellungnahmeID=S34992191-830d-4d1d-a136-f38d322b521d';
@@ -199,7 +199,7 @@ class StatementCreatorTest extends TestCase
         $statementCreated->setPublicStatement(StatementInterface::INTERNAL);
         $statementCreated->setPhase('earlyparticipation');
         $statementCreated->setPriority($priority);
-        $statementCreated->setVotes($vote);
+        $statementCreated->setVotePla($vote);
         $statementCreated->setTags($tags);
         $statementCreated->setFile($file);
         $statementCreated->lock();

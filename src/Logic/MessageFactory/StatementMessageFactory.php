@@ -121,13 +121,15 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $priority = new CodePrioritaetDerStellungnahmeType();
         $priority->setCode($this->getPriority($statementCreated->getPriority()));
         $statement->setPrioritaet($priority);
-        // set Abwaegungsvorschlag
-        $abwaegungVorschlag = new CodeAbwaegungsvorschlagType();
-        $statement->setAbwaegungsvorschlag(
-            $abwaegungVorschlag->setCode(
-                $this->getAbwaegungVorschlag($statementCreated->getVotes()->first())
-            )
-        );
+        // set Abwaegungsvorschlag - optional field - only set it if a value is given
+        if (null !== $statementCreated->getVotePla()) {
+            $abwaegungVorschlag = new CodeAbwaegungsvorschlagType();
+            $statement->setAbwaegungsvorschlag(
+                $abwaegungVorschlag->setCode(
+                    $this->getAbwaegungVorschlag($statementCreated->getVotePla())
+                )
+            );
+        }
         // set Schlagwort
         $statement->setSchlagwort($statementCreated->getTags());
         $nachricht = new NachrichteninhaltAnonymousPHPType();
@@ -257,14 +259,16 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         $abwaegungVorschlagCode = '';
         $abwaegungVorschlagMapping = [
-            'Der Stellungnahme wird gefolgt.'                   => '1000',
-            'Der Stellungnahme wurde bereits gefolgt.'          => '2000',
-            'Der Stellungnahme wird nicht gefolgt.'             => '3000',
-            'Die Stellungnahme wird im Arbeitskreis behandelt.' => '4000',
-            'Die Stellungnahme wird zur Kenntnis genommen.'     => '5000',
+            'following'      => '1000',
+            'followed'       => '2000',
+            'noFollow'       => '3000',
+            'workInProgress' => '4000',
+            'acknowledge'    => '5000',
         ];
         if (array_key_exists($abwaegungVorschlag, $abwaegungVorschlagMapping)) {
             $abwaegungVorschlagCode = $abwaegungVorschlagMapping[$abwaegungVorschlag];
+        } else {
+            $this->logger->warning('the stn-vote-pla could be matched to a corresponding code.');
         }
         return $abwaegungVorschlagCode;
     }

@@ -28,7 +28,7 @@ class StatementAction extends ValueObject
     protected string $title;
     protected string $feedback;
     protected  string $file;
-    protected Collection $votes;
+    protected ?string $votePla;
     protected array $tags;
     protected string $publicStatement = '';
     protected ?UserInterface $user;
@@ -187,14 +187,14 @@ class StatementAction extends ValueObject
         $this->publicStatement = $publicStatement;
     }
 
-    public function getVotes(): Collection
+    public function getVotePla(): ?string
     {
-        return $this->votes;
+        return $this->votePla;
     }
 
-    public function setVotes(Collection $votes): void
+    public function setVotePla(?string $votePla): void
     {
-        $this->votes = $votes;
+        $this->votePla = $votePla;
     }
 
     public function getTags(): array
