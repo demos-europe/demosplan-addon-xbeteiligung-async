@@ -18,6 +18,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonContentMandatoryFieldsException;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonOrgaNotFoundException;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonUserNotFoundException;
+use DemosEurope\DemosplanAddon\Contracts\Form\Procedure\AbstractProcedureFormTypeInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\FormatException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
@@ -288,6 +289,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'r_externalDesc'                                                => $procedureObject->getBeschreibungPlanungsanlass(),
             'orgaId'                                                        => $orga->getId(),
             'orgaName'                                                      => $orga->getName(),
+            AbstractProcedureFormTypeInterface::AGENCY_MAIN_EMAIL_ADDRESS   => $orga->getEmail2(),
             'action'                                                        => 'new',
             'r_master'                                                      => 'false',
             'r_copymaster'                                                  => $this->procedureService->getMasterTemplateId(),
