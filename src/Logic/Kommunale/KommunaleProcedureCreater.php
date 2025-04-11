@@ -289,6 +289,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'r_externalDesc'                                                => $procedureObject->getBeschreibungPlanungsanlass(),
             'orgaId'                                                        => $orga->getId(),
             'orgaName'                                                      => $orga->getName(),
+            // fixme: currently we dont get an email for Verfahrensträger from cockpit
             AbstractProcedureFormTypeInterface::AGENCY_MAIN_EMAIL_ADDRESS   => $orga->getEmail2(),
             'action'                                                        => 'new',
             'r_master'                                                      => 'false',
