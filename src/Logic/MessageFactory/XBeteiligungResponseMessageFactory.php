@@ -401,7 +401,7 @@ class XBeteiligungResponseMessageFactory
             $simpleXML->addAttribute(
                 self::SCHEMALOCATION,
                 'https://www.xleitstelle.de/xbeteiligung/12 ../../xbeteiligung-kommunaleBauleitplanung.xsd');
-        } elseif (in_array($xmlObject, $this->messageTypeMapping['300']['clasess'], true)) {
+        } elseif (in_array($xmlObject, $this->messageTypeMapping['300']['classes'], true)) {
             $simpleXML->addAttribute(
                 self::SCHEMALOCATION,
                 'https://www.xleitstelle.de/xbeteiligung/12 ../../xbeteiligung-raumordnung.xsd');
