@@ -198,7 +198,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     ): ProcedureInterface {
         // get user from message should be set, because of that userId here is not correct
         try {
-            $orgaName = $messageContent->getAkteurVorhaben()->getVeranlasser()->getName();
+            $orgaName = $messageContent->getAkteurVorhaben()?->getVeranlasser()?->getName()->getName() ?? '';
             $orgaList = $this->orgaService->getOrgaByFields(['name' => $orgaName, 'deleted' => false]);
             Assert::count($orgaList, 1);
             /** @var OrgaInterface $orga */
