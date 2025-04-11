@@ -13,26 +13,22 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures;
 
 use DateTime;
-use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureTypeInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Form\Procedure\AbstractProcedureFormTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -40,7 +36,6 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MockFactoryTest extends TestCase
 {
@@ -56,9 +51,16 @@ class MockFactoryTest extends TestCase
         return $this->createMock(ProcedureTypeServiceInterface::class);
     }
 
-    public function getTransActionServiceInterfaceMock(): TransactionServiceInterface
+    public function getTransactionServiceInterfaceMock(): TransactionServiceInterface
     {
-        return $this->createMock(TransactionServiceInterface::class);
+        $transactionServiceInterfaceMock = $this->createMock(TransactionServiceInterface::class);
+        $transactionServiceInterfaceMock->method('executeAndFlushInTransaction')->willReturnCallback(
+            function ($callback) {
+                return $callback();
+            }
+        );
+
+        return $transactionServiceInterfaceMock;
     }
 
     public function getKommunaleResponseMessageFactory()
@@ -180,4 +182,18 @@ class MockFactoryTest extends TestCase
         return $entityManagerMock;
     }
 
+    public function getProcedurePhaseExtractorMock(): ProcedurePhaseExtractor|MockObject
+    {
+        return $this->createMock(ProcedurePhaseExtractor::class);
+    }
+
+    public function getOrgaServiceInterfaceMock(): OrgaServiceInterface|MockObject
+    {
+        return $this->createMock(OrgaServiceInterface::class);
+    }
+
+    public function getXBeteiligungMapServiceMock(): XBeteiligungMapService|MockObject
+    {
+        return $this->createMock(XBeteiligungMapService::class);
+    }
 }

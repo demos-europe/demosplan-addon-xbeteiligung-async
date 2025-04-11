@@ -28,17 +28,20 @@ class KommunaleProcedureHandlerFactory
     ): KommunaleProcedureCreater {
         $commonDependencies = [
             $this->mockFactory->getCurrentUserProviderInterfaceMock(),
+            $this->mockFactory->getEntityManagerMock(),
+            $this->mockFactory->getKommunaleResponseMessageFactory(),
             $this->mockFactory->getLoggerInterfaceMock(),
+            $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
+            $this->mockFactory->getProcedurePhaseExtractorMock(),
             $this->mockFactory->getProcedureServiceInterface(),
             $this->mockFactory->getProcedureServiceStorage(),
             $this->mockFactory->getProcedureTypeService(),
-            $this->mockFactory->getUserHandlerMock(),
-            $this->mockFactory->getEntityManagerMock(),
-            $this->mockFactory->getKommunaleResponseMessageFactory(),
             $this->mockFactory->getRaumordnungResponseMessageFactory(),
-            $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
+            $this->mockFactory->getTransActionServiceInterfaceMock(),
             $this->mockFactory->getTranslatorMock(),
-            $this->mockFactory->getTransActionServiceInterfaceMock()
+            $this->mockFactory->getUserHandlerMock(),
+            $this->mockFactory->getOrgaServiceInterfaceMock(),
+            $this->mockFactory->getXBeteiligungMapServiceMock()
         ];
 
         switch ($handlerType) {
