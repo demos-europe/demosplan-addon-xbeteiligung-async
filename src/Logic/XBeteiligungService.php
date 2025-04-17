@@ -390,7 +390,7 @@ class XBeteiligungService
         $participationType->setAkteurVorhaben(
             $this->createAkteurVorhabenType($procedure->getOrga()?->getName() ?? '')
         );
-        $participationType->setPlanID($procedure->getId());
+        $participationType->setPlanID($procedure->getId()); // todo: for messages from cockpit this is not correct?
         $participationType->setPlanname($procedure->getName());
         $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
         $participationType->setFlaechenabgrenzungUrl(

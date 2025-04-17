@@ -33,7 +33,7 @@ class RabbitMQMessageBroker
     public function __construct(
         private readonly GlobalConfigInterface $globalConfig,
         private readonly LoggerInterface $logger,
-        private readonly string $rabbitMqQueueName,
+        private readonly string $rabbitMqQueueName, // todo: has to be a parameter in parameters_default.yml not service.yml
         private readonly XBeteiligungService $xBeteiligungService,
         private readonly StatementMessageFactory $statementMessageFactory,
         private readonly StatementCreator $statementCreator,
@@ -51,7 +51,7 @@ class RabbitMQMessageBroker
         }
         $this->client->addRequest('', $this->rabbitMqQueueName, 'XBeteiligung_Get', $routingKey, 300);
         $replies = $this->client->getReplies();
-        $result = Json::decodeToArray($replies['XBeteiligung_Get']);
+        $result = Json::decodeToArray($replies['XBeteiligung_Get']); // todo: use as parameter
         $this->logger->info('Got response from RabbitMQ', [$result]);
         foreach ($result as $message) {
             $this->logger->info('Process message', [$message]);
@@ -86,7 +86,7 @@ class RabbitMQMessageBroker
         $this->client->addRequest(
             $xmlString,
             $this->rabbitMqQueueName,
-            'XBeteiligung_Send',
+            'XBeteiligung_Send', // todo: as parameter
             $routingKey,
             $expiration
         );
