@@ -59,7 +59,9 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 
     public function handleAddonMaintenanceEvent(AddonMaintenanceEventInterface $event): void
     {
-        if (true === $this->parameterBag->get('addon_xbeteiligung_async_enable_rabbitmq_communication')) { // todo: has to be false
+        if (false === $this->parameterBag->get('addon_xbeteiligung_async_enable_rabbitmq_communication')) {
+            $this->cockpitLogger->info('RabbitMQ communication is disabled');
+
             return;
         }
         try {
