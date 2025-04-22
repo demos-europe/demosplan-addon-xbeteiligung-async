@@ -67,7 +67,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         $statement = new StellungnahmeType();
         // create message content
-        // todo: check if standard needs ids beginning with letter like XBauleiplanung
         $statement->setStellungnahmeID($statementCreated->getPublicId());
         $statement->setPlanID($statementCreated->getPlanId());
         $statement->setBeteiligungsID($statementCreated->getProcedureId());
