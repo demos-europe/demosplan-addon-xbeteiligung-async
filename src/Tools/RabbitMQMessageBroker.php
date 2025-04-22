@@ -31,6 +31,8 @@ class RabbitMQMessageBroker
 {
     protected RpcClient $client;
     private const RABBIT_MQ_QUEUE_NAME = 'addon_xbeteiligung_async_rabbitMqQueueName';
+    private const RABBIT_MQ_REQUEST_ID_GET = 'addon_xbeteiligung_async_rabbitMqRequestIdGet';
+    private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
 
     public function __construct(
         private readonly GlobalConfigInterface $globalConfig,
@@ -51,9 +53,15 @@ class RabbitMQMessageBroker
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
             $routingKey = '';
         }
-        $this->client->addRequest('', $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME), 'XBeteiligung_Get', $routingKey, 300);
+        $this->client->addRequest(
+            '',
+            $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
+            self::RABBIT_MQ_REQUEST_ID_GET,
+            $routingKey,
+            300
+        );
         $replies = $this->client->getReplies();
-        $result = Json::decodeToArray($replies['XBeteiligung_Get']); // todo: use as parameter
+        $result = Json::decodeToArray($replies[self::RABBIT_MQ_REQUEST_ID_GET]);
         $this->logger->info('Got response from RabbitMQ', [$result]);
         foreach ($result as $message) {
             $this->logger->info('Process message', [$message]);
@@ -88,7 +96,7 @@ class RabbitMQMessageBroker
         $this->client->addRequest(
             $xmlString,
             $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
-            'XBeteiligung_Send', // todo: as parameter
+            self::RABBIT_MQ_REQUEST_ID_SEND,
             $routingKey,
             $expiration
         );
@@ -96,7 +104,7 @@ class RabbitMQMessageBroker
 
         $this->logger->info('Replies from RabbitMQ', [$replies]);
 
-        return Json::decodeToMatchingType($replies['XBeteiligung_Send']);
+        return Json::decodeToMatchingType($replies[self::RABBIT_MQ_REQUEST_ID_SEND]);
     }
 
     /**

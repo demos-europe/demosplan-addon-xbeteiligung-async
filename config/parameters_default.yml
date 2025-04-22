@@ -19,3 +19,7 @@ parameters:
   addon_xbeteiligung_async_rabbitmq_communication_delay: 300
 
   addon_xbeteiligung_async_rabbitMqQueueName: 'XBeteiligungAddon'
+
+  addon_xbeteiligung_async_rabbitMqRequestIdGet: 'XBeteiligung_Get'
+
+  addon_xbeteiligung_async_rabbitMqRequestIdSend: 'XBeteiligung_Send'
