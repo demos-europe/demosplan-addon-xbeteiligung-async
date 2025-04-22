@@ -17,3 +17,5 @@ parameters:
 
   # Maximum time in seconds we are allowed to rabbitMQ Message Broker
   addon_xbeteiligung_async_rabbitmq_communication_delay: 300
+
+  addon_xbeteiligung_async_rabbitMqQueueName: 'XBeteiligungAddon'

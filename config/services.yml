@@ -26,8 +26,6 @@ services:
         calls:
             - [ 'setClient', [ '@old_sound_rabbit_mq.demos_plan_import_rpc' ] ]
         lazy: true
-        arguments:
-            $rabbitMqQueueName: 'XBeteiligungAddon'
 
     DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository:
         arguments:

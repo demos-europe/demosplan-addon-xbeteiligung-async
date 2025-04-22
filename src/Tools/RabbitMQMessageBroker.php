@@ -25,18 +25,20 @@ use InvalidArgumentException;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class RabbitMQMessageBroker
 {
     protected RpcClient $client;
+    private const RABBIT_MQ_QUEUE_NAME = 'addon_xbeteiligung_async_rabbitMqQueueName';
 
     public function __construct(
         private readonly GlobalConfigInterface $globalConfig,
         private readonly LoggerInterface $logger,
-        private readonly string $rabbitMqQueueName, // todo: has to be a parameter in parameters_default.yml not service.yml
-        private readonly XBeteiligungService $xBeteiligungService,
-        private readonly StatementMessageFactory $statementMessageFactory,
+        private readonly ParameterBagInterface $parameterBag,
         private readonly StatementCreator $statementCreator,
+        private readonly StatementMessageFactory $statementMessageFactory,
+        private readonly XBeteiligungService $xBeteiligungService,
     ) {
     }
 
@@ -49,7 +51,7 @@ class RabbitMQMessageBroker
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
             $routingKey = '';
         }
-        $this->client->addRequest('', $this->rabbitMqQueueName, 'XBeteiligung_Get', $routingKey, 300);
+        $this->client->addRequest('', $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME), 'XBeteiligung_Get', $routingKey, 300);
         $replies = $this->client->getReplies();
         $result = Json::decodeToArray($replies['XBeteiligung_Get']); // todo: use as parameter
         $this->logger->info('Got response from RabbitMQ', [$result]);
@@ -85,7 +87,7 @@ class RabbitMQMessageBroker
         $this->logger->info('Send Response to RabbitMQ', [$xmlString]);
         $this->client->addRequest(
             $xmlString,
-            $this->rabbitMqQueueName,
+            $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
             'XBeteiligung_Send', // todo: as parameter
             $routingKey,
             $expiration
