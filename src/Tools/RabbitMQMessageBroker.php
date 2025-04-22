@@ -25,6 +25,7 @@ use InvalidArgumentException;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class RabbitMQMessageBroker
@@ -46,6 +47,7 @@ class RabbitMQMessageBroker
 
     /**
      * @throws JsonException
+     * @throws ParameterNotFoundException
      */
     public function processMessages(): void
     {
