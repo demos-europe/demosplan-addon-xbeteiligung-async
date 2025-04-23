@@ -99,14 +99,14 @@ class ReusableMessageBlocks
         $reader->setVerzeichnisdienst($verzeichnisdienst); // required
 
 
-        $codeAuthorityIdentification = new Erreichbarkeit();
+        $erreichbarkeit = new Erreichbarkeit();
         $kanal = new CodeKommunikationKanalTypeType();
         $kanal->setListVersionID('');
         $kanal->setListURI(XBeteiligungService::CODELIST_ERREICHBARKEIT);
         $kanal->setCode(XBeteiligungService::NON_EXISTING_CODE);
-        $codeAuthorityIdentification->setKanal($kanal);
-        $codeAuthorityIdentification->setKennung(''); // required
-        $reader->setErreichbarkeit([$codeAuthorityIdentification]); // required
+        $erreichbarkeit->setKanal($kanal);
+        $erreichbarkeit->setKennung(''); // required
+        $reader->setErreichbarkeit([$erreichbarkeit]); // required
 
         return $reader;
     }
