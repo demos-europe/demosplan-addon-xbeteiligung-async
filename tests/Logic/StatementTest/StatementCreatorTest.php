@@ -128,7 +128,7 @@ class StatementCreatorTest extends TestCase
 
         $this->validateProductInfo($xmlMessage);
         $this->validateMessageId('0701', $header);
-        $commChannels = ['email' => $readerAgency->getErreichbarkeit()[0]];
+        $commChannels = ['Sonstiges' => $readerAgency->getErreichbarkeit()[0]];
         $this->validateK1Agency($readerAgency, 'LGV', $commChannels);
         $this->validateDemosAgency($authorAgency);
 
@@ -219,7 +219,7 @@ class StatementCreatorTest extends TestCase
     private function validateProductInfo(NachrichtG2GTypeType $xmlMessage): void
     {
         // message tests
-        self::assertSame('Demosplan', $xmlMessage->getProdukt());
+        self::assertSame('demosplan', $xmlMessage->getProdukt());
         self::assertSame('DEMOS plan GmbH', $xmlMessage->getProdukthersteller());
         self::assertSame('XBeteiligung', $xmlMessage->getStandard());
         self::assertSame('1.3', $xmlMessage->getVersion());
@@ -234,13 +234,13 @@ class StatementCreatorTest extends TestCase
      */
     private function validateK1Agency(BehoerdeTypeType $agency,string $prefixName, $commChannels=[]): void
     {
-        if (isset($commChannels['email'])) {
-            $emailComm = $commChannels['email'];
-            self::assertSame('01', $emailComm->getKanal()->getCode());
-            self::assertSame('info@gv.hamburg.de', $emailComm->getKennung());
+        if (isset($commChannels['Sonstiges'])) {
+            $emailComm = $commChannels['Sonstiges'];
+            self::assertSame('07', $emailComm->getKanal()->getCode());
+            self::assertSame('', $emailComm->getKennung());
             self::assertEmpty($emailComm->getZusatz());
         }
-        self::assertSame('0200', $agency->getVerzeichnisdienst()->getCode());
+        self::assertSame('DVDV', $agency->getVerzeichnisdienst()->getCode());
         self::assertSame('3', $agency->getVerzeichnisdienst()->getListVersionID());
         self::assertSame('urn:xoev-de:kosit:codeliste:verzeichnisdienst', $agency->getVerzeichnisdienst()->getListURI());
 
@@ -249,14 +249,14 @@ class StatementCreatorTest extends TestCase
     private function validateDemosAgency(BehoerdeTypeType $demosAgency): void
     {
         self::assertSame('3', $demosAgency->getVerzeichnisdienst()->getListVersionID());
-        self::assertSame('DEMOS plan GmbH', $demosAgency->getVerzeichnisdienst()->getCode());
+        self::assertSame('DVDV', $demosAgency->getVerzeichnisdienst()->getCode());
         self::assertSame('urn:xoev-de:kosit:codeliste:verzeichnisdienst', $demosAgency->getVerzeichnisdienst()->getListURI());
         $communication1 = $demosAgency->getErreichbarkeit()[0];
         self::assertSame('3', $communication1->getKanal()->getListVersionID());
-        self::assertSame('01', $communication1->getKanal()->getCode());
+        self::assertSame('urn:de:xoev:codeliste:erreichbarkeit', $communication1->getKanal()->getListURI());
+        self::assertSame('09', $communication1->getKanal()->getCode());
+        self::assertSame('https://demos-deutschland.de/impressum.html', $communication1->getKennung());
         self::assertEmpty($communication1->getZusatz());
-        $communication2 = $demosAgency->getErreichbarkeit()[1];
-        self::assertSame('officehamburg@demos-international.com', $communication2->getKennung());
     }
 
     protected function validateProcedureXML(string $procedureXml): void
