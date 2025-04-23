@@ -85,27 +85,25 @@ class ReusableMessageBlocks
 
     }
 
+    /**
+     * @throws UnsupportedMessageTypeException
+     */
     public function createReaderInformation(NachrichtG2GTypeType $messageObject): Leser
     {
         $headerInformationForMessage = $this->commonHelpers->mapClassToMessageIndentifier($messageObject);
 
         $reader = new Leser();
-        $reader->setKennung(''); // required
+        $reader->setKennung('xyz:0002'); // required
         $reader->setName($headerInformationForMessage['recipient']); // required
-        $verzeichnisdienst = new CodeVerzeichnisdienstTypeType();
-        $verzeichnisdienst->setListVersionID('');
-        $verzeichnisdienst->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
-        $verzeichnisdienst->setCode(XBeteiligungService::NON_EXISTING_CODE);
-        $reader->setVerzeichnisdienst($verzeichnisdienst); // required
-
+        $reader->setVerzeichnisdienst($this->createVerzeichnisdienst()); // required
 
         $erreichbarkeit = new Erreichbarkeit();
         $kanal = new CodeKommunikationKanalTypeType();
-        $kanal->setListVersionID('');
+        $kanal->setListVersionID('3');
         $kanal->setListURI(XBeteiligungService::CODELIST_ERREICHBARKEIT);
-        $kanal->setCode(XBeteiligungService::NON_EXISTING_CODE);
+        $kanal->setCode('07');
         $erreichbarkeit->setKanal($kanal);
-        $erreichbarkeit->setKennung('email or telefon'); // required
+        $erreichbarkeit->setKennung(''); // required
         $reader->setErreichbarkeit([$erreichbarkeit]); // required
 
         return $reader;
@@ -116,13 +114,9 @@ class ReusableMessageBlocks
         $headerInformationForMessage = $this->commonHelpers->mapClassToMessageIndentifier($messageObject);
 
         $author = new Autor();
-        $author->setKennung('');
+        $author->setKennung('xyz:0001');
         $author->setName($headerInformationForMessage['author']); // required
-        $prefixType = new CodeVerzeichnisdienstTypeType();
-        $prefixType->setListVersionID('');
-        $prefixType->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
-        $prefixType->setCode(XBeteiligungService::NON_EXISTING_CODE);
-        $author->setVerzeichnisdienst($prefixType); // required
+        $author->setVerzeichnisdienst($this->createVerzeichnisdienst()); // required
 
         $erreichbarkeit = new Erreichbarkeit();
         $kanal = new CodeKommunikationKanalTypeType();
@@ -140,5 +134,15 @@ class ReusableMessageBlocks
         $author->setErreichbarkeit([$erreichbarkeit]); // required
 
         return $author;
+    }
+
+    private function createVerzeichnisdienst(): CodeVerzeichnisdienstTypeType
+    {
+        $verzeichnisdienst = new CodeVerzeichnisdienstTypeType();
+        $verzeichnisdienst->setListVersionID('3');
+        $verzeichnisdienst->setListURI('urn:xoev-de:kosit:codeliste:verzeichnisdienst');
+        $verzeichnisdienst->setCode('DVDV');
+
+        return $verzeichnisdienst;
     }
 }

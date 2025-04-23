@@ -93,196 +93,196 @@ class CommonHelpers
             [
                 'code' => '0401',
                 'name' => 'kommunal.Initiieren.0401',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'K3',
             ],
         KommunalAktualisieren0402::class =>
             [
                 'code' => '0402',
                 'name' => 'kommunal.Aktualisieren.0402',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'K3',
             ],
         KommunalLoeschen0409::class =>
             [
                 'code' => '0409',
                 'name' => 'kommunal.Loeschen.0409',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'K3',
             ],
         AllgemeinStellungnahmeNeuabgegeben0701::class =>
             [
                 'code' => '0701',
                 'name' => 'allgemein.stellungnahme.Neuabgegeben.0701',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         RaumordnungInitiieren0301::class =>
             [
                 'code' => '0301',
                 'name' => 'raumordnung.Initiieren.0301',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'K3',
             ],
         RaumordnungAktualisieren0302::class =>
             [
                 'code' => '0302',
                 'name' => 'raumordnung.Aktualisieren.0302',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'K3',
             ],
         RaumordnungLoeschen0309::class =>
             [
                 'code' => '0309',
                 'name' => 'raumordnung.Loeschen.0309',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'K3',
             ],
         PlanfeststellungInitiieren0201::class =>
             [
                 'code' => '0201',
                 'name' => 'planfeststellung.Initiieren.0201',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'K3',
             ],
         PlanfeststellungAktualisieren0202::class =>
             [
                 'code' => '0202',
                 'name' => 'planfeststellung.Aktualisieren.0202',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'K3',
             ],
         PlanfeststellungLoeschen0209::class =>
             [
                 'code' => '0209',
                 'name' => 'planfeststellung.Loeschen.0209',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'K3',
             ],
         KommunalInitiierenOK0411::class =>
             [
                 'code' => '0411',
                 'name' => 'kommunal.Initiieren.OK.0411',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         KommunalInitiierenNOK0421::class =>
             [
                 'code' => '0421',
                 'name' => 'kommunal.Initiieren.NOK.0421',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         KommunalAktualisierenOK0412::class =>
             [
                 'code' => '0412',
                 'name' => 'kommunal.Aktualisieren.OK.0412',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         KommunalAktualisierenNOK0422::class =>
             [
                 'code' => '0422',
                 'name' => 'kommunal.Aktualisieren.NOK.0422',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         KommunalLoeschenOK0419::class =>
             [
                 'code' => '0419',
                 'name' => 'kommunal.Loeschen.OK.0419',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         KommunalLoeschenNOK0429::class =>
             [
                 'code' => '0429',
                 'name' => 'kommunal.Loeschen.NOK.0429',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         PlanfeststellungInitiierenOK0211::class =>
             [
                 'code' => '0211',
                 'name' => 'planfeststellung.Initiieren.OK.0211',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         PlanfeststellungAktualisierenOK0212::class =>
             [
                 'code' => '0212',
                 'name' => 'planfeststellung.Aktualisieren.OK.0212',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         PlanfeststellungLoeschenOK0219::class =>
             [
                 'code' => '0219',
                 'name' => 'planfeststellung.Loeschen.OK.0219',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         PlanfeststellungInitiierenNOK0221::class =>
             [
                 'code' => '0221',
                 'name' => 'planfeststellung.Initiieren.NOK.0221',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         PlanfeststellungAktualisierenNOK0222::class =>
             [
                 'code' => '0222',
                 'name' => 'planfeststellung.Aktualisieren.NOK.0222',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         PlanfeststellungLoeschenNOK0229::class =>
             [
                 'code' => '0229',
                 'name' => 'planfeststellung.Loeschen.NOK.0229',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         RaumordnungInitiierenOK0311::class =>
             [
                 'code' => '0311',
                 'name' => 'raumordnung.Initiieren.OK.0311',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         RaumordnungAktualisierenOK0312::class =>
             [
                 'code' => '0312',
                 'name' => 'raumordnung.Aktualisieren.OK.0312',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         RaumordnungLoeschenOK0319::class =>
             [
                 'code' => '0319',
                 'name' => 'raumordnung.Loeschen.OK.0319',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         RaumordnungInitiierenNOK0321::class =>
             [
                 'code' => '0321',
                 'name' => 'raumordnung.Initiieren.NOK.0321',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         RaumordnungAktualisierenNOK0322::class =>
             [
                 'code' => '0322',
                 'name' => 'raumordnung.Aktualisieren.NOK.0322',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
         RaumordnungLoeschenNOK0329::class =>
             [
                 'code' => '0329',
                 'name' => 'raumordnung.Loeschen.NOK.0329',
-                'author' => 'Demosplan',
+                'author' => 'DEMOS plan GmbH',
                 'recipient' => 'DiPlanCockpit',
             ],
     ];
