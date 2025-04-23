@@ -126,34 +126,19 @@ class ReusableMessageBlocks
 
         $erreichbarkeit = new Erreichbarkeit();
         $kanal = new CodeKommunikationKanalTypeType();
-        $kanal->setListVersionID('');
+        $kanal->setListVersionID('3');
         $kanal->setListURI(XBeteiligungService::CODELIST_ERREICHBARKEIT);
-        $kanal->setCode(XBeteiligungService::NON_EXISTING_CODE);
-        $erreichbarkeit->setKanal($kanal);
-        $erreichbarkeit->setKennung(''); // required
+        // Quelle - AdoRepo: Erreichbarkeit-3.xml
+        // (https://www.xrepository.de/details/urn:de:xoev:codeliste:erreichbarkeit_3#version)
+        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger,
+        // 06 -> Pager, 07 -> Sonstiges, 08 -> DE-Mail, 09 -> Web
+        $kanal->setCode('09');
+        //$kanal->setName('Web'); // not expected in validation
+        $erreichbarkeit->setKanal($kanal); // required
+        $erreichbarkeit->setKennung('https://demos-deutschland.de/impressum.html'); // required
+        $erreichbarkeit->setZusatz(''); // optional
         $author->setErreichbarkeit([$erreichbarkeit]); // required
-        $author->addToErreichbarkeit($this->addAuthorCommunicationType()); // required list 1 entry
-
 
         return $author;
     }
-
-    private function addAuthorCommunicationType(): Erreichbarkeit
-    {
-        $communicationType = new Erreichbarkeit();
-        $comCode = new CodeKommunikationKanalTypeType();
-        // Quelle - AdoRepo: Erreichbarkeit-3.xml
-        // 01 -> E-Mail, 02 -> Telefon Festnetz, 03 -> Telefon mobil, 04 -> Fax, 05 -> Instant Messenger,
-        // 06 -> Pager, 07 -> Sonstiges, (08 -> DE-Mail, 09 -> Web - these don't exist in validation)
-        $comCode->setCode('07');
-        //$comCode->setName('Sonstiges'); // not expected in validation
-        $comCode->setListURI(XBeteiligungService::CODELIST_ERREICHBARKEIT);
-        $comCode->setListVersionID('1');
-        $communicationType->setKanal($comCode); // required
-        $communicationType->setKennung('https://demosplan.com/impressum.html'); // required
-        $communicationType->setZusatz(''); // optional
-
-        return $communicationType;
-    }
-
 }
