@@ -234,7 +234,7 @@ class XBeteiligungService
      * @throws Exception
      */
     public function createProcedureDeleted409FromObject(
-        string $procedureId
+        ProcedureInterface $procedure
     ): string
     {
         $procedureDeleted409Object = new KommunalLoeschen0409();
@@ -242,7 +242,7 @@ class XBeteiligungService
         $procedureDeleted409Object->setNachrichtenkopfG2g(
             $this->reusableMessageBlocks->createMessageHeadFor($procedureDeleted409Object)
         ); // required
-        $procedureDeleted409Object->setNachrichteninhalt($this->generateMain409MessageContent($procedureId));
+        $procedureDeleted409Object->setNachrichteninhalt($this->generateMain409MessageContent($procedure));
 
         return SerializerFactory::serializeData($procedureDeleted409Object, $this->logger);
     }
@@ -251,7 +251,7 @@ class XBeteiligungService
      * @throws Exception
      */
     public function createXMLFor309(
-        string $procedureId
+        ProcedureInterface $procedure
     ): string
     {
         $procedureDeleted309 = new RaumordnungLoeschen0309();
@@ -260,7 +260,7 @@ class XBeteiligungService
             $this->reusableMessageBlocks->createMessageHeadFor($procedureDeleted309)
         );
         $procedureDeleted309->setNachrichteninhalt(
-            $this->generateMain309MessageContent($procedureId)
+            $this->generateMain309MessageContent($procedure)
         );
 
         return SerializerFactory::serializeData($procedureDeleted309, $this->logger);
@@ -310,22 +310,22 @@ class XBeteiligungService
         return $messageContent;
     }
 
-    private function generateMain409MessageContent(string $procedureId): Nachrichteninhalt409
+    private function generateMain409MessageContent(ProcedureInterface $procedure): Nachrichteninhalt409
     {
         $messageContent = new Nachrichteninhalt409();
         $messageContent->setVorgangsID($this->commonHelpers->uuid());
-        $messageContent->setPlanID($procedureId);
-        $messageContent->setBeteiligungsID($procedureId); // why does only a 409 Message still has this property?
+        $messageContent->setPlanID($this->determinePlanId($procedure));
+        $messageContent->setBeteiligungsID($procedure->getId()); // why does only a 409 Message still has this property?
 
         return $messageContent;
     }
 
-    public function generateMain309MessageContent(string $procedureId): Nachrichteninhalt309
+    public function generateMain309MessageContent(ProcedureInterface $procedure): Nachrichteninhalt309
     {
         $messageContent = new Nachrichteninhalt309();
         $messageContent->setVorgangsID($this->commonHelpers->uuid());
-        $messageContent->setPlanID($procedureId);
-        $messageContent->setBeteiligungsID($procedureId);
+        $messageContent->setPlanID($this->determinePlanId($procedure));
+        $messageContent->setBeteiligungsID($procedure->getId());
 
         return $messageContent;
     }
@@ -390,7 +390,7 @@ class XBeteiligungService
         $participationType->setAkteurVorhaben(
             $this->createAkteurVorhabenType($procedure->getOrga()?->getName() ?? '')
         );
-        $participationType->setPlanID($procedure->getId()); // todo: for messages from cockpit this is not correct?
+        $participationType->setPlanID($this->determinePlanId($procedure));
         $participationType->setPlanname($procedure->getName());
         $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
         $participationType->setFlaechenabgrenzungUrl(
@@ -757,5 +757,10 @@ class XBeteiligungService
         }
         */
         throw new InvalidArgumentException('Message payload not supported');
+    }
+
+    private function determinePlanId(ProcedureInterface $procedure): string
+    {
+        return '' === $procedure->getXtaPlanId() ? $procedure->getId() : $procedure->getXtaPlanId();
     }
 }
