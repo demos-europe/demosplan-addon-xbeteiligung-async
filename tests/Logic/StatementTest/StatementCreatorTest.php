@@ -113,7 +113,7 @@ class StatementCreatorTest extends TestCase
     {
         $statementCreated = $this->createStatement0701(3);
         $xmlMessageString = $this->sut->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
-        echo $xmlMessageString; // todo: remove when tests fixed
+        //echo $xmlMessageString; // for debugging
         $this->validateProcedureXML($xmlMessageString);
         /** @var AllgemeinStellungnahmeNeuabgegeben0701 $xmlMessage */
         $xmlMessage = $this->serializer->deserialize(
