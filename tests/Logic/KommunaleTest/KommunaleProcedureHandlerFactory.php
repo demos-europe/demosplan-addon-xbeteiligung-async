@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use InvalidArgumentException;
@@ -41,7 +42,7 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getTranslatorMock(),
             $this->mockFactory->getUserHandlerMock(),
             $this->mockFactory->getOrgaServiceInterfaceMock(),
-            $this->mockFactory->getXBeteiligungMapServiceMock()
+            new XBeteiligungMapService($this->mockFactory->getLoggerInterfaceMock())
         ];
 
         switch ($handlerType) {
