@@ -151,18 +151,51 @@ class XBeteiligungRestController extends APIController
         try {
             // Check for common message types in the XML
             $patterns = [
-                'kommunal.Initiieren.0401' => '/<xbeteiligung:planung2Beteiligung\.BeteiligungKommunalNeu\.0401/i',
-                'kommunal.Aktualisieren.0402' => '/<xbeteiligung:planung2Beteiligung\.BeteiligungKommunalAktualisieren\.0402/i',
-                'kommunal.Loeschen.0409' => '/<xbeteiligung:planung2Beteiligung\.BeteiligungKommunalLoeschen\.0409/i',
-                'raumordnung.Initiieren.0301' => '/<xbeteiligung:planung2Beteiligung\.BeteiligungRaumordnungNeu\.0301/i',
-                'raumordnung.Aktualisieren.0302' => '/<xbeteiligung:planung2Beteiligung\.BeteiligungRaumordnungAktualisieren\.0302/i',
-                'raumordnung.Loeschen.0309' => '/<xbeteiligung:planung2Beteiligung\.BeteiligungRaumordnungLoeschen\.0309/i',
-                'planfeststellung.Initiieren.0201' => '/<xbeteiligung:planung2Beteiligung\.BeteiligungPlanfeststellungNeu\.0201/i',
-                'planfeststellung.Aktualisieren.0202' => '/<xbeteiligung:planung2Beteiligung\.BeteiligungPlanfeststellungAktualisieren\.0202/i',
-                'planfeststellung.Loeschen.0209' => '/<xbeteiligung:planung2Beteiligung\.BeteiligungPlanfeststellungLoeschen\.0209/i',
+                'kommunal.Initiieren.0401' => '/<.*?:?planung2Beteiligung\.BeteiligungKommunalNeu\.0401/i',
+                'kommunal.Aktualisieren.0402' => '/<.*?:?planung2Beteiligung\.BeteiligungKommunalAktualisieren\.0402/i',
+                'kommunal.Loeschen.0409' => '/<.*?:?planung2Beteiligung\.BeteiligungKommunalLoeschen\.0409/i',
+                'raumordnung.Initiieren.0301' => '/<.*?:?planung2Beteiligung\.BeteiligungRaumordnungNeu\.0301/i',
+                'raumordnung.Aktualisieren.0302' => '/<.*?:?planung2Beteiligung\.BeteiligungRaumordnungAktualisieren\.0302/i',
+                'raumordnung.Loeschen.0309' => '/<.*?:?planung2Beteiligung\.BeteiligungRaumordnungLoeschen\.0309/i',
+                'planfeststellung.Initiieren.0201' => '/<.*?:?planung2Beteiligung\.BeteiligungPlanfeststellungNeu\.0201/i',
+                'planfeststellung.Aktualisieren.0202' => '/<.*?:?planung2Beteiligung\.BeteiligungPlanfeststellungAktualisieren\.0202/i',
+                'planfeststellung.Loeschen.0209' => '/<.*?:?planung2Beteiligung\.BeteiligungPlanfeststellungLoeschen\.0209/i',
             ];
 
+            // If we can't match the expected pattern, try to identify the message by code number
+            $codePatterns = [
+                'kommunal.Initiieren.0401' => '/0401/i',
+                'kommunal.Aktualisieren.0402' => '/0402/i',
+                'kommunal.Loeschen.0409' => '/0409/i',
+                'raumordnung.Initiieren.0301' => '/0301/i',
+                'raumordnung.Aktualisieren.0302' => '/0302/i',
+                'raumordnung.Loeschen.0309' => '/0309/i',
+                'planfeststellung.Initiieren.0201' => '/0201/i',
+                'planfeststellung.Aktualisieren.0202' => '/0202/i',
+                'planfeststellung.Loeschen.0209' => '/0209/i',
+            ];
+
+            // First try with the specific patterns
             foreach ($patterns as $type => $pattern) {
+                if (preg_match($pattern, $xmlContent)) {
+                    return $type;
+                }
+            }
+            
+            // Extract the root element to make a better guess
+            if (preg_match('/<([^:\s>]+:)?([^:\s>]+)/', $xmlContent, $matches)) {
+                $rootElement = $matches[2] ?? '';
+                
+                // If we found a root element, try to match it against code patterns
+                foreach ($codePatterns as $type => $pattern) {
+                    if (preg_match($pattern, $rootElement)) {
+                        return $type;
+                    }
+                }
+            }
+            
+            // As a last resort, check if any of the codes appear in the XML
+            foreach ($codePatterns as $type => $pattern) {
                 if (preg_match($pattern, $xmlContent)) {
                     return $type;
                 }
