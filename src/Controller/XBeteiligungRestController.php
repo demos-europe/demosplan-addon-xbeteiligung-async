@@ -64,7 +64,7 @@ class XBeteiligungRestController extends APIController
 
             // Get the request payload - simply use the raw XML content
             $xmlContent = $request->getContent();
-            
+
             if (empty($xmlContent)) {
                 throw new InvalidArgumentException('Empty request payload');
             }
@@ -78,7 +78,9 @@ class XBeteiligungRestController extends APIController
             ];
 
             $logger->info('Processing XBeteiligung procedure creation request', [
-                'messageTypeCode' => $messageTypeCode
+                'messageTypeCode' => $messageTypeCode,
+                'xmlStartsWith' => substr($xmlContent, 0, 200), // First 200 chars for debugging
+                'content_length' => strlen($xmlContent)
             ]);
 
             // Process the message using the same service that RabbitMQ would use
@@ -121,7 +123,7 @@ class XBeteiligungRestController extends APIController
 
     /**
      * Check if the provided token is valid in the custom X-Addon-XBeteiligung-Authorization header.
-     * Validates against the xbeteiligung_api_token parameter.
+     * Validates against the addon_xbeteiligung_async_rest_authentication parameter.
      */
     private function hasNoValidAuthToken(?string $authToken): bool
     {
@@ -134,7 +136,7 @@ class XBeteiligungRestController extends APIController
             $authToken = substr($authToken, 7);
         }
 
-        return $authToken !== $this->getParameter('xbeteiligung_api_token');
+        return $authToken !== $this->getParameter('addon_xbeteiligung_async_rest_authentication');
     }
 
     /**

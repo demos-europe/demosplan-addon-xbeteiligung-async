@@ -8,6 +8,9 @@ parameters:
   # the expected Xbeteiligung instance
   xbeteiligung_api_token: ""
 
+  # XBeteiligung Async REST API authentication token
+  addon_xbeteiligung_async_rest_authentication: ""
+
   # String to determine which type of procedure messages should be generated.
   # For Example: Kommunal, Raumordnung or Planfeststellung
   procedure_message_type: ""

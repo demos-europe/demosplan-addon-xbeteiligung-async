@@ -75,7 +75,7 @@ class XBeteiligungRestControllerTest extends TestCase
         // Mock the getParameter method to return a valid token
         $this->controller->expects($this->once())
             ->method('getParameter')
-            ->with('xbeteiligung_api_token')
+            ->with('addon_xbeteiligung_async_rest_authentication')
             ->willReturn('valid-token');
 
         // Prepare test data - now just XML content
@@ -116,7 +116,7 @@ class XBeteiligungRestControllerTest extends TestCase
         // Mock the getParameter method to return a valid token
         $this->controller->expects($this->once())
             ->method('getParameter')
-            ->with('xbeteiligung_api_token')
+            ->with('addon_xbeteiligung_async_rest_authentication')
             ->willReturn('valid-token');
 
         // Mock the request with invalid token
@@ -137,7 +137,7 @@ class XBeteiligungRestControllerTest extends TestCase
         // Mock the getParameter method to return a valid token
         $this->controller->expects($this->once())
             ->method('getParameter')
-            ->with('xbeteiligung_api_token')
+            ->with('addon_xbeteiligung_async_rest_authentication')
             ->willReturn('valid-token');
 
         // Mock the request with invalid data (empty body)
