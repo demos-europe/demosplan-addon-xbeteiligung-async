@@ -80,11 +80,15 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
     public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): void
     {
         if (false === $this->parameterBag->get('addon_xbeteiligung_async_enable_rabbitmq_communication')) {
+            $this->cockpitLogger->info('RabbitMQ communication is disabled');
+
             return;
         }
         if (!$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())
             && !$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())
             && !$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
+            $this->cockpitLogger->info('procedure_message_type is not set.');
+
             return;
         }
         try {
