@@ -280,8 +280,8 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         $simpleXML = simplexml_load_string($xml);
 
-        $simpleXML->addAttribute('xmlns:xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        $simpleXML->addAttribute('xmlns:xmlns:gml', 'http://www.opengis.net/gml/3.2');
+        $simpleXML->addAttribute('xmlns:xmlns:xsi', 'https://www.w3.org/2001/XMLSchema-instance');
+        $simpleXML->addAttribute('xmlns:xmlns:gml', 'https://www.opengis.net/gml/3.2');
 
         $result = $simpleXML->asXML();
         if (!is_string($result)) {
