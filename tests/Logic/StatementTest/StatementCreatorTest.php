@@ -164,7 +164,7 @@ class StatementCreatorTest extends TestCase
             $vote = 'acknowledge';
             $tags = ['Radverkehr', 'Straßenbau', 'Straßenbäume', 'Städtebaulicher Vertrag'];
             $file = 'Legende.pdf:dc855abd-c8df-11e5-8550-005056ae0004:119994:application/pdf';
-            $accessUrl = 'http://bob.beispiel.de?stellungnahmeID=S34992191-830d-4d1d-a136-f38d322b521d';
+            $accessUrl = 'https://bob.beispiel.de?stellungnahmeID=S34992191-830d-4d1d-a136-f38d322b521d';
         } else {
             throw new \RuntimeException("Version {$version} supported");
         }
