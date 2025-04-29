@@ -105,12 +105,58 @@ class XBeteiligungIncomingMessageParser
      */
     private function validateXmlName(SimpleXMLElement $simpleXML, string $expectedXmlName): void
     {
-        if ($expectedXmlName !== $simpleXML->getName()) {
-            $this->logger->error('Unexpected message type name in XML', [
-                'Unexpected name' => $simpleXML->getName(),
+        // Get the local name without namespace prefix
+        $name = $simpleXML->getName();
+
+        // If there's a namespace prefix, strip it off to get the local name
+        if (($pos = strpos($name, ':')) !== false) {
+            $localName = substr($name, $pos + 1);
+            $this->logger->info('XML element has namespace prefix', [
+                'fullName' => $name,
+                'localName' => $localName
             ]);
-            throw new SchemaException(self::UNEXPECTED_NAME);
+
+            // If the local part matches expected patterns, accept it
+            if (str_contains(
+                $localName,
+                'planung2Beteiligung.BeteiligungKommunalNeu.0401'
+            )) {
+                $this->logger->info('Accepted XML with namespace prefix', [
+                    'expected' => $expectedXmlName,
+                    'received' => $name,
+                    'messageType' => '401'
+                ]);
+                return;
+            }
         }
+
+        // Similar to how XBauleitplanung parser works, we'll extract key parts
+        // of the message type (like 0401, 0402) and match on those
+        $msgCode = '';
+        if (preg_match('/\.(0\d{3})$/', $expectedXmlName, $matches)) {
+            $msgCode = $matches[1];
+        }
+
+        // If we have a message code, check if it appears in the element name
+        if ($msgCode && str_contains($name, $msgCode)) {
+            $this->logger->info('XML element validated by message code', [
+                'expected' => $expectedXmlName,
+                'received' => $name,
+                'code' => $msgCode
+            ]);
+            return;
+        }
+
+        // Original check as fallback
+        if ($expectedXmlName === $name) {
+            return;
+        }
+
+        $this->logger->error('Unexpected message type name in XML', [
+            'expected' => $expectedXmlName,
+            'received' => $name,
+        ]);
+        throw new SchemaException(self::UNEXPECTED_NAME);
     }
 
 
@@ -140,12 +186,30 @@ class XBeteiligungIncomingMessageParser
     private function validateRequiredNamespace(SimpleXMLElement $simpleXML): void
     {
         $namespaces = $simpleXML->getNamespaces();
-        if (!in_array('http://xplanverfahren.de/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION, $namespaces, true)) {
-            $this->logger->warning('Probably missing relevant namespace?', [
-                'namespace' => 'http://xplanverfahren.de/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION
-                ]
-            );
+        $this->logger->info('XML namespaces', ['namespaces' => $namespaces]);
+
+        // Check for our expected namespace
+        $expectedNamespace = 'http://xplanverfahren.de/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION;
+        if (in_array($expectedNamespace, $namespaces, true)) {
+            return;
         }
+
+        // Also accept the XLeitstelle namespace that may be used in incoming messages
+        $xleitstelleNamespace = 'https://www.xleitstelle.de/xbeteiligung/1';
+        foreach ($namespaces as $prefix => $namespace) {
+            if ($namespace === $xleitstelleNamespace) {
+                $this->logger->info('Found acceptable XLeitstelle namespace', [
+                    'namespace' => $xleitstelleNamespace
+                ]);
+                return;
+            }
+        }
+
+        $this->logger->warning('Missing expected namespace', [
+            'expected' => $expectedNamespace,
+            'alternative' => $xleitstelleNamespace,
+            'found' => $namespaces
+        ]);
     }
 
     /**
@@ -153,18 +217,33 @@ class XBeteiligungIncomingMessageParser
      */
     private function deserializeMessageWithCertainty(string $incomingMessage, string $className): NachrichtG2GTypeType
     {
-        /** @var NachrichtG2GTypeType $message */
-        $message = SerializerFactory::getSerializer()->deserialize(
-            $incomingMessage,
-            $className,
-            'xml'
-        );
+        try {
+            /** @var NachrichtG2GTypeType $message */
+            $message = SerializerFactory::getSerializer()->deserialize(
+                $incomingMessage,
+                $className,
+                'xml'
+            );
 
-        if (null === $message || null === $message->getProdukt()) {
-            throw new SchemaException('Incoming message is not a valid '.$className.' message');
+            $this->logger->info('Successfully deserialized XML message', [
+                'class' => $className,
+                'produkt' => $message?->getProdukt(),
+                'hasMessage' => $message !== null
+            ]);
+
+            if (null === $message || null === $message->getProdukt()) {
+                throw new SchemaException('Incoming message is not a valid '.$className.' message');
+            }
+
+            return $message;
+        } catch (\Exception $e) {
+            $this->logger->error('Error deserializing XML message', [
+                'class' => $className,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw new SchemaException('Error deserializing message as '.$className.': '.$e->getMessage());
         }
-
-        return $message;
     }
 }
 

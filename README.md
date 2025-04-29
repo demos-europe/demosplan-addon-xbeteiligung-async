@@ -6,6 +6,40 @@ generate php classes from the xsd files from the XBeteiligung specification.
 # Usage
 How to use it is documented in tests like testReadBeteiligung2PlanungBeteiligungNeuOK0410()
 
+# REST API
+
+A REST API endpoint is available for processing XBeteiligung messages as an alternative to RabbitMQ. 
+
+## Endpoint
+
+`POST /addon/xbeteiligung/procedure/create`
+
+## Authentication
+
+Authentication is done via a Bearer token in the **X-Addon-XBeteiligung-Authorization** custom header. The token value must match the `xbeteiligung_api_token` parameter value.
+
+```
+X-Addon-XBeteiligung-Authorization: Bearer your-token-here
+```
+
+This custom header is used specifically for XBeteiligung addon authentication to avoid interference with the core application's authentication.
+
+## Request Format
+
+The request body should contain the raw XML message content directly:
+
+```xml
+<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>
+    <!-- XML content here -->
+</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>
+```
+
+The API automatically detects the message type from the XML content.
+
+## Response
+
+The response will be an XML string with Content-Type: application/xml
+
 # Generate from Standard
 
 When you want to generate the php classes from the standard you need to copy 
