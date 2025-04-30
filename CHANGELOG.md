@@ -2,6 +2,13 @@
 
 ## UNRELEASED
 
+## v0.10.1 (2025-04-30)
+- generate wms url without relying on basemap as baseLayer.
+- include layers within the url.
+- set CRS/SRS taking the used wms version into account
+- use http query builder to automatically url_encode the Parameters used and for better
+  visibility.
+
 ## v0.10 (2025-01-13)
 - refactor XBeteiligungProcedureChanged Event Listener and PlanningDocumentsLinkCreator
 - circumvent removing entities from the unitOfWork computed change set after adding them onFlush

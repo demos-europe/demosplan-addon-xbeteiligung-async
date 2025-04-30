@@ -637,11 +637,12 @@ class XBeteiligungService
                 'VERSION' => $baseLayer->getLayerVersion(),
                 'REQUEST' => 'GetMap',
                 'FORMAT' => 'image/png',
-                'TRANSPARENT' => true,
+                'TRANSPARENT' => 'true',
                 'WIDTH' => '512',
-                'HEIGHT' => (string)(512 * $widthAndHeight['height'] / $widthAndHeight['width']),
+                'HEIGHT' => (string)(int)(512 * $widthAndHeight['height'] / $widthAndHeight['width']),
                 $crsORsrs => $projectionLabel,
                 'STYLES' => '',
+                'LAYERS' => $baseLayer->getLayers(),
                 'BBOX' => $procedure->getSettings()->getMapExtent(),
             ];
             $url = $baseUrl . '?' . http_build_query($urlParams);
