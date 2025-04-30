@@ -7,6 +7,7 @@
 - Simplified API accepts raw XML content rather than requiring JSON with messageTypeCode
 - The REST API processes messages using the same logic as the RabbitMQ implementation and returns XML responses
 - Uses a custom `X-Addon-XBeteiligung-Authorization` header for authentication to avoid interfering with the core application
+- Symfony 6 compatibility
 
 ## v0.13 (2025-04-08)
 - enhance logging
