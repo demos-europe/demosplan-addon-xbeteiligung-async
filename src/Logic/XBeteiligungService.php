@@ -69,6 +69,7 @@ use Psr\Log\LoggerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Webmozart\Assert\Assert;
 
 class XBeteiligungService
 {
@@ -588,54 +589,98 @@ class XBeteiligungService
         return $author;
     }
 
+    /**
+     * @throws Exception
+     */
     private function generateFaceBoundaryWMSUrl(ProcedureInterface $procedure): string
     {
-        $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
+        try {
+            $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
 
-        if (null === $rootCategory) {
-            // Currently, all procedures have a root layer category
-            throw new InvalidArgumentException('Procedure has no root layer category, cannot add layers');
-        }
+            Assert::notNull($rootCategory, 'new procedure has no root layer category');
 
-        $gisLayers = $rootCategory->getGisLayers();
-        $basemapGisLayer = null;
-        /** @var GisLayerInterface $gisLayer */
-        foreach ($gisLayers as $gisLayer) {
-            if ('basemap' === $gisLayer->getName()) {
-                $basemapGisLayer = $gisLayer;
+            $gisLayers = $rootCategory->getGisLayers();
+            $baseLayer = null;
+            /** @var GisLayerInterface $gisLayer */
+            foreach ($gisLayers as $gisLayer) {
+                $layerType = $gisLayer->getType();
+                $enabled = $gisLayer->isEnabled();
+                if ($enabled &&
+                    'base' === $layerType)
+                {
+                    $baseLayer = $gisLayer;
+                }
             }
+            Assert::notNull($baseLayer, 'No enabled base layer found at new procedure - unable to create wmsUrl');
+
+            // prior to wms v1.3.0 the keyword SRS has to be used instead of CRS within urls
+            $crsORsrs = version_compare(
+                '1.3.0',
+                $gisLayer->getLayerVersion(),
+                '<='
+            ) ? 'CRS' : 'SRS';
+            $projectionLabel = strtoupper($gisLayer->getProjectionLabel());
+            // for some projections prior v1.3.0 the x and y coords are swapped
+            // - there are more, but the common ones are at least treated:
+            $areCoordsSwaped =
+                'SRS' === $crsORsrs &&
+                ('EPSG:4326' === $projectionLabel || 'EPSG:4258' === $projectionLabel)
+            ;
+            // why mapExtend? see here: T32377
+            $bboxArray = explode(',', $procedure->getSettings()->getMapExtent());
+
+            $widthAndHeight = $this->getWidthAndHeight($bboxArray, $areCoordsSwaped);
+
+            $baseUrl = $baseLayer->getUrl();
+            $urlParams = [
+                'SERVICE' => 'WMS',
+                'VERSION' => $baseLayer->getLayerVersion(),
+                'REQUEST' => 'GetMap',
+                'FORMAT' => 'image/png',
+                'TRANSPARENT' => true,
+                'WIDTH' => '512',
+                'HEIGHT' => (string)(512 * $widthAndHeight['height'] / $widthAndHeight['width']),
+                $crsORsrs => $projectionLabel,
+                'STYLES' => '',
+                'BBOX' => $procedure->getSettings()->getMapExtent(),
+            ];
+            $url = $baseUrl . '?' . http_build_query($urlParams);
+
+            return $url;
+        } catch (Exception $exception) {
+            $this->logger->error(
+                'XBeteiligung async: An error occurred on postProcedureCreate trying to build the wmsUrl to include xml',
+                ['exceptionMessage: ' => $exception->getMessage()]
+            );
+            throw $exception;
         }
-        // why mapExtend? see here: T32377
-        $bboxArray = explode(',', $procedure->getSettings()->getMapExtent());
+    }
+
+    /**
+     * @return array{'width': int, 'height': int}
+     */
+    private function getWidthAndHeight(array $bBox, bool $swappedCoords): array
+    {
         $absWidth = 1;
         $absHeight = 1;
+        if (4 === count($bBox)) {
+            if ($swappedCoords) {
+                $west = (float)$bBox[1];
+                $east = (float)$bBox[3];
+                $south = (float)$bBox[0];
+                $north = (float)$bBox[2];
+            } else {
+                $west = (float)$bBox[0];
+                $east = (float)$bBox[2];
+                $south = (float)$bBox[1];
+                $north = (float)$bBox[3];
+            }
 
-        if (4 === count($bboxArray)) {
-            $west = (float)$bboxArray[0];
-            $east = (float)$bboxArray[2];
-            $south = (float)$bboxArray[1];
-            $north = (float)$bboxArray[3];
-            $absWidth = abs($west - $east);
-            $absHeight = abs($south - $north);
+            $absWidth = (int)abs($west - $east);
+            $absHeight = (int)abs($south - $north);
         }
 
-        $url = $basemapGisLayer->getUrl();
-        $serviceType = '?SERVICE=WMS';
-        $version = '&VERSION=' . $basemapGisLayer->getLayerVersion();
-        $request = '&REQUEST=GetMap';
-        $format = '&FORMAT=image%2Fpng';
-        $transparent = '&TRANSPARENT=true';
-        $layers = '&LAYERS=' . str_replace(',', '%2C', $basemapGisLayer->getLayers());
-        $width = '&WIDTH=' . '512';
-        $height = '&HEIGHT=' . 512 * ($absHeight / $absWidth);
-        $crs = '&CRS=EPSG%3A3857';
-        $styles = '&STYLES=';
-        // why mapExtend? see here: T32377
-        $bbox = '&BBOX=' . str_replace(',', '%2C', $procedure->getSettings()->getMapExtent());
-
-
-        return $url . $serviceType . $version . $request . $format . $transparent . $layers . $width .
-            $height . $crs . $styles . $bbox;
+        return ['width' => $absWidth, 'height' => $absHeight];
     }
 
     private function addReadingAuthorityIdentificationType(): BehoerdenkennungTypeType
