@@ -14,13 +14,12 @@
       "DemosEurope\\DemosplanAddon\\XBeteiligung\\Tests\\": "tests/"
     }
   },
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
   "require": {
-    "demos-europe/demosplan-addon": "~0.51",
+    "demos-europe/demosplan-addon": "dev-f-symfony-6",
     "demos-europe/demosplan-addon-installer": "^0",
     "doctrine/doctrine-bundle": "^2",
     "ext-dom": "*",
-    "ext-fileinfo": "*",
     "ext-libxml": "*",
     "ext-simplexml": "*",
     "gedmo/doctrine-extensions": "^3",
@@ -30,9 +29,9 @@
     "php": ">=8.1 || < 8.3",
     "php-amqplib/rabbitmq-bundle": "2.*",
     "proj4php/proj4php": "^2.0",
-    "symfony/http-client": "^6.2",
-    "symfony/http-kernel": "5.*.*",
-    "symfony/security-core": "^5.4"
+    "symfony/http-client": "6.*.*",
+    "symfony/http-kernel": "6.*.*",
+    "symfony/security-core": "6.*.*"
   },
   "config": {
     "allow-plugins": {

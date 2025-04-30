@@ -26,24 +26,41 @@ class KommunaleProcedureHandlerFactory
     public function createProcedureHandler(
         string $handlerType
     ): KommunaleProcedureCreater {
-        $commonDependencies = [
-            $this->mockFactory->getCurrentUserProviderInterfaceMock(),
-            $this->mockFactory->getLoggerInterfaceMock(),
-            $this->mockFactory->getProcedureServiceInterface(),
-            $this->mockFactory->getProcedureServiceStorage(),
-            $this->mockFactory->getProcedureTypeService(),
-            $this->mockFactory->getUserHandlerMock(),
-            $this->mockFactory->getEntityManagerMock(),
-            $this->mockFactory->getKommunaleResponseMessageFactory(),
-            $this->mockFactory->getRaumordnungResponseMessageFactory(),
-            $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
-            $this->mockFactory->getTranslatorMock(),
-            $this->mockFactory->getTransActionServiceInterfaceMock()
-        ];
+        $currentUserProvider = $this->mockFactory->getCurrentUserProviderInterfaceMock();
+        $entityManager = $this->mockFactory->getEntityManagerMock();
+        $kommunaleMessageFactory = $this->mockFactory->getKommunaleResponseMessageFactory();
+        $logger = $this->mockFactory->getLoggerInterfaceMock();
+        $planfeststellungMessageFactory = $this->mockFactory->getPlanfeststellungResponseMessageFactory();
+        $procedurePhaseExtractor = $this->mockFactory->getProcedurePhaseExtractorMock();
+        $procedureService = $this->mockFactory->getProcedureServiceInterface();
+        $procedureServiceStorage = $this->mockFactory->getProcedureServiceStorage();
+        $procedureTypeService = $this->mockFactory->getProcedureTypeService();
+        $raumordnungMessageFactory = $this->mockFactory->getRaumordnungResponseMessageFactory();
+        $transactionService = $this->mockFactory->getTransActionServiceInterfaceMock();
+        $translator = $this->mockFactory->getTranslatorMock();
+        $userHandler = $this->mockFactory->getUserHandlerMock();
+        $orgaService = $this->mockFactory->getOrgaServiceInterfaceMock();
+        $xbeteiligungMapService = $this->mockFactory->getXBeteiligungMapServiceMock();
 
         switch ($handlerType) {
             case 'creator':
-                return new KommunaleProcedureCreater(...$commonDependencies);
+                return new KommunaleProcedureCreater(
+                    $currentUserProvider,
+                    $entityManager,
+                    $kommunaleMessageFactory,
+                    $logger,
+                    $planfeststellungMessageFactory,
+                    $procedurePhaseExtractor,
+                    $procedureService,
+                    $procedureServiceStorage,
+                    $procedureTypeService,
+                    $raumordnungMessageFactory,
+                    $transactionService,
+                    $translator,
+                    $userHandler,
+                    $orgaService,
+                    $xbeteiligungMapService
+                );
             default:
                 throw new InvalidArgumentException('Invalid handler type');
         }

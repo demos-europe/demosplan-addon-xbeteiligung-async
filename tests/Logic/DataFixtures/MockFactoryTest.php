@@ -8,6 +8,9 @@ declare(strict_types=1);
  * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
  *
  * All rights reserved
+ * 
+ * This class is a helper for creating mocks, not a test class itself.
+ * It's used by other test classes to create mock objects.
  */
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures;
@@ -75,7 +78,12 @@ class MockFactoryTest extends TestCase
 
     public function getTransActionServiceInterfaceMock(): TransactionServiceInterface
     {
-        return $this->createMock(TransactionServiceInterface::class);
+        $transactionService = $this->createMock(TransactionServiceInterface::class);
+        $transactionService->method('executeAndFlushInTransaction')
+            ->willReturnCallback(function ($callback) {
+                return $callback();
+            });
+        return $transactionService;
     }
 
     public function getProcedureMock(): MockObject|ProcedureInterface
@@ -123,6 +131,7 @@ class MockFactoryTest extends TestCase
         $userMock->method('getForumNotification')->willReturn(false);
         $userMock->method('getDplanroles')->willReturn(new ArrayCollection([$this->getRoleFP()]));
         $userMock->method('getCurrentCustomer')->willReturn($this->getCustomerMock());
+        $userMock->method('isPlanner')->willReturn(true);
 
         return $userMock;
     }
@@ -246,4 +255,51 @@ class MockFactoryTest extends TestCase
         return $entityManagerMock;
     }
 
+    public function getProcedurePhaseExtractorMock(): MockObject
+    {
+        $phaseExtractor = $this->createMock(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor::class);
+        
+        // Create a mock for ProcedurePhaseData
+        $phaseData = $this->createMock(\DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData::class);
+        
+        // Set up the mock to return configuration phase
+        $phaseData->method('getPublicParticipationPhase')
+            ->willReturn(\DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase::CONFIGURATION);
+        
+        $phaseData->method('getInstitutionParticipationPhase')
+            ->willReturn(\DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase::CONFIGURATION);
+            
+        // Set up the extract method to return our phase data
+        $phaseExtractor->method('extract')->willReturn($phaseData);
+        
+        return $phaseExtractor;
+    }
+
+    public function getOrgaServiceInterfaceMock(): MockObject
+    {
+        $orgaService = $this->createMock(\DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface::class);
+        $orga = $this->getOrgaMock();
+        $user = $this->getUser1();
+        
+        // Create a mock of Illuminate Collection instead of using ArrayCollection
+        $collection = $this->createMock(\Illuminate\Support\Collection::class);
+        $collection->method('filter')->willReturnSelf();
+        $collection->method('toArray')->willReturn([$user]);
+        
+        $orga->method('getUsers')->willReturn($collection);
+        $orgaService->method('getOrgaByFields')->willReturn([$orga]);
+        return $orgaService;
+    }
+
+    public function getXBeteiligungMapServiceMock(): MockObject
+    {
+        $mapService = $this->createMock(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService::class);
+        $mapData = $this->createMock(\DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\MapData::class);
+        $mapData->method('getTerritory')->willReturn('{"type":"FeatureCollection","features":[]}');
+        $mapData->method('getBbox')->willReturn('10.083,53.475,10.083,53.475');
+        $mapData->method('getMapExtent')->willReturn('904640.92309477,7067292.9633037,1195347.6354542,7350657.5148909');
+        
+        $mapService->method('setMapData')->willReturn($mapData);
+        return $mapService;
+    }
 }
