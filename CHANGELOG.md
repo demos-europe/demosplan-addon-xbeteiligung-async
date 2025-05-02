@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.10.3 (2025-05-02)
 - technical release without any changes
 
 ## v0.10.2 (2025-05-02)
