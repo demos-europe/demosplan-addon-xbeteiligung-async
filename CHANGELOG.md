@@ -1,6 +1,9 @@
 # Changelog
 
-## 
+## UNRELEASED
+- technical release without any changes
+
+## v0.10.2 (2025-05-02)
 - provide default boundingbox
 
 ## v0.10.1 (2025-04-30)
