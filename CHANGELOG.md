@@ -1,6 +1,7 @@
 # Changelog
 
-## UNRELEASED
+## 
+- provide default boundingbox
 
 ## v0.10.1 (2025-04-30)
 - generate wms url without relying on basemap as baseLayer.
