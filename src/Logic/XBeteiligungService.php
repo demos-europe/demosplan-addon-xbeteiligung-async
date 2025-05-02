@@ -189,16 +189,15 @@ class XBeteiligungService
     public const GENERIC_ERROR_DESCRIPTION = 'Während der Erstellung/Bearbeitung des Verfahrens ist ein Fehler aufgetreten.';
 
     public function __construct(
-        SerializerFactory                                       $serializerFactory,
-        private readonly ProcedureNewsServiceInterface          $procedureNewsService,
-        private readonly ProcedureMessageRepository             $procedureMessageRepository,
-        private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
-        private readonly RouterInterface                        $router,
-        private readonly GlobalConfigInterface                  $globalConfig,
         private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
-        private readonly LoggerInterface                        $logger,
-        private readonly XBeteiligungIncomingMessageParser      $incomingMessageParser,
+        private readonly GlobalConfigInterface                  $globalConfig,
         private readonly KommunaleProcedureCreater              $kommunaleProcedureCreater,
+        private readonly LoggerInterface                        $logger,
+        private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
+        private readonly ProcedureMessageRepository             $procedureMessageRepository,
+        private readonly ProcedureNewsServiceInterface          $procedureNewsService,
+        private readonly RouterInterface                        $router,
+        private readonly XBeteiligungIncomingMessageParser      $incomingMessageParser,
     ) {
         $this->serializer = SerializerFactory::getSerializer();
     }
@@ -505,7 +504,9 @@ class XBeteiligungService
         $participationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         );
-        $participationType->setDurchgang($procedure->getPublicParticipationPhaseObject()->getIteration());
+        // Ensure durchgang is at least 1 as required by XSD schema (xs:positiveInteger)
+        $iteration = $procedure->getPublicParticipationPhaseObject()->getIteration();
+        $participationType->setDurchgang($iteration);
         $participationType->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
 
         // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
@@ -553,7 +554,9 @@ class XBeteiligungService
         $institutionParticipationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
-        $institutionParticipationType->setDurchgang($procedure->getPhaseObject()->getIteration());
+        // Ensure durchgang is at least 1 as required by XSD schema (xs:positiveInteger)
+        $iteration = $procedure->getPhaseObject()->getIteration();
+        $institutionParticipationType->setDurchgang($iteration);
         $bkTOEBaaType = new BeteiligungKommunalTOEBArtAnonymousPHPType();
         $bkTOEBaaType->setBeteiligungKommunalFormalTOEB($this->getInstitutionProcedurePhaseCodeType($procedure));
         $institutionParticipationType->setBeteiligungKommunalTOEBArt($bkTOEBaaType);
@@ -574,7 +577,9 @@ class XBeteiligungService
         $publicParticipationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
-        $publicParticipationType->setDurchgang($procedure->getPublicParticipationPhaseObject()->getIteration());
+        // Ensure durchgang is at least 1 as required by XSD schema (xs:positiveInteger)
+        $iteration = $procedure->getPublicParticipationPhaseObject()->getIteration();
+        $publicParticipationType->setDurchgang($iteration);
         $bkoeaaType = new BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType();
         $bkoeaaType->setBeteiligungKommunalFormalOeffentlichkeit(
             $this->getPublicProcedurePhaseCodeType($procedure)
@@ -939,12 +944,26 @@ class XBeteiligungService
         $isValid = $document->schemaValidate($fullPath);
         if (!$isValid) {
             $errors = libxml_get_errors();
+            $errorMessages = [];
             foreach ($errors as $error) {
+                $errorMessages[] = sprintf(
+                    "Line %d: %s (Code: %d)",
+                    $error->line,
+                    $error->message,
+                    $error->code
+                );
                 $this->logger->warning('Invalid XML message', [$error]);
                 if ($verboseDebug) {
                     $this->logger->debug('XML validation error', ['error' => $error]);
                 }
             }
+
+            // In test environment, output error details - retain this for easier debugging in tests
+            if (getenv('APP_ENV') === 'test') {
+                echo "\nXML validation errors:\n" . implode("\n", $errorMessages) . "\n";
+                echo "\nXML content that failed validation:\n" . $message . "\n";
+            }
+
             libxml_clear_errors();
 
             return false;

@@ -29,6 +29,7 @@ use Psr\Log\LoggerInterface;
 
 class ProcedurePhaseExtractorTest extends TestCase
 {
+    protected ProcedurePhaseExtractor $sut;
 
     protected function setUp(): void
     {
