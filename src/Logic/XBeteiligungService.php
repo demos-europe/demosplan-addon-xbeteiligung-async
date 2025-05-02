@@ -12,6 +12,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateInterval;
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
@@ -63,7 +64,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\PostalischeInlandsanschr
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema\ZeitraumType;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
-use InvalidArgumentException;
+use proj4php\Point;
+use proj4php\Proj;
+use proj4php\Proj4php;
 use Ramsey\Uuid\Uuid;
 use Psr\Log\LoggerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
@@ -152,6 +155,7 @@ class XBeteiligungService
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
         private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
         private readonly RouterInterface                        $router,
+        private readonly GlobalConfigInterface                  $globalConfig,
     ) {
         $this->serializer = $serializerFactory->getSerializer();
     }
@@ -622,14 +626,22 @@ class XBeteiligungService
             $projectionLabel = strtoupper($gisLayer->getProjectionLabel());
             // for some projections prior v1.3.0 the x and y coords are swapped
             // - there are more, but the common ones are at least treated:
-            $areCoordsSwaped =
+            $areCoordsSwapped =
                 'SRS' === $crsORsrs &&
                 ('EPSG:4326' === $projectionLabel || 'EPSG:4258' === $projectionLabel)
             ;
             // why mapExtend? see here: T32377
-            $bboxArray = explode(',', $procedure->getSettings()->getMapExtent());
+            $bboxSourceArray = explode(',', $procedure->getSettings()->getMapExtent());
+            // ratio is independent of wms version and projection - coords are always stored as EPSG:3857
+            $widthAndHeight = $this->getWidthAndHeight($bboxSourceArray);
+            // transform coords to desired layer-projection
+            $transformedBboxArray = $this->reprojectBoundsFromCoordsStoredInDefaultMapProjection(
+                $bboxSourceArray,
+                $projectionLabel,
+                $areCoordsSwapped
+            );
 
-            $widthAndHeight = $this->getWidthAndHeight($bboxArray, $areCoordsSwaped);
+            $transformedBbox = implode(',', $transformedBboxArray);
 
             $baseUrl = $baseLayer->getUrl();
             $urlParams = [
@@ -643,7 +655,7 @@ class XBeteiligungService
                 $crsORsrs => $projectionLabel,
                 'STYLES' => '',
                 'LAYERS' => $baseLayer->getLayers(),
-                'BBOX' => $procedure->getSettings()->getMapExtent(),
+                'BBOX' => $transformedBbox,
             ];
             $url = $baseUrl . '?' . http_build_query($urlParams);
 
@@ -658,24 +670,82 @@ class XBeteiligungService
     }
 
     /**
+     * @param array{0: string, 1: string, 2: string, 3:string} $procedureSettingsBBox
+     * @param string $targetProjectionName all procedureSetting sourceProjection coords are EPSG:3857 formatted
+     * @param bool $areCoordsSwapped true if SRS in combination with geographic projections
+     * @return array{0: string, 1: string, 2: string, 3:string}
+     */
+    private function reprojectBoundsFromCoordsStoredInDefaultMapProjection(
+        array $procedureSettingsBBox,
+        string $targetProjectionName,
+        bool $areCoordsSwapped): array
+    {
+        $west = (float)$procedureSettingsBBox[0];
+        $south = (float)$procedureSettingsBBox[1];
+        $east = (float)$procedureSettingsBBox[2];
+        $north = (float)$procedureSettingsBBox[3];
+        $reprojectParams = [
+            [min([$west, $east]), min([$north, $south])],
+            [max([$west, $east]), max([$north, $south])],
+        ];
+
+        $proj4 = new Proj4php();
+
+        $targetProjection = new Proj($targetProjectionName, $proj4);
+        $sourceProjection = new Proj($this-> globalConfig->getMapDefaultProjection()['label'], $proj4);
+
+        $transformedCoords = array_map(
+            fn (array $coordinate) => $this->convertPoint(
+                $coordinate,
+                $sourceProjection,
+                $targetProjection
+            ),
+            $reprojectParams
+        );
+
+        $west = (string)$transformedCoords[0][0];
+        $east = (string)$transformedCoords[1][0];
+        $south = (string)$transformedCoords[0][1];
+        $north = (string)$transformedCoords[1][1];
+        $bboxArray = [$west, $south, $east, $north];
+        if ($areCoordsSwapped) {
+            $bboxArray = [$south, $west, $east, $north];
+        }
+
+        return $bboxArray;
+    }
+
+    /**
+     * @param string $returnType [self::ARRAY_RETURN_TYPE | self::STRING_RETURN_TYPE]
+     *
+     * @return array|string
+     */
+    public function convertPoint(
+        array $coordinate,
+        Proj $currentProjection,
+        Proj $newProjection
+    ) {
+        $projectionTransformer = new Proj4php();
+        $pointSrc = new Point($coordinate[0], $coordinate[1], $currentProjection);
+        $pointDest = $projectionTransformer
+            ->transform($newProjection, $pointSrc)
+            ->toArray();
+
+        return [$pointDest[0], $pointDest[1]];
+    }
+
+    /**
      * @return array{'width': int, 'height': int}
      */
-    private function getWidthAndHeight(array $bBox, bool $swappedCoords): array
+    private function getWidthAndHeight(array $bBox): array
     {
         $absWidth = 1;
         $absHeight = 1;
         if (4 === count($bBox)) {
-            if ($swappedCoords) {
-                $west = (float)$bBox[1];
-                $east = (float)$bBox[3];
-                $south = (float)$bBox[0];
-                $north = (float)$bBox[2];
-            } else {
-                $west = (float)$bBox[0];
-                $east = (float)$bBox[2];
-                $south = (float)$bBox[1];
-                $north = (float)$bBox[3];
-            }
+            $west = (float)$bBox[0];
+            $east = (float)$bBox[2];
+            $south = (float)$bBox[1];
+            $north = (float)$bBox[3];
 
             $absWidth = (int)abs($west - $east);
             $absHeight = (int)abs($south - $north);
