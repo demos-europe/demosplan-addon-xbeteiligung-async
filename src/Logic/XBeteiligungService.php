@@ -687,7 +687,8 @@ class XBeteiligungService
                 ('EPSG:4326' === $projectionLabel || 'EPSG:4258' === $projectionLabel)
             ;
             // why mapExtend? see here: T32377
-            $bboxSourceArray = explode(',', $procedure->getSettings()->getMapExtent());
+            $mapExtent = $procedure->getSettings()->getMapExtent();
+            $bboxSourceArray = !empty($mapExtent) ? explode(',', $mapExtent) : [];
             // ratio is independent of wms version and projection - coords are always stored as EPSG:3857
             $widthAndHeight = $this->getWidthAndHeight($bboxSourceArray);
             // transform coords to desired layer-projection
@@ -726,7 +727,7 @@ class XBeteiligungService
     }
 
     /**
-     * @param array{0: string, 1: string, 2: string, 3:string} $procedureSettingsBBox
+     * @param array $procedureSettingsBBox array of bbox coordinates
      * @param string $targetProjectionName all procedureSetting sourceProjection coords are EPSG:3857 formatted
      * @param bool $areCoordsSwapped true if SRS in combination with geographic projections
      * @return array{0: string, 1: string, 2: string, 3:string}
@@ -736,6 +737,15 @@ class XBeteiligungService
         string $targetProjectionName,
         bool $areCoordsSwapped): array
     {
+        // Check if we have all required bbox coordinates
+        if (count($procedureSettingsBBox) < 4) {
+            // Return a default bbox covering Germany for the projection if not enough coordinates
+            if ($targetProjectionName === 'EPSG:4326') {
+                return ['5.866', '47.270', '15.042', '55.058']; // Germany in WGS84 (lat/lon)
+            }
+            return ['653300', '5975800', '1674500', '6636200']; // Germany in EPSG:3857 Web Mercator
+        }
+
         $west = (float)$procedureSettingsBBox[0];
         $south = (float)$procedureSettingsBBox[1];
         $east = (float)$procedureSettingsBBox[2];

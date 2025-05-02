@@ -1,6 +1,11 @@
 # Changelog
 
 ## UNRELEASED
+## v0.10.3 (2025-05-02)
+- technical release without any changes
+
+## v0.10.2 (2025-05-02)
+- provide default boundingbox
 
 ### Added
 - Add REST API endpoint `/addon/xbeteiligung/procedure/create` that accepts XML payload directly
