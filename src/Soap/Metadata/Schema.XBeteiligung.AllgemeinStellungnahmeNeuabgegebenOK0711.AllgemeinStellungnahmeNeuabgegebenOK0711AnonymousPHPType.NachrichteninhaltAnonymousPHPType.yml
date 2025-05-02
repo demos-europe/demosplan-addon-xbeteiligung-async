@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenOK0711\AllgemeinStellungnahmeNeuabgegebenOK0711AnonymousPHPType\NachrichteninhaltAnonymousPHPType:
+    properties:
+        vorgangsID:
+            expose: true
+            access_type: public_method
+            serialized_name: vorgangsID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVorgangsID
+                setter: setVorgangsID
+            type: string
+        stellungnahmeID:
+            expose: true
+            access_type: public_method
+            serialized_name: stellungnahmeID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getStellungnahmeID
+                setter: setStellungnahmeID
+            type: string

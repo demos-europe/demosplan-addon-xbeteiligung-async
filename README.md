@@ -6,6 +6,40 @@ generate php classes from the xsd files from the XBeteiligung specification.
 # Usage
 How to use it is documented in tests like testReadBeteiligung2PlanungBeteiligungNeuOK0410()
 
+# REST API
+
+A REST API endpoint is available for processing XBeteiligung messages as an alternative to RabbitMQ. 
+
+## Endpoint
+
+`POST /addon/xbeteiligung/procedure/create`
+
+## Authentication
+
+Authentication is done via a Bearer token in the **X-Addon-XBeteiligung-Authorization** custom header. The token value must match the `xbeteiligung_api_token` parameter value.
+
+```
+X-Addon-XBeteiligung-Authorization: Bearer your-token-here
+```
+
+This custom header is used specifically for XBeteiligung addon authentication to avoid interference with the core application's authentication.
+
+## Request Format
+
+The request body should contain the raw XML message content directly:
+
+```xml
+<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>
+    <!-- XML content here -->
+</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>
+```
+
+The API automatically detects the message type from the XML content.
+
+## Response
+
+The response will be an XML string with Content-Type: application/xml
+
 # Generate from Standard
 
 When you want to generate the php classes from the standard you need to copy 
@@ -24,56 +58,95 @@ following steps
 XML messages could automatically be casted to php objects by using the
 JMS-Serializer-Bundle http://jmsyst.com/bundles/JMSSerializerBundle. It is
 also easily possible to cast php classes back to xml!
-
+add type to AbstractObject:
+````
+Resources/xsd/gmlProfilexplan.xsd:
+    <element name="AbstractObject" abstract="true" type="anyType"/>
+````
 # Necessary adjustments after standard update
 
 In order for generated XML messages to be successfully validated,
 the following adjustments must be made after generating the classes and
 Yml files:
 
-add `xbeteiligung:` as prefix to xml_root_name in 
-`schema.Planung2BeteiligungBeteiligungKommunalNeu0401.yml`,
-`schema.Planung2BeteiligungBeteiligungKommunalAktualisieren0402.yml`,
-`schema.Planung2BeteiligungBeteiligungKommunalLoeschen0409.yml`,
-`schema.Planung2BeteiligungBeteiligungRaumordnungNeu0301.yml`,
-`schema.Planung2BeteiligungBeteiligungRaumordnungAktualisieren0302.yml`,
-`schema.Planung2BeteiligungBeteiligungRaumordnungLoeschen0309.yml`
+Add `xbeteiligung:` as prefix to xml_root_name in
 
-Example - xml_root_name: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
+[`Schema.XBeteiligung.KommunalInitiieren0401.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalInitiieren0401.yml),
+[`Schema.XBeteiligung.KommunalAktualisieren0402.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalAktualisieren0402.yml),
+[`Schema.XBeteiligung.KommunalLoeschen0409.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalLoeschen0409.yml),
+[`Schema.XBeteiligung.RaumordnungInitiieren0301.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungInitiieren0301.yml),
+[`Schema.XBeteiligung.RaumordnungAktualisieren0302.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungAktualisieren0302.yml),
+[`Schema.XBeteiligung.RaumordnungLoeschen0309.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungLoeschen0309.yml),
+[`Schema.XBeteiligung.PlanfeststellungAktualisieren0202.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungAktualisieren0202.yml),
+[`Schema.XBeteiligung.PlanfeststellungInitiieren0201.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungInitiieren0201.yml),
+[`Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml)
 
-Add the following to enum in xbeteiligung-codes.xsd (search for "0401" then you should find it)
-`<xs:enumeration value="0301">
-    <xs:annotation>
-        <xs:appinfo>
-            <beschreibung>planung2Beteiligung.RaumordnungNeu.0301</beschreibung>
-        </xs:appinfo>
-    </xs:annotation>
-</xs:enumeration>
-<xs:enumeration value="0302">
-    <xs:annotation>
-        <xs:appinfo>
-            <beschreibung>planung2Beteiligung.RaumordnungAktualisieren.0302</beschreibung>
-        </xs:appinfo>
-    </xs:annotation>
-</xs:enumeration>
-<xs:enumeration value="0309">
-    <xs:annotation>
-        <xs:appinfo>
-            <beschreibung>planung2Beteiligung.RaumordnungLoeschen.0309</beschreibung>
-        </xs:appinfo>
-    </xs:annotation>
-</xs:enumeration>`
+Example - `xml_root_name`: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
 
-comment out `namespace: ...` in `schema.CodeType.yml` for
-`code` and `name`
+Add the Following to Schemas:
 
-comment out `namespace: ...` in `src/Soap/metadata/schema.BeteiligungKommunalOeffentlichkeitType.yml`
-for `anlagen`->`xml_list`
-comment out `namespace: ...` in `src/Soap/metadata/schema.BeteiligungRaumordnungType.yml`
-for `anlagen`->`xml_list`
+[`src/Soap/Metadata/Schema.Basisnachricht.Behoerde.BehoerdeTypeType.yml`](src/Soap/Metadata/Schema.Basisnachricht.Behoerde.BehoerdeTypeType.yml):
+```yaml
+Verzeichnisdienst:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+kennung:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+name:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+erreichbarkeit:
+    xml_list:
+        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+```
 
-comment out `namespace: ...` in `src/Soap/metadata/schema.MetadatenAnlageType.yml`
-for `bezeichnung` and `anlageart` and `mimeType` and `anhangOderVerlinkung`.
+[`src/Soap/Metadata/Schema.Basisnachricht.G2g.IdentifikationNachrichtTypeType.yml`](src/Soap/Metadata/Schema.Basisnachricht.G2g.IdentifikationNachrichtTypeType.yml):
+```yaml
+nachrichtenUUID:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+nachrichtentyp:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+erstellungszeitpunkt:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+```
+
+[`src/Soap/Metadata/Schema.Basisnachricht.Kommunikation.KommunikationTypeType.yml`](src/Soap/Metadata/Schema.Basisnachricht.Kommunikation.KommunikationTypeType.yml):
+```yaml
+kanal:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+kennung:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+zusatz:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+```
+
+[`src/Soap/Metadata/Schema.Basisnachricht.G2g.NachrichtenkopfG2GTypeType.yml`](src/Soap/Metadata/Schema.Basisnachricht.G2g.NachrichtenkopfG2GTypeType.yml):
+```yaml
+identifikationNachricht:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+leser:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+autor:
+    xml_element:
+        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+```
+
+
+comment out `namespace: ...` in [`Schema.Code.CodeType.yml`](src/Soap/Metadata/Schema.Code.CodeType.yml)
+for the fields `code` and `name`.
+comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml)
+for the fields: `anlagen.xml_list`
+comment out `namespace: ...` in [`Schema.XBeteiligung.MetadatenAnlageType.yml`](src/Soap/Metadata/Schema.XBeteiligung.MetadatenAnlageType.yml)
+for the fields: `bezeichnung`, `versionsnummer`, `datum`, `anlageart`, `mimeType` and `anhangOderVerlinkung`
 
 Run the unit tests XBeteiligungServiceTest- (401, 402, 409) and fix any bugs that appear.
 Update what is documented here if there are any changes to be aware of.

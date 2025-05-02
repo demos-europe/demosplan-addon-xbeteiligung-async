@@ -1,0 +1,529 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/12"
+           xmlns:bn-g2g="http://xoev.de/schemata/basisnachricht/g2g/1_1"
+           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/2/1"
+           targetNamespace="https://www.xleitstelle.de/xbeteiligung/12"
+           version="1.3"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:annotation>
+      <xs:appinfo>
+         <standard>
+            <nameLang>XBeteiligung</nameLang>
+            <nameKurz>XBeteiligung</nameKurz>
+            <nameTechnisch>xbeteiligung</nameTechnisch>
+            <kennung>urn:xoev-de:xleitstelle:standard:xbeteiligung</kennung>
+            <beschreibung>Beteiligungsverfahren - OZG</beschreibung>
+         </standard>
+         <versionStandard>
+            <version>1.3</version>
+            <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren nach dem BauGB, dem ROG und in der Planfeststellung</beschreibung>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>3.0.2</versionXOEVHandbuch>
+            <versionXGenerator>3.1.1</versionXGenerator>
+            <versionModellierungswerkzeug>19.0 SP 4</versionModellierungswerkzeug>
+            <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
+         </versionStandard>
+      </xs:appinfo>
+   </xs:annotation>
+   <xs:include schemaLocation="xbeteiligung-baukasten.xsd"/>
+   <xs:import schemaLocation="xbau-kernmodul-datentypen.xsd"
+              namespace="http://www.xleitstelle.de/xbau/kernmodul/1/2/1"/>
+   <xs:import schemaLocation="xoev-basisnachricht-g2g_1.1.xsd"
+              namespace="http://xoev.de/schemata/basisnachricht/g2g/1_1"/>
+   <xs:element name="raumordnung.Initiieren.0301">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+            <title>Initiierung eines Beteiligungsverfahrens im Rahmen der Raumordnung</title>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird an die Behörde versendet, die ein neues Beteiligungsverfahren im Rahmen der Raumordnung durchführen soll. Sie enthält die zur Anlage des Beteiligungsverfahrens notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungRaumordnung">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Aktualisieren.0302">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird an die, die Beteiligung durchführende, Behörde versendet und enthält die zur Aktualisierung des Beteiligungsverfahrens der Raumordnung notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungRaumordnung">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enhält die aktualisierten Angaben für zu beteiligende Stelle.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Loeschen.0309">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird an die, die Beteiligung durchführende, Behörde versendet und enthält die zum Löschen des Beteiligungsverfahrens der Raumordnung notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID, die in der Nachricht 0301 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligungsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Beteiligungs-ID, die in der Nachricht 0301 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="planID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Plan-ID, die in der Nachricht 0301 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Initiieren.OK.0311">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Quittierungsnachricht einer erfolgreichen Initiierung des Beteiligungsverfahrens im Rahmen der Raumordnung</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.OK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Aktualisieren.OK.0312">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Quittierungsnachricht einer erfolgten Aktualisierung des Beteiligungsverfahrens im Rahmen der Raumordnung.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.OK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Loeschen.OK.0319">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Quittierungsnachricht wird nach einem erfolgreichen Löschversuch einer Beteiligung versendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.OK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Initiieren.NOK.0321">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese negative Quittierungsnachricht wird nach einer erfolglosen Initiierung des Beteiligungsverfahrens an das Planungsportal gesendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.NOK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Aktualisieren.NOK.0322">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Negative Quittierungsnachricht einer misserfolgten Aktualisierung des Beteiligungsverfahrens im Rahmen der Raumordnung.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                     <xs:complexType>
+                        <xs:complexContent>
+                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.NOK">
+                              <xs:sequence>
+                                 <xs:element name="beteiligungsID" type="xs:token">
+                                    <xs:annotation>
+                                       <xs:documentation>Beteiligungs-ID, die in der Nachricht 0302 übermittelt wurde.</xs:documentation>
+                                    </xs:annotation>
+                                 </xs:element>
+                              </xs:sequence>
+                           </xs:extension>
+                        </xs:complexContent>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Loeschen.NOK.0329">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Negative Quittierungsnachricht einer misserfolgten Löschung des Beteiligungsverfahrens im Rahmen der Raumordnung.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                     <xs:complexType>
+                        <xs:complexContent>
+                           <xs:extension base="xbeteiligung:Nachrichteninhalt.template.NOK">
+                              <xs:sequence>
+                                 <xs:element name="beteiligungsID" type="xs:token">
+                                    <xs:annotation>
+                                       <xs:documentation>Beteiligungs-ID, die in der Nachricht 0309 übermittelt wurde.</xs:documentation>
+                                    </xs:annotation>
+                                 </xs:element>
+                              </xs:sequence>
+                           </xs:extension>
+                        </xs:complexContent>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Information.Initiiert.0351">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird an ein Beteiligungsportal versendet und enthält die Informationen zu einem neuen Beteiligungsverfahren der Raumordnung.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungRaumordnungDB">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enhält alle Angaben zur Initiierung einer Beteiligung.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Information.Aktualisiert.0352">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird an ein Beteiligungsportal versendet und enthält die aktualisierte Informationen zu einem Beteiligungsverfahren der Raumordnung.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Vorgangs-ID des Beteiligungsverfahrens, auf die sich die beteiligte Stelle in ihrer Antwort bezieht.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligung" type="xbeteiligung:BeteiligungRaumordnungDB">
+                              <xs:annotation>
+                                 <xs:documentation>Dieses Element enhält die aktualisierten Angaben für zu beteiligende Stelle.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Information.Geloescht.0359">
+      <xs:annotation>
+         <xs:appinfo>
+            <autor>Beteiligungsverfahren</autor>
+            <leser>Beteiligungsdatenbank</leser>
+         </xs:appinfo>
+         <xs:documentation>Diese Nachricht wird an ein Beteiligungsportal versendet und enthält die zum Löschen (z. B. bei irrtümlicher Anlage) des Beteiligungsverfahren der Raumordnung notwendigen Metadaten.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt">
+                     <xs:complexType>
+                        <xs:sequence>
+                           <xs:element name="vorgangsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Vorgangs-ID, die in der Nachricht 0301 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="beteiligungsID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Beteiligungs-ID, die in der Nachricht 0301 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                           <xs:element name="planID" type="xs:token">
+                              <xs:annotation>
+                                 <xs:documentation>Die Plan-ID, die in der Nachricht 0301 übermittelt wurde.</xs:documentation>
+                              </xs:annotation>
+                           </xs:element>
+                        </xs:sequence>
+                     </xs:complexType>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Information.Initiiert.OK.0361">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Quittierungsnachricht wird nach einer erfolgreichen Initiierung eines Beteiligungsverfahrens der Raumordnung von einem Beteiligungsportal gesendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.OK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Information.Aktualisiert.OK.0362">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Quittierungsnachricht wird nach einer erfolgreichen Aktualisierung eines Beteiligungsverfahrens der Raumordnung von einem Beteiligungsportal gesendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.OK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Information.Geloescht.OK.0369">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese Quittierungsnachricht wird nach einer erfolgreichen Löschung eines Beteiligungsverfahrens der Raumordnung von einem Beteiligungsportal gesendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.OK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht bestätigt die erfolgreiche Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Information.Initiiert.NOK.0371">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese negative Quittierungsnachricht wird nach einer erfolglosen Initiierung des Beteiligungsverfahrens der Raumordnung von einem Beteiligungsportal gesendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.NOK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Information.Aktualisiert.NOK.0372">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese negative Quittierungsnachricht wird nach einer erfolglosen Aktualisierung eines Beteiligungsverfahren der Raumordnung von einem Beteiligungsportal gesendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.NOK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+   <xs:element name="raumordnung.Information.Geloescht.NOK.0379">
+      <xs:annotation>
+         <xs:appinfo>
+            <rechtsgrundlage>Rechtsgrundlage</rechtsgrundlage>
+         </xs:appinfo>
+         <xs:documentation>Diese negative Quittierungsnachricht wird nach einer erfolglosen Löschung eines Beteiligungsverfahren der Raumordnung von einem Beteiligungsportal gesendet.</xs:documentation>
+      </xs:annotation>
+      <xs:complexType>
+         <xs:complexContent>
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
+               <xs:sequence>
+                  <xs:element name="nachrichteninhalt"
+                              type="xbeteiligung:Nachrichteninhalt.template.NOK">
+                     <xs:annotation>
+                        <xs:documentation>Diese Nachricht unterrichtet über einen Fehler bei der Verarbeitung der Originalnachricht.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:sequence>
+            </xs:extension>
+         </xs:complexContent>
+      </xs:complexType>
+   </xs:element>
+</xs:schema>

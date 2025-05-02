@@ -1,0 +1,50 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\VerwaltungspolitischeKodierungType:
+    properties:
+        bundesland:
+            expose: true
+            access_type: public_method
+            serialized_name: bundesland
+            accessor:
+                getter: getBundesland
+                setter: setBundesland
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeBundeslandType
+        bezirk:
+            expose: true
+            access_type: public_method
+            serialized_name: bezirk
+            accessor:
+                getter: getBezirk
+                setter: setBezirk
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeBezirkType
+        kreis:
+            expose: true
+            access_type: public_method
+            serialized_name: kreis
+            accessor:
+                getter: getKreis
+                setter: setKreis
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeKreisType
+        gemeindeschluessel:
+            expose: true
+            access_type: public_method
+            serialized_name: gemeindeschluessel
+            accessor:
+                getter: getGemeindeschluessel
+                setter: setGemeindeschluessel
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeAmtlicherGemeindeschluesselType
+        gemeindeteil:
+            expose: true
+            access_type: public_method
+            serialized_name: gemeindeteil
+            accessor:
+                getter: getGemeindeteil
+                setter: setGemeindeteil
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeGemeindeteilType
+        regionalschluessel:
+            expose: true
+            access_type: public_method
+            serialized_name: regionalschluessel
+            accessor:
+                getter: getRegionalschluessel
+                setter: setRegionalschluessel
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeAmtlicherRegionalschluesselType

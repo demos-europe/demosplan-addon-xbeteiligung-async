@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType:
+    properties:
+        beteiligungKommunalFormalOeffentlichkeit:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungKommunalFormalOeffentlichkeit
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBeteiligungKommunalFormalOeffentlichkeit
+                setter: setBeteiligungKommunalFormalOeffentlichkeit
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType
+        beteiligungKommunalInformellOeffentlichkeit:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungKommunalInformellOeffentlichkeit
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBeteiligungKommunalInformellOeffentlichkeit
+                setter: setBeteiligungKommunalInformellOeffentlichkeit
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeBeteiligungKommunalInformellOeffentlichkeitType

@@ -1,0 +1,32 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerhafteUnterlageType:
+    properties:
+        fehlerbeschreibung:
+            expose: true
+            access_type: public_method
+            serialized_name: fehlerbeschreibung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getFehlerbeschreibung
+                setter: setFehlerbeschreibung
+            type: string
+        dokumentID:
+            expose: true
+            access_type: public_method
+            serialized_name: dokumentID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getDokumentID
+                setter: setDokumentID
+            type: string
+        art:
+            expose: true
+            access_type: public_method
+            serialized_name: art
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getArt
+                setter: setArt
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeFehlerartType

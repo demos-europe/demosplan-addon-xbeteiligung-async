@@ -65,5 +65,23 @@ class PermissionInitializer implements PermissionInitializerInterface
                 PermissionConditionBuilder::start()->enableAlways()
             );
         }
+
+        if (ProcedureMessageTyp::PLANFESTSTELLUNG->value === $this->procedureMessageType)
+        {
+            $permissionCollection->configurePermissionInstance(
+                Features::feature_procedure_message_pln_create(),
+                PermissionConditionBuilder::start()->enableAlways()
+            );
+
+            $permissionCollection->configurePermissionInstance(
+                Features::feature_procedure_message_pln_update(),
+                PermissionConditionBuilder::start()->enableAlways()
+            );
+
+            $permissionCollection->configurePermissionInstance(
+                Features::feature_procedure_message_pln_delete(),
+                PermissionConditionBuilder::start()->enableAlways()
+            );
+        }
     }
 }
