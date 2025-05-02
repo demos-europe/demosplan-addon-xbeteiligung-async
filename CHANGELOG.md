@@ -8,6 +8,7 @@
 - set CRS/SRS taking the used wms version into account
 - use http query builder to automatically url_encode the Parameters used and for better
   visibility.
+- reproject procedureSettingsCoords always stored in EPSG:3857 to the desired projection
 
 ## v0.10 (2025-01-13)
 - refactor XBeteiligungProcedureChanged Event Listener and PlanningDocumentsLinkCreator

@@ -709,7 +709,7 @@ class XBeteiligungService
         $north = (string)$transformedCoords[1][1];
         $bboxArray = [$west, $south, $east, $north];
         if ($areCoordsSwapped) {
-            $bboxArray = [$south, $west, $east, $north];
+            $bboxArray = [$south, $west, $north, $east];
         }
 
         return $bboxArray;
