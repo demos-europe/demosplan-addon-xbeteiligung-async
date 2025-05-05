@@ -615,15 +615,21 @@ class XBeteiligungService
                     $baseLayer = $gisLayer;
                 }
             }
-            Assert::notNull($baseLayer, 'No enabled base layer found at new procedure - unable to create wmsUrl');
+
+            if (null === $baseLayer) {
+                $this->logger->warning('No enabled base layer found at new procedure -
+                using global config default instead');
+            }
 
             // prior to wms v1.3.0 the keyword SRS has to be used instead of CRS within urls
             $crsORsrs = version_compare(
                 '1.3.0',
-                $gisLayer->getLayerVersion(),
+                $baseLayer?->getLayerVersion() ?? '1.3.0',
                 '<='
             ) ? 'CRS' : 'SRS';
-            $projectionLabel = strtoupper($gisLayer->getProjectionLabel());
+            $projectionLabel = strtoupper(
+                $baseLayer?->getProjectionLabel() ?? $this->globalConfig->getMapDefaultProjection()
+            );
             // for some projections after v1.3.0 the x and y coords are swapped
             // - there are more, but the common ones are at least treated:
             $areCoordsSwapped =
@@ -644,10 +650,10 @@ class XBeteiligungService
 
             $transformedBbox = implode(',', $transformedBboxArray);
 
-            $baseUrl = $baseLayer->getUrl();
+            $baseUrl = $baseLayer->getUrl() ?? $this->globalConfig->getMapAdminBaselayer();
             $urlParams = [
                 'SERVICE' => 'WMS',
-                'VERSION' => $baseLayer->getLayerVersion(),
+                'VERSION' => $baseLayer->getLayerVersion() ?? '1.3.0',
                 'REQUEST' => 'GetMap',
                 'FORMAT' => 'image/png',
                 'TRANSPARENT' => 'true',
@@ -655,7 +661,7 @@ class XBeteiligungService
                 'HEIGHT' => (string)(int)(512 * $widthAndHeight['height'] / $widthAndHeight['width']),
                 $crsORsrs => $projectionLabel,
                 'STYLES' => '',
-                'LAYERS' => $baseLayer->getLayers(),
+                'LAYERS' => $baseLayer->getLayers() ?? $this->globalConfig->getMapAdminBaselayerLayers(),
                 'BBOX' => $transformedBbox,
             ];
             $url = $baseUrl . '?' . http_build_query($urlParams);
