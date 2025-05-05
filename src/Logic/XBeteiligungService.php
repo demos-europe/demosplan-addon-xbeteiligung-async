@@ -446,9 +446,13 @@ class XBeteiligungService
         $participationType->setPlanID($procedure->getId());
         $participationType->setPlanname($procedure->getName());
         $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
-        $participationType->setFlaechenabgrenzungUrl(
-            $this->generateFaceBoundaryWMSUrl($procedure)
-        );
+        $wmsUrl = $this->generateFaceBoundaryWMSUrl($procedure);
+        if (null !== $wmsUrl) {
+            $participationType->setFlaechenabgrenzungUrl(
+                $wmsUrl
+            );
+        }
+
         $participationType->setBeteiligungURL(
             $this->router->generate(
                 'DemosPlan_procedure_public_detail',
@@ -657,7 +661,7 @@ class XBeteiligungService
     /**
      * @throws Exception
      */
-    private function generateFaceBoundaryWMSUrl(ProcedureInterface $procedure): string
+    private function generateFaceBoundaryWMSUrl(ProcedureInterface $procedure): ?string
     {
         try {
             $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
@@ -676,19 +680,26 @@ class XBeteiligungService
                     $baseLayer = $gisLayer;
                 }
             }
-            Assert::notNull($baseLayer, 'No enabled base layer found at new procedure - unable to create wmsUrl');
+
+            if (null === $baseLayer) {
+                $this->logger->warning('No enabled base layer found at new procedure');
+
+                return null;
+            }
 
             // prior to wms v1.3.0 the keyword SRS has to be used instead of CRS within urls
             $crsORsrs = version_compare(
                 '1.3.0',
-                $gisLayer->getLayerVersion(),
+                $baseLayer?->getLayerVersion(),
                 '<='
             ) ? 'CRS' : 'SRS';
-            $projectionLabel = strtoupper($gisLayer->getProjectionLabel());
-            // for some projections prior v1.3.0 the x and y coords are swapped
+            $projectionLabel = strtoupper(
+                $baseLayer?->getProjectionLabel()
+            );
+            // for some projections after v1.3.0 the x and y coords are swapped
             // - there are more, but the common ones are at least treated:
             $areCoordsSwapped =
-                'SRS' === $crsORsrs &&
+                'CRS' === $crsORsrs &&
                 ('EPSG:4326' === $projectionLabel || 'EPSG:4258' === $projectionLabel)
             ;
             // why mapExtend? see here: T32377
@@ -705,10 +716,10 @@ class XBeteiligungService
 
             $transformedBbox = implode(',', $transformedBboxArray);
 
-            $baseUrl = $baseLayer->getUrl();
+            $baseUrl = $baseLayer?->getUrl();
             $urlParams = [
                 'SERVICE' => 'WMS',
-                'VERSION' => $baseLayer->getLayerVersion(),
+                'VERSION' => $baseLayer?->getLayerVersion(),
                 'REQUEST' => 'GetMap',
                 'FORMAT' => 'image/png',
                 'TRANSPARENT' => 'true',
@@ -716,7 +727,7 @@ class XBeteiligungService
                 'HEIGHT' => (string)(int)(512 * $widthAndHeight['height'] / $widthAndHeight['width']),
                 $crsORsrs => $projectionLabel,
                 'STYLES' => '',
-                'LAYERS' => $baseLayer->getLayers(),
+                'LAYERS' => $baseLayer?->getLayers(),
                 'BBOX' => $transformedBbox,
             ];
             $url = $baseUrl . '?' . http_build_query($urlParams);
@@ -743,7 +754,7 @@ class XBeteiligungService
         bool $areCoordsSwapped): array
     {
         // Check if we have all required bbox coordinates
-        if (count($procedureSettingsBBox) < 4) {
+        if (count($procedureSettingsBBox) !== 4) {
             // Return a default bbox covering Germany for the projection if not enough coordinates
             if ($targetProjectionName === 'EPSG:4326') {
                 return ['5.866', '47.270', '15.042', '55.058']; // Germany in WGS84 (lat/lon)
