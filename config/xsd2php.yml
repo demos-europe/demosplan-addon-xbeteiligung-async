@@ -3,39 +3,59 @@
 
 xsd2php:
   namespaces:
-    'http://www.opengis.net/gml/3.2': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/allgemeinername/3': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/auslandsanschrift/4': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/azrnummer/2': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/basisnachricht/5': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/behoerde/5': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/codes/gemeindeverzeichnis/3': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/datum/2': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/kommunikation/4': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/lichtbild/2': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/meldeanschrift/4': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/nachrichtentypen/5': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/postanschrift/4': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/quittung/3': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/rueckweisung/4': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.osci.de/xinneres/weiterleitung/5': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.w3.org/1999/xlink': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.xleitstelle.de/xbau/kernmodul/1/1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://www.xleitstelle.de/xbau/kernmodul/1/2': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://xbeteiligung.de': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap'
-    'http://xbeteiligung.de/V0103': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap'
-    'http://xoev.de/latinchars/1_1/datatypes': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'http://xoev.de/schemata/code/1_0': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'https://www.xleitstelle.de/xbeteiligung/1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
-    'urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema'
+    # gmlProfilexplan.xsd
+    'http://www.opengis.net/gml/3.2': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml'
+    # xlink.xsd
+    'http://www.w3.org/1999/xlink': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink'
+    # xbau-kernmodul-datentypen.xsd and xbau-kernmodul-codes.xsd
+    'http://www.xleitstelle.de/xbau/kernmodul/1/2/1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul'
+    # latinchars.xsd
+    'http://xoev.de/latinchars/1_1/datatypes': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema'
+    # xoev-basisnachricht-behoerde_1.1.xsd
+    'http://xoev.de/schemata/basisnachricht/behoerde/1_1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde'
+    # xoev-basisnachricht-g2g_1.1.xsd
+    'http://xoev.de/schemata/basisnachricht/g2g/1_1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g'
+    # xoev-basisnachricht-kommunikation_1.1.xsd
+    'http://xoev.de/schemata/basisnachricht/kommunikation/1_1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation'
+    # xoev-basisnachricht-unqualified-g2g_1.1.xsd
+    'http://xoev.de/schemata/basisnachricht/unqualified/g2g/1_1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Unqualified'
+    # xoev-code.xsd
+    'http://xoev.de/schemata/code/1_0': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Code'
+    # xbeteiligung-kommunaleBauleitplanung.xsd, xbeteiligung-planfeststellung.xsd, xbeteiligung-raumordnung.xsd,
+    # xbeteiligung.xsd, xbeteiligung-allgemein.xsd, xbeteiligung-baukasten.xsd, xbeteiligung-codes.xsd
+    'https://www.xleitstelle.de/xbeteiligung/12': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung'
+    # din-norm-91379-datatypes.xsd
+    'urn:xoev-de:kosit:xoev:datentyp:din-91379_2022-08': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema'
+    # din-91379-datatypes.xsd
+    'urn:xoev-de:kosit:xoev:datentyp:din-spec-91379_2019-03': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema'
 
   destinations_php:
     'DemosEurope\DemosplanAddon\XBeteiligung\Soap': src/Soap
-    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema': src/Soap/schema
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema': src/Soap/Schema
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml': src/Soap/Schema/Gml
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink': src/Soap/Schema/Xlink
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul': src/Soap/Schema/Kernmodul
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht': src/Soap/Schema/Basisnachricht
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde': src/Soap/Schema/Basisnachricht/Behoerde
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g': src/Soap/Schema/Basisnachricht/G2g
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation': src/Soap/Schema/Basisnachricht/Kommunikation
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Unqualified': src/Soap/Schema/Basisnachricht/Unqualified
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Code': src/Soap/Schema/Code
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung': src/Soap/Schema/XBeteiligung
 
   destinations_jms:
-    'DemosEurope\DemosplanAddon\XBeteiligung\Soap': src/Soap/metadata
-    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\schema': src/Soap/metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Unqualified': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Code': src/Soap/Metadata
+    'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung': src/Soap/Metadata
 
   aliases:
     'http://www.w3.org/2001/XMLSchema':

@@ -1,0 +1,66 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType:
+    properties:
+        produkt:
+            expose: true
+            access_type: public_method
+            serialized_name: produkt
+            accessor:
+                getter: getProdukt
+                setter: setProdukt
+            xml_attribute: true
+            type: string
+        produkthersteller:
+            expose: true
+            access_type: public_method
+            serialized_name: produkthersteller
+            accessor:
+                getter: getProdukthersteller
+                setter: setProdukthersteller
+            xml_attribute: true
+            type: string
+        produktversion:
+            expose: true
+            access_type: public_method
+            serialized_name: produktversion
+            accessor:
+                getter: getProduktversion
+                setter: setProduktversion
+            xml_attribute: true
+            type: string
+        standard:
+            expose: true
+            access_type: public_method
+            serialized_name: standard
+            accessor:
+                getter: getStandard
+                setter: setStandard
+            xml_attribute: true
+            type: string
+        test:
+            expose: true
+            access_type: public_method
+            serialized_name: test
+            accessor:
+                getter: getTest
+                setter: setTest
+            xml_attribute: true
+            type: string
+        version:
+            expose: true
+            access_type: public_method
+            serialized_name: version
+            accessor:
+                getter: getVersion
+                setter: setVersion
+            xml_attribute: true
+            type: string
+        nachrichtenkopfG2g:
+            expose: true
+            access_type: public_method
+            serialized_name: nachrichtenkopf.g2g
+            xml_element:
+                namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+            accessor:
+                getter: getNachrichtenkopfG2g
+                setter: setNachrichtenkopfG2g
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtenkopfG2g

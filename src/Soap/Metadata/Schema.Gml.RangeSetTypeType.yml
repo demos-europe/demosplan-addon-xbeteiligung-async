@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\RangeSetTypeType:
+    properties:
+        dataBlock:
+            expose: true
+            access_type: public_method
+            serialized_name: DataBlock
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getDataBlock
+                setter: setDataBlock
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\DataBlock
+        file:
+            expose: true
+            access_type: public_method
+            serialized_name: File
+            xml_element:
+                namespace: 'http://www.opengis.net/gml/3.2'
+            accessor:
+                getter: getFile
+                setter: setFile
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\File

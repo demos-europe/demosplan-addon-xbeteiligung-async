@@ -1,0 +1,34 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\KommunikationType:
+    properties:
+        kanal:
+            expose: true
+            access_type: public_method
+            serialized_name: kanal
+            accessor:
+                getter: getKanal
+                setter: setKanal
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeErreichbarkeitType
+        kennung:
+            expose: true
+            access_type: public_method
+            serialized_name: kennung
+            accessor:
+                getter: getKennung
+                setter: setKennung
+            type: string
+        istDienstlich:
+            expose: true
+            access_type: public_method
+            serialized_name: istDienstlich
+            accessor:
+                getter: getIstDienstlich
+                setter: setIstDienstlich
+            type: bool
+        zusatz:
+            expose: true
+            access_type: public_method
+            serialized_name: zusatz
+            accessor:
+                getter: getZusatz
+                setter: setZusatz
+            type: string

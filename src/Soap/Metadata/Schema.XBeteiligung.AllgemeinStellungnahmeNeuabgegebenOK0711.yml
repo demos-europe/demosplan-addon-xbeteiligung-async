@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenOK0711:
+    xml_root_name: allgemein.stellungnahme.Neuabgegeben.OK.0711
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

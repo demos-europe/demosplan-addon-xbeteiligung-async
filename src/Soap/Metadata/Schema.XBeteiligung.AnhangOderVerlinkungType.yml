@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnhangOderVerlinkungType:
+    properties:
+        anhang:
+            expose: true
+            access_type: public_method
+            serialized_name: anhang
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getAnhang
+                setter: setAnhang
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\MetadatenAnhangType
+        uriVerlinkung:
+            expose: true
+            access_type: public_method
+            serialized_name: uriVerlinkung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getUriVerlinkung
+                setter: setUriVerlinkung
+            type: string

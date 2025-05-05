@@ -1,0 +1,72 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType:
+    properties:
+        bezeichnung:
+            expose: true
+            access_type: public_method
+            serialized_name: bezeichnung
+            xml_element:
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBezeichnung
+                setter: setBezeichnung
+            type: string
+        versionsnummer:
+            expose: true
+            access_type: public_method
+            serialized_name: versionsnummer
+            xml_element:
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVersionsnummer
+                setter: setVersionsnummer
+            type: string
+        datum:
+            expose: true
+            access_type: public_method
+            serialized_name: datum
+            xml_element:
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getDatum
+                setter: setDatum
+            type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Date
+        anlageart:
+            expose: true
+            access_type: public_method
+            serialized_name: anlageart
+            xml_element:
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getAnlageart
+                setter: setAnlageart
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensunterlagetypType
+        mimeType:
+            expose: true
+            access_type: public_method
+            serialized_name: mimeType
+            xml_element:
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getMimeType
+                setter: setMimeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeXBauMimeTypeType
+        anhangOderVerlinkung:
+            expose: true
+            access_type: public_method
+            serialized_name: anhangOderVerlinkung
+            xml_element:
+                #namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getAnhangOderVerlinkung
+                setter: setAnhangOderVerlinkung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnhangOderVerlinkungType
+        dokument:
+            expose: true
+            access_type: public_method
+            serialized_name: dokument
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getDokument
+                setter: setDokument
+            type: GoetasWebservices\Xsd\XsdToPhp\Jms\Base64Encoded
