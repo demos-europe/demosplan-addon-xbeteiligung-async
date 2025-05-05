@@ -650,10 +650,10 @@ class XBeteiligungService
 
             $transformedBbox = implode(',', $transformedBboxArray);
 
-            $baseUrl = $baseLayer->getUrl() ?? $this->globalConfig->getMapAdminBaselayer();
+            $baseUrl = $baseLayer?->getUrl() ?? $this->globalConfig->getMapAdminBaselayer();
             $urlParams = [
                 'SERVICE' => 'WMS',
-                'VERSION' => $baseLayer->getLayerVersion() ?? '1.3.0',
+                'VERSION' => $baseLayer?->getLayerVersion() ?? '1.3.0',
                 'REQUEST' => 'GetMap',
                 'FORMAT' => 'image/png',
                 'TRANSPARENT' => 'true',
@@ -661,7 +661,7 @@ class XBeteiligungService
                 'HEIGHT' => (string)(int)(512 * $widthAndHeight['height'] / $widthAndHeight['width']),
                 $crsORsrs => $projectionLabel,
                 'STYLES' => '',
-                'LAYERS' => $baseLayer->getLayers() ?? $this->globalConfig->getMapAdminBaselayerLayers(),
+                'LAYERS' => $baseLayer?->getLayers() ?? $this->globalConfig->getMapAdminBaselayerLayers(),
                 'BBOX' => $transformedBbox,
             ];
             $url = $baseUrl . '?' . http_build_query($urlParams);
