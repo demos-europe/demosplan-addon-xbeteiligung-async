@@ -1,6 +1,10 @@
 # Changelog
 
 ## UNRELEASED
+
+## v0.10.4 (2025-05-05)
+ - swap coords for CRS + special projections instead of SRS
+
 ## v0.10.3 (2025-05-02)
 - technical release without any changes
 

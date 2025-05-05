@@ -624,10 +624,10 @@ class XBeteiligungService
                 '<='
             ) ? 'CRS' : 'SRS';
             $projectionLabel = strtoupper($gisLayer->getProjectionLabel());
-            // for some projections prior v1.3.0 the x and y coords are swapped
+            // for some projections after v1.3.0 the x and y coords are swapped
             // - there are more, but the common ones are at least treated:
             $areCoordsSwapped =
-                'SRS' === $crsORsrs &&
+                'CRS' === $crsORsrs &&
                 ('EPSG:4326' === $projectionLabel || 'EPSG:4258' === $projectionLabel)
             ;
             // why mapExtend? see here: T32377
@@ -682,7 +682,7 @@ class XBeteiligungService
         bool $areCoordsSwapped): array
     {
         // Check if we have all required bbox coordinates
-        if (count($procedureSettingsBBox) < 4) {
+        if (count($procedureSettingsBBox) !== 4) {
             // Return a default bbox covering Germany for the projection if not enough coordinates
             if ($targetProjectionName === 'EPSG:4326') {
                 return ['5.866', '47.270', '15.042', '55.058']; // Germany in WGS84 (lat/lon)
