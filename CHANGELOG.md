@@ -1,6 +1,11 @@
 # Changelog
 
 ## UNRELEASED
+## v0.10.3 (2025-05-02)
+- technical release without any changes
+
+## v0.10.2 (2025-05-02)
+- provide default boundingbox
 
 ### Added
 - Add REST API endpoint `/addon/xbeteiligung/procedure/create` that accepts XML payload directly
@@ -32,6 +37,14 @@
 - implement rabbitMQ in services.yml
 - adjust AddonMaintenanceEventInterface in eventSubscriber
 - create some classes to restructure xbeteiligung-async to can to work on comming stories in future
+
+## v0.10.1 (2025-04-30)
+- generate wms url without relying on basemap as baseLayer.
+- include layers within the url.
+- set CRS/SRS taking the used wms version into account
+- use http query builder to automatically url_encode the Parameters used and for better
+  visibility.
+- reproject procedureSettingsCoords always stored in EPSG:3857 to the desired projection
 
 ## v0.10 (2025-01-13)
 - refactor XBeteiligungProcedureChanged Event Listener and PlanningDocumentsLinkCreator

@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateInterval;
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
@@ -71,10 +72,14 @@ use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use JMS\Serializer\Serializer;
+use proj4php\Point;
+use proj4php\Proj;
+use proj4php\Proj4php;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
+use Webmozart\Assert\Assert;
 
 class XBeteiligungService
 {
@@ -184,14 +189,15 @@ class XBeteiligungService
     public const GENERIC_ERROR_DESCRIPTION = 'Während der Erstellung/Bearbeitung des Verfahrens ist ein Fehler aufgetreten.';
 
     public function __construct(
-        private readonly GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository,
-        private readonly LoggerInterface                     $logger,
-        private readonly ProcedureNewsServiceInterface       $procedureNewsService,
-        private readonly ProcedureMessageRepository          $procedureMessageRepository,
-        private readonly PlanningDocumentsLinkCreator        $planningDocumentsLinkCreator,
-        private readonly RouterInterface                     $router,
-        private readonly XBeteiligungIncomingMessageParser   $incomingMessageParser,
-        private readonly KommunaleProcedureCreater           $kommunaleProcedureCreater,
+        private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
+        private readonly GlobalConfigInterface                  $globalConfig,
+        private readonly KommunaleProcedureCreater              $kommunaleProcedureCreater,
+        private readonly LoggerInterface                        $logger,
+        private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
+        private readonly ProcedureMessageRepository             $procedureMessageRepository,
+        private readonly ProcedureNewsServiceInterface          $procedureNewsService,
+        private readonly RouterInterface                        $router,
+        private readonly XBeteiligungIncomingMessageParser      $incomingMessageParser,
     ) {
         $this->serializer = SerializerFactory::getSerializer();
     }
@@ -498,7 +504,9 @@ class XBeteiligungService
         $participationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         );
-        $participationType->setDurchgang($procedure->getPublicParticipationPhaseObject()->getIteration());
+        // Ensure durchgang is at least 1 as required by XSD schema (xs:positiveInteger)
+        $iteration = $procedure->getPublicParticipationPhaseObject()->getIteration();
+        $participationType->setDurchgang($iteration);
         $participationType->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
 
         // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
@@ -546,7 +554,9 @@ class XBeteiligungService
         $institutionParticipationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
-        $institutionParticipationType->setDurchgang($procedure->getPhaseObject()->getIteration());
+        // Ensure durchgang is at least 1 as required by XSD schema (xs:positiveInteger)
+        $iteration = $procedure->getPhaseObject()->getIteration();
+        $institutionParticipationType->setDurchgang($iteration);
         $bkTOEBaaType = new BeteiligungKommunalTOEBArtAnonymousPHPType();
         $bkTOEBaaType->setBeteiligungKommunalFormalTOEB($this->getInstitutionProcedurePhaseCodeType($procedure));
         $institutionParticipationType->setBeteiligungKommunalTOEBArt($bkTOEBaaType);
@@ -567,7 +577,9 @@ class XBeteiligungService
         $publicParticipationType->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
-        $publicParticipationType->setDurchgang($procedure->getPublicParticipationPhaseObject()->getIteration());
+        // Ensure durchgang is at least 1 as required by XSD schema (xs:positiveInteger)
+        $iteration = $procedure->getPublicParticipationPhaseObject()->getIteration();
+        $publicParticipationType->setDurchgang($iteration);
         $bkoeaaType = new BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType();
         $bkoeaaType->setBeteiligungKommunalFormalOeffentlichkeit(
             $this->getPublicProcedurePhaseCodeType($procedure)
@@ -642,54 +654,175 @@ class XBeteiligungService
         return $author;
     }
 
+    /**
+     * @throws Exception
+     */
     private function generateFaceBoundaryWMSUrl(ProcedureInterface $procedure): string
     {
-        $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
+        try {
+            $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
 
-        if (null === $rootCategory) {
-            // Currently, all procedures have a root layer category
-            throw new InvalidArgumentException('Procedure has no root layer category, cannot add layers');
-        }
+            Assert::notNull($rootCategory, 'new procedure has no root layer category');
 
-        $gisLayers = $rootCategory->getGisLayers();
-        $basemapGisLayer = null;
-        /** @var GisLayerInterface $gisLayer */
-        foreach ($gisLayers as $gisLayer) {
-            if ('basemap' === $gisLayer->getName()) {
-                $basemapGisLayer = $gisLayer;
+            $gisLayers = $rootCategory->getGisLayers();
+            $baseLayer = null;
+            /** @var GisLayerInterface $gisLayer */
+            foreach ($gisLayers as $gisLayer) {
+                $layerType = $gisLayer->getType();
+                $enabled = $gisLayer->isEnabled();
+                if ($enabled &&
+                    'base' === $layerType)
+                {
+                    $baseLayer = $gisLayer;
+                }
             }
+            Assert::notNull($baseLayer, 'No enabled base layer found at new procedure - unable to create wmsUrl');
+
+            // prior to wms v1.3.0 the keyword SRS has to be used instead of CRS within urls
+            $crsORsrs = version_compare(
+                '1.3.0',
+                $gisLayer->getLayerVersion(),
+                '<='
+            ) ? 'CRS' : 'SRS';
+            $projectionLabel = strtoupper($gisLayer->getProjectionLabel());
+            // for some projections prior v1.3.0 the x and y coords are swapped
+            // - there are more, but the common ones are at least treated:
+            $areCoordsSwapped =
+                'SRS' === $crsORsrs &&
+                ('EPSG:4326' === $projectionLabel || 'EPSG:4258' === $projectionLabel)
+            ;
+            // why mapExtend? see here: T32377
+            $mapExtent = $procedure->getSettings()->getMapExtent();
+            $bboxSourceArray = !empty($mapExtent) ? explode(',', $mapExtent) : [];
+            // ratio is independent of wms version and projection - coords are always stored as EPSG:3857
+            $widthAndHeight = $this->getWidthAndHeight($bboxSourceArray);
+            // transform coords to desired layer-projection
+            $transformedBboxArray = $this->reprojectBoundsFromCoordsStoredInDefaultMapProjection(
+                $bboxSourceArray,
+                $projectionLabel,
+                $areCoordsSwapped
+            );
+
+            $transformedBbox = implode(',', $transformedBboxArray);
+
+            $baseUrl = $baseLayer->getUrl();
+            $urlParams = [
+                'SERVICE' => 'WMS',
+                'VERSION' => $baseLayer->getLayerVersion(),
+                'REQUEST' => 'GetMap',
+                'FORMAT' => 'image/png',
+                'TRANSPARENT' => 'true',
+                'WIDTH' => '512',
+                'HEIGHT' => (string)(int)(512 * $widthAndHeight['height'] / $widthAndHeight['width']),
+                $crsORsrs => $projectionLabel,
+                'STYLES' => '',
+                'LAYERS' => $baseLayer->getLayers(),
+                'BBOX' => $transformedBbox,
+            ];
+            $url = $baseUrl . '?' . http_build_query($urlParams);
+
+            return $url;
+        } catch (Exception $exception) {
+            $this->logger->error(
+                'XBeteiligung async: An error occurred on postProcedureCreate trying to build the wmsUrl to include xml',
+                ['exceptionMessage: ' => $exception->getMessage()]
+            );
+            throw $exception;
         }
-        // why mapExtend? see here: T32377
-        $bboxArray = explode(',', $procedure->getSettings()->getMapExtent());
+    }
+
+    /**
+     * @param array $procedureSettingsBBox array of bbox coordinates
+     * @param string $targetProjectionName all procedureSetting sourceProjection coords are EPSG:3857 formatted
+     * @param bool $areCoordsSwapped true if SRS in combination with geographic projections
+     * @return array{0: string, 1: string, 2: string, 3:string}
+     */
+    private function reprojectBoundsFromCoordsStoredInDefaultMapProjection(
+        array $procedureSettingsBBox,
+        string $targetProjectionName,
+        bool $areCoordsSwapped): array
+    {
+        // Check if we have all required bbox coordinates
+        if (count($procedureSettingsBBox) < 4) {
+            // Return a default bbox covering Germany for the projection if not enough coordinates
+            if ($targetProjectionName === 'EPSG:4326') {
+                return ['5.866', '47.270', '15.042', '55.058']; // Germany in WGS84 (lat/lon)
+            }
+            return ['653300', '5975800', '1674500', '6636200']; // Germany in EPSG:3857 Web Mercator
+        }
+
+        $west = (float)$procedureSettingsBBox[0];
+        $south = (float)$procedureSettingsBBox[1];
+        $east = (float)$procedureSettingsBBox[2];
+        $north = (float)$procedureSettingsBBox[3];
+        $reprojectParams = [
+            [min([$west, $east]), min([$north, $south])],
+            [max([$west, $east]), max([$north, $south])],
+        ];
+
+        $proj4 = new Proj4php();
+
+        $targetProjection = new Proj($targetProjectionName, $proj4);
+        $sourceProjection = new Proj($this-> globalConfig->getMapDefaultProjection()['label'], $proj4);
+
+        $transformedCoords = array_map(
+            fn (array $coordinate) => $this->convertPoint(
+                $coordinate,
+                $sourceProjection,
+                $targetProjection
+            ),
+            $reprojectParams
+        );
+
+        $west = (string)$transformedCoords[0][0];
+        $east = (string)$transformedCoords[1][0];
+        $south = (string)$transformedCoords[0][1];
+        $north = (string)$transformedCoords[1][1];
+        $bboxArray = [$west, $south, $east, $north];
+        if ($areCoordsSwapped) {
+            $bboxArray = [$south, $west, $north, $east];
+        }
+
+        return $bboxArray;
+    }
+
+    /**
+     * @param string $returnType [self::ARRAY_RETURN_TYPE | self::STRING_RETURN_TYPE]
+     *
+     * @return array|string
+     */
+    public function convertPoint(
+        array $coordinate,
+        Proj $currentProjection,
+        Proj $newProjection
+    ) {
+        $projectionTransformer = new Proj4php();
+        $pointSrc = new Point($coordinate[0], $coordinate[1], $currentProjection);
+        $pointDest = $projectionTransformer
+            ->transform($newProjection, $pointSrc)
+            ->toArray();
+
+        return [$pointDest[0], $pointDest[1]];
+    }
+
+    /**
+     * @return array{'width': int, 'height': int}
+     */
+    private function getWidthAndHeight(array $bBox): array
+    {
         $absWidth = 1;
         $absHeight = 1;
+        if (4 === count($bBox)) {
+            $west = (float)$bBox[0];
+            $east = (float)$bBox[2];
+            $south = (float)$bBox[1];
+            $north = (float)$bBox[3];
 
-        if (4 === count($bboxArray)) {
-            $west = (float)$bboxArray[0];
-            $east = (float)$bboxArray[2];
-            $south = (float)$bboxArray[1];
-            $north = (float)$bboxArray[3];
-            $absWidth = abs($west - $east);
-            $absHeight = abs($south - $north);
+            $absWidth = (int)abs($west - $east);
+            $absHeight = (int)abs($south - $north);
         }
 
-        $url = $basemapGisLayer->getUrl();
-        $serviceType = '?SERVICE=WMS';
-        $version = '&VERSION=' . $basemapGisLayer->getLayerVersion();
-        $request = '&REQUEST=GetMap';
-        $format = '&FORMAT=image%2Fpng';
-        $transparent = '&TRANSPARENT=true';
-        $layers = '&LAYERS=' . str_replace(',', '%2C', $basemapGisLayer->getLayers());
-        $width = '&WIDTH=' . '512';
-        $height = '&HEIGHT=' . 512 * ($absHeight / $absWidth);
-        $crs = '&CRS=EPSG%3A3857';
-        $styles = '&STYLES=';
-        // why mapExtend? see here: T32377
-        $bbox = '&BBOX=' . str_replace(',', '%2C', $procedure->getSettings()->getMapExtent());
-
-
-        return $url . $serviceType . $version . $request . $format . $transparent . $layers . $width .
-            $height . $crs . $styles . $bbox;
+        return ['width' => $absWidth, 'height' => $absHeight];
     }
 
     private function addAuthorCommunicationType(): Erreichbarkeit
@@ -811,12 +944,26 @@ class XBeteiligungService
         $isValid = $document->schemaValidate($fullPath);
         if (!$isValid) {
             $errors = libxml_get_errors();
+            $errorMessages = [];
             foreach ($errors as $error) {
+                $errorMessages[] = sprintf(
+                    "Line %d: %s (Code: %d)",
+                    $error->line,
+                    $error->message,
+                    $error->code
+                );
                 $this->logger->warning('Invalid XML message', [$error]);
                 if ($verboseDebug) {
                     $this->logger->debug('XML validation error', ['error' => $error]);
                 }
             }
+
+            // In test environment, output error details - retain this for easier debugging in tests
+            if (getenv('APP_ENV') === 'test') {
+                echo "\nXML validation errors:\n" . implode("\n", $errorMessages) . "\n";
+                echo "\nXML content that failed validation:\n" . $message . "\n";
+            }
+
             libxml_clear_errors();
 
             return false;

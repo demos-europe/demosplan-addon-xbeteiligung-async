@@ -14,6 +14,8 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use InvalidArgumentException;
 
 class KommunaleProcedureHandlerFactory
@@ -26,19 +28,27 @@ class KommunaleProcedureHandlerFactory
     public function createProcedureHandler(
         string $handlerType
     ): KommunaleProcedureCreater {
+        // Create necessary mocks for ProcedureCommonFeatures
+        $logger = $this->mockFactory->getLoggerInterfaceMock();
+        $phaseExtractor = new ProcedurePhaseExtractor($logger);
+        $mapService = new XBeteiligungMapService($logger);
+
         $commonDependencies = [
             $this->mockFactory->getCurrentUserProviderInterfaceMock(),
+            $this->mockFactory->getEntityManagerMock(), // THIS IS THE CORRECT ORDER - EntityManager must be second!
+            $this->mockFactory->getKommunaleResponseMessageFactory(),
             $this->mockFactory->getLoggerInterfaceMock(),
+            $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
+            $phaseExtractor,
             $this->mockFactory->getProcedureServiceInterface(),
             $this->mockFactory->getProcedureServiceStorage(),
             $this->mockFactory->getProcedureTypeService(),
-            $this->mockFactory->getUserHandlerMock(),
-            $this->mockFactory->getEntityManagerMock(),
-            $this->mockFactory->getKommunaleResponseMessageFactory(),
             $this->mockFactory->getRaumordnungResponseMessageFactory(),
-            $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
+            $this->mockFactory->getTransActionServiceInterfaceMock(),
             $this->mockFactory->getTranslatorMock(),
-            $this->mockFactory->getTransActionServiceInterfaceMock()
+            $this->mockFactory->getUserHandlerMock(),
+            $this->mockFactory->getOrgaServiceInterfaceMock(),
+            $mapService
         ];
 
         switch ($handlerType) {
