@@ -446,9 +446,13 @@ class XBeteiligungService
         $participationType->setPlanID($procedure->getId());
         $participationType->setPlanname($procedure->getName());
         $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
-        $participationType->setFlaechenabgrenzungUrl(
-            $this->generateFaceBoundaryWMSUrl($procedure)
-        );
+        $wmsUrl = $this->generateFaceBoundaryWMSUrl($procedure);
+        if (null !== $wmsUrl) {
+            $participationType->setFlaechenabgrenzungUrl(
+                $wmsUrl
+            );
+        }
+
         $participationType->setBeteiligungURL(
             $this->router->generate(
                 'DemosPlan_procedure_public_detail',
@@ -657,7 +661,7 @@ class XBeteiligungService
     /**
      * @throws Exception
      */
-    private function generateFaceBoundaryWMSUrl(ProcedureInterface $procedure): string
+    private function generateFaceBoundaryWMSUrl(ProcedureInterface $procedure): ?string
     {
         try {
             $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
@@ -678,18 +682,19 @@ class XBeteiligungService
             }
 
             if (null === $baseLayer) {
-                $this->logger->warning('No enabled base layer found at new procedure -
-                using global config default instead');
+                $this->logger->warning('No enabled base layer found at new procedure');
+
+                return null;
             }
 
             // prior to wms v1.3.0 the keyword SRS has to be used instead of CRS within urls
             $crsORsrs = version_compare(
                 '1.3.0',
-                $baseLayer?->getLayerVersion() ?? '1.3.0',
+                $baseLayer?->getLayerVersion(),
                 '<='
             ) ? 'CRS' : 'SRS';
             $projectionLabel = strtoupper(
-                $baseLayer?->getProjectionLabel() ?? $this->globalConfig->getMapDefaultProjection()
+                $baseLayer?->getProjectionLabel()
             );
             // for some projections after v1.3.0 the x and y coords are swapped
             // - there are more, but the common ones are at least treated:
@@ -711,10 +716,10 @@ class XBeteiligungService
 
             $transformedBbox = implode(',', $transformedBboxArray);
 
-            $baseUrl = $baseLayer?->getUrl() ?? $this->globalConfig->getMapAdminBaselayer();
+            $baseUrl = $baseLayer?->getUrl();
             $urlParams = [
                 'SERVICE' => 'WMS',
-                'VERSION' => $baseLayer?->getLayerVersion() ?? '1.3.0',
+                'VERSION' => $baseLayer?->getLayerVersion(),
                 'REQUEST' => 'GetMap',
                 'FORMAT' => 'image/png',
                 'TRANSPARENT' => 'true',
@@ -722,7 +727,7 @@ class XBeteiligungService
                 'HEIGHT' => (string)(int)(512 * $widthAndHeight['height'] / $widthAndHeight['width']),
                 $crsORsrs => $projectionLabel,
                 'STYLES' => '',
-                'LAYERS' => $baseLayer?->getLayers() ?? $this->globalConfig->getMapAdminBaselayerLayers(),
+                'LAYERS' => $baseLayer?->getLayers(),
                 'BBOX' => $transformedBbox,
             ];
             $url = $baseUrl . '?' . http_build_query($urlParams);

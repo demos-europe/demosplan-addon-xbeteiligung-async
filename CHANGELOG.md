@@ -2,17 +2,8 @@
 
 ## UNRELEASED
 
-## v0.10.4 (2025-05-05)
- - swap coords for CRS + special projections instead of SRS
- - return at least the default german basemap
-
-## v0.10.3 (2025-05-02)
-- technical release without any changes
-
-## v0.10.2 (2025-05-02)
-- provide default boundingbox
-
 ### Added
+- Do not send wmsUrl if procedure has no enabled layer.
 - Add REST API endpoint `/addon/xbeteiligung/procedure/create` that accepts XML payload directly
 - Simplified API accepts raw XML content rather than requiring JSON with messageTypeCode
 - The REST API processes messages using the same logic as the RabbitMQ implementation and returns XML responses
@@ -42,6 +33,16 @@
 - implement rabbitMQ in services.yml
 - adjust AddonMaintenanceEventInterface in eventSubscriber
 - create some classes to restructure xbeteiligung-async to can to work on comming stories in future
+
+## v0.10.4 (2025-05-05)
+- swap coords for CRS + special projections instead of SRS
+- return at least the default german basemap
+
+## v0.10.3 (2025-05-02)
+- technical release without any changes
+
+## v0.10.2 (2025-05-02)
+- provide default boundingbox
 
 ## v0.10.1 (2025-04-30)
 - generate wms url without relying on basemap as baseLayer.
