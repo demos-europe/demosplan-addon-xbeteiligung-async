@@ -152,17 +152,34 @@ class MockFactoryTest extends TestCase
                     $this->procedure->method('getExternalName')->willReturn(isset($data['r_name']) ? $data['r_name'] : null);
                     $this->procedure->method('getDesc')->willReturn(isset($data['r_desc']) ? $data['r_desc'] : null);
                     $this->procedure->method('getExternalDesc')->willReturn(isset($data['r_externalDesc']) ? $data['r_externalDesc'] : null);
-                    $this->procedure->method('getStartDate')->willReturn(isset($data['r_startdate']) ? new DateTime($data['r_startdate']) : '');
-                    $this->procedure->method('getPublicParticipationStartDate')->willReturn(isset($data['r_startdate']) ? new DateTime($data['r_startdate']) : '');
-                    $this->procedure->method('getEndDate')->willReturn(isset($data['r_enddate']) ? new DateTime($data['r_enddate']) : '');
-                    $this->procedure->method('getPublicParticipationEndDate')->willReturn(isset($data['r_enddate']) ? new DateTime($data['r_enddate']) : '');
+                    $this->procedure->method('getStartDate')->willReturn(isset($data['r_startdate']) ? new DateTime($data['r_startdate']) : new DateTime());
+                    $this->procedure->method('getPublicParticipationStartDate')->willReturn(isset($data['r_startdate']) ? new DateTime($data['r_startdate']) : new DateTime());
+                    $this->procedure->method('getEndDate')->willReturn(isset($data['r_enddate']) ? new DateTime($data['r_enddate']) : new DateTime('+1 week'));
+                    $this->procedure->method('getPublicParticipationEndDate')->willReturn(isset($data['r_enddate']) ? new DateTime($data['r_enddate']) : new DateTime('+1 week'));
                     $this->procedure->method('getPublicParticipationPublicationEnabled')->willReturn(false);
                     $this->procedure->method('getOrga')->willReturn(isset($data['orgaId']) ? $this->getOrgaMock() : null);
                     $this->procedure->method('getOrgaName')->willReturn(isset($data['orgaName']) ? $data['orgaName'] : null);
-                    //$procedure->method('Was Muss Hier gesetzt werden?')->willReturn(isset($data['action']));
                     $this->procedure->method('getMaster')->willReturn('false');
-                    //$procedure->method('Was Muss Hier gesetzt werden?')->willReturn(isset($data['r_copymaster']) ? $data['r_copymaster'] : '');
                     $this->procedure->method('getAgencyMainEmailAddress')->willReturn(isset($data[AbstractProcedureFormTypeInterface::AGENCY_MAIN_EMAIL_ADDRESS]) ? $data[AbstractProcedureFormTypeInterface::AGENCY_MAIN_EMAIL_ADDRESS] : '');
+
+                    // Mock settings with territory method to return the verfahrensschrittKommunal code
+                    $settingsMock = $this->createMock(ProcedureSettingsInterface::class);
+                    // For the specific test in KommunaleProcedureCreatorTest
+                    $settingsMock->method('getTerritory')->willReturn('4000');
+                    $settingsMock->method('setTerritory')->willReturnSelf();
+                    $settingsMock->method('setBoundingBox')->willReturnSelf();
+                    $settingsMock->method('setMapExtent')->willReturnSelf();
+                    $settingsMock->method('getBoundingBox')->willReturn('1121972.185910,7070987.516246,1122801.260288,7071977.983916');
+                    $settingsMock->method('getMapExtent')->willReturn('1122283.0888018,7071358.9416223,1122490.3573963,7071606.5585396');
+                    $this->procedure->method('getSettings')->willReturn($settingsMock);
+
+                    // Mock phase objects
+                    $phaseObj = $this->createMock(\DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface::class);
+                    $phaseObj->method('getStartDate')->willReturn(new DateTime());
+                    $phaseObj->method('getEndDate')->willReturn(new DateTime('+1 week'));
+                    $phaseObj->method('getIteration')->willReturn(1);
+                    $this->procedure->method('getPhaseObject')->willReturn($phaseObj);
+                    $this->procedure->method('getPublicParticipationPhaseObject')->willReturn($phaseObj);
 
                     $procedureType = $this->getProcedureType();
                     $this->procedure->method('getProcedureType')->willReturn($procedureType);
@@ -170,7 +187,12 @@ class MockFactoryTest extends TestCase
                         ->willReturn($data['r_procedure_type'] ?? null);
 
                     $this->procedure->method('getXtaPlanId')->willReturn(isset($data['xtaPlanId']) ? $data['xtaPlanId'] : null);
-                    $this->procedure->method('getSettings')->willReturn($this->getProcedureSettingsMock());
+
+                    // For the test, let's mock setOrga, setAuthorizedUsers, and other methods that are called
+                    $this->procedure->method('setOrga')->willReturnSelf();
+                    $this->procedure->method('setAuthorizedUsers')->willReturnSelf();
+                    $this->procedure->method('setPublicParticipationPhase')->willReturnSelf();
+                    $this->procedure->method('setPhase')->willReturnSelf();
                     $this->procedure->method('getAuthorizedUsers')->willReturn(new ArrayCollection(
                         [$this->getUserMock()]
                     ));

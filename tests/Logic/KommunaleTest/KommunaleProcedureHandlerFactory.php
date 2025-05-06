@@ -27,13 +27,18 @@ class KommunaleProcedureHandlerFactory
     public function createProcedureHandler(
         string $handlerType
     ): KommunaleProcedureCreater {
+        // Create necessary mocks for ProcedureCommonFeatures
+        $logger = $this->mockFactory->getLoggerInterfaceMock();
+        $phaseExtractor = new \DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor($logger);
+        $mapService = new XBeteiligungMapService($logger);
+
         $commonDependencies = [
             $this->mockFactory->getCurrentUserProviderInterfaceMock(),
-            $this->mockFactory->getEntityManagerMock(),
+            $this->mockFactory->getEntityManagerMock(), // THIS IS THE CORRECT ORDER - EntityManager must be second!
             $this->mockFactory->getKommunaleResponseMessageFactory(),
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
-            $this->mockFactory->getProcedurePhaseExtractorMock(),
+            $phaseExtractor,
             $this->mockFactory->getProcedureServiceInterface(),
             $this->mockFactory->getProcedureServiceStorage(),
             $this->mockFactory->getProcedureTypeService(),
@@ -42,7 +47,7 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getTranslatorMock(),
             $this->mockFactory->getUserHandlerMock(),
             $this->mockFactory->getOrgaServiceInterfaceMock(),
-            new XBeteiligungMapService($this->mockFactory->getLoggerInterfaceMock())
+            $mapService
         ];
 
         switch ($handlerType) {
