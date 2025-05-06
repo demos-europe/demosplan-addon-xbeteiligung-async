@@ -80,12 +80,6 @@ class MockFactoryTest extends TestCase
     public function getRaumordnungResponseMessageFactory()
     {
         return $this->createMock(RaumordnungMessageFactory::class);
-        $mock->method('executeAndFlushInTransaction')->willReturnCallback(
-            function ($callback) {
-                return $callback();
-            }
-        );
-        return $mock;
     }
 
     public function getProcedureMock(): MockObject|ProcedureInterface
