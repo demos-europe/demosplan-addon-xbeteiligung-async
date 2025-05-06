@@ -162,16 +162,7 @@ class MockFactoryTest extends TestCase
                     $this->procedure->method('getMaster')->willReturn('false');
                     $this->procedure->method('getAgencyMainEmailAddress')->willReturn(isset($data[AbstractProcedureFormTypeInterface::AGENCY_MAIN_EMAIL_ADDRESS]) ? $data[AbstractProcedureFormTypeInterface::AGENCY_MAIN_EMAIL_ADDRESS] : '');
 
-                    // Mock settings with territory method to return the verfahrensschrittKommunal code
-                    $settingsMock = $this->createMock(ProcedureSettingsInterface::class);
-                    // For the specific test in KommunaleProcedureCreatorTest
-                    $settingsMock->method('getTerritory')->willReturn('4000');
-                    $settingsMock->method('setTerritory')->willReturnSelf();
-                    $settingsMock->method('setBoundingBox')->willReturnSelf();
-                    $settingsMock->method('setMapExtent')->willReturnSelf();
-                    $settingsMock->method('getBoundingBox')->willReturn('1121972.185910,7070987.516246,1122801.260288,7071977.983916');
-                    $settingsMock->method('getMapExtent')->willReturn('1122283.0888018,7071358.9416223,1122490.3573963,7071606.5585396');
-                    $this->procedure->method('getSettings')->willReturn($settingsMock);
+                    $this->procedure->method('getSettings')->willReturn($this->getProcedureSettingsMock());
 
                     // Mock phase objects
                     $phaseObj = $this->createMock(\DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface::class);

@@ -20,6 +20,8 @@ use Psr\Log\LoggerInterface;
 
 class CoordinateTransformationTest extends TestCase
 {
+    private XBeteiligungMapService $sut;
+    
     protected function setUp(): void
     {
         parent::setUp();

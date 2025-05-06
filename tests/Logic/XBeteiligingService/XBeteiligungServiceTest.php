@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\XBeteiligingServic
 
 use DateInterval;
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
@@ -55,19 +56,25 @@ abstract class XBeteiligungServiceTest extends TestCase
         $this->testProcedure = $this->getTestProcedure($this->getTestProcedureSettings());
         $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false));
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
+        
+        $globalConfigMock = $this->createMock(GlobalConfigInterface::class);
+        $globalConfigMock->method('getMapDefaultProjection')->willReturn([
+            'label' => 'EPSG:3857',
+        ]);
 
         $reusableMessageBlocks =
             new ReusableMessageBlocks(new CommonHelpers($this->createMock(LoggerInterface::class)));
 
         $this->sut = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
+            $globalConfigMock,
+            $this->createMock(KommunaleProcedureCreater::class),
             $this->createMock(LoggerInterface::class),
-            $this->procedureNewsService,
-            $this->procedureMessageRepository,
             $this->createMock( PlanningDocumentsLinkCreator::class),
+            $this->procedureMessageRepository,
+            $this->procedureNewsService,
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
-            $this->createMock(KommunaleProcedureCreater::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks
         );

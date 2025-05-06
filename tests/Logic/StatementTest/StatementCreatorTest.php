@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\StatementTest;
 
+use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
@@ -48,21 +49,11 @@ use Symfony\Component\Routing\RouterInterface;
 
 class StatementCreatorTest extends TestCase
 {
-    /**
-     * @var XBeteiligungResponseMessageFactory
-     */
-    protected $sut;
-
-    /**
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
-     * @var Serializer
-     */
-    protected $serializer;
-
+    protected XBeteiligungResponseMessageFactory $sut;
+    protected Logger $logger;
+    protected Serializer $serializer;
+    protected XBeteiligungService $XBeteiligungService;
+    
     private MockFactoryTest $mockFactory;
     protected MockObject $permissionEvaluator;
     protected MockObject $gisLayerCategoryRepository;
@@ -86,15 +77,22 @@ class StatementCreatorTest extends TestCase
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
         $reusableMessageBlocks =
             new ReusableMessageBlocks(new CommonHelpers($this->createMock(LoggerInterface::class)));
+            
+        $globalConfigMock = $this->createMock(GlobalConfigInterface::class);
+        $globalConfigMock->method('getMapDefaultProjection')->willReturn([
+            'label' => 'EPSG:3857',
+        ]);
+            
         $xbeteiligungService = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
+            $globalConfigMock,
+            $this->createMock(KommunaleProcedureCreater::class),
             $this->createMock(LoggerInterface::class),
-            $this->procedureNewsService,
-            $this->procedureMessageRepository,
             $this->createMock( PlanningDocumentsLinkCreator::class),
+            $this->procedureMessageRepository,
+            $this->procedureNewsService,
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
-            $this->createMock(KommunaleProcedureCreater::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks
         );
