@@ -13,57 +13,37 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures;
 
 use DateTime;
-use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureTypeInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Form\Procedure\AbstractProcedureFormTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Translator;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class MockFactoryTest extends TestCase
 {
     private ProcedureInterface|MockObject|null $procedure;
-
-    public function createNewMock(string $className): MockObject
-    {
-        return $this->createMock($className);
-    }
-
-    public function getKommunaleResponseMessageFactory(): MockObject|KommunaleMessageFactory
-    {
-        return $this->createMock(KommunaleMessageFactory::class);
-    }
-
-    public function getRaumordnungResponseMessageFactory(): MockObject|RaumordnungMessageFactory
-    {
-        return $this->createMock(RaumordnungMessageFactory::class);
-    }
-
-    public function getPlanfeststellungResponseMessageFactory(): MockObject|PlanfeststellungMessageFactory
-    {
-        return $this->createMock(PlanfeststellungMessageFactory::class);
-    }
 
     public function getTranslatorMock(): MockObject|Translator
     {
@@ -75,15 +55,31 @@ class MockFactoryTest extends TestCase
         return $this->createMock(ProcedureTypeServiceInterface::class);
     }
 
-    public function getTransActionServiceInterfaceMock(): TransactionServiceInterface
+    public function getTransactionServiceInterfaceMock(): TransactionServiceInterface
     {
-        $mock = $this->createMock(TransactionServiceInterface::class);
-        $mock->method('executeAndFlushInTransaction')->willReturnCallback(
+        $transactionServiceInterfaceMock = $this->createMock(TransactionServiceInterface::class);
+        $transactionServiceInterfaceMock->method('executeAndFlushInTransaction')->willReturnCallback(
             function ($callback) {
                 return $callback();
             }
         );
-        return $mock;
+
+        return $transactionServiceInterfaceMock;
+    }
+
+    public function getKommunaleResponseMessageFactory()
+    {
+        return $this->createMock(KommunaleMessageFactory::class);
+    }
+
+    public function getPlanfeststellungResponseMessageFactory()
+    {
+        return $this->createMock(PlanfeststellungMessageFactory::class);
+    }
+
+    public function getRaumordnungResponseMessageFactory()
+    {
+        return $this->createMock(RaumordnungMessageFactory::class);
     }
 
     public function getProcedureMock(): MockObject|ProcedureInterface
@@ -93,6 +89,16 @@ class MockFactoryTest extends TestCase
         $procedureMock->method('getOrgaId')->willReturn('a2734f23-175b-4a8b-a48b-f9351dc1bc24');
 
         return $procedureMock;
+    }
+
+    public function getProcedureSettingsMock(): ProcedureSettingsInterface
+    {
+        $procedureSettingsMock = $this->createMock(ProcedureSettingsInterface::class);
+        $procedureSettingsMock->method('getTerritory')->willReturn('{"type":"Polygon","coordinates":[[[1122490.3573962983,7071484.285754054],[1122482.2362970402,7071490.40680759],[1122478.999109264,7071492.845304786],[1122475.2042036585,7071495.781567061],[1122471.5251732466,7071498.5058959145],[1122471.360964572,7071498.627772408],[1122469.9660731317,7071499.224038446],[1122463.02764217,7071505.135395698],[1122451.0108444085,7071515.071890943],[1122435.128717185,7071525.847386543],[1122434.268690556,7071526.4304593485],[1122410.0366806341,7071547.389219202],[1122421.1579644377,7071561.588730869],[1122441.4799638607,7071587.54543312],[1122456.3661907252,7071606.558539621],[1122430.3149269223,7071588.72595191],[1122402.707278053,7071568.131007109],[1122396.0806524877,7071563.187822573],[1122350.858337287,7071529.455500149],[1122335.8999894143,7071516.840991722],[1122325.8392592138,7071506.425138527],[1122316.3031768298,7071497.64565565],[1122300.8185980634,7071483.391426601],[1122293.7498677047,7071475.827006324],[1122290.965665827,7071472.846312364],[1122288.0672533428,7071469.744618191],[1122283.0888017584,7071464.416527989],[1122299.6096302131,7071442.753501105],[1122320.7897785942,7071414.985345006],[1122334.505386014,7071395.280075988],[1122332.6508171991,7071393.875809563],[1122332.830013415,7071393.636017209],[1122335.6712878277,7071389.863623659],[1122356.6622858304,7071362.0278163785],[1122359.7101755266,7071358.9416223075],[1122366.7414734326,7071366.0306309415],[1122363.7870400304,7071369.307077891],[1122340.8624427796,7071399.7128248485],[1122320.6475335688,7071426.528118282],[1122317.0646003806,7071431.280250348],[1122319.3874984237,7071433.704692957],[1122362.406354156,7071478.592353006],[1122388.8004967493,7071460.632449447],[1122400.3920099915,7071477.869576714],[1122411.4351000325,7071469.425922151],[1122428.9701568882,7071458.0419582715],[1122432.4341652468,7071454.964494912],[1122435.8556671,7071452.624101453],[1122437.2985384408,7071451.763145272],[1122445.9607397611,7071446.593966149],[1122456.4597913737,7071440.3308425555],[1122450.2102129434,7071445.540627205],[1122452.4186055246,7071450.145783418],[1122454.3879646042,7071454.25186411],[1122455.6115985825,7071454.862045752],[1122475.7322453903,7071464.8924076725],[1122476.1818033245,7071465.115902283],[1122490.3573962983,7071484.285754054]]]}');
+        $procedureSettingsMock->method('getBoundingBox')->willReturn('1121972.185910,7070987.516246,1122801.260288,7071977.983916');
+        $procedureSettingsMock->method('getMapExtent')->willReturn('1122283.0888018,7071358.9416223,1122490.3573963,7071606.5585396');
+
+        return $procedureSettingsMock;
     }
 
     public function getLoggerInterfaceMock(): LoggerInterface
@@ -106,31 +112,11 @@ class MockFactoryTest extends TestCase
         return $this->createMock(UserHandlerInterface::class);
     }
 
-    public function getTranslatorInterfaceMock(): TranslatorInterface
-    {
-        return $this->createMock(TranslatorInterface::class);
-    }
-
-    public function getUser1(string $cockpitUserId = ''): UserInterface
+    public function getUserMock(): UserInterface
     {
         $userMock = $this->createMock(UserInterface::class);
-        $userMock->method('getId')->willReturnCallback(
-            function () use ($cockpitUserId): string
-            {
-                return '' === $cockpitUserId ? 'a2780f23-160b-4a8b-a48b-f9351dc1bc24' : $cockpitUserId;
-            }
-        );
-        $userMock->method('getOrga')->willReturn($this->getOrgaMock());
-        $userMock->method('getOrganisationId')->willReturn('a2734f23-175b-4a8b-a48b-f9351dc1bc24');
-        $userMock->method('getEmail')->willReturn('user1@test.de');
-        $userMock->method('getLogin')->willReturn('FHHNET\\ZinkDav');
-        $userMock->method('getLastname')->willReturn('Tester user1');
-        $userMock->method('getFirstname')->willReturn('another FP');
-        $userMock->method('getNewsletter')->willReturn(false);
-        $userMock->method('getNoPiwik')->willReturn(true);
-        $userMock->method('getForumNotification')->willReturn(false);
-        $userMock->method('getDplanroles')->willReturn(new ArrayCollection([$this->getRoleFP()]));
-        $userMock->method('getCurrentCustomer')->willReturn($this->getCustomerMock());
+        $userMock->method('getId')->willReturn('a2780f23-160b-4a8b-a48b-f9448dc1bc24');
+        $userMock->method('getName')->willReturn('Admin User');
         $userMock->method('isPlanner')->willReturn(true);
 
         return $userMock;
@@ -140,35 +126,12 @@ class MockFactoryTest extends TestCase
     {
         $orga = $this->createMock(OrgaInterface::class);
         $orga->method('getId')->willReturn('a2734f23-175b-4a8b-a48b-f9351dc1bc24');
-        $orga->method('getName')->willReturn('Test Orga');
+        $orga->method('getName')->willReturn('Musterzuständigkeit');
+        $orga->method('getUsers')->willReturn(new Collection(
+            [$this->getUserMock()]
+        ));
 
         return $orga;
-    }
-
-    public function getRoleFP(): RoleInterface
-    {
-        $role = $this->createMock(RoleInterface::class);
-        $role->method('getName')->willReturn('Fachplaner-Admin');
-        $role->method('getCode')->willReturn(RoleInterface::PLANNING_AGENCY_ADMIN);
-        $role->method('getGroupCode')->willReturn(RoleInterface::GLAUTH);
-        $role->method('getGroupName')->willReturn('Kommune');
-
-        return $role;
-    }
-
-    public function getCustomerMock(): CustomerInterface
-    {
-        $customerMock = $this->createMock(CustomerInterface::class);
-        $customerMock->method('getId')->willReturn('1');
-        $customerMock->method('getName')->willReturn('Test Customer');
-
-        return $customerMock;
-    }
-
-    public function getKommunaleProcedureCreatorMock(): KommunaleProcedureCreater
-    {
-        return $this->createMock(KommunaleProcedureCreater::class);
-
     }
 
     public function getProcedureType(): MockObject|ProcedureTypeInterface
@@ -200,14 +163,7 @@ class MockFactoryTest extends TestCase
                     $this->procedure->method('getMaster')->willReturn('false');
                     $this->procedure->method('getAgencyMainEmailAddress')->willReturn(isset($data[AbstractProcedureFormTypeInterface::AGENCY_MAIN_EMAIL_ADDRESS]) ? $data[AbstractProcedureFormTypeInterface::AGENCY_MAIN_EMAIL_ADDRESS] : '');
 
-                    // Mock settings with territory method to return the verfahrensschrittKommunal code
-                    $settingsMock = $this->createMock(ProcedureSettingsInterface::class);
-                    // For the specific test in KommunaleProcedureCreatorTest
-                    $settingsMock->method('getTerritory')->willReturn('4000');
-                    $settingsMock->method('setTerritory')->willReturnSelf();
-                    $settingsMock->method('setBoundingBox')->willReturnSelf();
-                    $settingsMock->method('setMapExtent')->willReturnSelf();
-                    $this->procedure->method('getSettings')->willReturn($settingsMock);
+                    $this->procedure->method('getSettings')->willReturn($this->getProcedureSettingsMock());
 
                     // Mock phase objects
                     $phaseObj = $this->createMock(ProcedurePhaseInterface::class);
@@ -223,12 +179,9 @@ class MockFactoryTest extends TestCase
                         ->willReturn($data['r_procedure_type'] ?? null);
 
                     $this->procedure->method('getXtaPlanId')->willReturn(isset($data['xtaPlanId']) ? $data['xtaPlanId'] : null);
-
-                    // For the test, let's mock setOrga, setAuthorizedUsers, and other methods that are called
-                    $this->procedure->method('setOrga')->willReturnSelf();
-                    $this->procedure->method('setAuthorizedUsers')->willReturnSelf();
-                    $this->procedure->method('setPublicParticipationPhase')->willReturnSelf();
-                    $this->procedure->method('setPhase')->willReturnSelf();
+                    $this->procedure->method('getAuthorizedUsers')->willReturn(new ArrayCollection(
+                        [$this->getUserMock()]
+                    ));
 
                     return $this->procedure;
                 }
@@ -259,15 +212,6 @@ class MockFactoryTest extends TestCase
         return $procedureServiceInterfaceMock;
     }
 
-    public function getProcedureTypeServiceInterfaceMock(): ProcedureTypeServiceInterface
-    {
-        $procedureTypeServiceInterfaceMock = $this->createMock(ProcedureTypeServiceInterface::class);
-        $procedureTypeServiceInterfaceMock->method('getProcedureTypeByName')
-            ->willReturn($this->getProcedureType());
-
-        return $procedureTypeServiceInterfaceMock;
-    }
-
     public function getEntityManagerMock(): EntityManagerInterface|MockObject
     {
         $entityManagerMock = $this->createMock(EntityManagerInterface::class);
@@ -277,27 +221,21 @@ class MockFactoryTest extends TestCase
         return $entityManagerMock;
     }
 
-    public function getOrgaServiceInterfaceMock()
+    public function getProcedurePhaseExtractorMock(): ProcedurePhaseExtractor|MockObject
     {
-        $mock = $this->createMock('DemosEurope\\DemosplanAddon\\Contracts\\Services\\OrgaServiceInterface');
-
-        $orgaMock = $this->getOrgaMock();
-        $userMock = $this->getUser1();
-
-        // Create a mock for Illuminate\Support\Collection
-        $collection = $this->createMock('Illuminate\\Support\\Collection');
-        $collection->method('filter')->willReturnSelf();
-        $collection->method('toArray')->willReturn([$userMock]);
-
-        $orgaMock->method('getUsers')->willReturn($collection);
-        $mock->method('getOrgaByFields')->willReturn([$orgaMock]);
-
-        return $mock;
+        return $this->createMock(ProcedurePhaseExtractor::class);
     }
 
-    public function createMock($className): MockObject
+    public function getOrgaServiceInterfaceMock(): OrgaServiceInterface|MockObject
     {
-        return parent::createMock($className);
+        $orgaServiceInterfaceMock = $this->createMock(OrgaServiceInterface::class);
+        $orgaServiceInterfaceMock->method('getOrgaByFields')->willReturn([$this->getOrgaMock()]);
+
+        return $orgaServiceInterfaceMock;
     }
 
+    public function getXBeteiligungMapServiceMock(): XBeteiligungMapService|MockObject
+    {
+        return $this->createMock(XBeteiligungMapService::class);
+    }
 }

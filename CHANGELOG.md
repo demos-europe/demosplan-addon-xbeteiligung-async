@@ -8,6 +8,12 @@
 - Simplified API accepts raw XML content rather than requiring JSON with messageTypeCode
 - The REST API processes messages using the same logic as the RabbitMQ implementation and returns XML responses
 - Uses a custom `X-Addon-XBeteiligung-Authorization` header for authentication to avoid interfering with the core application
+- Added new parameters for rabbitmq addon_xbeteiligung_async_rabbitMqQueueName,
+  addon_xbeteiligung_async_rabbitMqRequestIdGet and addon_xbeteiligung_async_rabbitMqRequestIdSend
+- Added creation of 701 messages
+- Removed duplicated code
+- Enhance logging and error handling
+- bug fixing
 
 ## v0.13 (2025-04-08)
 - enhance logging

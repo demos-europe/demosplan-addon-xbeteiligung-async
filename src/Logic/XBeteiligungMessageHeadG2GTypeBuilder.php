@@ -151,12 +151,12 @@ class XBeteiligungMessageHeadG2GTypeBuilder
     /**
      * @return $this
      */
-    public function setAgentContactChannelName(string $name, string $agentType, int $index = 0): static
+    public function setAgentContactChannelListVersion(string $listVersion, string $agentType, int $index = 0): static
     {
         if (!isset($this->getAgent($agentType)->getErreichbarkeit()[$index])) {
             $this->newAgentKommunikationType($index, $agentType);
         }
-        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()?->setName($name);
+        $this->getAgent($agentType)->getErreichbarkeit()[$index]->getKanal()?->setListVersionID($listVersion);
 
         return $this;
     }

@@ -13,8 +13,11 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tools;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Exception\JsonException;
 use DemosEurope\DemosplanAddon\Utilities\Json;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -22,21 +25,29 @@ use InvalidArgumentException;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class RabbitMQMessageBroker
 {
     protected RpcClient $client;
+    private const RABBIT_MQ_QUEUE_NAME = 'addon_xbeteiligung_async_rabbitMqQueueName';
+    private const RABBIT_MQ_REQUEST_ID_GET = 'addon_xbeteiligung_async_rabbitMqRequestIdGet';
+    private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
 
     public function __construct(
         private readonly GlobalConfigInterface $globalConfig,
         private readonly LoggerInterface $logger,
-        private readonly string $rabbitMqQueueName,
+        private readonly ParameterBagInterface $parameterBag,
+        private readonly StatementCreator $statementCreator,
+        private readonly StatementMessageFactory $statementMessageFactory,
         private readonly XBeteiligungService $xBeteiligungService,
     ) {
     }
 
     /**
      * @throws JsonException
+     * @throws ParameterNotFoundException
      */
     public function processMessages(): void
     {
@@ -44,9 +55,15 @@ class RabbitMQMessageBroker
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
             $routingKey = '';
         }
-        $this->client->addRequest('', $this->rabbitMqQueueName, 'XBeteiligung_Get', $routingKey, 300);
+        $this->client->addRequest(
+            '',
+            $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
+            self::RABBIT_MQ_REQUEST_ID_GET,
+            $routingKey,
+            300
+        );
         $replies = $this->client->getReplies();
-        $result = Json::decodeToArray($replies['XBeteiligung_Get']);
+        $result = Json::decodeToArray($replies[self::RABBIT_MQ_REQUEST_ID_GET]);
         $this->logger->info('Got response from RabbitMQ', [$result]);
         foreach ($result as $message) {
             $this->logger->info('Process message', [$message]);
@@ -80,8 +97,8 @@ class RabbitMQMessageBroker
         $this->logger->info('Send Response to RabbitMQ', [$xmlString]);
         $this->client->addRequest(
             $xmlString,
-            $this->rabbitMqQueueName,
-            'XBeteiligung_Send',
+            $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
+            self::RABBIT_MQ_REQUEST_ID_SEND,
             $routingKey,
             $expiration
         );
@@ -89,7 +106,26 @@ class RabbitMQMessageBroker
 
         $this->logger->info('Replies from RabbitMQ', [$replies]);
 
-        return Json::decodeToMatchingType($replies['XBeteiligung_Send']);
+        return Json::decodeToMatchingType($replies[self::RABBIT_MQ_REQUEST_ID_SEND]);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): ?StatementCreatedEventInterface
+    {
+        $statementCreated = $this->statementCreator->getStatementCreatedFromEvent($event);
+        if ($statementCreated->getPlanId() === null) {
+            $this->logger->error('StatementCreatedEvent has no planId', [$statementCreated]);
+            return null;
+        }
+        // this technically returns a response which is currently unused
+
+        $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
+        $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
+        $this->sendRabbitMq($xmlString);
+
+        return $event;
     }
 
     /**

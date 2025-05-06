@@ -18,11 +18,11 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonContentMandatoryFieldsException;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonOrgaNotFoundException;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonUserNotFoundException;
+use DemosEurope\DemosplanAddon\Contracts\Form\Procedure\AbstractProcedureFormTypeInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\FormatException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeFehlerartType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
@@ -36,6 +36,8 @@ use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Webmozart\Assert\Assert;
+use function count;
+use function sprintf;
 
 class KommunaleProcedureCreater extends ProcedureCommonFeatures
 {
@@ -58,37 +60,59 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 XBeteiligungService::MISSING_USER_ERROR_CODE,
                 $message
             )];
-            $this->logger->error('On create new Procedure: unable to determine user.', [$exception]);
+            $this->logger->error('On create new Procedure: unable to determine user.', [
+                'errorMessage' => $exception->getMessage(),
+                'exception' => $exception
+            ]);
         } catch (SchemaException $exception) {
             $errorTypes = [$this->getErrorType(
                 XBeteiligungService::WRONG_ATTACHMENT_FORMAT_ERROR_CODE,
                 XBeteiligungService::WRONG_ATTACHMENT_FORMAT_ERROR_DESCRIPTION
             )];
-            $this->logger->error('On create new Procedure: wrong attachment format.', [$exception]);
+            $this->logger->error('On create new Procedure: wrong attachment format.', [
+                'errorMessage' => $exception->getMessage(),
+                'exception' => $exception
+            ]);
         } catch (AccessDeniedException $exception) {
             $errorTypes = [$this->getErrorType(
                 XBeteiligungService::ACCESS_DENIED_ERROR_CODE,
                 XBeteiligungService::ACCESS_DENIED_ERROR_DESCRIPTION),
             ];
-            $this->logger->error('On create new Procedure: access not permitted.', [$exception]);
+            $this->logger->error('On create new Procedure: access not permitted.', [
+                'errorMessage' => $exception->getMessage(),
+                'exception' => $exception
+            ]);
         } catch (AddonContentMandatoryFieldsException $exception) {
             $errorTypes = [];
             foreach ($exception->getMandatoryFieldMessages() as $mandatoryFieldMessage) {
                 $errorTypes[] = $this->getErrorType(XBeteiligungService::MISCELLANEOUS_ERROR_CODE, $mandatoryFieldMessage);
             }
-            $this->logger->error('On create new Procedure: mandatory field is missing.', [$exception]);
+            $this->logger->error('On create new Procedure: mandatory field is missing.', [
+                'errorMessage' => $exception->getMessage(),
+                'exception' => $exception
+            ]);
         } catch (AddonOrgaNotFoundException $exception) {
             $errorTypes = [$this->getErrorType(
                 XBeteiligungService::GENERIC_ERROR_CODE,
-                $this->translator->trans('error.organisation.of.user.not.found')
+                $exception->getMessage()
             )];
-            $this->logger->error('On create new Procedure: related organisation not found.', [$exception]);
+            $this->logger->error('Terminating 401 procedure create attempt as no valid orga with at least one
+                active planner could be found for administration', [
+                    'errorMessage' => $exception->getMessage(),
+                    'exception' => $exception
+            ]);
         } catch (InvalidArgumentException $exception) {
             //return untranslated error message?
             $errorTypes = [$this->getErrorType(XBeteiligungService::GENERIC_ERROR_CODE, $exception->getMessage())];
-            $this->logger->error('On create new Procedure: invalid argument.', [$exception]);
+            $this->logger->error('On create new Procedure: invalid argument.', [
+                'errorMessage' => $exception->getMessage(),
+                'exception' => $exception
+            ]);
         } catch (Exception $exception) {
-            $this->logger->error('Unspecific exception', [$exception]);
+            $this->logger->error('Unspecific exception', [
+                'errorMessage' => $exception->getMessage(),
+                'exception' => $exception
+            ]);
             $errorTypes = [$this->getErrorType(
                 XBeteiligungService::GENERIC_ERROR_CODE,
                 XBeteiligungService::GENERIC_ERROR_DESCRIPTION
@@ -198,9 +222,25 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     ): ProcedureInterface {
         // get user from message should be set, because of that userId here is not correct
         try {
-            $orgaName = $messageContent->getAkteurVorhaben()->getVeranlasser()->getName();
+            $orgaName = $messageContent->getAkteurVorhaben()?->getVeranlasser()?->getName()?->getName() ?? '';
             $orgaList = $this->orgaService->getOrgaByFields(['name' => $orgaName, 'deleted' => false]);
-            Assert::count($orgaList, 1);
+            if (0 === count($orgaList)) {
+                $errorMessage = sprintf(
+                    'Es konnte keine Organisation mit dem Namen "%s" gefunden werden.',
+                    $orgaName
+                );
+
+                throw new AddonOrgaNotFoundException($errorMessage);
+            }
+            if (1 < count($orgaList)) {
+                $errorMessage = sprintf(
+                    'Der Organistationsnamen "%s" scheint nicht unique zu sein. '
+                    . 'Es gibt mehrere Organisationen mit diesem Namen im System.',
+                    $orgaName
+                );
+
+                throw new AddonOrgaNotFoundException($errorMessage);
+            }
             /** @var OrgaInterface $orga */
             $orga = array_pop($orgaList);
             Assert::isInstanceOf($orga, OrgaInterface::class);
@@ -208,23 +248,29 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             $usersToAllowAccessToProcedure = $usersToAllowAccessToProcedure->filter(
                 fn (UserInterface $user): bool => $user->isPlanner()
             )->toArray();
-            Assert::greaterThanEq(count($usersToAllowAccessToProcedure), 1);
+            if (0 === count($usersToAllowAccessToProcedure)) {
+                $errorMessage = sprintf(
+                    'Es gibt keine aktiven Planer in der Organisation "%s".',
+                    $orga->getName()
+                );
+
+                throw new AddonOrgaNotFoundException($errorMessage);
+            }
             /** @var UserInterface $rndPlannerAsProcedureCreator */
             $rndPlannerAsProcedureCreator = reset($usersToAllowAccessToProcedure);
             $userId = $rndPlannerAsProcedureCreator->getId();
             Assert::notNull($userId, 'User Id could not be fetched');
-        } catch (Exception $exception) {
-            $this->logger->error(
-                'Terminating 401 procedure create attempt as no valid orga with at leas one
-                active planner could be found for administration',
-                ['exceptionMessage' => $exception->getMessage(), 'exception' => $exception]
-            );
+        } catch (AddonOrgaNotFoundException $exception) {
+            throw $exception;
+        }
+        catch (Exception $exception) {
             throw new AddonOrgaNotFoundException(
-                'unable to fetch an orga by name with at least one planner active in the current customer',
+                'Beim Zuordnen der Organisation ist ein Fehler aufgetreten.',
                 0,
                 $exception
             );
         }
+
         $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $orga);
         $procedure = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
         $procedure->setAuthorizedUsers($usersToAllowAccessToProcedure);
@@ -243,6 +289,8 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'r_externalDesc'                                                => $procedureObject->getBeschreibungPlanungsanlass(),
             'orgaId'                                                        => $orga->getId(),
             'orgaName'                                                      => $orga->getName(),
+            // fixme: currently we dont get an email for Verfahrensträger from cockpit
+            AbstractProcedureFormTypeInterface::AGENCY_MAIN_EMAIL_ADDRESS   => $orga->getEmail2(),
             'action'                                                        => 'new',
             'r_master'                                                      => 'false',
             'r_copymaster'                                                  => $this->procedureService->getMasterTemplateId(),

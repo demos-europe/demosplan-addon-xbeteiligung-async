@@ -46,8 +46,7 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
         return $this->buildProcedureCreatedResponse(
             $procedure,
             $xmlObject201,
-            new PlanfeststellungInitiierenOK0211(),
-            '0211'
+            new PlanfeststellungInitiierenOK0211()
         );
     }
 
@@ -63,8 +62,7 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
         return $this->buildProcedureUpdateResponse(
             $procedure,
             $xmlObject202,
-            new PlanfeststellungAktualisierenOK0212(),
-            '0212'
+            new PlanfeststellungAktualisierenOK0212()
         );
     }
 
@@ -79,8 +77,7 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
     {
         return $this->buildProcedureDeletedResponse(
             $xmlObject209,
-            new PlanfeststellungLoeschenOK0219(),
-            '0219'
+            new PlanfeststellungLoeschenOK0219()
         );
     }
 
@@ -98,8 +95,7 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
             $errorTypes,
             $xmlObject201,
             new PlanfeststellungInitiierenNOK0221(),
-            new NachrichteninhaltTemplateNOKType(),
-            '0221'
+            new NachrichteninhaltTemplateNOKType()
         );
     }
 
@@ -119,8 +115,7 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
             $errorTypes,
             $xmlObject202,
             new PlanfeststellungAktualisierenNOK0222(),
-            new PlanfeststellungAktualisierenNOOKAnonymousPHPType(),
-            '0222'
+            new PlanfeststellungAktualisierenNOOKAnonymousPHPType()
         );
     }
 
@@ -139,8 +134,7 @@ class PlanfeststellungMessageFactory extends XBeteiligungResponseMessageFactory
             $errorTypes,
             $xmlObject209,
             new PlanfeststellungLoeschenNOK0229(),
-            new PlanfeststellungLoeschenNOOKAnonymousPHPType(),
-            '0229'
+            new PlanfeststellungLoeschenNOOKAnonymousPHPType()
         );
     }
 

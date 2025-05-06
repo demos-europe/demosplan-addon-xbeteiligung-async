@@ -24,7 +24,9 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
@@ -54,10 +56,14 @@ abstract class XBeteiligungServiceTest extends TestCase
         $this->testProcedure = $this->getTestProcedure($this->getTestProcedureSettings());
         $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false));
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
+
         $globalConfigMock = $this->createMock(GlobalConfigInterface::class);
         $globalConfigMock->method('getMapDefaultProjection')->willReturn([
             'label' => 'EPSG:3857',
         ]);
+
+        $reusableMessageBlocks =
+            new ReusableMessageBlocks(new CommonHelpers($this->createMock(LoggerInterface::class)));
 
         $this->sut = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
@@ -69,7 +75,8 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->procedureNewsService,
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
-
+            $this->createMock(CommonHelpers::class),
+            $reusableMessageBlocks
         );
     }
 
@@ -104,6 +111,7 @@ abstract class XBeteiligungServiceTest extends TestCase
         $procedurePhaseMock = $this->createMock(ProcedurePhaseInterface::class);
         $procedurePhaseMock->method('getStartDate')->willReturn($startDate);
         $procedurePhaseMock->method('getEndDate')->willReturn($endDate);
+        $procedurePhaseMock->method('getIteration')->willReturn(1);
         $procedure->method('getPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
@@ -161,7 +169,14 @@ abstract class XBeteiligungServiceTest extends TestCase
 
     protected function validateProcedureXML(string $procedureXml, string $messageClass): void
     {
-        $isValid = $this->sut->isValidMessage($procedureXml, true, '', $messageClass);
+        $commonHelpers = new CommonHelpers($this->createMock(LoggerInterface::class));
+
+        $isValid = $commonHelpers->isValidMessage(
+            $procedureXml,
+            true,
+            '',
+            $messageClass,
+        );
         self::assertTrue($isValid);
     }
 }

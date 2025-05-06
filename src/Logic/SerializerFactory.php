@@ -17,6 +17,7 @@ use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\XmlSchemaDateHandler;
 use JMS\Serializer\Handler\HandlerRegistryInterface;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializerBuilder;
+use Psr\Log\LoggerInterface;
 
 class SerializerFactory
 {
@@ -34,5 +35,28 @@ class SerializerFactory
         });
 
         return $serializerBuilder->build();
+    }
+
+    public static function serializeData($data, LoggerInterface $logger): string
+    {
+        // Serialize the data to XML with a custom root name
+        $xml =  self::getSerializer()->serialize($data, 'xml');
+        $logger->debug('Serialized XML:', [$xml]);
+
+        // Load the XML string into a SimpleXMLElement object
+        $xml = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
+        if ($xml === false) {
+            $logger->error('Failed to load XML string.');
+            return '';
+        }
+
+        // Save the XML to a string
+        $result = $xml->saveXML();
+        if ($result === false) {
+            $logger->error('Error on save serialized xml.', [$xml->asXML()]);
+            return '';
+        }
+
+        return $result;
     }
 }
