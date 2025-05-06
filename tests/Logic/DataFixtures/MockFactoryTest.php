@@ -69,7 +69,7 @@ class MockFactoryTest extends TestCase
 
     public function getKommunaleResponseMessageFactory()
     {
-        $mock = $this->createMock(KommunaleMessageFactory::class);
+        return $this->createMock(KommunaleMessageFactory::class);
     }
 
     public function getPlanfeststellungResponseMessageFactory()
