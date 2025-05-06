@@ -12,9 +12,10 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use InvalidArgumentException;
 
 class KommunaleProcedureHandlerFactory
@@ -29,7 +30,7 @@ class KommunaleProcedureHandlerFactory
     ): KommunaleProcedureCreater {
         // Create necessary mocks for ProcedureCommonFeatures
         $logger = $this->mockFactory->getLoggerInterfaceMock();
-        $phaseExtractor = new \DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor($logger);
+        $phaseExtractor = new ProcedurePhaseExtractor($logger);
         $mapService = new XBeteiligungMapService($logger);
 
         $commonDependencies = [

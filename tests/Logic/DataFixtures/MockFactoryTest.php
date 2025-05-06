@@ -15,6 +15,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
@@ -68,7 +69,7 @@ class MockFactoryTest extends TestCase
 
     public function getKommunaleResponseMessageFactory()
     {
-        return $this->createMock(KommunaleMessageFactory::class);
+        $mock = $this->createMock(KommunaleMessageFactory::class);
     }
 
     public function getPlanfeststellungResponseMessageFactory()
@@ -79,6 +80,12 @@ class MockFactoryTest extends TestCase
     public function getRaumordnungResponseMessageFactory()
     {
         return $this->createMock(RaumordnungMessageFactory::class);
+        $mock->method('executeAndFlushInTransaction')->willReturnCallback(
+            function ($callback) {
+                return $callback();
+            }
+        );
+        return $mock;
     }
 
     public function getProcedureMock(): MockObject|ProcedureInterface
@@ -165,7 +172,7 @@ class MockFactoryTest extends TestCase
                     $this->procedure->method('getSettings')->willReturn($this->getProcedureSettingsMock());
 
                     // Mock phase objects
-                    $phaseObj = $this->createMock(\DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface::class);
+                    $phaseObj = $this->createMock(ProcedurePhaseInterface::class);
                     $phaseObj->method('getStartDate')->willReturn(new DateTime());
                     $phaseObj->method('getEndDate')->willReturn(new DateTime('+1 week'));
                     $phaseObj->method('getIteration')->willReturn(1);
@@ -178,12 +185,6 @@ class MockFactoryTest extends TestCase
                         ->willReturn($data['r_procedure_type'] ?? null);
 
                     $this->procedure->method('getXtaPlanId')->willReturn(isset($data['xtaPlanId']) ? $data['xtaPlanId'] : null);
-
-                    // For the test, let's mock setOrga, setAuthorizedUsers, and other methods that are called
-                    $this->procedure->method('setOrga')->willReturnSelf();
-                    $this->procedure->method('setAuthorizedUsers')->willReturnSelf();
-                    $this->procedure->method('setPublicParticipationPhase')->willReturnSelf();
-                    $this->procedure->method('setPhase')->willReturnSelf();
                     $this->procedure->method('getAuthorizedUsers')->willReturn(new ArrayCollection(
                         [$this->getUserMock()]
                     ));

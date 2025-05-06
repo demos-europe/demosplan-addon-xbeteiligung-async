@@ -644,56 +644,72 @@ class XBeteiligungService
         string $targetProjectionName,
         bool $areCoordsSwapped): array
     {
-        // If no bbox set or if target projection is the same as the source, return the input
-        if (empty($procedureSettingsBBox) || 'EPSG:3857' === $targetProjectionName) {
-            return $procedureSettingsBBox ?: ['0', '0', '0', '0'];
+        // Check if we have all required bbox coordinates
+        if (count($procedureSettingsBBox) !== 4) {
+            // Return a default bbox covering Germany for the projection if not enough coordinates
+            if ($targetProjectionName === 'EPSG:4326') {
+                return ['5.866', '47.270', '15.042', '55.058']; // Germany in WGS84 (lat/lon)
+            }
+            return ['653300', '5975800', '1674500', '6636200']; // Germany in EPSG:3857 Web Mercator
         }
 
-        // Check if we have all 4 coordinates needed for a bounding box
-        if (4 !== count($procedureSettingsBBox)) {
-            // Return default bounding box for Germany in the target projection
-            return ['0', '0', '0', '0'];
-        }
-
-        // Initialize proj4php with source and target projections
-        $proj4 = new Proj4php();
-        $sourceProj = new Proj($proj4, 'EPSG:3857');
-        $targetProj = new Proj($proj4, $targetProjectionName);
-
-        // Extract coordinates
         $west = (float)$procedureSettingsBBox[0];
         $south = (float)$procedureSettingsBBox[1];
         $east = (float)$procedureSettingsBBox[2];
         $north = (float)$procedureSettingsBBox[3];
+        $reprojectParams = [
+            [min([$west, $east]), min([$north, $south])],
+            [max([$west, $east]), max([$north, $south])],
+        ];
 
-        // Transform corner points
-        $sourcePoint1 = new Point($west, $south, $sourceProj);
-        $sourcePoint2 = new Point($east, $north, $sourceProj);
+        $proj4 = new Proj4php();
 
-        $targetPoint1 = $proj4->transform($targetProj, $sourcePoint1);
-        $targetPoint2 = $proj4->transform($targetProj, $sourcePoint2);
+        $targetProjection = new Proj($targetProjectionName, $proj4);
+        $sourceProjection = new Proj($this-> globalConfig->getMapDefaultProjection()['label'], $proj4);
 
-        // For some projections like EPSG:4326, x and y coordinates are swapped
+        $transformedCoords = array_map(
+            fn (array $coordinate) => $this->convertPoint(
+                $coordinate,
+                $sourceProjection,
+                $targetProjection
+            ),
+            $reprojectParams
+        );
+
+        $west = (string)$transformedCoords[0][0];
+        $east = (string)$transformedCoords[1][0];
+        $south = (string)$transformedCoords[0][1];
+        $north = (string)$transformedCoords[1][1];
+        $bboxArray = [$west, $south, $east, $north];
         if ($areCoordsSwapped) {
-            return [
-                (string)$targetPoint1->y,
-                (string)$targetPoint1->x,
-                (string)$targetPoint2->y,
-                (string)$targetPoint2->x,
-            ];
+            $bboxArray = [$south, $west, $north, $east];
         }
 
-        return [
-            (string)$targetPoint1->x,
-            (string)$targetPoint1->y,
-            (string)$targetPoint2->x,
-            (string)$targetPoint2->y,
-        ];
+        return $bboxArray;
+    }
+
+    /**
+     * @param string $returnType [self::ARRAY_RETURN_TYPE | self::STRING_RETURN_TYPE]
+     *
+     * @return array|string
+     */
+    public function convertPoint(
+        array $coordinate,
+        Proj $currentProjection,
+        Proj $newProjection
+    ) {
+        $projectionTransformer = new Proj4php();
+        $pointSrc = new Point($coordinate[0], $coordinate[1], $currentProjection);
+        $pointDest = $projectionTransformer
+            ->transform($newProjection, $pointSrc)
+            ->toArray();
+
+        return [$pointDest[0], $pointDest[1]];
     }
 
     /**
      * Calculate width and height from bounding box coordinates
-     * 
+     *
      * @param array $bboxArray Array of bbox coordinates [west, south, east, north]
      * @return array{width: float, height: float} Width and height values
      */
@@ -707,7 +723,7 @@ class XBeteiligungService
             $south = (float)$bboxArray[1];
             $east = (float)$bboxArray[2];
             $north = (float)$bboxArray[3];
-            
+
             $width = abs($east - $west);
             $height = abs($north - $south);
         }
