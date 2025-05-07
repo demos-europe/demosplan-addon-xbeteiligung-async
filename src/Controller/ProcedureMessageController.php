@@ -2,7 +2,9 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Controller;
 
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Controller\APIController;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -31,7 +33,7 @@ class ProcedureMessageController extends APIController
         try {
             $message = $procedureMessageRepository->getProcedureMessage($procedureMessageId);
             $procedureMessageRepository->updateObject($procedureMessageId);
-            $response = $this->createResponse([$message], 200);
+            $response = new Response($message, 200, ['Content-Type' => 'application/xml']);
         } catch (NoResultException|NonUniqueResultException $e) {
             $this->logger->warning('No unique procedure message found for given ID.', [
                 'exception' => $e->getMessage()
@@ -62,6 +64,7 @@ class ProcedureMessageController extends APIController
     #[Route(path: 'api/new/procedure_message/ids', name: 'dplan_api_get_new_procedure_messages_ids', methods: ['GET'])]
     public function showNewImportableProcedureMessages(
         ProcedureMessageRepository $procedureMessageRepository,
+        ProcedureServiceInterface $procedureService,
         Request $request
     ): Response {
         if ($this->hasNoValidAuthToken($request->headers->get('authToken'))) {
@@ -71,7 +74,30 @@ class ProcedureMessageController extends APIController
             return $this->createEmptyResponse();
         }
 
-        return $this->createResponse($procedureMessageRepository->findIdsBy(['requestCount' => 0]), 200);
+        $procedureMessages = $procedureMessageRepository->findBy(['requestCount' => 0]);
+        $responseData = [];
+
+        /** @var ProcedureMessage $procedureMessage */
+        foreach ($procedureMessages as $procedureMessage) {
+            $procedureId = $procedureMessage->getProcedureId();
+            $procedure = $procedureService->getProcedure($procedureId);
+            $subdomain = null;
+
+            // Get the customer subdomain if procedure is available
+            if (null !== $procedure?->getCustomer()) {
+                $subdomain = $procedure->getCustomer()->getSubdomain();
+            }
+
+            $responseData[] = [
+                'type' => 'procedure_message',
+                'id' => $procedureMessage->getId(),
+                'attributes' => [
+                    'customer' => $subdomain
+                ]
+            ];
+        }
+
+        return $this->createResponse(['data' => $responseData], 200);
     }
 
     /**
