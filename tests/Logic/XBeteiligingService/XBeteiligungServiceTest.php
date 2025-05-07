@@ -169,6 +169,23 @@ abstract class XBeteiligungServiceTest extends TestCase
 
     protected function validateProcedureXML(string $procedureXml, string $messageClass): void
     {
+        // Basic XML validation
+        self::assertNotEmpty($procedureXml, "Generated XML should not be empty");
+        self::assertStringContainsString('<?xml', $procedureXml, "Should be a valid XML document");
+
+        // Check for important XML message elements
+        if (str_contains($messageClass, 'Kommunal')) {
+            self::assertStringContainsString('kommunal', $procedureXml, "XML should contain kommunal message tag");
+        } else if (str_contains($messageClass, 'Raumordnung')) {
+            self::assertStringContainsString('raumordnung', $procedureXml, "XML should contain raumordnung message tag");
+        } else if (str_contains($messageClass, 'Planfeststellung')) {
+            self::assertStringContainsString('planfeststellung', $procedureXml, "XML should contain planfeststellung message tag");
+        }
+
+        // Check for common elements
+        self::assertStringContainsString('nachrichtenkopf.g2g', $procedureXml, "XML should contain message header");
+        self::assertStringContainsString('nachrichteninhalt', $procedureXml, "XML should contain message content");
+        self::assertStringContainsString('beteiligung', $procedureXml, "XML should contain participation element");
         $commonHelpers = new CommonHelpers($this->createMock(LoggerInterface::class));
 
         $isValid = $commonHelpers->isValidMessage(

@@ -65,9 +65,12 @@ class KommunaleProcedureCreatorTest extends TestCase
             'xml'
         );
 
+        self::assertInstanceOf(KommunalInitiieren0401::class, $inputMsgObj);
         // Act
         $procedure = $this->sut->createNewKommunalProcedureFromXBeteiligungMessage($inputMsgObj);
         $inputMsgContent = $inputMsgObj->getNachrichteninhalt()->getBeteiligung();
+
+        self::assertNotNull($inputMsgContent);
 
         // Assert
         $valid = false;

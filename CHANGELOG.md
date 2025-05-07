@@ -14,6 +14,7 @@
 - Removed duplicated code
 - Enhance logging and error handling
 - bug fixing
+- Symfony 6 compatibility
 
 ## v0.13 (2025-04-08)
 - enhance logging

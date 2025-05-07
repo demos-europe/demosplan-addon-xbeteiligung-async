@@ -8,6 +8,9 @@ declare(strict_types=1);
  * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
  *
  * All rights reserved
+ *
+ * This class is a helper for creating mocks, not a test class itself.
+ * It's used by other test classes to create mock objects.
  */
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures;
