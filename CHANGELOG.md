@@ -2,6 +2,10 @@
 
 ## UNRELEASED
 
+## v0.10.5 (2025-05-07)
+ - update API responses to include customer information in procedure messages endpoint
+ - modify procedure message endpoint to return XML directly with proper Content-Type header
+
 ## v0.10.4 (2025-05-05)
  - swap coords for CRS + special projections instead of SRS
  - return at least the default german basemap
