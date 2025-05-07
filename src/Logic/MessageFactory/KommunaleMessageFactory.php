@@ -45,8 +45,7 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
         return $this->buildProcedureCreatedResponse(
             $procedure,
             $xmlObject401,
-            new KommunalInitiierenOK0411(),
-            '0411'
+            new KommunalInitiierenOK0411()
         );
     }
 
@@ -62,8 +61,7 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
         return $this->buildProcedureUpdateResponse(
             $procedure,
             $xmlObject402,
-            new KommunalAktualisierenOK0412(),
-            '0412'
+            new KommunalAktualisierenOK0412()
         );
     }
 
@@ -76,8 +74,7 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
     {
         return $this->buildProcedureDeletedResponse(
             $xmlObject409,
-            new KommunalLoeschenOK0419(),
-            '0419'
+            new KommunalLoeschenOK0419()
         );
     }
 
@@ -95,8 +92,7 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
             $errorTypes,
             $xmlObject401,
             new KommunalInitiierenNOK0421(),
-            new NachrichteninhaltTemplateNOKType(),
-            '0421'
+            new NachrichteninhaltTemplateNOKType()
         );
     }
 
@@ -116,8 +112,7 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
             $errorTypes,
             $xmlObject402,
             new KommunalAktualisierenNOK0422(),
-            new KommunalAktualisierenNOOKAnonymousPHPType(),
-            '0422'
+            new KommunalAktualisierenNOOKAnonymousPHPType()
         );
     }
 
@@ -136,8 +131,7 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
             $errorTypes,
             $xmlObject409,
             new KommunalLoeschenNOK0429(),
-            new KommunalLoeschenNOOKAnonymousPHPType(),
-            '0429'
+            new KommunalLoeschenNOOKAnonymousPHPType()
         );
     }
 }

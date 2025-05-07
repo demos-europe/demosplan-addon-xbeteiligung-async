@@ -19,13 +19,13 @@ class XBeteiligungService409Test extends XBeteiligungServiceTest
 {
     public function testPlanung2BeteiligungBeteiligungNeu0409(): void
     {
-        $procedureXml = $this->sut->createProcedureDeleted409FromObject($this->testProcedure->getId());
+        $procedureXml = $this->sut->createProcedureDeleted409FromObject($this->testProcedure);
         $this->validateProcedureXML($procedureXml, KommunalLoeschen0409::class);
     }
 
     public function testPlanung2BeteiligungRaumordnungLoeschen0309(): void
     {
-        $procedureXml = $this->sut->createXMLFor309($this->testProcedure->getId());
+        $procedureXml = $this->sut->createXMLFor309($this->testProcedure);
         $this->validateProcedureXML($procedureXml, RaumordnungLoeschen0309::class);
     }
 }

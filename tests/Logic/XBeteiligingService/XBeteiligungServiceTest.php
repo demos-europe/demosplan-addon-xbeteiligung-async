@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\XBeteiligingServic
 
 use DateInterval;
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
@@ -23,7 +24,9 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
@@ -54,15 +57,26 @@ abstract class XBeteiligungServiceTest extends TestCase
         $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false));
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
 
+        $globalConfigMock = $this->createMock(GlobalConfigInterface::class);
+        $globalConfigMock->method('getMapDefaultProjection')->willReturn([
+            'label' => 'EPSG:3857',
+        ]);
+
+        $reusableMessageBlocks =
+            new ReusableMessageBlocks(new CommonHelpers($this->createMock(LoggerInterface::class)));
+
         $this->sut = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
+            $globalConfigMock,
+            $this->createMock(KommunaleProcedureCreater::class),
             $this->createMock(LoggerInterface::class),
-            $this->procedureNewsService,
-            $this->procedureMessageRepository,
             $this->createMock( PlanningDocumentsLinkCreator::class),
+            $this->procedureMessageRepository,
+            $this->procedureNewsService,
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
-            $this->createMock(KommunaleProcedureCreater::class),
+            $this->createMock(CommonHelpers::class),
+            $reusableMessageBlocks
         );
     }
 
@@ -76,6 +90,9 @@ abstract class XBeteiligungServiceTest extends TestCase
         $gisMo->method('getUrl')->willReturn('https://sgx.geodatenzentrum.de/wms_basemapde');
         $gisMo->method('getLayerVersion')->willReturn('1.3.0');
         $gisMo->method('getLayers')->willReturn('de_basemapde_web_raster_farbe');
+        $gisMo->method('getType')->willReturn('base');
+        $gisMo->method('isEnabled')->willReturn(true);
+        $gisMo->method('getProjectionLabel')->willReturn('EPSG:3857');
         $gisLayerCategoryInterfaceMock->method('getGisLayers')->willReturn(new ArrayCollection([$gisMo]));
         $this->gisLayerCategoryRepository->method('getRootLayerCategory')->willReturn($gisLayerCategoryInterfaceMock);
 
@@ -94,6 +111,7 @@ abstract class XBeteiligungServiceTest extends TestCase
         $procedurePhaseMock = $this->createMock(ProcedurePhaseInterface::class);
         $procedurePhaseMock->method('getStartDate')->willReturn($startDate);
         $procedurePhaseMock->method('getEndDate')->willReturn($endDate);
+        $procedurePhaseMock->method('getIteration')->willReturn(1);
         $procedure->method('getPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
@@ -154,7 +172,7 @@ abstract class XBeteiligungServiceTest extends TestCase
         // Basic XML validation
         self::assertNotEmpty($procedureXml, "Generated XML should not be empty");
         self::assertStringContainsString('<?xml', $procedureXml, "Should be a valid XML document");
-        
+
         // Check for important XML message elements
         if (str_contains($messageClass, 'Kommunal')) {
             self::assertStringContainsString('kommunal', $procedureXml, "XML should contain kommunal message tag");
@@ -163,10 +181,19 @@ abstract class XBeteiligungServiceTest extends TestCase
         } else if (str_contains($messageClass, 'Planfeststellung')) {
             self::assertStringContainsString('planfeststellung', $procedureXml, "XML should contain planfeststellung message tag");
         }
-        
+
         // Check for common elements
         self::assertStringContainsString('nachrichtenkopf.g2g', $procedureXml, "XML should contain message header");
         self::assertStringContainsString('nachrichteninhalt', $procedureXml, "XML should contain message content");
         self::assertStringContainsString('beteiligung', $procedureXml, "XML should contain participation element");
+        $commonHelpers = new CommonHelpers($this->createMock(LoggerInterface::class));
+
+        $isValid = $commonHelpers->isValidMessage(
+            $procedureXml,
+            true,
+            '',
+            $messageClass,
+        );
+        self::assertTrue($isValid);
     }
 }

@@ -235,12 +235,12 @@ class XBeteiligungProcedureChanged
     private function onProcedureSoftDeleted(ProcedureInterface $procedure): void
     {
         if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_delete())) {
-            $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure->getId());
+            $xml = $this->xBeteiligungService->createProcedureDeleted409FromObject($procedure);
             $this->createProcedureDeleteMessage($xml, $procedure, KommunalLoeschen0409::class);
         }
 
         if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_delete())) {
-            $xml = $this->xBeteiligungService->createXMLFor309($procedure->getId());
+            $xml = $this->xBeteiligungService->createXMLFor309($procedure);
             $this->createProcedureDeleteMessage($xml, $procedure, RaumordnungLoeschen0309::class);
         }
     }

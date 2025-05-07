@@ -79,7 +79,8 @@ Add `xbeteiligung:` as prefix to xml_root_name in
 [`Schema.XBeteiligung.RaumordnungLoeschen0309.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungLoeschen0309.yml),
 [`Schema.XBeteiligung.PlanfeststellungAktualisieren0202.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungAktualisieren0202.yml),
 [`Schema.XBeteiligung.PlanfeststellungInitiieren0201.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungInitiieren0201.yml),
-[`Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml)
+[`Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml),
+[`Schema.AllgemeinStellungnahmeNeuabgegeben0701.yml`](src/Soap/Metadata/Schema.XBeteiligung.AllgemeinStellungnahmeNeuabgegeben0701.yml),
 
 Example - `xml_root_name`: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
 

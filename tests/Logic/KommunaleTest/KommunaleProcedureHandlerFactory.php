@@ -14,6 +14,8 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use InvalidArgumentException;
 
 class KommunaleProcedureHandlerFactory
@@ -26,41 +28,32 @@ class KommunaleProcedureHandlerFactory
     public function createProcedureHandler(
         string $handlerType
     ): KommunaleProcedureCreater {
-        $currentUserProvider = $this->mockFactory->getCurrentUserProviderInterfaceMock();
-        $entityManager = $this->mockFactory->getEntityManagerMock();
-        $kommunaleMessageFactory = $this->mockFactory->getKommunaleResponseMessageFactory();
+        // Create necessary mocks for ProcedureCommonFeatures
         $logger = $this->mockFactory->getLoggerInterfaceMock();
-        $planfeststellungMessageFactory = $this->mockFactory->getPlanfeststellungResponseMessageFactory();
-        $procedurePhaseExtractor = $this->mockFactory->getProcedurePhaseExtractorMock();
-        $procedureService = $this->mockFactory->getProcedureServiceInterface();
-        $procedureServiceStorage = $this->mockFactory->getProcedureServiceStorage();
-        $procedureTypeService = $this->mockFactory->getProcedureTypeService();
-        $raumordnungMessageFactory = $this->mockFactory->getRaumordnungResponseMessageFactory();
-        $transactionService = $this->mockFactory->getTransActionServiceInterfaceMock();
-        $translator = $this->mockFactory->getTranslatorMock();
-        $userHandler = $this->mockFactory->getUserHandlerMock();
-        $orgaService = $this->mockFactory->getOrgaServiceInterfaceMock();
-        $xbeteiligungMapService = $this->mockFactory->getXBeteiligungMapServiceMock();
+        $phaseExtractor = new ProcedurePhaseExtractor($logger);
+        $mapService = new XBeteiligungMapService($logger);
+
+        $commonDependencies = [
+            $this->mockFactory->getCurrentUserProviderInterfaceMock(),
+            $this->mockFactory->getEntityManagerMock(), // THIS IS THE CORRECT ORDER - EntityManager must be second!
+            $this->mockFactory->getKommunaleResponseMessageFactory(),
+            $this->mockFactory->getLoggerInterfaceMock(),
+            $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
+            $phaseExtractor,
+            $this->mockFactory->getProcedureServiceInterface(),
+            $this->mockFactory->getProcedureServiceStorage(),
+            $this->mockFactory->getProcedureTypeService(),
+            $this->mockFactory->getRaumordnungResponseMessageFactory(),
+            $this->mockFactory->getTransActionServiceInterfaceMock(),
+            $this->mockFactory->getTranslatorMock(),
+            $this->mockFactory->getUserHandlerMock(),
+            $this->mockFactory->getOrgaServiceInterfaceMock(),
+            $mapService
+        ];
 
         switch ($handlerType) {
             case 'creator':
-                return new KommunaleProcedureCreater(
-                    $currentUserProvider,
-                    $entityManager,
-                    $kommunaleMessageFactory,
-                    $logger,
-                    $planfeststellungMessageFactory,
-                    $procedurePhaseExtractor,
-                    $procedureService,
-                    $procedureServiceStorage,
-                    $procedureTypeService,
-                    $raumordnungMessageFactory,
-                    $transactionService,
-                    $translator,
-                    $userHandler,
-                    $orgaService,
-                    $xbeteiligungMapService
-                );
+                return new KommunaleProcedureCreater(...$commonDependencies);
             default:
                 throw new InvalidArgumentException('Invalid handler type');
         }
