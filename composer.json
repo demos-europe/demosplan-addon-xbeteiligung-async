@@ -14,9 +14,9 @@
       "DemosEurope\\DemosplanAddon\\XBeteiligung\\Tests\\": "tests/"
     }
   },
-  "minimum-stability": "dev",
+  "minimum-stability": "stable",
   "require": {
-    "demos-europe/demosplan-addon": "dev-f-symfony-6",
+    "demos-europe/demosplan-addon": "^v0.54",
     "demos-europe/demosplan-addon-installer": "^0",
     "doctrine/doctrine-bundle": "^2",
     "ext-dom": "*",
