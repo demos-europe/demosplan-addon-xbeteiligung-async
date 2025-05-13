@@ -1,0 +1,21 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\GeoreferenzierteFlaecheType:
+    properties:
+        flaeche:
+            expose: true
+            access_type: public_method
+            serialized_name: flaeche
+            accessor:
+                getter: getFlaeche
+                setter: setFlaeche
+            xml_list:
+                inline: true
+                entry_name: flaeche
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\GeoreferenzierteFlaecheType\FlaecheAnonymousPHPType>
+        erlaeuterung:
+            expose: true
+            access_type: public_method
+            serialized_name: erlaeuterung
+            accessor:
+                getter: getErlaeuterung
+                setter: setErlaeuterung
+            type: string

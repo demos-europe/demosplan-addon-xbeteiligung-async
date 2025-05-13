@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation\Erreichbarkeit:
+    xml_root_name: erreichbarkeit
+    xml_root_namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'

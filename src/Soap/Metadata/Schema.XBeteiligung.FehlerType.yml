@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType:
+    properties:
+        beschreibung:
+            expose: true
+            access_type: public_method
+            serialized_name: beschreibung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBeschreibung
+                setter: setBeschreibung
+            type: string
+        art:
+            expose: true
+            access_type: public_method
+            serialized_name: art
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getArt
+                setter: setArt
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeFehlerartType

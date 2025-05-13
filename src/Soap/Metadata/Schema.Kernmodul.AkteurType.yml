@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AkteurType:
+    properties:
+        natuerlichePerson:
+            expose: true
+            access_type: public_method
+            serialized_name: natuerlichePerson
+            accessor:
+                getter: getNatuerlichePerson
+                setter: setNatuerlichePerson
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AmBauBeteiligtePersonType
+        organisation:
+            expose: true
+            access_type: public_method
+            serialized_name: organisation
+            accessor:
+                getter: getOrganisation
+                setter: setOrganisation
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType

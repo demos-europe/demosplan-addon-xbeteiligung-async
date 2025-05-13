@@ -2,13 +2,52 @@
 
 ## UNRELEASED
 
+### Added
+- Do not send wmsUrl if procedure has no enabled layer.
+- Add REST API endpoint `/addon/xbeteiligung/procedure/create` that accepts XML payload directly
+- Simplified API accepts raw XML content rather than requiring JSON with messageTypeCode
+- The REST API processes messages using the same logic as the RabbitMQ implementation and returns XML responses
+- Uses a custom `X-Addon-XBeteiligung-Authorization` header for authentication to avoid interfering with the core application
+- Added new parameters for rabbitmq addon_xbeteiligung_async_rabbitMqQueueName,
+  addon_xbeteiligung_async_rabbitMqRequestIdGet and addon_xbeteiligung_async_rabbitMqRequestIdSend
+- Added creation of 701 messages
+- Removed duplicated code
+- Enhance logging and error handling
+- bug fixing
+- Symfony 6 compatibility
+
+## v0.13 (2025-04-08)
+- enhance logging
+- set the iteration (Durchgangsnummer) by getting it from the procedure
+- fix bugs (namespace errors, wrong paths, 409 was not created, $messageClass was missing
+  for 401, 402, 409, 301, 302 and 309)
+
+## v0.12 (2025-04-04)
+- bumped required demosplan-addon version to v0.51
+- fetch orga by 401 included name and set its planners as authorized
+- update the standard to 1.3 (new xsd files), mapping of every xsd namespace to
+  on php namespace
+- generate new schema yml files and php classes from xsd files
+- Update the current addon code to be functional with the new 1.3 standard.
+- Update XBeteiligungService
+- Update ReadMe
+- Add handling of public participation procedure phases and institution procedure phases
+  for incoming 401 messages
+- extract map data from given epsg:4326 territory-polygon and introduce fitting tests.
+
+## v0.11 (2025-02-28)
+- add rabbitMQ package
+- implement rabbitMQ in services.yml
+- adjust AddonMaintenanceEventInterface in eventSubscriber
+- create some classes to restructure xbeteiligung-async to can to work on comming stories in future
+
 ## v0.10.5 (2025-05-07)
  - update API responses to include customer information in procedure messages endpoint
  - modify procedure message endpoint to return XML directly with proper Content-Type header
 
 ## v0.10.4 (2025-05-05)
- - swap coords for CRS + special projections instead of SRS
- - return at least the default german basemap
+- swap coords for CRS + special projections instead of SRS
+- return at least the default german basemap
 
 ## v0.10.3 (2025-05-02)
 - technical release without any changes

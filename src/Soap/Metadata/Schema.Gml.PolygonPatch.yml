@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\PolygonPatch:
+    xml_root_name: PolygonPatch
+    xml_root_namespace: 'http://www.opengis.net/gml/3.2'
