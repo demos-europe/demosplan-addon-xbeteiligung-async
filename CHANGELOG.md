@@ -2,7 +2,7 @@
 
 ## UNRELEASED
 
-### Added
+###  v0.14 (2025-05-13)
 - Do not send wmsUrl if procedure has no enabled layer.
 - Add REST API endpoint `/addon/xbeteiligung/procedure/create` that accepts XML payload directly
 - Simplified API accepts raw XML content rather than requiring JSON with messageTypeCode
