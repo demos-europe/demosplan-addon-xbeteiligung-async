@@ -628,7 +628,7 @@ class XBeteiligungService
                 '<='
             ) ? 'CRS' : 'SRS';
             $projectionLabel = strtoupper(
-                $baseLayer?->getProjectionLabel() ?? $this->globalConfig->getMapDefaultProjection()
+                $baseLayer?->getProjectionLabel() ?? $this->globalConfig->getMapDefaultProjection()['label']
             );
             // for some projections after v1.3.0 the x and y coords are swapped
             // - there are more, but the common ones are at least treated:
