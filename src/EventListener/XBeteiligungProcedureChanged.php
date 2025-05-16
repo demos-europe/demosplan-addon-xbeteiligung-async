@@ -81,6 +81,10 @@ class XBeteiligungProcedureChanged
             if ($procedure->getMaster()) {
                 continue;
             }
+            if ($procedure->getDeleted()) {
+                $this->updatedProcedures[$procedure->getId()] = $procedure;
+                continue;
+            }
             $changeSet = $this->unitOfWork->getEntityChangeSet($procedure);
             $this->addUniqueRelevantProcedure($changeSet, $procedure);
         }
