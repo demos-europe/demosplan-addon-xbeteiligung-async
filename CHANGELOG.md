@@ -2,6 +2,11 @@
 
 ## UNRELEASED
 
+## v0.10.6 (2025-05-16)
+- Symfony 6 compatibility
+- fix creation of X09 messages
+- fix getting map default projection label
+
 ## v0.10.5 (2025-05-07)
  - update API responses to include customer information in procedure messages endpoint
  - modify procedure message endpoint to return XML directly with proper Content-Type header
