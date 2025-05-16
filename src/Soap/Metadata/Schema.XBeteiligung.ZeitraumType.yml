@@ -1,0 +1,32 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType:
+    properties:
+        beginn:
+            expose: true
+            access_type: public_method
+            serialized_name: beginn
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBeginn
+                setter: setBeginn
+            type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Date
+        ende:
+            expose: true
+            access_type: public_method
+            serialized_name: ende
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getEnde
+                setter: setEnde
+            type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Date
+        zusatz:
+            expose: true
+            access_type: public_method
+            serialized_name: zusatz
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getZusatz
+                setter: setZusatz
+            type: string

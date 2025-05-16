@@ -1,0 +1,64 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink\ExtendedType:
+    properties:
+        type:
+            expose: true
+            access_type: public_method
+            serialized_name: type
+            accessor:
+                getter: getType
+                setter: setType
+            xml_attribute: true
+            type: string
+        role:
+            expose: true
+            access_type: public_method
+            serialized_name: role
+            accessor:
+                getter: getRole
+                setter: setRole
+            xml_attribute: true
+            type: string
+        title:
+            expose: true
+            access_type: public_method
+            serialized_name: title
+            accessor:
+                getter: getTitle
+                setter: setTitle
+            xml_list:
+                inline: true
+                entry_name: title
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink\Title>
+        resource:
+            expose: true
+            access_type: public_method
+            serialized_name: resource
+            accessor:
+                getter: getResource
+                setter: setResource
+            xml_list:
+                inline: true
+                entry_name: resource
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink\ResourceXsd>
+        locator:
+            expose: true
+            access_type: public_method
+            serialized_name: locator
+            accessor:
+                getter: getLocator
+                setter: setLocator
+            xml_list:
+                inline: true
+                entry_name: locator
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink\Locator>
+        arc:
+            expose: true
+            access_type: public_method
+            serialized_name: arc
+            accessor:
+                getter: getArc
+                setter: setArc
+            xml_list:
+                inline: true
+                entry_name: arc
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink\Arc>

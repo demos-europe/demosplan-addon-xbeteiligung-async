@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AnbindungFachverfahrenType:
+    properties:
+        apiKey:
+            expose: true
+            access_type: public_method
+            serialized_name: apiKey
+            accessor:
+                getter: getApiKey
+                setter: setApiKey
+            type: string
+        anwendungsspezifischeErweiterung:
+            expose: true
+            access_type: public_method
+            serialized_name: anwendungsspezifischeErweiterung
+            accessor:
+                getter: getAnwendungsspezifischeErweiterung
+                setter: setAnwendungsspezifischeErweiterung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AnwendungsspezifischeErweiterungXMLType
