@@ -81,6 +81,9 @@ class ProcedureMessageController extends APIController
         foreach ($procedureMessages as $procedureMessage) {
             $procedureId = $procedureMessage->getProcedureId();
             $procedure = $procedureService->getProcedure($procedureId);
+            $origin = '' === $procedure->getXtaPlanId() ?
+                'DiPlanBeteiligung' : 'DiPlanCockpit'
+            ;
             $subdomain = null;
 
             // Get the customer subdomain if procedure is available
@@ -92,7 +95,8 @@ class ProcedureMessageController extends APIController
                 'type' => 'procedure_message',
                 'id' => $procedureMessage->getId(),
                 'attributes' => [
-                    'customer' => $subdomain
+                    'customer' => $subdomain,
+                    'origin' => $origin,
                 ]
             ];
         }

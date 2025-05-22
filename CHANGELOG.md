@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- add procedure origin information to ProcedureMessageController::showNewImportableProcedureMessages api response as
+  k3 needs to know if the procedure was created within dplan or if the procedure was originally created within cockpit
 
 ###  v0.14 (2025-05-13)
 - Do not send wmsUrl if procedure has no enabled layer.
