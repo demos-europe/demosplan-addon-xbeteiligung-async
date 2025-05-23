@@ -17,7 +17,7 @@ A REST API endpoint is available for processing XBeteiligung messages as an alte
 ## Authentication
 
 Authentication is done via a Bearer token in the **X-Addon-XBeteiligung-Authorization** custom header.
-The token value must match the `addon_xbeteiligung_async_xbeteiligung_api_token` parameter value.
+The token value must match the `addon_xbeteiligung_async_api_token` parameter value.
 
 ```
 X-Addon-XBeteiligung-Authorization: Bearer your-token-here

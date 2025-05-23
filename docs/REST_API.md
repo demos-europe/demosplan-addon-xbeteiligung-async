@@ -14,7 +14,7 @@ X-Addon-XBeteiligung-Authorization: Bearer your-token-here
 
 This custom header is used specifically for XBeteiligung addon authentication to avoid interference with the core application's authentication mechanisms.
 
-The token value must match the `addon_xbeteiligung_async_xbeteiligung_api_token` parameter value configured in the application parameters.
+The token value must match the `addon_xbeteiligung_async_api_token` parameter value configured in the application parameters.
 
 ## Endpoint
 
