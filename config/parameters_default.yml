@@ -6,7 +6,7 @@ parameters:
   xbeteiligung_procedure_message_api_baseurl: ""
   # Auth token used for verifying the import request originated from
   # the expected Xbeteiligung instance
-  xbeteiligung_api_token: ""
+  addon_xbeteiligung_async_xbeteiligung_api_token: ""
 
   # XBeteiligung Async REST API authentication token
   addon_xbeteiligung_async_rest_authentication: ""
