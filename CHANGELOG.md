@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 - fix getting map default projection label
+- Ensure that config params use `addon_xbeteiligung_async_` prefix
 
 ###  v0.14 (2025-05-13)
 - Do not send wmsUrl if procedure has no enabled layer.
