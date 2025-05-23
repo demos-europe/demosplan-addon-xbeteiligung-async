@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- fix getting map default projection label
 - add procedure origin information to ProcedureMessageController::showNewImportableProcedureMessages api response as
   k3 needs to know if the procedure was created within dplan or if the procedure was originally created within cockpit
 
@@ -43,13 +44,18 @@
 - adjust AddonMaintenanceEventInterface in eventSubscriber
 - create some classes to restructure xbeteiligung-async to can to work on comming stories in future
 
+## v0.10.6 (2025-05-16)
+- Symfony 6 compatibility
+- fix creation of X09 messages
+- fix getting map default projection label
+
 ## v0.10.5 (2025-05-07)
  - update API responses to include customer information in procedure messages endpoint
  - modify procedure message endpoint to return XML directly with proper Content-Type header
 
 ## v0.10.4 (2025-05-05)
-- swap coords for CRS + special projections instead of SRS
-- return at least the default german basemap
+ - swap coords for CRS + special projections instead of SRS
+ - return at least the default german basemap
 
 ## v0.10.3 (2025-05-02)
 - technical release without any changes
