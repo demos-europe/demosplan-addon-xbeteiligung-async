@@ -13,7 +13,7 @@ parameters:
 
   # String to determine which type of procedure messages should be generated.
   # For Example: Kommunal, Raumordnung or Planfeststellung
-  procedure_message_type: ""
+  addon_xbeteiligung_async_procedure_message_type: ""
 
   # Use for incoming messages from rabbitMQ
   addon_xbeteiligung_async_enable_rabbitmq_communication: false
