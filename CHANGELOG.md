@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+
+###  v0.15 (2025-05-27)
 - fix getting map default projection label
 - add procedure origin information to ProcedureMessageController::showNewImportableProcedureMessages api response as
   k3 needs to know if the procedure was created within dplan or if the procedure was originally created within cockpit
