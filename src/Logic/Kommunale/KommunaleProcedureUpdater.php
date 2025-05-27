@@ -12,9 +12,64 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
+use Exception;
+use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 
 class KommunaleProcedureUpdater extends ProcedureCommonFeatures
 {
+    /**
+     * @throws SchemaException
+     * @throws Exception
+     */
+    public function updateProcedure(KommunalAktualisieren0402 $kommunalAktualisieren0402): ResponseValue
+    {
+        $errorTypes = [];
 
+        // Get BeteiligungKommunalType from the message
+        $beteiligungKommunalType = $kommunalAktualisieren0402->getNachrichteninhalt()?->getBeteiligung();
+        if (null === $beteiligungKommunalType) {
+            return $this->kommunaleMessageFactory->buildProcedureUpdateErrorResponse422(
+                $errorTypes,
+                $kommunalAktualisieren0402
+            );
+        }
+        // Get the procedure to update
+        $procedureToUpdate = $this->getProcedure($beteiligungKommunalType);
+        if (null === $procedureToUpdate) {
+            return $this->kommunaleMessageFactory->buildProcedureUpdateErrorResponse422(
+                $errorTypes,
+                $kommunalAktualisieren0402
+            );
+        }
+
+        // Handle procedure phases
+        $procedurePhaseData = $this->procedurePhaseExtractor->extract($beteiligungKommunalType);
+        $this->setProcedurePhase($procedureToUpdate, $procedurePhaseData);
+
+        // create OK message for procedure update
+        return $this->kommunaleMessageFactory->buildProcedureUpdateOKResponse412(
+            $kommunalAktualisieren0402,
+            $procedureToUpdate
+        );
+    }
+
+    private function getProcedure(
+        BeteiligungKommunalType $beteiligungKommunalType,
+    ): ?ProcedureInterface {
+        $procedureToUpdate = $this->procedureService->getProcedure(
+            $beteiligungKommunalType->getBeteiligungOeffentlichkeit()?->getBeteiligungsID()
+        );
+        if (null === $procedureToUpdate) {
+            $procedureToUpdate = $this->procedureService->getProcedure(
+                $beteiligungKommunalType->getBeteiligungTOEB()?->getBeteiligungsID()
+            );
+        }
+
+        return $procedureToUpdate;
+    }
 }

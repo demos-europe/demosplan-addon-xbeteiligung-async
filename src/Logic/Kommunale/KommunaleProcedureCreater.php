@@ -180,40 +180,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         );
     }
 
-    private function setProcedurePhase(
-        ProcedureInterface $procedure,
-        ProcedurePhaseData $procedurePhaseData,
-    ): void {
-        if (null !== $procedurePhaseData->getPublicParticipationPhase()) {
-            $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhase()->getKey());
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationPhase()) {
-            $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhase()->getKey());
-        }
-        if (null !== $procedurePhaseData->getPublicParticipationStartDate()) {
-            $procedure->setPublicParticipationStartDate($procedurePhaseData->getPublicParticipationStartDate());
-        }
-        if (null !== $procedurePhaseData->getPublicParticipationEndDate()) {
-            $procedure->setPublicParticipationEndDate($procedurePhaseData->getPublicParticipationEndDate());
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationStartDate()) {
-            $procedure->setStartDate($procedurePhaseData->getInstitutionParticipationStartDate());
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationEndDate()) {
-            $procedure->setEndDate($procedurePhaseData->getInstitutionParticipationEndDate());
-        }
-        if (null !== $procedurePhaseData->getPublicParticipationIteration()) {
-            $procedure->getPublicParticipationPhaseObject()->setIteration(
-                $procedurePhaseData->getPublicParticipationIteration()
-            );
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationIteration()) {
-            $procedure->getPhaseObject()->setIteration(
-                $procedurePhaseData->getInstitutionParticipationIteration()
-            );
-        }
-    }
-
     /**
      * @throws AddonOrgaNotFoundException
      */
