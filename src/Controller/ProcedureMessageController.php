@@ -59,7 +59,7 @@ class ProcedureMessageController extends APIController
      * do not want to give the guest user that permission. Authenticating from xbeteiligung
      * with any other user would require implementing JWT support which will happen
      * in the near future. Until then, access is limited with a purpose-generated
-     * token stored in `xbeteiligung_api_token`.
+     * token stored in `addon_xbeteiligung_async_api_token`.
      */
     #[Route(path: 'api/new/procedure_message/ids', name: 'dplan_api_get_new_procedure_messages_ids', methods: ['GET'])]
     public function showNewImportableProcedureMessages(
@@ -70,7 +70,7 @@ class ProcedureMessageController extends APIController
         if ($this->hasNoValidAuthToken($request->headers->get('authToken'))) {
             return $this->renderEmpty();
         }
-        if ($request->headers->get('authToken') !== $this->getParameter('xbeteiligung_api_token')) {
+        if ($request->headers->get('authToken') !== $this->getParameter('addon_xbeteiligung_async_api_token')) {
             return $this->createEmptyResponse();
         }
 
@@ -151,6 +151,6 @@ class ProcedureMessageController extends APIController
 
     private function hasNoValidAuthToken(string|null $authToken): bool
     {
-        return $authToken !== $this->getParameter('xbeteiligung_api_token');
+        return $authToken !== $this->getParameter('addon_xbeteiligung_async_api_token');
     }
 }

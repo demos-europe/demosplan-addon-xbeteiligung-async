@@ -16,7 +16,7 @@ class PermissionInitializer implements PermissionInitializerInterface
     public function __construct(GlobalConfigInterface $globalConfig, ParameterBagInterface $parameterBag)
     {
         $this->restrictedAccess = $globalConfig->hasProcedureUserRestrictedAccess();
-        $this->procedureMessageType = $parameterBag->get('procedure_message_type');
+        $this->procedureMessageType = $parameterBag->get('addon_xbeteiligung_async_procedure_message_type');
     }
 
     /**
