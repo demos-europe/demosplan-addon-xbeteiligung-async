@@ -16,9 +16,11 @@ use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Exception\JsonException;
 use DemosEurope\DemosplanAddon\Utilities\Json;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
@@ -34,6 +36,11 @@ class RabbitMQMessageBroker
     private const RABBIT_MQ_QUEUE_NAME = 'addon_xbeteiligung_async_rabbitMqQueueName';
     private const RABBIT_MQ_REQUEST_ID_GET = 'addon_xbeteiligung_async_rabbitMqRequestIdGet';
     private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
+    private const RABBIT_MQ_ROUTING_KEY_AUTHOR = 'addon_xbeteiligung_async_rabbitmq_routing_key_author';
+    private const RABBIT_MQ_ROUTING_KEY_READER = 'addon_xbeteiligung_async_rabbitmq_routing_key_reader';
+    private const BETEILIGUNG_QUEUE = 'beteiligung'; // for outgoing messages
+    private const COCKPIT_QUEUE = 'cockpit'; // for incoming messages
+    private const COCKPIT_SUBDOMAIN = 'init'; // subdomain for incoming cockpit messages
 
     public function __construct(
         private readonly GlobalConfigInterface $globalConfig,
@@ -69,7 +76,7 @@ class RabbitMQMessageBroker
             $this->logger->info('Process message', [$message]);
             try {
                 $responseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction($message);
-                $this->sendRabbitMq($responseObject->getPayload());
+                $this->sendRabbitMq($responseObject->getPayload(), $message['messageTypeCode'], false);
             } catch (InvalidArgumentException $e) {
                 $this->logger->error('Message payload not supported', [$e]);
             } catch (SchemaException $e) {
@@ -88,9 +95,9 @@ class RabbitMQMessageBroker
      * @throws AMQPTimeoutException
      * @throws Exception
      */
-    protected function sendRabbitMq(string $xmlString, int $expiration = 300): bool
+    protected function sendRabbitMq(string $xmlString, string $messageType, bool $isOutgoing, int $expiration = 300): bool
     {
-        $routingKey = $this->globalConfig->getProjectPrefix();
+        $routingKey = $this->buildRoutingKey($messageType, $isOutgoing);
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
             $routingKey = '';
         }
@@ -123,7 +130,11 @@ class RabbitMQMessageBroker
 
         $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
         $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
-        $this->sendRabbitMq($xmlString);
+        $this->sendRabbitMq(
+            $xmlString,
+            CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[AllgemeinStellungnahmeNeuabgegeben0701::class]['name'],
+            true
+        );
 
         return $event;
     }
@@ -134,5 +145,18 @@ class RabbitMQMessageBroker
     public function setClient(RpcClient $client): void
     {
         $this->client = $client;
+    }
+
+    private function buildRoutingKey(string $messageType, bool $isOutgoing): string
+    {
+        $author = $this->parameterBag->get(self::RABBIT_MQ_ROUTING_KEY_AUTHOR);
+        $reader = $this->parameterBag->get(self::RABBIT_MQ_ROUTING_KEY_READER);
+        if ($isOutgoing) {
+            $subdomain = $this->globalConfig->getSubdomain();
+
+            return $subdomain . '.' . self::BETEILIGUNG_QUEUE . '.' . $author . '.' . $reader . '.' . $messageType;
+        }
+
+        return self::COCKPIT_SUBDOMAIN . '.' . self::COCKPIT_QUEUE . '.' . $author . '.' . $reader . '.' . $messageType;
     }
 }

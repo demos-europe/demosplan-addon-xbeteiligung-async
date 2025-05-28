@@ -26,3 +26,7 @@ parameters:
   addon_xbeteiligung_async_rabbitMqRequestIdGet: 'XBeteiligung_Get'
 
   addon_xbeteiligung_async_rabbitMqRequestIdSend: 'XBeteiligung_Send'
+
+  addon_xbeteiligung_async_rabbitmq_routing_key_author: 'xyz.0001'
+
+  addon_xbeteiligung_async_rabbitmq_routing_key_reader: 'xyz.0002'
