@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- add building of a routing key for rabbit mq communication
 
 ###  v0.15 (2025-05-27)
 - fix getting map default projection label
