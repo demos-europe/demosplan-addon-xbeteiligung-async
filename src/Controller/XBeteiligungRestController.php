@@ -122,6 +122,88 @@ class XBeteiligungRestController extends APIController
     }
 
     /**
+     * Updates a procedure via XBeteiligung REST API instead of using RabbitMQ.
+     * This endpoint handles procedure update messages (402/302/202).
+     *
+     * @throws JsonException
+     */
+    #[Route(
+        path: '/addon/xbeteiligung/procedure/update',
+        name: 'dplan_addon_xbeteiligung_procedure_update',
+        methods: ['PATCH']
+    )]
+    public function updateProcedure(
+        Request $request,
+        XBeteiligungService $xBeteiligungService,
+        LoggerInterface $logger
+    ): Response {
+
+        try {
+            // Verify that the request has a valid API token using a custom header specific to XBeteiligung
+            if ($this->hasNoValidAuthToken($request->headers->get('X-Addon-XBeteiligung-Authorization'))) {
+                throw new AccessDeniedException('Unauthorized');
+            }
+
+            // Get the request payload - simply use the raw XML content
+            $xmlContent = $request->getContent();
+
+            if (empty($xmlContent)) {
+                throw new InvalidArgumentException('Empty request payload');
+            }
+
+            // Create a message structure expected by the service
+            // We'll extract the message type from the XML content for logging
+            $messageTypeCode = $this->extractMessageTypeFromXml($xmlContent);
+            $message = [
+                'messageData' => $xmlContent,
+                'messageTypeCode' => $messageTypeCode
+            ];
+
+            $logger->info('Processing XBeteiligung procedure update request', [
+                'messageTypeCode' => $messageTypeCode,
+                'xmlStartsWith' => substr($xmlContent, 0, 200), // First 200 chars for debugging
+                'content_length' => strlen($xmlContent)
+            ]);
+
+            // Process the message using the same service that RabbitMQ would use
+            $responseObject = $xBeteiligungService->determineMessageContextAndDelegateAction($message);
+
+            // Prepare the XML response
+            $xmlPayload = $responseObject->getPayload();
+            $response = new Response($xmlPayload);
+            $response->headers->set('Content-Type', 'application/xml');
+
+        } catch (Exception $e) {
+            // Determine the appropriate status code and message based on the exception type
+            $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $message = 'Error processing procedure update request: ' . $e->getMessage();
+            $logContext = [$e, $e->getTraceAsString()];
+            $logMessage = 'Error processing procedure update request';
+
+            if ($e instanceof AccessDeniedException) {
+                // Handle unauthorized access (401 Unauthorized)
+                $statusCode = Response::HTTP_UNAUTHORIZED;
+                $message = 'Unauthorized';
+                $logMessage = 'Unauthorized access attempt to XBeteiligung procedure update: Invalid X-Addon-XBeteiligung-Authorization header';
+                $logContext = [$e];
+            } elseif ($e instanceof InvalidArgumentException || $e instanceof SchemaException) {
+                // Handle validation errors (400 Bad Request)
+                $statusCode = Response::HTTP_BAD_REQUEST;
+                $message = $e->getMessage();
+                $logMessage = $e instanceof SchemaException
+                    ? 'XBeteiligung procedure update message could not be parsed'
+                    : 'XBeteiligung procedure update payload not supported';
+                $logContext = [$e];
+            }
+
+            $logger->error($logMessage, $logContext);
+            $response = new Response($message, $statusCode);
+        }
+
+        return $response;
+    }
+
+    /**
      * Check if the provided token is valid in the custom X-Addon-XBeteiligung-Authorization header.
      * Validates against the addon_xbeteiligung_async_rest_authentication parameter.
      */
