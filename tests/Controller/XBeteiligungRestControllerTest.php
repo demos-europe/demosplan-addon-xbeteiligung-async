@@ -70,7 +70,65 @@ class XBeteiligungRestControllerTest extends TestCase
             ->getMock();
     }
 
-    public function testCreateProcedureWithValidData(): void
+    /**
+     * Helper method to execute procedure tests with common setup.
+     */
+    private function executeProcedureTest(
+        string $methodName,
+        string $xmlData,
+        string $expectedMessageType,
+        string $responsePayload,
+        string $authToken,
+        bool $shouldThrowException = false
+    ): Response {
+        // Mock the getParameter method to return a valid token
+        $this->controller->expects($this->once())
+            ->method('getParameter')
+            ->with('addon_xbeteiligung_async_rest_authentication')
+            ->willReturn('valid-token');
+
+        // Mock the request
+        $request = new Request([], [], [], [], [], [], $xmlData);
+        if ($authToken) {
+            $request->headers->set('X-Addon-XBeteiligung-Authorization', $authToken);
+        }
+
+        // Setup service response (only if we expect the service to be called)
+        // For empty payload, the service won't be called due to early validation
+        if (!empty($xmlData)) {
+            if ($shouldThrowException) {
+                $this->xBeteiligungService->expects($this->once())
+                    ->method('determineMessageContextAndDelegateAction')
+                    ->willThrowException(new \Exception('Service error'));
+            } else {
+                $responseValue = new ResponseValue();
+                $responseValue->setPayload($responsePayload);
+
+                $this->xBeteiligungService->expects($this->once())
+                    ->method('determineMessageContextAndDelegateAction')
+                    ->with($this->callback(function($message) use ($xmlData, $expectedMessageType) {
+                        return is_array($message)
+                            && isset($message['messageData'])
+                            && $message['messageData'] === $xmlData
+                            && isset($message['messageTypeCode'])
+                            && $message['messageTypeCode'] === $expectedMessageType;
+                    }))
+                    ->willReturn($responseValue);
+            }
+        } else {
+            // For empty payload, service should never be called
+            $this->xBeteiligungService->expects($this->never())
+                ->method('determineMessageContextAndDelegateAction');
+        }
+
+        // Execute controller method
+        return $this->controller->$methodName($request, $this->xBeteiligungService, $this->logger);
+    }
+
+    /**
+     * Helper method to execute simple authentication tests.
+     */
+    private function executeAuthenticationTest(string $methodName, string $authToken): Response
     {
         // Mock the getParameter method to return a valid token
         $this->controller->expects($this->once())
@@ -78,252 +136,172 @@ class XBeteiligungRestControllerTest extends TestCase
             ->with('addon_xbeteiligung_async_rest_authentication')
             ->willReturn('valid-token');
 
-        // Prepare test data - now just XML content
-        $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>test</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>';
-
         // Mock the request
-        $request = new Request([], [], [], [], [], [], $xmlData);
-        $request->headers->set('X-Addon-XBeteiligung-Authorization', 'Bearer valid-token');
-
-        // Setup response from service
-        $responseValue = new ResponseValue();
-        $responseValue->setPayload('<xml>response</xml>');
-
-        // Mock service response - check that the correct message structure is passed
-        $this->xBeteiligungService->expects($this->once())
-            ->method('determineMessageContextAndDelegateAction')
-            ->with($this->callback(function($message) use ($xmlData) {
-                return is_array($message)
-                    && isset($message['messageData'])
-                    && $message['messageData'] === $xmlData
-                    && isset($message['messageTypeCode'])
-                    && $message['messageTypeCode'] === 'kommunal.Initiieren.0401';
-            }))
-            ->willReturn($responseValue);
+        $request = new Request();
+        if ($authToken) {
+            $request->headers->set('X-Addon-XBeteiligung-Authorization', $authToken);
+        }
 
         // Execute controller method
-        $response = $this->controller->createProcedure($request, $this->xBeteiligungService, $this->logger);
+        return $this->controller->$methodName($request, $this->xBeteiligungService, $this->logger);
+    }
 
-        // Assertions
+    /**
+     * Helper method to assert successful responses.
+     */
+    private function assertSuccessfulResponse(Response $response, string $expectedContent): void
+    {
         $this->assertInstanceOf(Response::class, $response);
         $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('<xml>response</xml>', $response->getContent());
+        $this->assertEquals($expectedContent, $response->getContent());
         $this->assertEquals('application/xml', $response->headers->get('Content-Type'));
+    }
+
+    /**
+     * Helper method to assert unauthorized responses.
+     */
+    private function assertUnauthorizedResponse(Response $response): void
+    {
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(401, $response->getStatusCode());
+        $this->assertEquals('Unauthorized', $response->getContent());
+    }
+
+    /**
+     * Helper method to assert bad request responses.
+     */
+    private function assertBadRequestResponse(Response $response, string $expectedMessage): void
+    {
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(400, $response->getStatusCode());
+        $this->assertEquals($expectedMessage, $response->getContent());
+    }
+
+    /**
+     * Helper method to assert server error responses.
+     */
+    private function assertServerErrorResponse(Response $response, string $expectedMessageSubstring): void
+    {
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertEquals(500, $response->getStatusCode());
+        $this->assertStringContainsString($expectedMessageSubstring, $response->getContent());
+    }
+
+    public function testCreateProcedureWithValidData(): void
+    {
+        $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>test</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>';
+        $expectedMessageType = 'kommunal.Initiieren.0401';
+        $expectedResponse = '<xml>response</xml>';
+
+        $response = $this->executeProcedureTest(
+            'createProcedure',
+            $xmlData,
+            $expectedMessageType,
+            $expectedResponse,
+            'Bearer valid-token'
+        );
+
+        $this->assertSuccessfulResponse($response, $expectedResponse);
     }
 
     public function testCreateProcedureWithInvalidToken(): void
     {
-        // Mock the getParameter method to return a valid token
-        $this->controller->expects($this->once())
-            ->method('getParameter')
-            ->with('addon_xbeteiligung_async_rest_authentication')
-            ->willReturn('valid-token');
-
-        // Mock the request with invalid token
-        $request = new Request();
-        $request->headers->set('X-Addon-XBeteiligung-Authorization', 'Bearer invalid-token');
-
-        // Execute controller method
-        $response = $this->controller->createProcedure($request, $this->xBeteiligungService, $this->logger);
-
-        // Assertions
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals('Unauthorized', $response->getContent());
+        $response = $this->executeAuthenticationTest('createProcedure', 'Bearer invalid-token');
+        $this->assertUnauthorizedResponse($response);
     }
 
     public function testCreateProcedureWithEmptyPayload(): void
     {
-        // Mock the getParameter method to return a valid token
-        $this->controller->expects($this->once())
-            ->method('getParameter')
-            ->with('addon_xbeteiligung_async_rest_authentication')
-            ->willReturn('valid-token');
-
-        // Mock the request with invalid data (empty body)
-        $request = new Request([], [], [], [], [], [], '');
-        $request->headers->set('X-Addon-XBeteiligung-Authorization', 'Bearer valid-token');
-
-        // Execute controller method
-        $response = $this->controller->createProcedure($request, $this->xBeteiligungService, $this->logger);
-
-        // Assertions
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('Empty request payload', $response->getContent());
+        $response = $this->executeProcedureTest(
+            'createProcedure',
+            '',
+            '',
+            '',
+            'Bearer valid-token'
+        );
+        $this->assertBadRequestResponse($response, 'Empty request payload');
     }
 
     public function testUpdateProcedureWithValidData(): void
     {
-        // Mock the getParameter method to return a valid token
-        $this->controller->expects($this->once())
-            ->method('getParameter')
-            ->with('addon_xbeteiligung_async_rest_authentication')
-            ->willReturn('valid-token');
-
-        // Prepare test data - XML content for update message (402)
         $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>test update</xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>';
+        $expectedMessageType = 'kommunal.Aktualisieren.0402';
+        $expectedResponse = '<xml>update response</xml>';
 
-        // Mock the request
-        $request = new Request([], [], [], [], [], [], $xmlData);
-        $request->headers->set('X-Addon-XBeteiligung-Authorization', 'Bearer valid-token');
+        $response = $this->executeProcedureTest(
+            'updateProcedure',
+            $xmlData,
+            $expectedMessageType,
+            $expectedResponse,
+            'Bearer valid-token'
+        );
 
-        // Setup response from service
-        $responseValue = new ResponseValue();
-        $responseValue->setPayload('<xml>update response</xml>');
-
-        // Mock service response - check that the correct message structure is passed
-        $this->xBeteiligungService->expects($this->once())
-            ->method('determineMessageContextAndDelegateAction')
-            ->with($this->callback(function($message) use ($xmlData) {
-                return is_array($message)
-                    && isset($message['messageData'])
-                    && $message['messageData'] === $xmlData
-                    && isset($message['messageTypeCode'])
-                    && $message['messageTypeCode'] === 'kommunal.Aktualisieren.0402';
-            }))
-            ->willReturn($responseValue);
-
-        // Execute controller method
-        $response = $this->controller->updateProcedure($request, $this->xBeteiligungService, $this->logger);
-
-        // Assertions
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('<xml>update response</xml>', $response->getContent());
-        $this->assertEquals('application/xml', $response->headers->get('Content-Type'));
+        $this->assertSuccessfulResponse($response, $expectedResponse);
     }
 
     public function testUpdateProcedureWithInvalidToken(): void
     {
-        // Mock the getParameter method to return a valid token
-        $this->controller->expects($this->once())
-            ->method('getParameter')
-            ->with('addon_xbeteiligung_async_rest_authentication')
-            ->willReturn('valid-token');
-
-        // Mock the request with invalid token
-        $request = new Request();
-        $request->headers->set('X-Addon-XBeteiligung-Authorization', 'Bearer invalid-token');
-
-        // Execute controller method
-        $response = $this->controller->updateProcedure($request, $this->xBeteiligungService, $this->logger);
-
-        // Assertions
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals('Unauthorized', $response->getContent());
+        $response = $this->executeAuthenticationTest('updateProcedure', 'Bearer invalid-token');
+        $this->assertUnauthorizedResponse($response);
     }
 
     public function testUpdateProcedureWithEmptyPayload(): void
     {
-        // Mock the getParameter method to return a valid token
-        $this->controller->expects($this->once())
-            ->method('getParameter')
-            ->with('addon_xbeteiligung_async_rest_authentication')
-            ->willReturn('valid-token');
-
-        // Mock the request with invalid data (empty body)
-        $request = new Request([], [], [], [], [], [], '');
-        $request->headers->set('X-Addon-XBeteiligung-Authorization', 'Bearer valid-token');
-
-        // Execute controller method
-        $response = $this->controller->updateProcedure($request, $this->xBeteiligungService, $this->logger);
-
-        // Assertions
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals('Empty request payload', $response->getContent());
+        $response = $this->executeProcedureTest(
+            'updateProcedure',
+            '',
+            '',
+            '',
+            'Bearer valid-token'
+        );
+        $this->assertBadRequestResponse($response, 'Empty request payload');
     }
 
     public function testUpdateProcedureWithServiceException(): void
     {
-        // Mock the getParameter method to return a valid token
-        $this->controller->expects($this->once())
-            ->method('getParameter')
-            ->with('addon_xbeteiligung_async_rest_authentication')
-            ->willReturn('valid-token');
-
-        // Prepare test data
         $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>test update</xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>';
 
-        // Mock the request
-        $request = new Request([], [], [], [], [], [], $xmlData);
-        $request->headers->set('X-Addon-XBeteiligung-Authorization', 'Bearer valid-token');
+        $response = $this->executeProcedureTest(
+            'updateProcedure',
+            $xmlData,
+            'kommunal.Aktualisieren.0402',
+            '',
+            'Bearer valid-token',
+            true
+        );
 
-        // Mock service to throw exception
-        $this->xBeteiligungService->expects($this->once())
-            ->method('determineMessageContextAndDelegateAction')
-            ->willThrowException(new \Exception('Service error'));
-
-        // Execute controller method
-        $response = $this->controller->updateProcedure($request, $this->xBeteiligungService, $this->logger);
-
-        // Assertions
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(500, $response->getStatusCode());
-        $this->assertStringContainsString('Error processing procedure update request', $response->getContent());
+        $this->assertServerErrorResponse($response, 'Error processing procedure update request');
     }
 
     public function testCreateProcedureWithServiceException(): void
     {
-        // Mock the getParameter method to return a valid token
-        $this->controller->expects($this->once())
-            ->method('getParameter')
-            ->with('addon_xbeteiligung_async_rest_authentication')
-            ->willReturn('valid-token');
-
-        // Prepare test data
         $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>test</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>';
 
-        // Mock the request
-        $request = new Request([], [], [], [], [], [], $xmlData);
-        $request->headers->set('X-Addon-XBeteiligung-Authorization', 'Bearer valid-token');
+        $response = $this->executeProcedureTest(
+            'createProcedure',
+            $xmlData,
+            'kommunal.Initiieren.0401',
+            '',
+            'Bearer valid-token',
+            true
+        );
 
-        // Mock service to throw exception
-        $this->xBeteiligungService->expects($this->once())
-            ->method('determineMessageContextAndDelegateAction')
-            ->willThrowException(new \Exception('Service error'));
-
-        // Execute controller method
-        $response = $this->controller->createProcedure($request, $this->xBeteiligungService, $this->logger);
-
-        // Assertions
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(500, $response->getStatusCode());
-        $this->assertStringContainsString('Error processing procedure creation request', $response->getContent());
+        $this->assertServerErrorResponse($response, 'Error processing procedure creation request');
     }
 
     public function testAuthTokenWithoutBearerPrefix(): void
     {
-        // Mock the getParameter method to return a valid token
-        $this->controller->expects($this->once())
-            ->method('getParameter')
-            ->with('addon_xbeteiligung_async_rest_authentication')
-            ->willReturn('valid-token');
-
-        // Prepare test data
         $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>test</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>';
+        $expectedResponse = '<xml>response</xml>';
 
-        // Mock the request with token without Bearer prefix
-        $request = new Request([], [], [], [], [], [], $xmlData);
-        $request->headers->set('X-Addon-XBeteiligung-Authorization', 'valid-token'); // Without "Bearer " prefix
+        $response = $this->executeProcedureTest(
+            'createProcedure',
+            $xmlData,
+            'kommunal.Initiieren.0401',
+            $expectedResponse,
+            'valid-token' // Without "Bearer " prefix
+        );
 
-        // Setup response from service
-        $responseValue = new ResponseValue();
-        $responseValue->setPayload('<xml>response</xml>');
-
-        // Mock service response
-        $this->xBeteiligungService->expects($this->once())
-            ->method('determineMessageContextAndDelegateAction')
-            ->willReturn($responseValue);
-
-        // Execute controller method
-        $response = $this->controller->createProcedure($request, $this->xBeteiligungService, $this->logger);
-
-        // Assertions - should still work since the code handles both cases
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals('<xml>response</xml>', $response->getContent());
+        $this->assertSuccessfulResponse($response, $expectedResponse);
     }
 }
