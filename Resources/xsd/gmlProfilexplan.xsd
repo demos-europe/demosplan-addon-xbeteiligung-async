@@ -3,7 +3,7 @@
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:gml="http://www.opengis.net/gml/3.2"
 	version="3.2.1" elementFormDefault="qualified" targetNamespace="http://www.opengis.net/gml/3.2">
-	
+
 	<import schemaLocation="xlink.xsd" namespace="http://www.w3.org/1999/xlink"/>
 	<!-- ================================================= -->
 	<complexType name="AbstractMetadataPropertyType" abstract="true">
@@ -59,14 +59,14 @@
 	<!-- ================================================= -->
 	<attribute name="id" type="ID"/>
 	<!-- ================================================= -->
-	<element name="AbstractObject" abstract="true" type="anyType"/>
+    <element name="AbstractObject" abstract="true" type="anyType"/>
 	<!-- ================================================= -->
 	<attributeGroup name="AssociationAttributeGroup">
 		<annotation>
 			<documentation>XLink components are the standard method to support hypertext referencing in XML. An XML Schema attribute group, gml:AssociationAttributeGroup, is provided to support the use of Xlinks as the method for indicating the value of a property by reference in a uniform manner in GML.</documentation>
 		</annotation>
 		<attributeGroup ref="xlink:simpleAttrs"/>
-		<attribute name="nilReason" type="gml:NilReasonType"/>		
+		<attribute name="nilReason" type="gml:NilReasonType"/>
 	</attributeGroup>
 	<!-- ================================================= -->
 	<simpleType name="NilReasonType">
@@ -425,18 +425,18 @@
 				<sequence>
 					<element ref="gml:exterior" minOccurs="0"/>
 					<element ref="gml:interior" minOccurs="0" maxOccurs="unbounded"/>
-				</sequence>			
+				</sequence>
 			</extension>
 		</complexContent>
 	</complexType>
 	<!-- ================================================= -->
 	<element name="PolygonPatch" type="gml:PolygonPatchType" substitutionGroup="gml:AbstractSurfacePatch">
 		<annotation>
-			<documentation>A gml:PolygonPatch is a surface patch that is defined by a set of boundary curves and an underlying surface to which these curves adhere. The curves shall be coplanar and the polygon uses planar interpolation in its interior. 
+			<documentation>A gml:PolygonPatch is a surface patch that is defined by a set of boundary curves and an underlying surface to which these curves adhere. The curves shall be coplanar and the polygon uses planar interpolation in its interior.
 interpolation is fixed to "planar", i.e. an interpolation shall return points on a single plane. The boundary of the patch shall be contained within that plane.</documentation>
 		</annotation>
 	</element>
-	
+
 	<!-- ================================================= -->
 	<element name="CompositeCurve" type="gml:CompositeCurveType"
 		substitutionGroup="gml:AbstractCurve"/>

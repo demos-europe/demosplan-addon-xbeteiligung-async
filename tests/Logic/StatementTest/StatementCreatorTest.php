@@ -63,10 +63,14 @@ class StatementCreatorTest extends TestCase
     protected MockObject $procedure;
     protected MockObject $meta;
 
+    public function createMockObject(string $className): MockObject
+    {
+        return $this->createMock($className);
+    }
+
     protected function setUp(): void
     {
-        $mockFactory = new MockFactoryTest();
-        $this->mockFactory = $mockFactory;
+        $this->mockFactory = new MockFactoryTest($this);
         $this->permissionEvaluator = $this->createMock(PermissionEvaluatorInterface::class);
         $this->permissionEvaluator->method('isPermissionEnabled')->willReturn(true);
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
