@@ -19,6 +19,7 @@
   - Refactored MockFactoryTest from extending TestCase to using dependency injection pattern
   - Fixed constructor parameter issues and method visibility
   - Cleaned up unnecessary property declarations in test classes
+  - Updated test XML namespace from `xbeteiligung/12` to `xbeteiligung/1/3` and version from 1.1 to 1.3 to match XSD updates
 
 
 ###  v0.15 (2025-05-27)
