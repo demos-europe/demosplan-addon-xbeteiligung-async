@@ -85,6 +85,10 @@ class XBeteiligungProcedureChanged
             if ($procedure->getMaster()) {
                 continue;
             }
+            // Skip if this procedure was also scheduled for insertion in this UnitOfWork
+            if (in_array($procedure, $this->getInsertions(ProcedureInterface::class), true)) {
+                continue;
+            }
             if ($procedure->getDeleted()) {
                 $this->updatedProcedures[$procedure->getId()] = $procedure;
                 continue;

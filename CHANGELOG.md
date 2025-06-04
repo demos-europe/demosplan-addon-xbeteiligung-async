@@ -2,6 +2,8 @@
 
 ## UNRELEASED
 
+- Prevent duplicate procedure update messages during procedure creation by skipping procedures that are scheduled for insertion in the same UnitOfWork
+
 ###  v0.15 (2025-05-27)
 - fix getting map default projection label
 - add procedure origin information to ProcedureMessageController::showNewImportableProcedureMessages api response as
