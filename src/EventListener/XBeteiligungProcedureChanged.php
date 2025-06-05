@@ -21,17 +21,19 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoe
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
-use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
+use Doctrine\Persistence\ObjectManager;
 use Exception;
 
 #[AsDoctrineListener(Events::onFlush)]
 class XBeteiligungProcedureChanged
 {
     private UnitOfWork $unitOfWork;
-    private Connection $connection;
+    private ObjectManager|EntityManagerInterface $objectManager;
     private array $updatedProcedures = [];
 
     public function __construct(
@@ -48,7 +50,7 @@ class XBeteiligungProcedureChanged
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
         $this->unitOfWork = $eventArgs->getObjectManager()->getUnitOfWork();
-        $this->connection = $eventArgs->getObjectManager()->getConnection();
+        $this->objectManager = $eventArgs->getObjectManager();
 
         $this->handleProcedureSettingsUpdates();
         $this->handleProcedureUpdates();
@@ -307,15 +309,20 @@ class XBeteiligungProcedureChanged
             !array_key_exists($updatedProcedure->getId(), $this->updatedProcedures)) {
             // Check if the Procedure has been inserted into the database at this point
             // During ProcedureCreation multiple flushes occur and potentially trigger this
-            // update event. To prevent this we use the connection to execute a sql query directly
+            // update event. To prevent this we use a new connection to execute a sql query directly
             // and try to fetch this procedure from the DB.
             // If we find it - the create transaction had been committed.
-            $sql = 'SELECT 1 FROM _procedure WHERE _p_id = ? LIMIT 1';
-            $result = $this->connection->executeQuery($sql, [$updatedProcedure->getId()]);
-            if ($result->fetchOne() !== false) {
+            // Create new connection to bypass transaction isolation
+            $newConnection = DriverManager::getConnection($this->objectManager->getConnection()->getParams());
+            $sql = 'SELECT _p_id FROM _procedure WHERE _p_id = ? LIMIT 1';
+            $result = $newConnection->executeQuery($sql, [$updatedProcedure->getId()]);
 
+            if ($result->fetchOne() === false) {
+                $newConnection->close();
                 return;
             };
+
+            $newConnection->close();
 
             $this->updatedProcedures[$updatedProcedure->getId()] = $updatedProcedure;
         }
