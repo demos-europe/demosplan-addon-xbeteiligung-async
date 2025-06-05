@@ -21,6 +21,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoe
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
@@ -30,6 +31,7 @@ use Exception;
 class XBeteiligungProcedureChanged
 {
     private UnitOfWork $unitOfWork;
+    private Connection $connection;
     private array $updatedProcedures = [];
 
     public function __construct(
@@ -46,6 +48,7 @@ class XBeteiligungProcedureChanged
     public function onFlush(OnFlushEventArgs $eventArgs): void
     {
         $this->unitOfWork = $eventArgs->getObjectManager()->getUnitOfWork();
+        $this->connection = $eventArgs->getObjectManager()->getConnection();
 
         $this->handleProcedureSettingsUpdates();
         $this->handleProcedureUpdates();
@@ -83,10 +86,6 @@ class XBeteiligungProcedureChanged
 
         foreach ($proceduresToUpdate as $procedure) {
             if ($procedure->getMaster()) {
-                continue;
-            }
-            // Skip if this procedure was also scheduled for insertion in this UnitOfWork
-            if (in_array($procedure, $this->getInsertions(ProcedureInterface::class), true)) {
                 continue;
             }
             if ($procedure->getDeleted()) {
@@ -306,6 +305,18 @@ class XBeteiligungProcedureChanged
     {
         if (RelevantPropertiesForUpdatedProcedure::propertyHasChanged($changeSet) &&
             !array_key_exists($updatedProcedure->getId(), $this->updatedProcedures)) {
+            // Check if the Procedure has been inserted into the database at this point
+            // During ProcedureCreation multiple flushes occur and potentially trigger this
+            // update event. To prevent this we use the connection to execute a sql query directly
+            // and try to fetch this procedure from the DB.
+            // If we find it - the create transaction had been committed.
+            $sql = 'SELECT 1 FROM _procedure WHERE _p_id = ? LIMIT 1';
+            $result = $this->connection->executeQuery($sql, [$updatedProcedure->getId()]);
+            if ($result->fetchOne() !== false) {
+
+                return;
+            };
+
             $this->updatedProcedures[$updatedProcedure->getId()] = $updatedProcedure;
         }
     }
