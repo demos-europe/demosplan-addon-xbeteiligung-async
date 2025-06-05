@@ -40,7 +40,6 @@ enum PublicParticipationPhase
                     self::CONFIGURATION => self::CONFIGURATION,
                     self::EARLY_PARTICIPATION => self::EARLY_PARTICIPATION,
                     self::PARTICIPATION => self::PARTICIPATION,
-                    self::ANOTHER_PARTICIPATION => self::ANOTHER_PARTICIPATION,
                     self::EVALUATING => self::EVALUATING,
                     self::CLOSED => self::CLOSED,
                 };
