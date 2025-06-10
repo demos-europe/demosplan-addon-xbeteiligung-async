@@ -47,14 +47,22 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
             );
         }
 
-        // Handle procedure phases
-        $procedurePhaseData = $this->procedurePhaseExtractor->extract($beteiligungKommunalType);
-        $this->setProcedurePhase($procedureToUpdate, $procedurePhaseData);
+        // Update procedure with the data from BeteiligungKommunalType
+        $procedureUpdated = $this->transactionService->executeAndFlushInTransaction(
+            function () use ($beteiligungKommunalType, $procedureToUpdate) {
+                // Handle procedure phases
+                $procedurePhaseData = $this->procedurePhaseExtractor->extract($beteiligungKommunalType);
+                $this->setProcedurePhase($procedureToUpdate, $procedurePhaseData);
+
+                return $procedureToUpdate;
+            }
+        );
+
 
         // create OK message for procedure update
         return $this->kommunaleMessageFactory->buildProcedureUpdateOKResponse412(
             $kommunalAktualisieren0402,
-            $procedureToUpdate
+            $procedureUpdated
         );
     }
 
