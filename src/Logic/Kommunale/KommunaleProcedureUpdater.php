@@ -50,9 +50,13 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         // Update procedure with the data from BeteiligungKommunalType
         $procedureUpdated = $this->transactionService->executeAndFlushInTransaction(
             function () use ($beteiligungKommunalType, $procedureToUpdate) {
-                // Handle procedure phases
+                // Update procedure phases
                 $procedurePhaseData = $this->procedurePhaseExtractor->extract($beteiligungKommunalType);
                 $this->setProcedurePhase($procedureToUpdate, $procedurePhaseData);
+                // Update procedure description and external description
+                $description = $beteiligungKommunalType->getBeschreibungPlanungsanlass() ?? '';
+                $procedureToUpdate->setDesc($description);
+                $procedureToUpdate->setExternalDesc($description);
 
                 return $procedureToUpdate;
             }
