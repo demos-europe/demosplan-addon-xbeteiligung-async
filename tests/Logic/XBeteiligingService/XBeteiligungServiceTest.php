@@ -26,6 +26,7 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
@@ -73,6 +74,7 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->gisLayerCategoryRepository,
             $globalConfigMock,
             $this->createMock(KommunaleProcedureCreater::class),
+            $this->createMock(KommunaleProcedureUpdater::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock( PlanningDocumentsLinkCreator::class),
             $this->procedureMessageRepository,

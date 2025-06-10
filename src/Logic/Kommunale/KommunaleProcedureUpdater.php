@@ -26,8 +26,10 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
      * @throws SchemaException
      * @throws Exception
      */
-    public function updateProcedure(KommunalAktualisieren0402 $kommunalAktualisieren0402): ResponseValue
-    {
+    public function updateProcedure(
+        KommunalAktualisieren0402 $kommunalAktualisieren0402,
+        array $messageAttachments
+    ): ResponseValue {
         $errorTypes = [];
 
         // Get BeteiligungKommunalType from the message
@@ -57,6 +59,10 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
                 $description = $beteiligungKommunalType->getBeschreibungPlanungsanlass() ?? '';
                 $procedureToUpdate->setDesc($description);
                 $procedureToUpdate->setExternalDesc($description);
+                // Update procedure documents
+                $publicDocuments = $beteiligungKommunalType->getBeteiligungOeffentlichkeit()?->getAnlagen();
+                $institutionalDocuments = $beteiligungKommunalType->getBeteiligungOeffentlichkeit()?->getAnlagen();
+                // todo: implement logic to map anlagen to procedure documents
 
                 return $procedureToUpdate;
             }

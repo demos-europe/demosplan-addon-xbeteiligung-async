@@ -26,6 +26,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
@@ -150,6 +151,7 @@ class XBeteiligungService
         private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
         private readonly GlobalConfigInterface                  $globalConfig,
         private readonly KommunaleProcedureCreater              $kommunaleProcedureCreater,
+        private readonly KommunaleProcedureUpdater              $kommunaleProcedureUpdater,
         private readonly LoggerInterface                        $logger,
         private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
@@ -854,16 +856,17 @@ class XBeteiligungService
             $xmlObject401 = $this->incomingMessageParser->getXmlObject($payload, '401');
             return $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
         }
+
+        if (self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
+            $messageAttachments = $message['messageAttachments']; // todo: check if this is correct?!
+            $xmlObject402 = $this->incomingMessageParser->getXmlObject($payload, '402');
+
+            return $this->kommunaleProcedureUpdater->updateProcedure($xmlObject402, $messageAttachments);
+        }
         /*
          * The code is for different message types code and we use this thing in future
          * There are not implement yet
          *
-        if (self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
-            $messageAttachments = $message['messageAttachments'];
-            $xmlObject402 = $this->incomingMessageParser->getXmlObject($payload, 402);
-
-            return $this->updateProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject402, $messageAttachments);
-        }
         if (str_contains($payload, self::DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER)) {
             $xmlObject409 = $this->incomingMessageParser->getXmlObject($payload, 409);
 

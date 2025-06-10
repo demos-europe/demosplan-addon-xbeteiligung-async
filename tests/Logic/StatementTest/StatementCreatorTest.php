@@ -23,6 +23,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
@@ -53,7 +54,7 @@ class StatementCreatorTest extends TestCase
     protected Logger $logger;
     protected Serializer $serializer;
     protected XBeteiligungService $XBeteiligungService;
-    
+
     private MockFactoryTest $mockFactory;
     protected MockObject $permissionEvaluator;
     protected MockObject $gisLayerCategoryRepository;
@@ -77,16 +78,17 @@ class StatementCreatorTest extends TestCase
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
         $reusableMessageBlocks =
             new ReusableMessageBlocks(new CommonHelpers($this->createMock(LoggerInterface::class)));
-            
+
         $globalConfigMock = $this->createMock(GlobalConfigInterface::class);
         $globalConfigMock->method('getMapDefaultProjection')->willReturn([
             'label' => 'EPSG:3857',
         ]);
-            
+
         $xbeteiligungService = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
             $globalConfigMock,
             $this->createMock(KommunaleProcedureCreater::class),
+            $this->createMock(KommunaleProcedureUpdater::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock( PlanningDocumentsLinkCreator::class),
             $this->procedureMessageRepository,
