@@ -8,7 +8,7 @@ xsd2php:
     # xlink.xsd
     'http://www.w3.org/1999/xlink': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink'
     # xbau-kernmodul-datentypen.xsd and xbau-kernmodul-codes.xsd
-    'http://www.xleitstelle.de/xbau/kernmodul/1/2/1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul'
+    'http://www.xleitstelle.de/xbau/kernmodul/1/2/1/1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul'
     # latinchars.xsd
     'http://xoev.de/latinchars/1_1/datatypes': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema'
     # xoev-basisnachricht-behoerde_1.1.xsd
@@ -23,7 +23,7 @@ xsd2php:
     'http://xoev.de/schemata/code/1_0': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Code'
     # xbeteiligung-kommunaleBauleitplanung.xsd, xbeteiligung-planfeststellung.xsd, xbeteiligung-raumordnung.xsd,
     # xbeteiligung.xsd, xbeteiligung-allgemein.xsd, xbeteiligung-baukasten.xsd, xbeteiligung-codes.xsd
-    'https://www.xleitstelle.de/xbeteiligung/12': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung'
+    'https://www.xleitstelle.de/xbeteiligung/1/3': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung'
     # din-norm-91379-datatypes.xsd
     'urn:xoev-de:kosit:xoev:datentyp:din-91379_2022-08': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema'
     # din-91379-datatypes.xsd

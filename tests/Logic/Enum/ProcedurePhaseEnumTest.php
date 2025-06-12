@@ -71,7 +71,7 @@ class ProcedurePhaseEnumTest extends TestCase
     /**
      * @return array<int, array<string, string>>
      */
-    public function publicParticipationPhaseCodeToKeyProvider(): array
+    public static function publicParticipationPhaseCodeToKeyProvider(): array
     {
         return [
             [ProcedurePhaseKey::CONFIGURATION->value, PublicParticipationPhase::CONFIGURATION->getCode()],
@@ -85,7 +85,7 @@ class ProcedurePhaseEnumTest extends TestCase
     /**
      * @return array<int, array<string, string>>
      */
-    public function institutionParticipationPhaseCodeToKeyProvider(): array
+    public static function institutionParticipationPhaseCodeToKeyProvider(): array
     {
         return [
             [ProcedurePhaseKey::CONFIGURATION->value, InstitutionParticipationPhase::CONFIGURATION->getCode()],
@@ -99,7 +99,7 @@ class ProcedurePhaseEnumTest extends TestCase
     /**
      * @return array<array{string, PublicParticipationPhase}>
      */
-    public function publicKeyToParticipationPhaseProvider(): array
+    public static function publicKeyToParticipationPhaseProvider(): array
     {
         return [
             [ProcedurePhaseKey::CONFIGURATION->value, PublicParticipationPhase::CONFIGURATION],
@@ -114,7 +114,7 @@ class ProcedurePhaseEnumTest extends TestCase
     /**
      * @return array<array{string, InstitutionParticipationPhase}>
      */
-    public function institutionKeyToParticipationPhaseProvider(): array
+    public static function institutionKeyToParticipationPhaseProvider(): array
     {
         return [
             [ProcedurePhaseKey::CONFIGURATION->value, InstitutionParticipationPhase::CONFIGURATION],

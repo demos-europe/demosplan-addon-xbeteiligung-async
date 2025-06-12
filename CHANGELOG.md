@@ -2,6 +2,26 @@
 
 ## UNRELEASED
 
+- XSD Namespace Consistency Fix
+  Fixed namespace mismatch between XBeteiligung baukasten and XBau kernmodul XSD files that was preventing successful xsd2php code
+  generation.
+
+  Problem: The xbeteiligung-baukasten.xsd file was importing kernmodul with namespace
+  http://www.xleitstelle.de/xbau/kernmodul/1/2/1/1, but the kernmodul files were using http://www.xleitstelle.de/xbau/kernmodul/1/2/1.
+
+  Solution: Updated both kernmodul XSD files to use the expected /1/2/1/1 namespace:
+- xbau-kernmodul-datentypen.xsd - updated xmlns:xbauk and targetNamespace
+- xbau-kernmodul-codes.xsd - updated xmlns:xbauk and targetNamespace
+
+- PHPUnit 11 Compatibility Fix
+  Updated test suite to be compatible with PHPUnit 11:
+  - Made data provider methods static as required by PHPUnit 11+
+  - Refactored MockFactoryTest from extending TestCase to using dependency injection pattern
+  - Fixed constructor parameter issues and method visibility
+  - Cleaned up unnecessary property declarations in test classes
+  - Updated test XML namespace from `xbeteiligung/12` to `xbeteiligung/1/3` and version from 1.1 to 1.3 to match XSD updates
+
+
 ###  v0.15 (2025-05-27)
 - fix getting map default projection label
 - add procedure origin information to ProcedureMessageController::showNewImportableProcedureMessages api response as
