@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 
+###  v0.16 (2025-06-13)
 - XSD Namespace Consistency Fix
   Fixed namespace mismatch between XBeteiligung baukasten and XBau kernmodul XSD files that was preventing successful xsd2php code
   generation.
