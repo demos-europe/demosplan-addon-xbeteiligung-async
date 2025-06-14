@@ -627,9 +627,16 @@ class XBeteiligungService
                 $baseLayer?->getLayerVersion() ?? '1.3.0',
                 '<='
             ) ? 'CRS' : 'SRS';
-            $projectionLabel = strtoupper(
-                $baseLayer?->getProjectionLabel() ?? $this->globalConfig->getMapDefaultProjection()['label']
-            );
+            // use default projection label in case base layer is not set, projection label is not set or projection label is empty string
+            $baseLayerProjection = $baseLayer?->getProjectionLabel();
+            $defaultProjection = $this->globalConfig->getMapDefaultProjection()['label'] ?? '';
+
+            if (empty($baseLayerProjection) && empty($defaultProjection)) {
+                $this->logger->error('XBeteiligung: Both base layer projection and default projection are empty');
+                throw new Exception('No valid projection label found - check base layer and map_default_projection configuration');
+            }
+
+            $projectionLabel = strtoupper(!empty($baseLayerProjection) ? $baseLayerProjection : $defaultProjection);
             // for some projections after v1.3.0 the x and y coords are swapped
             // - there are more, but the common ones are at least treated:
             $areCoordsSwapped =
@@ -708,7 +715,7 @@ class XBeteiligungService
         $proj4 = new Proj4php();
 
         $targetProjection = new Proj($targetProjectionName, $proj4);
-        $sourceProjection = new Proj($this-> globalConfig->getMapDefaultProjection()['label'], $proj4);
+        $sourceProjection = new Proj($this->globalConfig->getMapDefaultProjection()['label'], $proj4);
 
         $transformedCoords = array_map(
             fn (array $coordinate) => $this->convertPoint(
