@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 
+### Fixed
+- fix projection definition validation to handle empty projection labels in WMS URL generation
+
 ## v0.10.6 (2025-05-16)
 - Symfony 6 compatibility
 - fix creation of X09 messages
