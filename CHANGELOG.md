@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.10.7 (2025-06-14)
 
 ### Fixed
 - fix projection definition validation to handle empty projection labels in WMS URL generation
