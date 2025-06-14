@@ -1,6 +1,19 @@
 # Changelog
 
 ## UNRELEASED
+## v0.10.7 (2025-06-14)
+
+### Fixed
+- fix projection definition validation to handle empty projection labels in WMS URL generation
+
+## v0.10.6 (2025-05-16)
+- Symfony 6 compatibility
+- fix creation of X09 messages
+- fix getting map default projection label
+
+## v0.10.5 (2025-05-07)
+ - update API responses to include customer information in procedure messages endpoint
+ - modify procedure message endpoint to return XML directly with proper Content-Type header
 
 ###  v0.16 (2025-06-13)
 - XSD Namespace Consistency Fix
