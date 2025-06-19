@@ -1,3 +1,0 @@
-DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtenkopfG2g:
-    xml_root_name: nachrichtenkopf.g2g
-    xml_root_namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
