@@ -1,0 +1,3 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeGeloeschtNOK0729:
+    xml_root_name: allgemein.stellungnahme.Geloescht.NOK.0729
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

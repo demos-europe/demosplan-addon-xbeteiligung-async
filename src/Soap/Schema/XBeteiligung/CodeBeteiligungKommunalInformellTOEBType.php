@@ -1,0 +1,16 @@
+<?php
+
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung;
+
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Code\CodeType;
+
+/**
+ * Class representing CodeBeteiligungKommunalInformellTOEBType
+ *
+ * Hier kann die Art des informellen Verfahrens zur Beteiligung der Träger öffentlicher Belange übermittelt werden.
+ * XSD Type: Code.BeteiligungKommunalInformellTOEB
+ */
+class CodeBeteiligungKommunalInformellTOEBType extends CodeType
+{
+}
+

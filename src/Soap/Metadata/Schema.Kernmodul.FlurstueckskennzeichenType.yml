@@ -1,0 +1,18 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\FlurstueckskennzeichenType:
+    properties:
+        bundesland:
+            expose: true
+            access_type: public_method
+            serialized_name: bundesland
+            accessor:
+                getter: getBundesland
+                setter: setBundesland
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeBundeslandType
+        kodierungFlurstueck:
+            expose: true
+            access_type: public_method
+            serialized_name: kodierungFlurstueck
+            accessor:
+                getter: getKodierungFlurstueck
+                setter: setKodierungFlurstueck
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\KodierungFlurstueckType

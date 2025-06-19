@@ -1,0 +1,26 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\BezugType:
+    properties:
+        referenz:
+            expose: true
+            access_type: public_method
+            serialized_name: referenz
+            accessor:
+                getter: getReferenz
+                setter: setReferenz
+            type: string
+        vorgang:
+            expose: true
+            access_type: public_method
+            serialized_name: vorgang
+            accessor:
+                getter: getVorgang
+                setter: setVorgang
+            type: string
+        bezugNachricht:
+            expose: true
+            access_type: public_method
+            serialized_name: bezugNachricht
+            accessor:
+                getter: getBezugNachricht
+                setter: setBezugNachricht
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\IdentifikationNachrichtTypeType

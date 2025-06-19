@@ -1,0 +1,13 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\VerlinkungType\LinklisteAnonymousPHPType:
+    properties:
+        link:
+            expose: true
+            access_type: public_method
+            serialized_name: link
+            accessor:
+                getter: getLink
+                setter: setLink
+            xml_list:
+                inline: true
+                entry_name: link
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\VerlinkungType\LinklisteAnonymousPHPType\LinkAnonymousPHPType>

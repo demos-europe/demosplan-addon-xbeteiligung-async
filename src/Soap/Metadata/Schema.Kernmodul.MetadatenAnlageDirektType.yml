@@ -1,0 +1,50 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\MetadatenAnlageDirektType:
+    properties:
+        bezeichnung:
+            expose: true
+            access_type: public_method
+            serialized_name: bezeichnung
+            accessor:
+                getter: getBezeichnung
+                setter: setBezeichnung
+            type: string
+        versionsnummer:
+            expose: true
+            access_type: public_method
+            serialized_name: versionsnummer
+            accessor:
+                getter: getVersionsnummer
+                setter: setVersionsnummer
+            type: int
+        datum:
+            expose: true
+            access_type: public_method
+            serialized_name: datum
+            accessor:
+                getter: getDatum
+                setter: setDatum
+            type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Date
+        anlageart:
+            expose: true
+            access_type: public_method
+            serialized_name: anlageart
+            accessor:
+                getter: getAnlageart
+                setter: setAnlageart
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeAnlageArtType
+        mimeType:
+            expose: true
+            access_type: public_method
+            serialized_name: mimeType
+            accessor:
+                getter: getMimeType
+                setter: setMimeType
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeXBauMimeTypeType
+        anhangOderVerlinkung:
+            expose: true
+            access_type: public_method
+            serialized_name: anhangOderVerlinkung
+            accessor:
+                getter: getAnhangOderVerlinkung
+                setter: setAnhangOderVerlinkung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AnhangOderVerlinkungType

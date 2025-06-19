@@ -1,0 +1,38 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml\DirectPositionTypeType:
+    properties:
+        srsName:
+            expose: true
+            access_type: public_method
+            serialized_name: srsName
+            accessor:
+                getter: getSrsName
+                setter: setSrsName
+            xml_attribute: true
+            type: string
+        srsDimension:
+            expose: true
+            access_type: public_method
+            serialized_name: srsDimension
+            accessor:
+                getter: getSrsDimension
+                setter: setSrsDimension
+            xml_attribute: true
+            type: int
+        axisLabels:
+            expose: true
+            access_type: public_method
+            serialized_name: axisLabels
+            accessor:
+                getter: getAxisLabels
+                setter: setAxisLabels
+            xml_attribute: true
+            type: GoetasWebservices\Xsd\XsdToPhp\Jms\SimpleListOf<string>
+        uomLabels:
+            expose: true
+            access_type: public_method
+            serialized_name: uomLabels
+            accessor:
+                getter: getUomLabels
+                setter: setUomLabels
+            xml_attribute: true
+            type: GoetasWebservices\Xsd\XsdToPhp\Jms\SimpleListOf<string>

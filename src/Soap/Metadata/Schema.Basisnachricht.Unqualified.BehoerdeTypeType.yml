@@ -1,0 +1,37 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Unqualified\BehoerdeTypeType:
+    properties:
+        verzeichnisdienst:
+            expose: true
+            access_type: public_method
+            serialized_name: verzeichnisdienst
+            accessor:
+                getter: getVerzeichnisdienst
+                setter: setVerzeichnisdienst
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Unqualified\CodeVerzeichnisdienstTypeType
+        kennung:
+            expose: true
+            access_type: public_method
+            serialized_name: kennung
+            accessor:
+                getter: getKennung
+                setter: setKennung
+            type: string
+        name:
+            expose: true
+            access_type: public_method
+            serialized_name: name
+            accessor:
+                getter: getName
+                setter: setName
+            type: string
+        erreichbarkeit:
+            expose: true
+            access_type: public_method
+            serialized_name: erreichbarkeit
+            accessor:
+                getter: getErreichbarkeit
+                setter: setErreichbarkeit
+            xml_list:
+                inline: true
+                entry_name: erreichbarkeit
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Unqualified\KommunikationTypeType>

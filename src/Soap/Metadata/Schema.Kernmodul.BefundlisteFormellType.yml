@@ -1,0 +1,13 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\BefundlisteFormellType:
+    properties:
+        befund:
+            expose: true
+            access_type: public_method
+            serialized_name: befund
+            accessor:
+                getter: getBefund
+                setter: setBefund
+            xml_list:
+                inline: true
+                entry_name: befund
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\BefundlisteFormellType\BefundAnonymousPHPType>
