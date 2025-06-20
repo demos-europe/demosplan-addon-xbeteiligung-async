@@ -15,6 +15,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
@@ -40,6 +41,11 @@ class KommunaleProcedureCreatorTest extends TestCase
      */
     protected $serializer;
 
+    /**
+     * @var XBeteiligungIncomingMessageParser
+     */
+    protected $messageParser;
+
 
     public function createMockObject(string $className): MockObject
     {
@@ -51,6 +57,7 @@ class KommunaleProcedureCreatorTest extends TestCase
         $mockFactory = new MockFactoryTest($this);
         $this->logger = new Logger();
         $this->serializer = SerializerFactory::getSerializer();
+        $this->messageParser = new XBeteiligungIncomingMessageParser($this->logger);
         $procedureHandlerFactory = new KommunaleProcedureHandlerFactory($mockFactory);
         $this->sut = $procedureHandlerFactory->createProcedureHandler('creator');
 
@@ -63,11 +70,7 @@ class KommunaleProcedureCreatorTest extends TestCase
     {
         $inputMsgXml = file_get_contents(AddonPath::getRootPath($filePath));
         /** @var KommunalInitiieren0401 $inputMsgObj */
-        $inputMsgObj = $this->serializer->deserialize(
-            $inputMsgXml,
-            KommunalInitiieren0401::class,
-            'xml'
-        );
+        $inputMsgObj = $this->messageParser->getXmlObject($inputMsgXml, '401');
 
         self::assertInstanceOf(KommunalInitiieren0401::class, $inputMsgObj);
         // Act

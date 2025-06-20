@@ -183,31 +183,43 @@ class XBeteiligungIncomingMessageParser
         return $simpleXML;
     }
 
+    /**
+     * Validates that the incoming XML contains the expected xBeteiligung namespace.
+     *
+     * The primary namespace for this addon is XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
+     * as we implement the xBeteiligung standard for public participation workflows.
+     *
+     * XPlan namespace (xplanverfahren.de/V14) is for spatial planning data exchange and is often
+     * declared in XML for compatibility but typically unused in actual message content, so it serves as a fallback only.
+     */
     private function validateRequiredNamespace(SimpleXMLElement $simpleXML): void
     {
         $namespaces = $simpleXML->getNamespaces();
         $this->logger->info('XML namespaces', ['namespaces' => $namespaces]);
 
-        // Check for our expected namespace
-        $expectedNamespace = 'http://xplanverfahren.de/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION;
-        if (in_array($expectedNamespace, $namespaces, true)) {
-            return;
-        }
-
-        // Also accept the XLeitstelle namespace that may be used in incoming messages
-        $xleitstelleNamespace = 'https://www.xleitstelle.de/xbeteiligung/1';
+        // Check for our primary expected namespace (XLeitstelle xBeteiligung 1.2)
+        $expectedNamespace = 'https://www.xleitstelle.de/xbeteiligung/12';
         foreach ($namespaces as $prefix => $namespace) {
-            if ($namespace === $xleitstelleNamespace) {
-                $this->logger->info('Found acceptable XLeitstelle namespace', [
-                    'namespace' => $xleitstelleNamespace
+            if ($namespace === $expectedNamespace) {
+                $this->logger->info('Found expected XLeitstelle xBeteiligung namespace', [
+                    'namespace' => $expectedNamespace
                 ]);
                 return;
             }
         }
 
+        // Fallback: also accept XPlan namespace for compatibility
+        $xplanNamespace = 'http://xplanverfahren.de/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION;
+        if (in_array($xplanNamespace, $namespaces, true)) {
+            $this->logger->info('Found acceptable XPlan namespace fallback', [
+                'namespace' => $xplanNamespace
+            ]);
+            return;
+        }
+
         $this->logger->warning('Missing expected namespace', [
             'expected' => $expectedNamespace,
-            'alternative' => $xleitstelleNamespace,
+            'fallback' => $xplanNamespace,
             'found' => $namespaces
         ]);
     }
