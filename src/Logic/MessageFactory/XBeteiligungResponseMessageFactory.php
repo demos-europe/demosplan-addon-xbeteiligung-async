@@ -43,7 +43,6 @@ use Psr\Log\LoggerInterface;
 class XBeteiligungResponseMessageFactory
 {
     public const XBETEILIGUNG_VERSION = 'V14';
-    private const SCHEMA_LOCATION = 'xsi:schemaLocation';
     private const ERROR_TEXT = 'A Procedure with id';
 
     /** @var Serializer */
@@ -67,7 +66,6 @@ class XBeteiligungResponseMessageFactory
         $messageClass->setNachrichtenkopfG2g($header);
         $messageClass->setNachrichteninhalt($contentClass);
         $messageXml = SerializerFactory::serializeData($messageClass, $this->logger);
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($contentClass, $messageXml);
         $response->setPayload($messageXml);
         $response->lock();
 
@@ -225,22 +223,5 @@ class XBeteiligungResponseMessageFactory
         return $procedureCreated;
     }
 
-    /**
-     * Generates a string with the necessary namespaces for a 411, 421, 419, 429 xml file.
-     */
-    private function addNamespacesToBeteiligung2PlanungXML($xmlObject, string $xml): string
-    {
-        $simpleXML = simplexml_load_string($xml);
 
-        // The namespace xmlns:xoev-code is only needed for error response messages,
-        // because thy use the FehlerType (which has a property CodeFehlerartType) which is defined in the
-        // xoev-code namespace.
-        $simpleXML->addAttribute('xmlns:xmlns:xoev-code', 'https://xoev.de/schemata/code/1_0');
-        $simpleXML->addAttribute('xmlns:xmlns:xsi', 'https://www.w3.org/2001/XMLSchema-instance');
-        $simpleXML->addAttribute(self::SCHEMA_LOCATION,
-            'https://www.xleitstelle.de/xbeteiligung/12 ../xbeteiligung.xsd'
-        );
-
-        return $simpleXML->asXML();
-    }
 }

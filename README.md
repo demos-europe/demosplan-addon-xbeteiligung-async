@@ -70,8 +70,9 @@ In order for generated XML messages to be successfully validated,
 the following adjustments must be made after generating the classes and
 Yml files:
 
-Add `xbeteiligung:` as prefix to xml_root_name in
+Add `xbeteiligung:` as prefix to xml_root_name and add `xml_namespaces` configuration to prevent auto-generated namespace prefixes in:
 
+**Input Message Files:**
 [`Schema.XBeteiligung.KommunalInitiieren0401.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalInitiieren0401.yml),
 [`Schema.XBeteiligung.KommunalAktualisieren0402.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalAktualisieren0402.yml),
 [`Schema.XBeteiligung.KommunalLoeschen0409.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalLoeschen0409.yml),
@@ -81,9 +82,61 @@ Add `xbeteiligung:` as prefix to xml_root_name in
 [`Schema.XBeteiligung.PlanfeststellungAktualisieren0202.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungAktualisieren0202.yml),
 [`Schema.XBeteiligung.PlanfeststellungInitiieren0201.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungInitiieren0201.yml),
 [`Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml),
-[`Schema.AllgemeinStellungnahmeNeuabgegeben0701.yml`](src/Soap/Metadata/Schema.XBeteiligung.AllgemeinStellungnahmeNeuabgegeben0701.yml),
+[`Schema.AllgemeinStellungnahmeNeuabgegeben0701.yml`](src/Soap/Metadata/Schema.XBeteiligung.AllgemeinStellungnahmeNeuabgegeben0701.yml)
 
-Example - `xml_root_name`: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
+**Response Message Files (OK/NOK):**
+
+*Kommunal Series (400):*
+[`Schema.XBeteiligung.KommunalInitiierenOK0411.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalInitiierenOK0411.yml),
+[`Schema.XBeteiligung.KommunalInitiierenNOK0421.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalInitiierenNOK0421.yml),
+[`Schema.XBeteiligung.KommunalAktualisierenOK0412.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalAktualisierenOK0412.yml),
+[`Schema.XBeteiligung.KommunalAktualisierenNOK0422.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalAktualisierenNOK0422.yml),
+[`Schema.XBeteiligung.KommunalLoeschenOK0419.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalLoeschenOK0419.yml),
+[`Schema.XBeteiligung.KommunalLoeschenNOK0429.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalLoeschenNOK0429.yml)
+
+*Raumordnung Series (300):*
+[`Schema.XBeteiligung.RaumordnungInitiierenOK0311.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungInitiierenOK0311.yml),
+[`Schema.XBeteiligung.RaumordnungInitiierenNOK0321.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungInitiierenNOK0321.yml),
+[`Schema.XBeteiligung.RaumordnungAktualisierenOK0312.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungAktualisierenOK0312.yml),
+[`Schema.XBeteiligung.RaumordnungAktualisierenNOK0322.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungAktualisierenNOK0322.yml),
+[`Schema.XBeteiligung.RaumordnungLoeschenOK0319.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungLoeschenOK0319.yml),
+[`Schema.XBeteiligung.RaumordnungLoeschenNOK0329.yml`](src/Soap/Metadata/Schema.XBeteiligung.RaumordnungLoeschenNOK0329.yml)
+
+*Planfeststellung Series (200):*
+[`Schema.XBeteiligung.PlanfeststellungInitiierenOK0211.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungInitiierenOK0211.yml),
+[`Schema.XBeteiligung.PlanfeststellungInitiierenNOK0221.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungInitiierenNOK0221.yml),
+[`Schema.XBeteiligung.PlanfeststellungAktualisierenOK0212.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungAktualisierenOK0212.yml),
+[`Schema.XBeteiligung.PlanfeststellungAktualisierenNOK0222.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungAktualisierenNOK0222.yml),
+[`Schema.XBeteiligung.PlanfeststellungLoeschenOK0219.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungLoeschenOK0219.yml),
+[`Schema.XBeteiligung.PlanfeststellungLoeschenNOK0229.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungLoeschenNOK0229.yml)
+
+**Example configuration for input message files:**
+```yaml
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401:
+    xml_root_name: xbeteiligung:kommunal.Initiieren.0401
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+    xml_namespaces:
+        xbeteiligung: 'https://www.xleitstelle.de/xbeteiligung/12'
+        g2g: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+        behoerde: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+        kommunikation: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+```
+
+**Example configuration for response message files:**
+```yaml
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiierenOK0411:
+    xml_root_name: xbeteiligung:kommunal.Initiieren.OK.0411
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+    xml_namespaces:
+        xbeteiligung: 'https://www.xleitstelle.de/xbeteiligung/12'
+        g2g: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+        behoerde: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+        kommunikation: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+        xoev-code: 'http://xoev.de/schemata/code/1_0'
+        xsi: 'http://www.w3.org/2001/XMLSchema-instance'
+```
+
+The `xml_namespaces` configuration ensures that JMS Serializer uses clean, readable namespace prefixes like `g2g:`, `behoerde:`, and `kommunikation:` instead of random generated ones like `ns-625090a5:`. This configuration replaces the previous manual namespace handling approach for both input and response messages.
 
 Add the Following to Schemas:
 
