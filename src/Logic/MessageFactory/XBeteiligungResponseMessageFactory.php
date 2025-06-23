@@ -43,7 +43,6 @@ use Psr\Log\LoggerInterface;
 class XBeteiligungResponseMessageFactory
 {
     public const XBETEILIGUNG_VERSION = 'V14';
-    private const SCHEMALOCATION = 'xmlsn:xsi:schemaLocation';
     private const ERROR_TEXT = 'A Procedure with id';
 
     /** @var Serializer */
@@ -67,7 +66,6 @@ class XBeteiligungResponseMessageFactory
         $messageClass->setNachrichtenkopfG2g($header);
         $messageClass->setNachrichteninhalt($contentClass);
         $messageXml = SerializerFactory::serializeData($messageClass, $this->logger);
-        $messageXml = $this->addNamespacesToBeteiligung2PlanungXML($contentClass, $messageXml);
         $response->setPayload($messageXml);
         $response->lock();
 
@@ -225,30 +223,5 @@ class XBeteiligungResponseMessageFactory
         return $procedureCreated;
     }
 
-    /**
-     * Generates a string with the necessary namespaces for a 411, 421, 419, 429 xml file.
-     */
-    private function addNamespacesToBeteiligung2PlanungXML($xmlObject, string $xml): string
-    {
-        $simpleXML = simplexml_load_string($xml);
-
-        $simpleXML->addAttribute('xmlns:xmlns:xoev-code', 'http://xoev.de/schemata/code/1_0');
-        $simpleXML->addAttribute('xmlsn:xmlns:xs', 'http://www.w3.org/2001/XMLSchema-instance');
-        if (in_array($xmlObject, CommonHelpers::MESSAGE_TYPE_MAPPING['400']['classes'], true)) {
-            $simpleXML->addAttribute(
-                self::SCHEMALOCATION,
-                'https://www.xleitstelle.de/xbeteiligung/12 ../../xbeteiligung-kommunaleBauleitplanung.xsd');
-        } elseif (in_array($xmlObject, CommonHelpers::MESSAGE_TYPE_MAPPING['300']['classes'], true)) {
-            $simpleXML->addAttribute(
-                self::SCHEMALOCATION,
-                'https://www.xleitstelle.de/xbeteiligung/12 ../../xbeteiligung-raumordnung.xsd');
-        } elseif (in_array($xmlObject, CommonHelpers::MESSAGE_TYPE_MAPPING['200']['classes'], true)) {
-            $simpleXML->addAttribute(
-                self::SCHEMALOCATION,
-                'https://www.xleitstelle.de/xbeteiligung/12 ../../xbeteiligung-planfeststellung.xsd');
-        }
-
-        return $simpleXML->asXML();
-    }
 
 }
