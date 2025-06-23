@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/2/1/1"
+           xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/2/1"
            xmlns:bn-g2g="http://xoev.de/schemata/basisnachricht/g2g/1_1"
            xmlns:bn-uq-g2g="http://xoev.de/schemata/basisnachricht/unqualified/g2g/1_1"
            xmlns:din91379="urn:xoev-de:kosit:xoev:datentyp:din-91379_2022-08"
            xmlns:gml="http://www.opengis.net/gml/3.2"
            xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
            xmlns:xoev-lc="http://xoev.de/latinchars/1_1/datatypes"
-           targetNamespace="http://www.xleitstelle.de/xbau/kernmodul/1/2/1/1"
+           targetNamespace="http://www.xleitstelle.de/xbau/kernmodul/1/2/1"
            version="1.2.1"
            elementFormDefault="unqualified"
            attributeFormDefault="unqualified">

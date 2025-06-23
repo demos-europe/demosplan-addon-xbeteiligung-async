@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType:
             access_type: public_method
             serialized_name: beginn
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getBeginn
                 setter: setBeginn
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType:
             access_type: public_method
             serialized_name: ende
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getEnde
                 setter: setEnde
@@ -25,7 +25,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType:
             access_type: public_method
             serialized_name: zusatz
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getZusatz
                 setter: setZusatz

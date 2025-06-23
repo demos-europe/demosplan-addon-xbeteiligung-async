@@ -1,3 +1,3 @@
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschenNOK0229:
     xml_root_name: planfeststellung.Loeschen.NOK.0229
-    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

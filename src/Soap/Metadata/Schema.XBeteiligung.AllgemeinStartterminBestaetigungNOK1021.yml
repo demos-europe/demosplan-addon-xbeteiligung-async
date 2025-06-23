@@ -1,3 +1,3 @@
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStartterminBestaetigungNOK1021:
     xml_root_name: allgemein.starttermin.Bestaetigung.NOK.1021
-    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'

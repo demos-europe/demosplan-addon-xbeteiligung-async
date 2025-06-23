@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungType
             access_type: public_method
             serialized_name: kommunal
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getKommunal
                 setter: setKommunal
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungType
             access_type: public_method
             serialized_name: raumordnung
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getRaumordnung
                 setter: setRaumordnung
@@ -25,7 +25,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungType
             access_type: public_method
             serialized_name: planfeststellung
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getPlanfeststellung
                 setter: setPlanfeststellung

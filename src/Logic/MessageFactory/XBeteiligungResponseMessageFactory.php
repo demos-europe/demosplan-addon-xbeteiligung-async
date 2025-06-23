@@ -43,7 +43,7 @@ use Psr\Log\LoggerInterface;
 class XBeteiligungResponseMessageFactory
 {
     public const XBETEILIGUNG_VERSION = 'V14';
-    private const SCHEMALOCATION = 'xmlsn:xsi:schemaLocation';
+    private const SCHEMA_LOCATION = 'xsi:schemaLocation';
     private const ERROR_TEXT = 'A Procedure with id';
 
     /** @var Serializer */
@@ -232,23 +232,15 @@ class XBeteiligungResponseMessageFactory
     {
         $simpleXML = simplexml_load_string($xml);
 
-        $simpleXML->addAttribute('xmlns:xmlns:xoev-code', 'http://xoev.de/schemata/code/1_0');
-        $simpleXML->addAttribute('xmlsn:xmlns:xs', 'http://www.w3.org/2001/XMLSchema-instance');
-        if (in_array($xmlObject, CommonHelpers::MESSAGE_TYPE_MAPPING['400']['classes'], true)) {
-            $simpleXML->addAttribute(
-                self::SCHEMALOCATION,
-                'https://www.xleitstelle.de/xbeteiligung/12 ../../xbeteiligung-kommunaleBauleitplanung.xsd');
-        } elseif (in_array($xmlObject, CommonHelpers::MESSAGE_TYPE_MAPPING['300']['classes'], true)) {
-            $simpleXML->addAttribute(
-                self::SCHEMALOCATION,
-                'https://www.xleitstelle.de/xbeteiligung/12 ../../xbeteiligung-raumordnung.xsd');
-        } elseif (in_array($xmlObject, CommonHelpers::MESSAGE_TYPE_MAPPING['200']['classes'], true)) {
-            $simpleXML->addAttribute(
-                self::SCHEMALOCATION,
-                'https://www.xleitstelle.de/xbeteiligung/12 ../../xbeteiligung-planfeststellung.xsd');
-        }
+        // The namespace xmlns:xoev-code is only needed for error response messages,
+        // because thy use the FehlerType (which has a property CodeFehlerartType) which is defined in the
+        // xoev-code namespace.
+        $simpleXML->addAttribute('xmlns:xmlns:xoev-code', 'https://xoev.de/schemata/code/1_0');
+        $simpleXML->addAttribute('xmlns:xmlns:xsi', 'https://www.w3.org/2001/XMLSchema-instance');
+        $simpleXML->addAttribute(self::SCHEMA_LOCATION,
+            'https://www.xleitstelle.de/xbeteiligung/12 ../xbeteiligung.xsd'
+        );
 
         return $simpleXML->asXML();
     }
-
 }

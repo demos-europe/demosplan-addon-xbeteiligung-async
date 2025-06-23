@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Change xbeteiligung standard from 1.3 to 1.2
+
 ## v0.10.7 (2025-06-14)
 
 ### Fixed
