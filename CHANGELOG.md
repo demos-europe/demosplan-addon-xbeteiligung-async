@@ -5,6 +5,13 @@
 - Changed the primary namespace for this addon to XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
   as we implement the xBeteiligung standard for public participation workflows.
 - Use schema validation within getXmlObject method used in production for test xsds as well.
+- Standardize XML namespace handling and improve readability
+    - Updated all 28 YAML metadata files (10 input + 18 response messages) to use consistent namespace prefixes
+    - Replaced auto-generated namespace prefixes (like `ns-625090a5`) with clean, readable prefixes (`g2g:`, `behoerde:`, `kommunikation:`, `xsi:`)
+    - Corrected XML Schema instance namespace prefix from `xs:` to `xsi:` across all response message files
+    - Added comprehensive `xml_namespaces` configuration to prevent JMS Serializer from generating random namespace prefixes
+    - Removed inconsistent manual namespace handling in favor of unified JMS Serializer approach
+    - Updated documentation with proper namespace configuration examples for both input and response messages
 
 ## v0.10.7 (2025-06-14)
 
