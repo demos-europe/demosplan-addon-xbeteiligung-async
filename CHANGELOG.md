@@ -3,6 +3,40 @@
 ## UNRELEASED
 - add building of a routing key for rabbit mq communication
 
+## v0.10.7 (2025-06-14)
+
+### Fixed
+- fix projection definition validation to handle empty projection labels in WMS URL generation
+
+## v0.10.6 (2025-05-16)
+- Symfony 6 compatibility
+- fix creation of X09 messages
+- fix getting map default projection label
+
+## v0.10.5 (2025-05-07)
+ - update API responses to include customer information in procedure messages endpoint
+ - modify procedure message endpoint to return XML directly with proper Content-Type header
+
+###  v0.16 (2025-06-13)
+- XSD Namespace Consistency Fix
+  Fixed namespace mismatch between XBeteiligung baukasten and XBau kernmodul XSD files that was preventing successful xsd2php code
+  generation.
+
+  Problem: The xbeteiligung-baukasten.xsd file was importing kernmodul with namespace
+  http://www.xleitstelle.de/xbau/kernmodul/1/2/1/1, but the kernmodul files were using http://www.xleitstelle.de/xbau/kernmodul/1/2/1.
+
+  Solution: Updated both kernmodul XSD files to use the expected /1/2/1/1 namespace:
+- xbau-kernmodul-datentypen.xsd - updated xmlns:xbauk and targetNamespace
+- xbau-kernmodul-codes.xsd - updated xmlns:xbauk and targetNamespace
+
+- PHPUnit 11 Compatibility Fix
+  Updated test suite to be compatible with PHPUnit 11:
+  - Made data provider methods static as required by PHPUnit 11+
+  - Refactored MockFactoryTest from extending TestCase to using dependency injection pattern
+  - Fixed constructor parameter issues and method visibility
+  - Cleaned up unnecessary property declarations in test classes
+  - Updated test XML namespace from `xbeteiligung/12` to `xbeteiligung/1/3` and version from 1.1 to 1.3 to match XSD updates
+
 ###  v0.15 (2025-05-27)
 - fix getting map default projection label
 - add procedure origin information to ProcedureMessageController::showNewImportableProcedureMessages api response as

@@ -1,3 +1,3 @@
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeAufforderungOK0760:
     xml_root_name: allgemein.stellungnahme.Aufforderung.OK.0760
-    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
