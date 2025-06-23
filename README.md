@@ -133,7 +133,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiie
         behoerde: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
         kommunikation: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
         xoev-code: 'http://xoev.de/schemata/code/1_0'
-        xs: 'http://www.w3.org/2001/XMLSchema-instance'
+        xsi: 'http://www.w3.org/2001/XMLSchema-instance'
 ```
 
 The `xml_namespaces` configuration ensures that JMS Serializer uses clean, readable namespace prefixes like `g2g:`, `behoerde:`, and `kommunikation:` instead of random generated ones like `ns-625090a5:`. This configuration replaces the previous manual namespace handling approach for both input and response messages.

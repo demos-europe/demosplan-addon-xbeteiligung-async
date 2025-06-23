@@ -7,4 +7,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiie
         behoerde: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
         kommunikation: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
         xoev-code: 'http://xoev.de/schemata/code/1_0'
-        xs: 'http://www.w3.org/2001/XMLSchema-instance'
+        xsi: 'http://www.w3.org/2001/XMLSchema-instance'
