@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 - Change xbeteiligung standard from 1.3 to 1.2
+- Changed the primary namespace for this addon to XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
+  as we implement the xBeteiligung standard for public participation workflows.
+- Use schema validation within getXmlObject method used in production for test xsds as well.
 
 ## v0.10.7 (2025-06-14)
 

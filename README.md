@@ -150,6 +150,10 @@ for the fields: `anlagen.xml_list`
 comment out `namespace: ...` in [`Schema.XBeteiligung.MetadatenAnlageType.yml`](src/Soap/Metadata/Schema.XBeteiligung.MetadatenAnlageType.yml)
 for the fields: `bezeichnung`, `versionsnummer`, `datum`, `anlageart`, `mimeType` and `anhangOderVerlinkung`
 
+When updating to a new xBeteiligung standard version, update the hardcoded 
+namespace version in `XBeteiligungIncomingMessageParser::validateRequiredNamespace()` 
+from `/12` to the new version number. This validation only triggers a warning so far.
+
 Run the unit tests XBeteiligungServiceTest- (401, 402, 409) and fix any bugs that appear.
 Update what is documented here if there are any changes to be aware of.
 
