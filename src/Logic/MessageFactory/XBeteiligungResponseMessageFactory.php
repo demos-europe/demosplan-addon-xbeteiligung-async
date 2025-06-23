@@ -235,8 +235,8 @@ class XBeteiligungResponseMessageFactory
         // The namespace xmlns:xoev-code is only needed for error response messages,
         // because thy use the FehlerType (which has a property CodeFehlerartType) which is defined in the
         // xoev-code namespace.
-        $simpleXML->addAttribute('xmlns:xoev-code', 'http://xoev.de/schemata/code/1_0');
-        $simpleXML->addAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        $simpleXML->addAttribute('xmlns:xmlns:xoev-code', 'https://xoev.de/schemata/code/1_0');
+        $simpleXML->addAttribute('xmlns:xmlns:xsi', 'https://www.w3.org/2001/XMLSchema-instance');
         $simpleXML->addAttribute(self::SCHEMA_LOCATION,
             'https://www.xleitstelle.de/xbeteiligung/12 ../xbeteiligung.xsd'
         );
