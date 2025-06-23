@@ -70,7 +70,7 @@ In order for generated XML messages to be successfully validated,
 the following adjustments must be made after generating the classes and
 Yml files:
 
-Add `xbeteiligung:` as prefix to xml_root_name in
+Add `xbeteiligung:` as prefix to xml_root_name and add `xml_namespaces` configuration to prevent auto-generated namespace prefixes in:
 
 [`Schema.XBeteiligung.KommunalInitiieren0401.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalInitiieren0401.yml),
 [`Schema.XBeteiligung.KommunalAktualisieren0402.yml`](src/Soap/Metadata/Schema.XBeteiligung.KommunalAktualisieren0402.yml),
@@ -81,9 +81,21 @@ Add `xbeteiligung:` as prefix to xml_root_name in
 [`Schema.XBeteiligung.PlanfeststellungAktualisieren0202.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungAktualisieren0202.yml),
 [`Schema.XBeteiligung.PlanfeststellungInitiieren0201.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungInitiieren0201.yml),
 [`Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml`](src/Soap/Metadata/Schema.XBeteiligung.PlanfeststellungLoeschen0209.yml),
-[`Schema.AllgemeinStellungnahmeNeuabgegeben0701.yml`](src/Soap/Metadata/Schema.XBeteiligung.AllgemeinStellungnahmeNeuabgegeben0701.yml),
+[`Schema.AllgemeinStellungnahmeNeuabgegeben0701.yml`](src/Soap/Metadata/Schema.XBeteiligung.AllgemeinStellungnahmeNeuabgegeben0701.yml)
 
-Example - `xml_root_name`: `xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401`
+**Example configuration for a root schema file:**
+```yaml
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401:
+    xml_root_name: xbeteiligung:kommunal.Initiieren.0401
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+    xml_namespaces:
+        xbeteiligung: 'https://www.xleitstelle.de/xbeteiligung/12'
+        g2g: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+        behoerde: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+        kommunikation: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+```
+
+The `xml_namespaces` configuration ensures that JMS Serializer uses clean, readable namespace prefixes like `g2g:`, `behoerde:`, and `kommunikation:` instead of random generated ones like `ns-625090a5:`.
 
 Add the Following to Schemas:
 
