@@ -208,18 +208,8 @@ class XBeteiligungIncomingMessageParser
             }
         }
 
-        // Fallback: also accept XPlan namespace for compatibility
-        $xplanNamespace = 'http://xplanverfahren.de/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION;
-        if (in_array($xplanNamespace, $namespaces, true)) {
-            $this->logger->info('Found acceptable XPlan namespace fallback', [
-                'namespace' => $xplanNamespace
-            ]);
-            return;
-        }
-
         $this->logger->warning('Missing expected namespace', [
             'expected' => $expectedNamespace,
-            'fallback' => $xplanNamespace,
             'found' => $namespaces
         ]);
     }
