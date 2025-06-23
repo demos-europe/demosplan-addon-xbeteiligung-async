@@ -219,7 +219,6 @@ class XBeteiligungIncomingMessageParser
 
         $this->logger->warning('Missing expected namespace', [
             'expected' => $expectedNamespace,
-            'fallback' => $xplanNamespace,
             'found' => $namespaces
         ]);
     }
