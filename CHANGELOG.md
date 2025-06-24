@@ -12,6 +12,9 @@
     - Added comprehensive `xml_namespaces` configuration to prevent JMS Serializer from generating random namespace prefixes
     - Removed inconsistent manual namespace handling in favor of unified JMS Serializer approach
     - Updated documentation with proper namespace configuration examples for both input and response messages
+- Add PATCH REST endpoint `/addon/xbeteiligung/procedure/update` for XBeteiligung procedure updates
+- Refactor and eliminate code duplication between create and update methods in XBeteiligungRestController
+- Enhance test coverage with comprehensive PATCH endpoint tests
 
 ## v0.10.7 (2025-06-14)
 
