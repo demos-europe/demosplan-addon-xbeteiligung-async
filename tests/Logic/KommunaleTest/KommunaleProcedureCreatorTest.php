@@ -15,10 +15,12 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use JMS\Serializer\Serializer;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Log\Logger;
 
@@ -39,14 +41,23 @@ class KommunaleProcedureCreatorTest extends TestCase
      */
     protected $serializer;
 
-    private MockFactoryTest $mockFactory;
+    /**
+     * @var XBeteiligungIncomingMessageParser
+     */
+    protected $messageParser;
+
+
+    public function createMockObject(string $className): MockObject
+    {
+        return $this->createMock($className);
+    }
 
     protected function setUp(): void
     {
-        $mockFactory = new MockFactoryTest();
-        $this->mockFactory = $mockFactory;
+        $mockFactory = new MockFactoryTest($this);
         $this->logger = new Logger();
         $this->serializer = SerializerFactory::getSerializer();
+        $this->messageParser = new XBeteiligungIncomingMessageParser($this->logger);
         $procedureHandlerFactory = new KommunaleProcedureHandlerFactory($mockFactory);
         $this->sut = $procedureHandlerFactory->createProcedureHandler('creator');
 
@@ -59,11 +70,7 @@ class KommunaleProcedureCreatorTest extends TestCase
     {
         $inputMsgXml = file_get_contents(AddonPath::getRootPath($filePath));
         /** @var KommunalInitiieren0401 $inputMsgObj */
-        $inputMsgObj = $this->serializer->deserialize(
-            $inputMsgXml,
-            KommunalInitiieren0401::class,
-            'xml'
-        );
+        $inputMsgObj = $this->messageParser->getXmlObject($inputMsgXml, '401');
 
         self::assertInstanceOf(KommunalInitiieren0401::class, $inputMsgObj);
         // Act
@@ -94,7 +101,7 @@ class KommunaleProcedureCreatorTest extends TestCase
      *
      * @return string[][]
      */
-    public function getTestXmlFiles(): array
+    public static function getTestXmlFiles(): array
     {
         return [
             ['tests/res/xmlv14/xbeteiligung-test-kommunal.Initiieren.0401.xml'],

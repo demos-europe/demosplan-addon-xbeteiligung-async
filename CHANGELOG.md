@@ -1,6 +1,52 @@
 # Changelog
 
 ## UNRELEASED
+- Change xbeteiligung standard from 1.3 to 1.2
+- Changed the primary namespace for this addon to XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
+  as we implement the xBeteiligung standard for public participation workflows.
+- Use schema validation within getXmlObject method used in production for test xsds as well.
+- Standardize XML namespace handling and improve readability
+    - Updated all 28 YAML metadata files (10 input + 18 response messages) to use consistent namespace prefixes
+    - Replaced auto-generated namespace prefixes (like `ns-625090a5`) with clean, readable prefixes (`g2g:`, `behoerde:`, `kommunikation:`, `xsi:`)
+    - Corrected XML Schema instance namespace prefix from `xs:` to `xsi:` across all response message files
+    - Added comprehensive `xml_namespaces` configuration to prevent JMS Serializer from generating random namespace prefixes
+    - Removed inconsistent manual namespace handling in favor of unified JMS Serializer approach
+    - Updated documentation with proper namespace configuration examples for both input and response messages
+
+## v0.10.7 (2025-06-14)
+
+### Fixed
+- fix projection definition validation to handle empty projection labels in WMS URL generation
+
+## v0.10.6 (2025-05-16)
+- Symfony 6 compatibility
+- fix creation of X09 messages
+- fix getting map default projection label
+
+## v0.10.5 (2025-05-07)
+ - update API responses to include customer information in procedure messages endpoint
+ - modify procedure message endpoint to return XML directly with proper Content-Type header
+
+###  v0.16 (2025-06-13)
+- XSD Namespace Consistency Fix
+  Fixed namespace mismatch between XBeteiligung baukasten and XBau kernmodul XSD files that was preventing successful xsd2php code
+  generation.
+
+  Problem: The xbeteiligung-baukasten.xsd file was importing kernmodul with namespace
+  http://www.xleitstelle.de/xbau/kernmodul/1/2/1/1, but the kernmodul files were using http://www.xleitstelle.de/xbau/kernmodul/1/2/1.
+
+  Solution: Updated both kernmodul XSD files to use the expected /1/2/1/1 namespace:
+- xbau-kernmodul-datentypen.xsd - updated xmlns:xbauk and targetNamespace
+- xbau-kernmodul-codes.xsd - updated xmlns:xbauk and targetNamespace
+
+- PHPUnit 11 Compatibility Fix
+  Updated test suite to be compatible with PHPUnit 11:
+  - Made data provider methods static as required by PHPUnit 11+
+  - Refactored MockFactoryTest from extending TestCase to using dependency injection pattern
+  - Fixed constructor parameter issues and method visibility
+  - Cleaned up unnecessary property declarations in test classes
+  - Updated test XML namespace from `xbeteiligung/12` to `xbeteiligung/1/3` and version from 1.1 to 1.3 to match XSD updates
+
 
 - Prevent duplicate procedure update messages during procedure creation by skipping procedures that are scheduled for insertion in the same UnitOfWork
 
