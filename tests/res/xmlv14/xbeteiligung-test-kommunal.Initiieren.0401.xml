@@ -3,7 +3,7 @@
         produkt="DiPlan Cockpit"
         produkthersteller="]init[ AG"
         standard="XBeteiligung"
-        version="1.1"
+        version="1.2"
         xmlns:ns6="http://xplanverfahren.de/V14"
         xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12"
         xmlns:ns2="http://xoev.de/schemata/basisnachricht/g2g/1_1"
