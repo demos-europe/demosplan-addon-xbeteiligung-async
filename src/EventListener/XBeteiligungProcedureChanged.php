@@ -317,10 +317,10 @@ class XBeteiligungProcedureChanged
             $sql = 'SELECT _p_id FROM _procedure WHERE _p_id = ? LIMIT 1';
             $result = $newConnection->executeQuery($sql, [$updatedProcedure->getId()]);
 
-            if ($result->fetchOne() === false) {
+            if (false === $result->fetchOne()) {
                 $newConnection->close();
                 return;
-            };
+            }
 
             $newConnection->close();
 
