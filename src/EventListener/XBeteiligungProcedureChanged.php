@@ -28,6 +28,7 @@ use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
 use Doctrine\Persistence\ObjectManager;
 use Exception;
+use Psr\Log\LoggerInterface;
 
 #[AsDoctrineListener(Events::onFlush)]
 class XBeteiligungProcedureChanged
@@ -39,7 +40,8 @@ class XBeteiligungProcedureChanged
     public function __construct(
         private readonly PermissionEvaluatorInterface  $permissionEvaluator,
         private readonly XBeteiligungDebugger $xBeteiligungDebugger,
-        private readonly XBeteiligungService $xBeteiligungService
+        private readonly XBeteiligungService $xBeteiligungService,
+        private readonly LoggerInterface $logger
     )
     {
     }
@@ -305,26 +307,34 @@ class XBeteiligungProcedureChanged
 
     private function addUniqueRelevantProcedure(array $changeSet, ProcedureInterface $updatedProcedure): void
     {
-        if (RelevantPropertiesForUpdatedProcedure::propertyHasChanged($changeSet) &&
-            !array_key_exists($updatedProcedure->getId(), $this->updatedProcedures)) {
-            // Check if the Procedure has been inserted into the database at this point
-            // During ProcedureCreation multiple flushes occur and potentially trigger this
-            // update event. To prevent this we use a new connection to execute a sql query directly
-            // and try to fetch this procedure from the DB.
-            // If we find it - the create transaction had been committed.
-            // Create new connection to bypass transaction isolation
-            $newConnection = DriverManager::getConnection($this->objectManager->getConnection()->getParams());
-            $sql = 'SELECT _p_id FROM _procedure WHERE _p_id = ? LIMIT 1';
-            $result = $newConnection->executeQuery($sql, [$updatedProcedure->getId()]);
+        try {
+            if (RelevantPropertiesForUpdatedProcedure::propertyHasChanged($changeSet) &&
+                !array_key_exists($updatedProcedure->getId(), $this->updatedProcedures)) {
+                // Check if the Procedure has been inserted into the database at this point
+                // During ProcedureCreation multiple flushes occur and potentially trigger this
+                // update event. To prevent this we use a new connection to execute a sql query directly
+                // and try to fetch this procedure from the DB.
+                // If we find it - the create transaction had been committed.
+                // Create new connection to bypass transaction isolation
+                $newConnection = DriverManager::getConnection($this->objectManager->getConnection()->getParams());
+                $sql = 'SELECT _p_id FROM _procedure WHERE _p_id = ? LIMIT 1';
+                $result = $newConnection->executeQuery($sql, [$updatedProcedure->getId()]);
 
-            if (false === $result->fetchOne()) {
+                if (false === $result->fetchOne()) {
+                    $newConnection->close();
+                    return;
+                }
+
                 $newConnection->close();
-                return;
+
+                $this->updatedProcedures[$updatedProcedure->getId()] = $updatedProcedure;
             }
-
-            $newConnection->close();
-
-            $this->updatedProcedures[$updatedProcedure->getId()] = $updatedProcedure;
+        } catch (Exception $e) {
+            $this->logger->error('Error during XBeteiligung procedure synchronization check for procedure {procedureId}: {error}', [
+                'procedureId' => $updatedProcedure->getId(),
+                'error' => $e->getMessage(),
+                'exception' => $e
+            ]);
         }
     }
 }
