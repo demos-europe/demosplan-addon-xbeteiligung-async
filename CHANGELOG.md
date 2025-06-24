@@ -12,6 +12,7 @@
     - Added comprehensive `xml_namespaces` configuration to prevent JMS Serializer from generating random namespace prefixes
     - Removed inconsistent manual namespace handling in favor of unified JMS Serializer approach
     - Updated documentation with proper namespace configuration examples for both input and response messages
+- Prevent duplicate procedure update messages during procedure creation by skipping procedures that are scheduled for insertion in the same UnitOfWork
 
 ## v0.10.7 (2025-06-14)
 
@@ -47,8 +48,6 @@
   - Cleaned up unnecessary property declarations in test classes
   - Updated test XML namespace from `xbeteiligung/12` to `xbeteiligung/1/3` and version from 1.1 to 1.3 to match XSD updates
 
-
-- Prevent duplicate procedure update messages during procedure creation by skipping procedures that are scheduled for insertion in the same UnitOfWork
 
 ###  v0.15 (2025-05-27)
 - fix getting map default projection label
