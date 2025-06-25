@@ -30,7 +30,11 @@ use Symfony\Component\Yaml\Yaml;
 class XBeteiligung401TestFactory
 {
     private const TEMPLATE_FILE = 'tests/fixtures/xbeteiligung/templates/kommunal-initiieren-0401.xml.template';
-    private const SCENARIOS_FILE = 'tests/fixtures/xbeteiligung/test-data/kommunal-initiieren-0401-scenarios.yml';
+    private const SCENARIOS_BASE_DIR = 'tests/fixtures/xbeteiligung/test-data/401';
+    private const DEFAULTS_FILE = 'defaults.yml';
+    private const GEOJSON_DIR = 'geojson';
+    private const VALID_SCENARIOS_DIR = 'scenarios/valid';
+    private const INVALID_SCENARIOS_DIR = 'scenarios/invalid';
     
     private string $templateContent;
     private array $scenariosConfig;
@@ -132,18 +136,84 @@ class XBeteiligung401TestFactory
     }
 
     /**
-     * Load scenario configurations from YAML file.
+     * Load scenario configurations from individual YAML files and shared defaults.
      */
     private function loadScenarios(): void
     {
-        $scenariosPath = $this->addonRootPath . '/' . self::SCENARIOS_FILE;
+        $baseDir = $this->addonRootPath . '/' . self::SCENARIOS_BASE_DIR;
         
-        if (!file_exists($scenariosPath)) {
-            throw new RuntimeException("Scenarios file not found: {$scenariosPath}");
+        if (!is_dir($baseDir)) {
+            throw new RuntimeException("Scenarios base directory not found: {$baseDir}");
         }
 
-        $this->scenariosConfig = Yaml::parseFile($scenariosPath);
-        $this->defaults = $this->scenariosConfig['defaults'] ?? [];
+        // Load defaults
+        $this->loadDefaults($baseDir);
+        
+        // Load individual scenario files
+        $this->scenariosConfig = [
+            'valid_scenarios' => $this->loadScenariosFromDirectory($baseDir . '/' . self::VALID_SCENARIOS_DIR),
+            'invalid_scenarios' => $this->loadScenariosFromDirectory($baseDir . '/' . self::INVALID_SCENARIOS_DIR)
+        ];
+    }
+
+    /**
+     * Load shared defaults from defaults.yml file.
+     */
+    private function loadDefaults(string $baseDir): void
+    {
+        $defaultsPath = $baseDir . '/' . self::DEFAULTS_FILE;
+        
+        if (!file_exists($defaultsPath)) {
+            throw new RuntimeException("Defaults file not found: {$defaultsPath}");
+        }
+
+        $this->defaults = Yaml::parseFile($defaultsPath);
+    }
+
+    /**
+     * Load all scenario files from a directory.
+     */
+    private function loadScenariosFromDirectory(string $directory): array
+    {
+        if (!is_dir($directory)) {
+            return [];
+        }
+
+        $scenarios = [];
+        $files = glob($directory . '/*.yml');
+        
+        foreach ($files as $file) {
+            $scenarioName = pathinfo($file, PATHINFO_FILENAME);
+            $scenarioData = Yaml::parseFile($file);
+            
+            // Load GeoJSON if referenced
+            $scenarioData = $this->loadGeoJsonForScenario($scenarioData, dirname($directory, 2));
+            
+            $scenarios[$scenarioName] = $scenarioData;
+        }
+
+        return $scenarios;
+    }
+
+    /**
+     * Load GeoJSON data for a scenario if it references a GeoJSON file.
+     */
+    private function loadGeoJsonForScenario(array $scenarioData, string $baseDir): array
+    {
+        if (isset($scenarioData['geltungsbereich_geojson_file'])) {
+            $geoJsonPath = $baseDir . '/' . $scenarioData['geltungsbereich_geojson_file'];
+            
+            if (file_exists($geoJsonPath)) {
+                $geoJsonContent = file_get_contents($geoJsonPath);
+                if ($geoJsonContent !== false) {
+                    // Replace the file reference with the actual GeoJSON content
+                    $scenarioData['geltungsbereich_json'] = $geoJsonContent;
+                    unset($scenarioData['geltungsbereich_geojson_file']);
+                }
+            }
+        }
+
+        return $scenarioData;
     }
 
     /**
