@@ -1,0 +1,181 @@
+# XBeteiligung 401 Test Scenarios Configuration
+# This file defines test cases for dynamic XML generation
+
+# Default values used across all test cases (can be overridden per scenario)
+defaults:
+  # Message metadata
+  produkt: "DiPlan Cockpit"
+  produkthersteller: "DEMOS plan GmbH"
+  
+  # Message header defaults
+  leser_kennung: "xyz:0002"
+  leser_name: "DiPlanBeteiligung"
+  leser_kanal_code: "02"
+  leser_kontakt: "+49 30 123456"
+  
+  autor_kennung: "xyz:0001"
+  autor_name: "DEMOS plan GmbH"
+  autor_kanal_code: "07"
+  autor_kontakt: "https://demos-deutschland.de/impressum.html"
+  
+  # Default procedure values
+  verfahrensschritt_code: "4000"
+  geltungsbereich_json: '{"type":"Polygon","coordinates":[[[10.083502443258789,53.4757288003767],[10.083429490182915,53.47576152622487],[10.083400410030347,53.47577456349788],[10.083502443258789,53.4757288003767]]]}'
+
+# Valid test scenarios - these should all pass validation and create procedures successfully
+valid_scenarios:
+  
+  # Basic test with Stadt Quickborn - minimal required fields
+  quickborn_minimal:
+    description: "Test minimal procedure creation with Stadt Quickborn"
+    org_name: "Stadt Quickborn"
+    plan_name: "Test Bebauungsplan Minimal"
+    arbeitstitel: "B-Plan Test Minimal"
+    planart_code: "6_Bebauungsplan"
+    beschreibung_planungsanlass: "Testverfahren für minimale Anforderungen"
+    flaechen_url: "https://quickborn.test.local/api/verfahren/minimal/karten"
+    raeumliche_beschreibung: "Testgebiet für minimale Konfiguration"
+    include_beteiligung_oeffentlichkeit: false
+    include_beteiligung_toeb: false
+
+  # Comprehensive test with Stadt Quickborn - includes public participation
+  quickborn_comprehensive:
+    description: "Test comprehensive procedure with public participation"
+    org_name: "Stadt Quickborn"
+    plan_name: "Bebauungsplan Industriegebiet Nord"
+    arbeitstitel: "B-Plan Nr. 42 - Industriegebiet Nord"
+    planart_code: "6_Bebauungsplan"
+    beschreibung_planungsanlass: "Neuausweisung eines Industriegebiets zur Ansiedlung von Produktionsbetrieben"
+    flaechen_url: "https://quickborn.test.local/api/verfahren/industriegebiet/karten"
+    raeumliche_beschreibung: "Gebiet im nördlichen Stadtgebiet von Quickborn"
+    include_beteiligung_oeffentlichkeit: true
+    beteiligung_oeffentlichkeit_id: "bet_oeffentlich_001"
+    durchgang_oeffentlichkeit: 1
+    bekanntmachung_oeffentlichkeit: "2025-07-01"
+    zeitraum_beginn_oeffentlichkeit: "2025-07-15+02:00"
+    zeitraum_ende_oeffentlichkeit: "2025-08-15+02:00"
+    zeitraum_zusatz_oeffentlichkeit: "Öffentliche Auslegung im Rathaus"
+    beteiligung_formal_code_oeffentlichkeit: "4000"
+    veroeffentlichung_beginn_oeffentlichkeit: "2025-07-01+02:00"
+    veroeffentlichung_ende_oeffentlichkeit: "2025-08-30+02:00"
+    veroeffentlichung_zusatz_oeffentlichkeit: "Veröffentlichung im Amtsblatt"
+    include_beteiligung_toeb: false
+
+  # Test with Büro organization - different org validation
+  buero_flachennutzung:
+    description: "Test procedure creation with Büro organization"
+    org_name: "Büro"
+    plan_name: "Flächennutzungsplan Änderung Südwest"
+    arbeitstitel: "FNP-Änderung Nr. 15 - Wohngebiet Südwest"
+    planart_code: "3_Flaechennutzungsplan"
+    verfahrensschritt_code: "2000"
+    beschreibung_planungsanlass: "Änderung des Flächennutzungsplans zur Ausweisung eines neuen Wohngebiets"
+    flaechen_url: "https://buero.test.local/api/verfahren/fnp-suedwest/karten"
+    raeumliche_beschreibung: "Gebiet im südwestlichen Bereich der Gemeinde"
+    geltungsbereich_json: '{"type":"Polygon","coordinates":[[[9.123456789,52.987654321],[9.124567890,52.987654321],[9.124567890,52.988765432],[9.123456789,52.988765432],[9.123456789,52.987654321]]]}'
+    include_beteiligung_oeffentlichkeit: false
+    include_beteiligung_toeb: true
+    beteiligung_toeb_id: "bet_toeb_001"
+    durchgang_toeb: 1
+    bekanntmachung_toeb: "2025-07-01"
+    zeitraum_beginn_toeb: "2025-07-15+02:00"
+    zeitraum_ende_toeb: "2025-08-15+02:00"
+    zeitraum_zusatz_toeb: "TÖB Beteiligung per E-Mail"
+    beteiligung_formal_code_toeb: "2000"
+    veroeffentlichung_beginn_toeb: "2025-07-01+02:00"
+    veroeffentlichung_ende_toeb: "2025-08-30+02:00"
+    veroeffentlichung_zusatz_toeb: "Direktversand an TÖB"
+
+  # Test with attachments for both participation types
+  quickborn_with_attachments:
+    description: "Test procedure with document attachments"
+    org_name: "Stadt Quickborn"
+    plan_name: "Bebauungsplan Mit Anlagen"
+    arbeitstitel: "B-Plan Test mit Dokumenten"
+    planart_code: "6_Bebauungsplan"
+    beschreibung_planungsanlass: "Testverfahren mit Dokumentenanhängen"
+    flaechen_url: "https://quickborn.test.local/api/verfahren/attachments/karten"
+    raeumliche_beschreibung: "Testgebiet mit Anlagen"
+    include_beteiligung_oeffentlichkeit: true
+    include_anlagen_oeffentlichkeit: true
+    beteiligung_oeffentlichkeit_id: "bet_oeffentlich_anlage"
+    anlage_version_oeffentlichkeit: "1.0"
+    anlage_datum_oeffentlichkeit: "2025-07-01+02:00"
+    anlage_art_code_oeffentlichkeit: "9900"
+    anlage_mime_type_oeffentlichkeit: "application/pdf"
+    anlage_filesize_oeffentlichkeit: "3908"
+    anlage_hash_oeffentlichkeit: "23203f9264161714cdb8d2f474b9b641e6a735f8cea4098c40a3cab8743bd749"
+    anlage_dokument_id_oeffentlichkeit: "ID_693a4b4a-8431-4b29-9aef-456ff3a63bef"
+    anlage_dateiname_oeffentlichkeit: "bebauungsplan-entwurf.pdf"
+    include_beteiligung_toeb: false
+
+# Invalid test scenarios - these should fail validation with specific error messages
+invalid_scenarios:
+
+  # Organization validation errors
+  unknown_organization:
+    description: "Test with non-existent organization (should fail)"
+    expected_error: "Es konnte keine Organisation mit dem Namen \"Musterzuständigkeit\" gefunden werden."
+    org_name: "Musterzuständigkeit"
+    plan_name: "Test Plan Unknown Org"
+    arbeitstitel: "Test Arbeitstitel"
+    planart_code: "6_Bebauungsplan"
+    beschreibung_planungsanlass: "Test mit unbekannter Organisation"
+    flaechen_url: "https://test.local/api/verfahren/unknown/karten"
+    raeumliche_beschreibung: "Test Beschreibung"
+    include_beteiligung_oeffentlichkeit: false
+    include_beteiligung_toeb: false
+
+  empty_organization:
+    description: "Test with empty organization name (should fail)"
+    expected_error_type: "validation_error"
+    org_name: ""
+    plan_name: "Test Plan Empty Org"
+    arbeitstitel: "Test Arbeitstitel"
+    planart_code: "6_Bebauungsplan"
+    beschreibung_planungsanlass: "Test mit leerer Organisation"
+    flaechen_url: "https://test.local/api/verfahren/empty/karten"
+    raeumliche_beschreibung: "Test Beschreibung"
+    include_beteiligung_oeffentlichkeit: false
+    include_beteiligung_toeb: false
+
+  # Required field validation
+  missing_plan_name:
+    description: "Test with missing plan name (should fail)"
+    expected_error_type: "validation_error"
+    org_name: "Stadt Quickborn"
+    plan_name: ""
+    arbeitstitel: "Test Arbeitstitel"
+    planart_code: "6_Bebauungsplan"
+    beschreibung_planungsanlass: "Test ohne Planname"
+    flaechen_url: "https://test.local/api/verfahren/noname/karten"
+    raeumliche_beschreibung: "Test Beschreibung"
+    include_beteiligung_oeffentlichkeit: false
+    include_beteiligung_toeb: false
+
+  invalid_planart_code:
+    description: "Test with invalid plan type code (should fail)"
+    expected_error_type: "validation_error"
+    org_name: "Stadt Quickborn"
+    plan_name: "Test Plan Invalid Code"
+    arbeitstitel: "Test Arbeitstitel"
+    planart_code: "INVALID_CODE"
+    beschreibung_planungsanlass: "Test mit ungültigem Planart Code"
+    flaechen_url: "https://test.local/api/verfahren/invalid/karten"
+    raeumliche_beschreibung: "Test Beschreibung"
+    include_beteiligung_oeffentlichkeit: false
+    include_beteiligung_toeb: false
+
+  malformed_geltungsbereich:
+    description: "Test with malformed GeoJSON (should fail)"
+    expected_error_type: "validation_error"
+    org_name: "Stadt Quickborn"
+    plan_name: "Test Plan Malformed GeoJSON"
+    arbeitstitel: "Test Arbeitstitel"
+    planart_code: "6_Bebauungsplan"
+    beschreibung_planungsanlass: "Test mit ungültigem GeoJSON"
+    flaechen_url: "https://test.local/api/verfahren/malformed/karten"
+    raeumliche_beschreibung: "Test Beschreibung"
+    geltungsbereich_json: '{"invalid":"json"}'
+    include_beteiligung_oeffentlichkeit: false
+    include_beteiligung_toeb: false
