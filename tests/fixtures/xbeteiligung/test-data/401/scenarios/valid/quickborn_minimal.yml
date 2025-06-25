@@ -1,0 +1,11 @@
+# Basic test with Stadt Quickborn - minimal required fields
+description: "Test minimal procedure creation with Stadt Quickborn"
+org_name: "Stadt Quickborn"
+plan_name: "Test Bebauungsplan Minimal"
+arbeitstitel: "B-Plan Test Minimal"
+planart_code: "6_Bebauungsplan"
+beschreibung_planungsanlass: "Testverfahren für minimale Anforderungen"
+flaechen_url: "https://quickborn.test.local/api/verfahren/minimal/karten"
+raeumliche_beschreibung: "Testgebiet für minimale Konfiguration"
+include_beteiligung_oeffentlichkeit: false
+include_beteiligung_toeb: false

@@ -1,0 +1,30 @@
+# Test with attachments for both participation types
+description: "Test procedure with document attachments"
+org_name: "Stadt Quickborn"
+plan_name: "Bebauungsplan Mit Anlagen"
+arbeitstitel: "B-Plan Test mit Dokumenten"
+planart_code: "6_Bebauungsplan"
+beschreibung_planungsanlass: "Testverfahren mit Dokumentenanhängen"
+flaechen_url: "https://quickborn.test.local/api/verfahren/attachments/karten"
+raeumliche_beschreibung: "Testgebiet mit Anlagen"
+include_beteiligung_oeffentlichkeit: true
+include_anlagen_oeffentlichkeit: true
+beteiligung_oeffentlichkeit_id: "bet_oeffentlich_anlage"
+durchgang_oeffentlichkeit: 1
+bekanntmachung_oeffentlichkeit: "2025-07-01"
+zeitraum_beginn_oeffentlichkeit: "2025-07-15+02:00"
+zeitraum_ende_oeffentlichkeit: "2025-08-15+02:00"
+zeitraum_zusatz_oeffentlichkeit: "Öffentliche Auslegung im Rathaus"
+beteiligung_formal_code_oeffentlichkeit: "4000"
+veroeffentlichung_beginn_oeffentlichkeit: "2025-07-01+02:00"
+veroeffentlichung_ende_oeffentlichkeit: "2025-08-30+02:00"
+veroeffentlichung_zusatz_oeffentlichkeit: "Veröffentlichung im Amtsblatt"
+anlage_version_oeffentlichkeit: "1.0"
+anlage_datum_oeffentlichkeit: "2025-07-01+02:00"
+anlage_art_code_oeffentlichkeit: "9900"
+anlage_mime_type_oeffentlichkeit: "application/pdf"
+anlage_filesize_oeffentlichkeit: "3908"
+anlage_hash_oeffentlichkeit: "23203f9264161714cdb8d2f474b9b641e6a735f8cea4098c40a3cab8743bd749"
+anlage_dokument_id_oeffentlichkeit: "ID_693a4b4a-8431-4b29-9aef-456ff3a63bef"
+anlage_dateiname_oeffentlichkeit: "bebauungsplan-entwurf.pdf"
+include_beteiligung_toeb: false
