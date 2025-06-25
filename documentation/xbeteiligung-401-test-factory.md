@@ -18,10 +18,11 @@ The XBeteiligung 401 Test Factory provides a dynamic, template-based approach fo
    - Uses proper namespace conventions (xbeteiligung:, g2g:, behoerde:, kommunikation:)
    - Supports dynamic content injection
 
-3. **Test Scenarios Configuration** (`tests/fixtures/xbeteiligung/test-data/kommunal-initiieren-0401-scenarios.yml`)
-   - YAML configuration defining test scenarios
-   - Includes both valid and invalid test cases
-   - Provides default values to reduce duplication
+3. **Test Scenarios Configuration** (`tests/fixtures/xbeteiligung/test-data/401/`)
+   - Individual YAML files for each test scenario
+   - Separate valid and invalid scenario directories
+   - Shared defaults.yml file for common values
+   - Separate GeoJSON files for territory definitions
 
 4. **Unit Tests** (`tests/DataFactory/XBeteiligung401TestFactoryTest.php`)
    - Comprehensive test coverage for the factory
@@ -180,37 +181,81 @@ The factory automatically generates certain parameters:
 
 ## Configuration
 
-### YAML Structure
+### New YAML Structure
 
+With the individual file approach, configuration is split across multiple files:
+
+**defaults.yml** (shared values):
 ```yaml
 # Default values used across all scenarios
-defaults:
-  produkt: "DiPlan Cockpit"
-  produkthersteller: "DEMOS plan GmbH"
-  # ... more defaults ...
+produkt: "DiPlan Cockpit"
+produkthersteller: "DEMOS plan GmbH"
+leser_kennung: "xyz:0002"
+# ... more defaults ...
 
-# Valid test scenarios
-valid_scenarios:
-  scenario_name:
-    description: "Description of what this scenario tests"
-    org_name: "Organization Name"
-    plan_name: "Plan Name"
-    # ... scenario-specific values ...
+# Default GeoJSON reference
+geltungsbereich_geojson_file: "../../geojson/default_territory.geojson"
+```
 
-# Invalid test scenarios  
-invalid_scenarios:
-  scenario_name:
-    description: "Description of expected failure"
-    expected_error: "Expected error message"
-    # ... invalid values ...
+**Individual scenario files** (e.g., quickborn_minimal.yml):
+```yaml
+description: "Test minimal procedure creation with Stadt Quickborn"
+org_name: "Stadt Quickborn"
+plan_name: "Test Bebauungsplan Minimal"
+planart_code: "6_Bebauungsplan"
+include_beteiligung_oeffentlichkeit: false
+include_beteiligung_toeb: false
+# Uses default GeoJSON from defaults.yml
+```
+
+**GeoJSON files** (e.g., default_territory.geojson):
+```json
+{
+  "type": "Polygon",
+  "coordinates": [
+    [
+      [10.083502443258789, 53.4757288003767],
+      [10.083429490182915, 53.47576152622487],
+      [10.083400410030347, 53.47577456349788],
+      [10.083502443258789, 53.4757288003767]
+    ]
+  ]
+}
 ```
 
 ### Adding New Scenarios
 
-1. Add scenario configuration to the YAML file
-2. Include any new placeholders in the template if needed
-3. Add test cases in the factory unit tests
-4. Update integration tests to use the new scenario
+With the new individual file structure, adding scenarios is easier than ever:
+
+1. **Create scenario file**: Add a new `.yml` file in the appropriate directory:
+   - Valid scenarios: `tests/fixtures/xbeteiligung/test-data/401/scenarios/valid/`
+   - Invalid scenarios: `tests/fixtures/xbeteiligung/test-data/401/scenarios/invalid/`
+
+2. **Configure scenario data**: Use the following format:
+   ```yaml
+   description: "Brief description of what this scenario tests"
+   org_name: "Organization Name"
+   plan_name: "Plan Name"
+   # ... other scenario-specific values
+   # Reference GeoJSON file if needed:
+   geltungsbereich_geojson_file: "../../geojson/default_territory.geojson"
+   ```
+
+3. **Add GeoJSON if needed**: Create new `.geojson` files in:
+   `tests/fixtures/xbeteiligung/test-data/401/geojson/`
+
+4. **Update defaults if needed**: Modify `401/defaults.yml` for new common values
+
+5. **No code changes required**: The factory automatically discovers new scenario files
+
+### New File Structure Benefits
+
+✅ **Self-contained scenarios**: Each test case is in its own file  
+✅ **Better organization**: Clear separation of valid/invalid scenarios  
+✅ **Reusable GeoJSON**: Multiple scenarios can reference the same territory  
+✅ **Easier maintenance**: Edit individual scenarios without affecting others  
+✅ **Version control friendly**: Cleaner git diffs when modifying scenarios  
+✅ **Future-ready**: Easily extensible for 402, 409, and other message types
 
 ## Benefits
 
@@ -243,10 +288,28 @@ tests/
 │       ├── templates/
 │       │   └── kommunal-initiieren-0401.xml.template  # XML template
 │       └── test-data/
-│           └── kommunal-initiieren-0401-scenarios.yml # Test scenarios
+│           └── 401/                            # 401-specific test data
+│               ├── defaults.yml                # Shared default values
+│               ├── geojson/
+│               │   ├── default_territory.geojson      # Valid GeoJSON
+│               │   └── invalid_territory.geojson     # Invalid GeoJSON for testing
+│               └── scenarios/
+│                   ├── valid/
+│                   │   ├── quickborn_minimal.yml
+│                   │   ├── quickborn_comprehensive.yml
+│                   │   ├── buero_flachennutzung.yml
+│                   │   └── quickborn_with_attachments.yml
+│                   └── invalid/
+│                       ├── unknown_organization.yml
+│                       ├── empty_organization.yml
+│                       ├── missing_plan_name.yml
+│                       ├── invalid_planart_code.yml
+│                       └── malformed_geltungsbereich.yml
+├── Integration/
+│   └── XBeteiligungRestApiIntegrationTest.php  # Integration tests
 └── Logic/
     └── KommunaleTest/
-        └── KommunaleProcedureCreatorTest.php   # Integration tests
+        └── KommunaleProcedureCreatorTest.php   # Updated legacy tests
 ```
 
 ## Migration from Static XML
