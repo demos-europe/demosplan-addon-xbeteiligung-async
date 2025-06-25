@@ -1,0 +1,11 @@
+description: "Test with invalid plan type code (should fail)"
+expected_error_type: "validation_error"
+org_name: "Stadt Quickborn"
+plan_name: "Test Plan Invalid Code"
+arbeitstitel: "Test Arbeitstitel"
+planart_code: "INVALID_CODE"
+beschreibung_planungsanlass: "Test mit ungültigem Planart Code"
+flaechen_url: "https://test.local/api/verfahren/invalid/karten"
+raeumliche_beschreibung: "Test Beschreibung"
+include_beteiligung_oeffentlichkeit: false
+include_beteiligung_toeb: false
