@@ -168,6 +168,9 @@ class XBeteiligung401TestFactory
         }
 
         $this->defaults = Yaml::parseFile($defaultsPath);
+        
+        // Load GeoJSON for defaults if referenced
+        $this->defaults = $this->loadGeoJsonForScenario($this->defaults, $baseDir);
     }
 
     /**

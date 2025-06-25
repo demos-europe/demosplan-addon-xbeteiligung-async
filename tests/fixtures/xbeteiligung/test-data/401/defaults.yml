@@ -20,4 +20,4 @@ autor_kontakt: "https://demos-deutschland.de/impressum.html"
 verfahrensschritt_code: "4000"
 
 # Default GeoJSON reference (can be overridden per scenario)
-geltungsbereich_geojson_file: "../../geojson/default_territory.geojson"
+geltungsbereich_geojson_file: "geojson/default_territory.geojson"
