@@ -291,7 +291,7 @@ class XBeteiligung401TestFactory
     private function replacePlaceholders(string $xml, array $parameters): string
     {
         foreach ($parameters as $key => $value) {
-            $placeholder = "{{$key}}";
+            $placeholder = '{{' . $key . '}}';
             $xml = str_replace($placeholder, (string) $value, $xml);
         }
 
