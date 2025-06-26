@@ -27,7 +27,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungProcedureContextService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureAgsRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType;
@@ -147,17 +149,19 @@ class XBeteiligungService
     public const GENERIC_ERROR_DESCRIPTION = 'Während der Erstellung/Bearbeitung des Verfahrens ist ein Fehler aufgetreten.';
 
     public function __construct(
-        private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
-        private readonly GlobalConfigInterface                  $globalConfig,
-        private readonly KommunaleProcedureCreater              $kommunaleProcedureCreater,
-        private readonly LoggerInterface                        $logger,
-        private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
-        private readonly ProcedureMessageRepository             $procedureMessageRepository,
-        private readonly ProcedureNewsServiceInterface          $procedureNewsService,
-        private readonly RouterInterface                        $router,
-        private readonly XBeteiligungIncomingMessageParser      $incomingMessageParser,
-        private readonly CommonHelpers                          $commonHelpers,
-        private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
+        private readonly GisLayerCategoryRepositoryInterface       $gisLayerCategoryRepository,
+        private readonly GlobalConfigInterface                     $globalConfig,
+        private readonly KommunaleProcedureCreater                 $kommunaleProcedureCreater,
+        private readonly LoggerInterface                           $logger,
+        private readonly PlanningDocumentsLinkCreator              $planningDocumentsLinkCreator,
+        private readonly ProcedureMessageRepository                $procedureMessageRepository,
+        private readonly XBeteiligungProcedureAgsRepository        $procedureAgsRepository,
+        private readonly XBeteiligungProcedureContextService       $procedureContextService,
+        private readonly ProcedureNewsServiceInterface             $procedureNewsService,
+        private readonly RouterInterface                           $router,
+        private readonly XBeteiligungIncomingMessageParser         $incomingMessageParser,
+        private readonly CommonHelpers                             $commonHelpers,
+        private readonly ReusableMessageBlocks                     $reusableMessageBlocks,
     ) {
     }
 
@@ -859,6 +863,17 @@ class XBeteiligungService
         if (self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
             /** @var KommunalInitiieren0401 $xmlObject401 */
             $xmlObject401 = $this->incomingMessageParser->getXmlObject($payload, '401');
+
+            // Extract AGS codes BEFORE procedure creation - if this fails, abort everything
+            $agsCodes = $this->extractAndValidateAgsCodesFor401Message($xmlObject401);
+
+            // Extract planId from 401 XML to use as context key
+            $planId = $this->extractPlanIdFrom401Message($xmlObject401);
+
+            // Store AGS codes in context BEFORE procedure creation
+            $this->procedureContextService->storeAgsContext($planId, $agsCodes);
+
+            // Create procedure - the EventSubscriber will handle AGS storage using procedure.getXtaPlanId()
             return $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
         }
         /*
@@ -918,4 +933,51 @@ class XBeteiligungService
     {
         return '' === $procedure->getXtaPlanId() ? $procedure->getId() : $procedure->getXtaPlanId();
     }
+
+    /**
+     * Extract and validate AGS codes from 401 XML message (MUST succeed or abort)
+     */
+    private function extractAndValidateAgsCodesFor401Message(KommunalInitiieren0401 $xmlObject401): array
+    {
+        // Extract AGS codes from XML - this MUST succeed
+        $agsCodes = $this->incomingMessageParser->extractAgsCodesFromXmlObject($xmlObject401);
+
+        // Validate AGS codes - this MUST succeed
+        $this->incomingMessageParser->validateAgsCodesForRouting($agsCodes);
+
+        $this->logger->info('Successfully extracted AGS codes from 401 message', [
+            'autorAgs' => $agsCodes['autor'],
+            'leserAgs' => $agsCodes['leser']
+        ]);
+
+        return $agsCodes;
+    }
+
+    /**
+     * Extract planId from 401 XML message to use as context key
+     */
+    private function extractPlanIdFrom401Message(KommunalInitiieren0401 $xmlObject401): string
+    {
+        $nachrichteninhalt = $xmlObject401->getNachrichteninhalt();
+        if (null === $nachrichteninhalt) {
+            throw new \RuntimeException('No nachrichteninhalt found in 401 XML message');
+        }
+
+        $beteiligung = $nachrichteninhalt->getBeteiligung();
+        if (null === $beteiligung) {
+            throw new \RuntimeException('No beteiligung found in 401 XML message');
+        }
+
+        $planId = $beteiligung->getPlanID();
+        if (null === $planId || '' === $planId) {
+            throw new \RuntimeException('No planID found in 401 XML message');
+        }
+
+        $this->logger->info('Extracted planId from 401 XML message', [
+            'planId' => $planId
+        ]);
+
+        return $planId;
+    }
+
 }

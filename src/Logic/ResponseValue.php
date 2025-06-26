@@ -30,4 +30,24 @@ class ResponseValue extends ValueObject
     {
         $this->payload = $payload;
     }
+
+    /**
+     * Check if the response indicates successful procedure creation
+     * Success is determined by the absence of error elements in the XML payload
+     */
+    public function isSuccessful(): bool
+    {
+        // Check for error indicators in the XML payload
+        if (str_contains($this->payload, '<fehler>') || str_contains($this->payload, 'NOK')) {
+            return false;
+        }
+        
+        // Check for success indicators
+        if (str_contains($this->payload, '<beteiligungsID>') || str_contains($this->payload, 'OK')) {
+            return true;
+        }
+        
+        // Default to false if we can't determine success
+        return false;
+    }
 }
