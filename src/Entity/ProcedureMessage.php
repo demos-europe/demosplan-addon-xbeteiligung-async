@@ -2,8 +2,8 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Entity;
 use DateTime;
-
 use DemosEurope\DemosplanAddon\Contracts\Entities\UuidEntityInterface;
+use DemosEurope\DemosplanAddon\Doctrine\Generator\UuidV4Generator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -18,7 +18,7 @@ class ProcedureMessage implements UuidEntityInterface
     #[ORM\Column(type: 'string', length: 36, nullable: false, options:['fixed' => true])]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: \demosplan\DemosPlanCoreBundle\Doctrine\Generator\UuidV4Generator::class)]
+    #[ORM\CustomIdGenerator(class: UuidV4Generator::class)]
     private ?string $id;
 
     #[ORM\Column(name: 'procedure_id', length: 36, type: 'string', nullable: false)]
