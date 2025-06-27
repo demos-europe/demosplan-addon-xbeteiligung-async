@@ -240,4 +240,14 @@ class XBeteiligungAuditService
     {
         $this->markAsSent($auditId);
     }
+
+    /**
+     * Find audit records by procedure ID and target system
+     *
+     * @return XBeteiligungMessageAudit[]
+     */
+    public function findAuditRecordsByProcedureAndTargetSystem(string $procedureId, string $targetSystem): array
+    {
+        return $this->auditRepository->findByProcedureIdAndTargetSystem($procedureId, $targetSystem);
+    }
 }

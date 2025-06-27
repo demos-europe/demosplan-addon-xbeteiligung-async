@@ -185,4 +185,17 @@ class XBeteiligungMessageAuditRepository extends ServiceEntityRepository
 
         return $counts;
     }
+
+    /**
+     * Find audit records by procedure ID and target system
+     *
+     * @return array<XBeteiligungMessageAudit>
+     */
+    public function findByProcedureIdAndTargetSystem(string $procedureId, string $targetSystem): array
+    {
+        return $this->findBy([
+            'procedureId' => $procedureId,
+            'targetSystem' => $targetSystem
+        ], ['createdAt' => 'ASC']);
+    }
 }
