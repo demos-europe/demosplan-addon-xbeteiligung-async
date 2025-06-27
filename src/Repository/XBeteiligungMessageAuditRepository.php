@@ -16,18 +16,13 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use Exception;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class XBeteiligungMessageAuditRepository extends ServiceEntityRepository
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
         ManagerRegistry $registry,
-        private LoggerInterface $logger,
-        string $entityClass,
-        private ValidatorInterface $validator
+        string $entityClass
     ) {
         parent::__construct($registry, $entityClass);
     }
