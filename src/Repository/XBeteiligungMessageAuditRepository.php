@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Repository;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -75,7 +76,7 @@ class XBeteiligungMessageAuditRepository extends ServiceEntityRepository
             ->andWhere('a.direction = :direction')
             ->andWhere('a.messageType = :messageType')
             ->setParameter('procedureId', $procedureId)
-            ->setParameter('direction', 'received')
+            ->setParameter('direction', XBeteiligungAuditService::DIRECTION_RECEIVED)
             ->setParameter('messageType', '401')
             ->orderBy('a.createdAt', 'ASC')
             ->setMaxResults(1)
