@@ -1,0 +1,78 @@
+# XBeteiligung Message Audit Infrastructure
+
+Audit infrastructure for XBeteiligung message processing (DPLAN-16006).
+
+## Components
+
+- **XBeteiligungMessageAudit** - Entity storing audit records
+- **XBeteiligungMessageAuditRepository** - Data access layer
+- **XBeteiligungAuditService** - Central audit service
+
+## Configuration
+
+```yaml
+addon_xbeteiligung_async_enable_audit: true  # Enable audit (default: true)
+```
+
+## Database Schema
+
+Key fields:
+- `direction` - 'received' or 'sent'
+- `target_system` - 'cockpit' or 'k3'
+- `message_type` - e.g., 'kommunal.Initiieren.0401'
+- `message_content` - Full XML content
+- `procedure_id` - Added when procedure created
+- `plan_id` - Extracted from XML
+- `status` - 'pending', 'processed', 'sent', 'failed'
+
+## Message Flow
+
+### Cockpit (RabbitMQ)
+1. Incoming: `received/cockpit/pending` → `processed` (when procedure created)
+2. Outgoing: `sent/cockpit/pending` → `sent` or `failed`
+
+### K3 (REST API) 
+1. Created: `sent/k3/pending` → `sent` (when K3 fetches)
+
+## API Usage
+
+```php
+// Create audit records
+$auditService->auditReceivedMessage($content, $type, $planId);
+$auditService->auditSentMessage($content, $type, $procedureId, $planId, $responseId, $statementId);
+$auditService->auditK3Message($content, $type, $procedureId, $planId);
+
+// Update status
+$auditService->markAsProcessed($auditId, $procedureId);
+$auditService->markAsSent($auditId);
+$auditService->markAsFailed($auditId);
+
+// Query
+$auditService->findAuditRecordsByProcedureAndTargetSystem($procedureId, $targetSystem);
+$repository->get($auditId);
+```
+
+## Supported Message Types
+
+**Cockpit (RabbitMQ):**
+- `kommunal.Initiieren.0401`
+- `allgemein.stellungnahme.Neuabgegeben.0701`
+- `kommunal.Initiieren.OK.0411`, `kommunal.Initiieren.NOK.0421` (responses)
+
+**K3 (REST API):**
+- `kommunal.Initiieren.0401`, `kommunal.Aktualisieren.0402`, `kommunal.Loeschen.0409`
+- `raumordnung.Initiieren.0301`, `raumordnung.Aktualisieren.0302`, `raumordnung.Loeschen.0309`
+
+## Status Values
+
+- `pending` - Initial status
+- `processed` - Incoming message processed (procedure created)
+- `sent` - Successfully delivered
+- `failed` - Processing/delivery failed
+
+## Implementation Notes
+
+- Migration: `src/DoctrineMigrations/2025/06/Version20250627120000.php`
+- All commonly queried fields are indexed
+- Full XML content stored but not indexed
+- Unit tests: `tests/Logic/XBeteiligungAuditServiceUnitTest.php`
