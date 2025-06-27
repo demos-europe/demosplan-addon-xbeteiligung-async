@@ -15,6 +15,17 @@
 - Add PATCH REST endpoint `/addon/xbeteiligung/procedure/update` for XBeteiligung procedure updates
 - Refactor and eliminate code duplication between create and update methods in XBeteiligungRestController
 - Enhance test coverage with comprehensive PATCH endpoint tests
+- Add comprehensive XBeteiligung message audit infrastructure (DPLAN-16006)
+    - Complete audit system for all XBeteiligung message processing with full traceability
+    - Support for both Cockpit (RabbitMQ) and K3 (REST API) communication systems
+    - Audit all incoming messages (401), outgoing statements (701), and response messages (411/421)
+    - Status lifecycle tracking (pending → processed/sent/failed) throughout message processing
+    - Full XML content storage with metadata (procedure ID, plan ID, statement ID, target system)
+    - Message relationship tracking via responseToMessageId for complete audit trails
+    - Configurable enable/disable via `addon_xbeteiligung_async_enable_audit` parameter
+    - Database migration with optimized indexes for efficient querying
+    - Comprehensive unit test coverage for audit service and entity classes
+    - Developer documentation for audit configuration and usage
 
 ## v0.10.7 (2025-06-14)
 
