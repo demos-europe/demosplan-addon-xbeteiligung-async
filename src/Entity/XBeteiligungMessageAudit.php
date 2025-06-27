@@ -223,14 +223,14 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
         return $this;
     }
 
-    public function isIncoming(): bool
+    public function isReceived(): bool
     {
-        return $this->direction === 'incoming';
+        return $this->direction === 'received';
     }
 
-    public function isOutgoing(): bool
+    public function isSent(): bool
     {
-        return $this->direction === 'outgoing';
+        return $this->direction === 'sent';
     }
 
     public function isPending(): bool

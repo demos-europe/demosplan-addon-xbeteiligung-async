@@ -75,7 +75,7 @@ class XBeteiligungMessageAuditRepository extends ServiceEntityRepository
             ->andWhere('a.direction = :direction')
             ->andWhere('a.messageType = :messageType')
             ->setParameter('procedureId', $procedureId)
-            ->setParameter('direction', 'incoming')
+            ->setParameter('direction', 'received')
             ->setParameter('messageType', '401')
             ->orderBy('a.createdAt', 'ASC')
             ->setMaxResults(1)
