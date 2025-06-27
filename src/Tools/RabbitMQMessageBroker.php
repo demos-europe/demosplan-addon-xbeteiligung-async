@@ -94,23 +94,37 @@ class RabbitMQMessageBroker
      * @throws AMQPTimeoutException
      * @throws Exception
      */
-    protected function sendRabbitMq(string $xmlString, int $expiration = 300): bool
+    protected function sendRabbitMq(string $xmlString, int $expiration = 300, ?string $auditRecordId = null): bool
     {
         $routingKey = $this->globalConfig->getProjectPrefix();
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
             $routingKey = '';
         }
         $this->logger->info('Send Response to RabbitMQ', [$xmlString]);
-        $this->client->addRequest(
-            $xmlString,
-            $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
-            self::RABBIT_MQ_REQUEST_ID_SEND,
-            $routingKey,
-            $expiration
-        );
-        $replies = $this->client->getReplies();
+        
+        try {
+            $this->client->addRequest(
+                $xmlString,
+                $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
+                self::RABBIT_MQ_REQUEST_ID_SEND,
+                $routingKey,
+                $expiration
+            );
+            $replies = $this->client->getReplies();
 
-        $this->logger->info('Replies from RabbitMQ', [$replies]);
+            // Mark as sent after successful RabbitMQ communication
+            if (null !== $auditRecordId) {
+                $this->auditService->markAsSent($auditRecordId);
+            }
+
+            $this->logger->info('Replies from RabbitMQ', [$replies]);
+        } catch (\Exception $e) {
+            // Mark as failed only if RabbitMQ send failed (before markAsSent was called)
+            if (null !== $auditRecordId) {
+                $this->auditService->markAsFailed($auditRecordId, $e->getMessage());
+            }
+            throw $e;
+        }
 
         return Json::decodeToMatchingType($replies[self::RABBIT_MQ_REQUEST_ID_SEND]);
     }
@@ -129,7 +143,21 @@ class RabbitMQMessageBroker
 
         $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
         $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
-        $this->sendRabbitMq($xmlString);
+        
+        // Audit statement message (701) with procedure context
+        $auditRecord = null;
+        if ($this->parameterBag->get('addon_xbeteiligung_async_enable_audit')) {
+            $auditRecord = $this->auditService->auditSentMessage(
+                $xmlString,
+                'allgemein.stellungnahme.Neuabgegeben.0701', // Statement message type
+                $statementCreated->getProcedureId(),
+                $statementCreated->getPlanId(),
+                null, // responseToMessageId
+                $statementCreated->getPublicId() // statementId
+            );
+        }
+        
+        $this->sendRabbitMq($xmlString, 300, $auditRecord?->getId());
 
         return $event;
     }

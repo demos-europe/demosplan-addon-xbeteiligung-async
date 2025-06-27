@@ -40,6 +40,7 @@ class Version20250627120000 extends AbstractMigration
             procedure_id CHAR(36) NULL,
             plan_id VARCHAR(255) NULL,
             response_to_message_id CHAR(36) NULL,
+            statement_id CHAR(36) NULL,
             status VARCHAR(20) DEFAULT \'pending\' NOT NULL,
             error_details TEXT NULL,
             processing_notes TEXT NULL,
@@ -53,7 +54,8 @@ class Version20250627120000 extends AbstractMigration
             INDEX idx_plan_id (plan_id),
             INDEX idx_status (status),
             INDEX idx_created_at (created_at),
-            INDEX idx_response_to_message (response_to_message_id)
+            INDEX idx_response_to_message (response_to_message_id),
+            INDEX idx_statement_id (statement_id)
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
     }
 

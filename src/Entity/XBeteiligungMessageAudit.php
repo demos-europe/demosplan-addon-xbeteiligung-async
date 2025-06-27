@@ -58,6 +58,9 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
     #[ORM\Column(type: 'string', length: 36, nullable: true)]
     private ?string $responseToMessageId = null;
 
+    #[ORM\Column(type: 'string', length: 36, nullable: true)]
+    private ?string $statementId = null;
+
     // === Processing Status ===
     #[ORM\Column(type: 'string', length: 20, nullable: false, options: ['default' => 'pending'])]
     private string $status = 'pending';
@@ -163,6 +166,17 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
         return $this;
     }
 
+    public function getStatementId(): ?string
+    {
+        return $this->statementId;
+    }
+
+    public function setStatementId(?string $statementId): self
+    {
+        $this->statementId = $statementId;
+        return $this;
+    }
+
     public function getStatus(): string
     {
         return $this->status;
@@ -228,7 +242,7 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
         return $this->direction === 'received';
     }
 
-    public function isSent(): bool
+    public function isSentDirection(): bool
     {
         return $this->direction === 'sent';
     }

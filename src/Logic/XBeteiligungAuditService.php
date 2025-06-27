@@ -71,7 +71,8 @@ class XBeteiligungAuditService
         string $messageType,
         ?string $procedureId = null,
         ?string $planId = null,
-        ?string $responseToMessageId = null
+        ?string $responseToMessageId = null,
+        ?string $statementId = null
     ): XBeteiligungMessageAudit {
         $audit = new XBeteiligungMessageAudit();
         $audit->setDirection(self::DIRECTION_SENT);
@@ -80,6 +81,7 @@ class XBeteiligungAuditService
         $audit->setProcedureId($procedureId);
         $audit->setPlanId($planId);
         $audit->setResponseToMessageId($responseToMessageId);
+        $audit->setStatementId($statementId);
         $audit->setStatus(self::STATUS_PENDING);
 
 
@@ -194,4 +196,5 @@ class XBeteiligungAuditService
             'procedureId' => $procedureId
         ]);
     }
+
 }
