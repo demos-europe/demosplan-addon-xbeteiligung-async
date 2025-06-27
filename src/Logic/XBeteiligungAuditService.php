@@ -250,4 +250,27 @@ class XBeteiligungAuditService
     {
         return $this->auditRepository->findByProcedureIdAndTargetSystem($procedureId, $targetSystem);
     }
+
+    /**
+     * Find the original incoming 401 message for a procedure from cockpit
+     * This should be unique - there should only be one per procedure
+     */
+    public function findOriginalIncoming401Message(string $procedureId): ?XBeteiligungMessageAudit
+    {
+        $auditRecords = $this->auditRepository->findByProcedureIdAndTargetSystem(
+            $procedureId,
+            self::TARGET_SYSTEM_COCKPIT
+        );
+
+        foreach ($auditRecords as $record) {
+            if ($record->isReceived() &&
+                'kommunal.Initiieren.0401' === $record->getMessageType() &&
+                $record->getProcedureId() === $procedureId &&
+                $record->getTargetSystem() === self::TARGET_SYSTEM_COCKPIT) {
+                return $record;
+            }
+        }
+
+        return null;
+    }
 }

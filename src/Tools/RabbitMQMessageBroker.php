@@ -75,7 +75,32 @@ class RabbitMQMessageBroker
 
             try {
                 $responseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction($message, $auditEnabled);
-                $this->sendRabbitMq($responseObject->getPayload());
+
+                // Audit outgoing response message (OK/NOK)
+                $auditRecordId = null;
+                if ($auditEnabled) {
+                    $responsePayload = $responseObject->getPayload();
+                    $responseMessageType = $this->determineResponseMessageType($responsePayload);
+
+                    // Find the original audit record for the incoming 401 message to link the response
+                    $originalAuditRecord = null;
+                    if (null !== $responseObject->getProcedureId()) {
+                        $originalAuditRecord = $this->auditService->findOriginalIncoming401Message(
+                            $responseObject->getProcedureId()
+                        );
+                    }
+
+                    $auditRecord = $this->auditService->auditSentMessage(
+                        $responsePayload,
+                        $responseMessageType,
+                        $responseObject->getProcedureId(),
+                        $originalAuditRecord?->getPlanId(), // planId from original incoming message
+                        $originalAuditRecord?->getId() // responseToMessageId - link to original audit record
+                    );
+                    $auditRecordId = $auditRecord->getId();
+                }
+
+                $this->sendRabbitMq($responseObject->getPayload(), 300, $auditRecordId);
             } catch (InvalidArgumentException $e) {
                 $this->logger->error('Message payload not supported', [$e]);
             } catch (SchemaException $e) {
@@ -101,7 +126,7 @@ class RabbitMQMessageBroker
             $routingKey = '';
         }
         $this->logger->info('Send Response to RabbitMQ', [$xmlString]);
-        
+
         try {
             $this->client->addRequest(
                 $xmlString,
@@ -143,7 +168,7 @@ class RabbitMQMessageBroker
 
         $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
         $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
-        
+
         // Audit statement message (701) with procedure context
         $auditRecord = null;
         if ($this->parameterBag->get('addon_xbeteiligung_async_enable_audit')) {
@@ -156,7 +181,7 @@ class RabbitMQMessageBroker
                 $statementCreated->getPublicId() // statementId
             );
         }
-        
+
         $this->sendRabbitMq($xmlString, 300, $auditRecord?->getId());
 
         return $event;
@@ -168,5 +193,22 @@ class RabbitMQMessageBroker
     public function setClient(RpcClient $client): void
     {
         $this->client = $client;
+    }
+
+    /**
+     * Determine message type from XML response content
+     */
+    private function determineResponseMessageType(string $xmlContent): string
+    {
+        // Check for OK responses
+        if (str_contains($xmlContent, 'kommunal.Initiieren.OK.0411')) {
+            return 'kommunal.Initiieren.OK.0411';
+        }
+        if (str_contains($xmlContent, 'kommunal.Initiieren.NOK.0421')) {
+            return 'kommunal.Initiieren.NOK.0421';
+        }
+
+        // Default fallback
+        return 'unknown.response';
     }
 }

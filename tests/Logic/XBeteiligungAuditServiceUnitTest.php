@@ -172,4 +172,48 @@ class XBeteiligungAuditServiceUnitTest extends TestCase
         $result = $this->service->findAuditRecordsByProcedureAndTargetSystem('proc-123', 'k3');
         self::assertSame($expectedAudits, $result);
     }
+
+    public function testFindOriginalIncoming401Message(): void
+    {
+        $audit401Cockpit = new XBeteiligungMessageAudit();
+        $audit401Cockpit->setDirection('received')
+            ->setTargetSystem('cockpit')
+            ->setMessageType('kommunal.Initiieren.0401')
+            ->setProcedureId('proc-123');
+
+        $audit401K3 = new XBeteiligungMessageAudit();
+        $audit401K3->setDirection('sent')
+            ->setTargetSystem('k3')
+            ->setMessageType('kommunal.Initiieren.0401')
+            ->setProcedureId('proc-123');
+
+        $audits = [$audit401Cockpit, $audit401K3];
+
+        $this->auditRepository->expects($this->once())
+            ->method('findByProcedureIdAndTargetSystem')
+            ->with('proc-123', 'cockpit')
+            ->willReturn($audits);
+
+        $result = $this->service->findOriginalIncoming401Message('proc-123');
+        self::assertSame($audit401Cockpit, $result);
+    }
+
+    public function testFindOriginalIncoming401MessageNotFound(): void
+    {
+        $auditOther = new XBeteiligungMessageAudit();
+        $auditOther->setDirection('sent')
+            ->setTargetSystem('cockpit')
+            ->setMessageType('kommunal.Initiieren.OK.0411')
+            ->setProcedureId('proc-123');
+
+        $audits = [$auditOther];
+
+        $this->auditRepository->expects($this->once())
+            ->method('findByProcedureIdAndTargetSystem')
+            ->with('proc-123', 'cockpit')
+            ->willReturn($audits);
+
+        $result = $this->service->findOriginalIncoming401Message('proc-123');
+        self::assertNull($result);
+    }
 }
