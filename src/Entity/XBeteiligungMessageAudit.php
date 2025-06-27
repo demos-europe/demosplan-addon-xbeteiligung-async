@@ -36,8 +36,6 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
     #[ORM\Column(type: 'text', nullable: false)]
     private string $messageContent;
 
-    #[ORM\Column(type: 'json', nullable: true)]
-    private ?array $messageMetadata = null;
 
 
     // === Procedure Relationship ===
@@ -120,16 +118,6 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
         return $this;
     }
 
-    public function getMessageMetadata(): ?array
-    {
-        return $this->messageMetadata;
-    }
-
-    public function setMessageMetadata(?array $messageMetadata): self
-    {
-        $this->messageMetadata = $messageMetadata;
-        return $this;
-    }
 
 
     public function getProcedureId(): ?string
