@@ -34,6 +34,7 @@ class Version20250627120000 extends AbstractMigration
         $this->addSql('CREATE TABLE IF NOT EXISTS xbeteiligung_async_message_audit (
             id CHAR(36) NOT NULL,
             direction VARCHAR(20) NOT NULL,
+            target_system VARCHAR(10) NOT NULL,
             message_type VARCHAR(10) NOT NULL,
             message_class VARCHAR(100) NULL,
             message_content LONGTEXT NOT NULL,
@@ -49,6 +50,7 @@ class Version20250627120000 extends AbstractMigration
             sent_at DATETIME NULL,
             PRIMARY KEY(id),
             INDEX idx_direction (direction),
+            INDEX idx_target_system (target_system),
             INDEX idx_message_type (message_type),
             INDEX idx_procedure_id (procedure_id),
             INDEX idx_plan_id (plan_id),

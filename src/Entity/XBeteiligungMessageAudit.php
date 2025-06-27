@@ -37,6 +37,9 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
     private string $direction;
 
     #[ORM\Column(type: 'string', length: 10, nullable: false)]
+    private string $targetSystem;
+
+    #[ORM\Column(type: 'string', length: 10, nullable: false)]
     private string $messageType;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
@@ -95,6 +98,17 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
     public function setDirection(string $direction): self
     {
         $this->direction = $direction;
+        return $this;
+    }
+
+    public function getTargetSystem(): string
+    {
+        return $this->targetSystem;
+    }
+
+    public function setTargetSystem(string $targetSystem): self
+    {
+        $this->targetSystem = $targetSystem;
         return $this;
     }
 

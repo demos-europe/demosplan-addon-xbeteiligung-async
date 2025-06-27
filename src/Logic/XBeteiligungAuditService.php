@@ -22,6 +22,9 @@ class XBeteiligungAuditService
     public const DIRECTION_RECEIVED = 'received';
     public const DIRECTION_SENT = 'sent';
 
+    public const TARGET_SYSTEM_COCKPIT = 'cockpit';
+    public const TARGET_SYSTEM_K3 = 'k3';
+
     public const STATUS_PENDING = 'pending';
     public const STATUS_PROCESSED = 'processed';
     public const STATUS_SENT = 'sent';
@@ -33,7 +36,47 @@ class XBeteiligungAuditService
     ) {}
 
     /**
-     * Audit a received message from external system
+     * Create audit record for any message
+     */
+    private function createAuditRecord(
+        string $direction,
+        string $targetSystem,
+        string $xmlContent,
+        string $messageType,
+        ?string $procedureId = null,
+        ?string $planId = null,
+        ?string $responseToMessageId = null,
+        ?string $statementId = null
+    ): XBeteiligungMessageAudit {
+        $audit = new XBeteiligungMessageAudit();
+        $audit->setDirection($direction);
+        $audit->setTargetSystem($targetSystem);
+        $audit->setMessageType($messageType);
+        $audit->setMessageContent($xmlContent);
+        $audit->setProcedureId($procedureId);
+        $audit->setPlanId($planId);
+        $audit->setResponseToMessageId($responseToMessageId);
+        $audit->setStatementId($statementId);
+
+        if (self::DIRECTION_SENT === $direction) {
+            $audit->setStatus(self::STATUS_PENDING);
+        }
+
+        $this->auditRepository->save($audit);
+
+        $this->logger->info('XBeteiligung Message Audit: Message logged', [
+            'auditId' => $audit->getId(),
+            'direction' => $direction,
+            'targetSystem' => $targetSystem,
+            'messageType' => $messageType,
+            'procedureId' => $procedureId
+        ]);
+
+        return $audit;
+    }
+
+    /**
+     * Audit a received message from external system (Cockpit)
      */
     public function auditReceivedMessage(
         string $xmlContent,
@@ -42,29 +85,19 @@ class XBeteiligungAuditService
         ?string $procedureId = null,
         ?string $responseToMessageId = null
     ): XBeteiligungMessageAudit {
-        $audit = new XBeteiligungMessageAudit();
-        $audit->setDirection(self::DIRECTION_RECEIVED);
-        $audit->setMessageType($messageType);
-        $audit->setMessageContent($xmlContent);
-        $audit->setPlanId($planId);
-        $audit->setProcedureId($procedureId);
-        $audit->setResponseToMessageId($responseToMessageId);
-
-
-        $this->auditRepository->save($audit);
-
-        $this->logger->info('XBeteiligung Message Audit: Received message logged', [
-            'auditId' => $audit->getId(),
-            'messageType' => $messageType,
-            'direction' => self::DIRECTION_RECEIVED,
-            'procedureId' => $procedureId
-        ]);
-
-        return $audit;
+        return $this->createAuditRecord(
+            self::DIRECTION_RECEIVED,
+            self::TARGET_SYSTEM_COCKPIT,
+            $xmlContent,
+            $messageType,
+            $procedureId,
+            $planId,
+            $responseToMessageId
+        );
     }
 
     /**
-     * Audit a sent message to external system
+     * Audit a sent message to external system (Cockpit)
      */
     public function auditSentMessage(
         string $xmlContent,
@@ -74,28 +107,16 @@ class XBeteiligungAuditService
         ?string $responseToMessageId = null,
         ?string $statementId = null
     ): XBeteiligungMessageAudit {
-        $audit = new XBeteiligungMessageAudit();
-        $audit->setDirection(self::DIRECTION_SENT);
-        $audit->setMessageType($messageType);
-        $audit->setMessageContent($xmlContent);
-        $audit->setProcedureId($procedureId);
-        $audit->setPlanId($planId);
-        $audit->setResponseToMessageId($responseToMessageId);
-        $audit->setStatementId($statementId);
-        $audit->setStatus(self::STATUS_PENDING);
-
-
-        $this->auditRepository->save($audit);
-
-        $this->logger->info('XBeteiligung Message Audit: Sent message logged', [
-            'auditId' => $audit->getId(),
-            'messageType' => $messageType,
-            'direction' => self::DIRECTION_SENT,
-            'procedureId' => $procedureId,
-            'planId' => $planId
-        ]);
-
-        return $audit;
+        return $this->createAuditRecord(
+            self::DIRECTION_SENT,
+            self::TARGET_SYSTEM_COCKPIT,
+            $xmlContent,
+            $messageType,
+            $procedureId,
+            $planId,
+            $responseToMessageId,
+            $statementId
+        );
     }
 
     /**
@@ -128,25 +149,38 @@ class XBeteiligungAuditService
     }
 
     /**
-     * Mark a message as sent
+     * Update audit record with callback function
      */
-    public function markAsSent(string $auditId): void
+    private function updateAuditRecord(string $auditId, callable $updateFunction, string $logMessage, array $logContext = []): void
     {
         $audit = $this->auditRepository->get($auditId);
         if (null === $audit) {
             $this->logger->warning(
-                'XBeteiligung Message Audit: Cannot mark as sent - audit record not found',
+                'XBeteiligung Message Audit: Cannot update audit record - not found',
                 ['auditId' => $auditId]
             );
             return;
         }
 
-        $audit->setStatus(self::STATUS_SENT);
-        $audit->setSentAt(new DateTime());
-
+        $updateFunction($audit);
         $this->auditRepository->save($audit);
 
-        $this->logger->info('XBeteiligung Message Audit: Message marked as sent', ['auditId' => $auditId]);
+        $this->logger->info($logMessage, array_merge(['auditId' => $auditId], $logContext));
+    }
+
+    /**
+     * Mark a message as sent
+     */
+    public function markAsSent(string $auditId): void
+    {
+        $this->updateAuditRecord(
+            $auditId,
+            function (XBeteiligungMessageAudit $audit) {
+                $audit->setStatus(self::STATUS_SENT);
+                $audit->setSentAt(new DateTime());
+            },
+            'XBeteiligung Message Audit: Message marked as sent'
+        );
     }
 
     /**
@@ -154,24 +188,15 @@ class XBeteiligungAuditService
      */
     public function markAsFailed(string $auditId, string $errorDetails): void
     {
-        $audit = $this->auditRepository->get($auditId);
-        if (null === $audit) {
-            $this->logger->warning(
-                'XBeteiligung Message Audit: Cannot mark as failed - audit record not found',
-                ['auditId' => $auditId]
-            );
-            return;
-        }
-
-        $audit->setStatus(self::STATUS_FAILED);
-        $audit->setErrorDetails($errorDetails);
-
-        $this->auditRepository->save($audit);
-
-        $this->logger->error('XBeteiligung Message Audit: Message marked as failed', [
-            'auditId' => $auditId,
-            'errorDetails' => $errorDetails
-        ]);
+        $this->updateAuditRecord(
+            $auditId,
+            function (XBeteiligungMessageAudit $audit) use ($errorDetails) {
+                $audit->setStatus(self::STATUS_FAILED);
+                $audit->setErrorDetails($errorDetails);
+            },
+            'XBeteiligung Message Audit: Message marked as failed',
+            ['errorDetails' => $errorDetails]
+        );
     }
 
     /**
@@ -179,22 +204,40 @@ class XBeteiligungAuditService
      */
     public function updateAuditWithProcedureId(string $auditId, string $procedureId): void
     {
-        $audit = $this->auditRepository->get($auditId);
-        if (null === $audit) {
-            $this->logger->warning(
-                'XBeteiligung Message Audit: Cannot update with procedure ID - audit record not found',
-                ['auditId' => $auditId]
-            );
-            return;
-        }
-
-        $audit->setProcedureId($procedureId);
-        $this->auditRepository->save($audit);
-
-        $this->logger->info('XBeteiligung Message Audit: Updated audit record with procedure ID', [
-            'auditId' => $auditId,
-            'procedureId' => $procedureId
-        ]);
+        $this->updateAuditRecord(
+            $auditId,
+            function (XBeteiligungMessageAudit $audit) use ($procedureId) {
+                $audit->setProcedureId($procedureId);
+            },
+            'XBeteiligung Message Audit: Updated audit record with procedure ID',
+            ['procedureId' => $procedureId]
+        );
     }
 
+    /**
+     * Audit a message created for K3 system
+     */
+    public function auditK3Message(
+        string $xmlContent,
+        string $messageType,
+        string $procedureId,
+        ?string $planId = null
+    ): XBeteiligungMessageAudit {
+        return $this->createAuditRecord(
+            self::DIRECTION_SENT,
+            self::TARGET_SYSTEM_K3,
+            $xmlContent,
+            $messageType,
+            $procedureId,
+            $planId
+        );
+    }
+
+    /**
+     * Mark K3 message as delivered when fetched by K3
+     */
+    public function markK3MessageAsDelivered(string $auditId): void
+    {
+        $this->markAsSent($auditId);
+    }
 }
