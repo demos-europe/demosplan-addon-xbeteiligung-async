@@ -15,6 +15,10 @@ parameters:
   # For Example: Kommunal, Raumordnung or Planfeststellung
   addon_xbeteiligung_async_procedure_message_type: ""
 
+  # Cockpit mandant identifier for incoming message routing
+  # For Example: hamburg, bayern, berlin
+  addon_xbeteiligung_async_cockpit_mandant: ""
+
   # Use for incoming messages from rabbitMQ
   addon_xbeteiligung_async_enable_rabbitmq_communication: false
 
@@ -27,6 +31,6 @@ parameters:
 
   addon_xbeteiligung_async_rabbitMqRequestIdSend: 'XBeteiligung_Send'
 
-  addon_xbeteiligung_async_rabbitmq_routing_key_author: 'xyz.0001'
-
-  addon_xbeteiligung_async_rabbitmq_routing_key_reader: 'xyz.0002'
+  # Legacy parameters removed - replaced with dynamic AGS routing:
+  # addon_xbeteiligung_async_rabbitmq_routing_key_author: 'xyz.0001'
+  # addon_xbeteiligung_async_rabbitmq_routing_key_reader: 'xyz.0002'

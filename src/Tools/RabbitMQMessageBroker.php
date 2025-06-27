@@ -20,6 +20,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureAgsRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -36,11 +37,12 @@ class RabbitMQMessageBroker
     private const RABBIT_MQ_QUEUE_NAME = 'addon_xbeteiligung_async_rabbitMqQueueName';
     private const RABBIT_MQ_REQUEST_ID_GET = 'addon_xbeteiligung_async_rabbitMqRequestIdGet';
     private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
-    private const RABBIT_MQ_ROUTING_KEY_AUTHOR = 'addon_xbeteiligung_async_rabbitmq_routing_key_author';
-    private const RABBIT_MQ_ROUTING_KEY_READER = 'addon_xbeteiligung_async_rabbitmq_routing_key_reader';
-    private const BETEILIGUNG_QUEUE = 'beteiligung'; // for outgoing messages
-    private const COCKPIT_QUEUE = 'cockpit'; // for incoming messages
-    private const COCKPIT_SUBDOMAIN = 'init'; // subdomain for incoming cockpit messages
+    // Legacy constants removed - replaced with dynamic AGS routing:
+    // private const RABBIT_MQ_ROUTING_KEY_AUTHOR = 'addon_xbeteiligung_async_rabbitmq_routing_key_author';
+    // private const RABBIT_MQ_ROUTING_KEY_READER = 'addon_xbeteiligung_async_rabbitmq_routing_key_reader';
+    // private const BETEILIGUNG_QUEUE = 'beteiligung'; // for outgoing messages
+    // private const COCKPIT_QUEUE = 'cockpit'; // for incoming messages
+    // private const COCKPIT_SUBDOMAIN = 'init'; // subdomain for incoming cockpit messages
 
     public function __construct(
         private readonly GlobalConfigInterface $globalConfig,
@@ -49,6 +51,7 @@ class RabbitMQMessageBroker
         private readonly StatementCreator $statementCreator,
         private readonly StatementMessageFactory $statementMessageFactory,
         private readonly XBeteiligungService $xBeteiligungService,
+        private readonly XBeteiligungProcedureAgsRepository $procedureAgsRepository,
     ) {
     }
 
@@ -58,7 +61,7 @@ class RabbitMQMessageBroker
      */
     public function processMessages(): void
     {
-        $routingKey = $this->globalConfig->getProjectPrefix();
+        $routingKey = $this->buildIncomingRoutingKey();
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
             $routingKey = '';
         }
@@ -95,13 +98,17 @@ class RabbitMQMessageBroker
      * @throws AMQPTimeoutException
      * @throws Exception
      */
-    protected function sendRabbitMq(string $xmlString, string $messageType, bool $isOutgoing, int $expiration = 300): bool
+    protected function sendRabbitMq(string $xmlString, string $messageType, bool $isOutgoing, ?string $procedureId = null, int $expiration = 300): bool
     {
-        $routingKey = $this->buildRoutingKey($messageType, $isOutgoing);
+        $routingKey = $this->buildRoutingKey($messageType, $isOutgoing, $procedureId);
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
             $routingKey = '';
         }
-        $this->logger->info('Send Response to RabbitMQ', [$xmlString]);
+        $this->logger->info('Send Response to RabbitMQ', [
+            'xmlString' => $xmlString,
+            'routingKey' => $routingKey,
+            'isOutgoing' => $isOutgoing
+        ]);
         $this->client->addRequest(
             $xmlString,
             $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
@@ -133,7 +140,8 @@ class RabbitMQMessageBroker
         $this->sendRabbitMq(
             $xmlString,
             CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[AllgemeinStellungnahmeNeuabgegeben0701::class]['name'],
-            true
+            true,
+            $statementCreated->getPlanId() // Pass procedure ID for AGS lookup
         );
 
         return $event;
@@ -147,16 +155,123 @@ class RabbitMQMessageBroker
         $this->client = $client;
     }
 
-    private function buildRoutingKey(string $messageType, bool $isOutgoing): string
+    /**
+     * @throws Exception
+     */
+    private function buildRoutingKey(string $messageType, bool $isOutgoing, ?string $procedureId = null): string
     {
-        $author = $this->parameterBag->get(self::RABBIT_MQ_ROUTING_KEY_AUTHOR);
-        $reader = $this->parameterBag->get(self::RABBIT_MQ_ROUTING_KEY_READER);
         if ($isOutgoing) {
-            $subdomain = $this->globalConfig->getSubdomain();
-
-            return $subdomain . '.' . self::BETEILIGUNG_QUEUE . '.' . $author . '.' . $reader . '.' . $messageType;
+            // Format: {project_type}.beteiligung.{autor_ags}.{leser_ags}.{message_type}
+            return $this->buildOutgoingRoutingKey($messageType, $procedureId);
         }
 
-        return self::COCKPIT_SUBDOMAIN . '.' . self::COCKPIT_QUEUE . '.' . $author . '.' . $reader . '.' . $messageType;
+        // Format: {cockpit_mandant}.cockpit.*.*.{message_type}
+        return $this->buildIncomingRoutingKey($messageType);
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function buildOutgoingRoutingKey(string $messageType, ?string $procedureId): string
+    {
+        try {
+            // Get project type from configuration and map to routing prefix
+            $projectType = $this->getProjectType();
+
+            // Get AGS codes from database for the procedure
+            $agsData = null;
+            if (null !== $procedureId) {
+                $agsData = $this->procedureAgsRepository->getAgsCodesForRouting($procedureId);
+            }
+
+            if (null === $agsData) {
+                $this->logger->error('Cannot send message: No AGS codes found for procedure', [
+                    'procedureId' => $procedureId,
+                    'messageType' => $messageType,
+                    'reason' => 'Missing AGS codes from database'
+                ]);
+
+                throw new InvalidArgumentException(
+                    \sprintf('Cannot build routing key: No AGS codes found for procedure %s', $procedureId ?? 'null')
+                );
+            }
+
+            // Build dynamic routing key with real AGS codes
+            $routingKey = \sprintf(
+                '%s.beteiligung.%s.%s.%s',
+                $projectType,
+                $agsData['autor'],
+                $agsData['leser'],
+                $messageType
+            );
+
+            $this->logger->info('Built dynamic outgoing routing key', [
+                'routingKey' => $routingKey,
+                'procedureId' => $procedureId,
+                'projectType' => $projectType,
+                'autorAgs' => $agsData['autor'],
+                'leserAgs' => $agsData['leser']
+            ]);
+
+            return $routingKey;
+
+        } catch (Exception $e) {
+            $this->logger->error('Cannot send message: Failed to build dynamic routing key', [
+                'procedureId' => $procedureId,
+                'messageType' => $messageType,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Re-throw the exception - do not send message if routing key cannot be built
+            throw $e;
+        }
+    }
+
+    private function buildIncomingRoutingKey(?string $messageType = null): string
+    {
+        $cockpitMandant = $this->getCockpitMandant();
+
+        if (null !== $messageType) {
+            // Specific message type routing: {cockpit_mandant}.cockpit.*.*.{message_type}
+            return \sprintf('%s.cockpit.*.*.%s', $cockpitMandant, $messageType);
+        }
+
+        // General incoming routing: {cockpit_mandant}.cockpit.#
+        return \sprintf('%s.cockpit.#', $cockpitMandant);
+    }
+
+    private function getProjectType(): string
+    {
+        $procedureMessageType = $this->parameterBag->get('addon_xbeteiligung_async_procedure_message_type');
+
+        if ('' === $procedureMessageType) {
+            throw new InvalidArgumentException('Parameter addon_xbeteiligung_async_procedure_message_type is not configured');
+        }
+
+        return $this->mapProcedureTypeToRoutingPrefix($procedureMessageType);
+    }
+
+    private function mapProcedureTypeToRoutingPrefix(string $procedureType): string
+    {
+        return match (strtolower($procedureType)) {
+            'kommunal' => 'bau',           // Bauleitplanung
+            'raumordnung' => 'rog',        // Raumordnung
+            'planfeststellung' => 'pfv',   // Planfeststellung
+            default => throw new InvalidArgumentException(
+                sprintf('Unknown procedure message type "%s". Valid values: Kommunal, Raumordnung, Planfeststellung', $procedureType)
+            )
+        };
+    }
+
+    private function getCockpitMandant(): string
+    {
+        $cockpitMandant = $this->parameterBag->get('addon_xbeteiligung_async_cockpit_mandant');
+
+        if ('' === $cockpitMandant) {
+            throw new InvalidArgumentException('Parameter addon_xbeteiligung_async_cockpit_mandant is not configured');
+        }
+
+        return $cockpitMandant;
     }
 }
