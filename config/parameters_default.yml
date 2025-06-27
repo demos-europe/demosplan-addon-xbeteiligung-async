@@ -26,3 +26,7 @@ parameters:
   addon_xbeteiligung_async_rabbitMqRequestIdGet: 'XBeteiligung_Get'
 
   addon_xbeteiligung_async_rabbitMqRequestIdSend: 'XBeteiligung_Send'
+
+  # === XBeteiligung Message Audit Configuration ===
+  # Enable/disable comprehensive message audit logging
+  addon_xbeteiligung_async_enable_audit: true
