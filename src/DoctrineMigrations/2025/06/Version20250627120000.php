@@ -38,7 +38,6 @@ class Version20250627120000 extends AbstractMigration
             message_class VARCHAR(100) NULL,
             message_content LONGTEXT NOT NULL,
             message_metadata JSON NULL,
-            extracted_data JSON NULL,
             procedure_id CHAR(36) NULL,
             plan_id VARCHAR(255) NULL,
             response_to_message_id CHAR(36) NULL,
