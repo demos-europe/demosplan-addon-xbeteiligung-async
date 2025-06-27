@@ -18,6 +18,7 @@ use DemosEurope\DemosplanAddon\Exception\JsonException;
 use DemosEurope\DemosplanAddon\Utilities\Json;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -42,6 +43,7 @@ class RabbitMQMessageBroker
         private readonly StatementCreator $statementCreator,
         private readonly StatementMessageFactory $statementMessageFactory,
         private readonly XBeteiligungService $xBeteiligungService,
+        private readonly XBeteiligungAuditService $auditService,
     ) {
     }
 
@@ -67,8 +69,12 @@ class RabbitMQMessageBroker
         $this->logger->info('Got response from RabbitMQ', [$result]);
         foreach ($result as $message) {
             $this->logger->info('Process message', [$message]);
+
+            // Audit will be handled in XBeteiligungService where parsed objects are available
+            $auditEnabled = $this->parameterBag->get('addon_xbeteiligung_async_enable_audit');
+
             try {
-                $responseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction($message);
+                $responseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction($message, $auditEnabled);
                 $this->sendRabbitMq($responseObject->getPayload());
             } catch (InvalidArgumentException $e) {
                 $this->logger->error('Message payload not supported', [$e]);

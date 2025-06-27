@@ -171,4 +171,27 @@ class XBeteiligungAuditService
             'errorDetails' => $errorDetails
         ]);
     }
+
+    /**
+     * Update audit record with procedure ID after procedure creation
+     */
+    public function updateAuditWithProcedureId(string $auditId, string $procedureId): void
+    {
+        $audit = $this->auditRepository->get($auditId);
+        if (null === $audit) {
+            $this->logger->warning(
+                'XBeteiligung Message Audit: Cannot update with procedure ID - audit record not found',
+                ['auditId' => $auditId]
+            );
+            return;
+        }
+
+        $audit->setProcedureId($procedureId);
+        $this->auditRepository->save($audit);
+
+        $this->logger->info('XBeteiligung Message Audit: Updated audit record with procedure ID', [
+            'auditId' => $auditId,
+            'procedureId' => $procedureId
+        ]);
+    }
 }

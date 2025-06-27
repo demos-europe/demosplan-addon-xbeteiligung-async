@@ -158,6 +158,7 @@ class XBeteiligungService
         private readonly XBeteiligungIncomingMessageParser      $incomingMessageParser,
         private readonly CommonHelpers                          $commonHelpers,
         private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
+        private readonly XBeteiligungAuditService               $auditService,
     ) {
     }
 
@@ -850,8 +851,9 @@ class XBeteiligungService
 
     /**
      * @throws SchemaException
+     * @throws Exception
      */
-    public function determineMessageContextAndDelegateAction(array $message): ResponseValue
+    public function determineMessageContextAndDelegateAction(array $message, bool $auditEnabled = false): ResponseValue
     {
         $payload = $message['messageData'];
         $messageTypeCode = array_key_exists('messageTypeCode', $message) ? $message['messageTypeCode'] : '';
@@ -859,7 +861,36 @@ class XBeteiligungService
         if (self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
             /** @var KommunalInitiieren0401 $xmlObject401 */
             $xmlObject401 = $this->incomingMessageParser->getXmlObject($payload, '401');
-            return $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
+
+            // Audit received message using parsed XML object
+            $auditRecord = null;
+            if ($auditEnabled) {
+                $planId = $xmlObject401->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
+                $auditRecord = $this->auditService->auditReceivedMessage(
+                    $payload,
+                    $messageTypeCode,
+                    $planId
+                );
+            }
+
+            try {
+                $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
+
+                // Mark as processed and update with procedure ID from response
+                if (null !== $auditRecord) {
+                    $this->auditService->markAsProcessed($auditRecord->getId());
+                    if (null !== $response->getProcedureId()) {
+                        $this->auditService->updateAuditWithProcedureId($auditRecord->getId(), $response->getProcedureId());
+                    }
+                }
+
+                return $response;
+            } catch (Exception $e) {
+                if (null !== $auditRecord) {
+                    $this->auditService->markAsFailed($auditRecord->getId(), $e->getMessage());
+                }
+                throw $e;
+            }
         }
         /*
          * The code is for different message types code and we use this thing in future
