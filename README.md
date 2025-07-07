@@ -208,6 +208,18 @@ autor:
         namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
 ```
 
+[`src/Soap/Metadata/Schema.Gml.AbstractGMLTypeType.yml`](src/Soap/Metadata/Schema.Gml.AbstractGMLTypeType.yml):
+```yaml
+id:
+    expose: true
+    access_type: public_method
+    serialized_name: "gml:id"
+    accessor:
+        getter: getId
+        setter: setId
+    xml_attribute: true
+    type: string
+```
 
 comment out `namespace: ...` in [`Schema.Code.CodeType.yml`](src/Soap/Metadata/Schema.Code.CodeType.yml)
 for the fields `code` and `name`.
