@@ -15,6 +15,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\GeoreferenzierungConverter;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
@@ -53,6 +54,7 @@ class XBeteiligungResponseMessageFactory
         protected readonly LoggerInterface $logger,
         protected readonly PermissionEvaluatorInterface $permissionEvaluator,
         protected readonly ReusableMessageBlocks $reusableMessageBlocks,
+        protected readonly GeoreferenzierungConverter $georeferenzierungConverter,
     ) {
         $this->serializer = SerializerFactory::getSerializer();
     }

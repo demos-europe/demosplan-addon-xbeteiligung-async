@@ -22,6 +22,7 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\GeoreferenzierungConverter;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
@@ -103,11 +104,13 @@ class StatementCreatorTest extends TestCase
         $this->XBeteiligungService = $xbeteiligungService;
         $this->logger = new Logger();
         $this->serializer = SerializerFactory::getSerializer();
+        $georeferenzierungConverter = new GeoreferenzierungConverter();
         $this->sut = new StatementMessageFactory(
             $this->createMock(CommonHelpers::class),
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->permissionEvaluator,
-            $reusableMessageBlocks
+            $reusableMessageBlocks,
+            $georeferenzierungConverter
         );
     }
 
@@ -115,7 +118,6 @@ class StatementCreatorTest extends TestCase
     {
         $statementCreated = $this->createStatement0701(3);
         $xmlMessageString = $this->sut->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
-        //echo $xmlMessageString; // for debugging
         $this->validateProcedureXML($xmlMessageString);
         /** @var AllgemeinStellungnahmeNeuabgegeben0701 $xmlMessage */
         $xmlMessage = $this->serializer->deserialize(
@@ -167,6 +169,7 @@ class StatementCreatorTest extends TestCase
             $tags = ['Radverkehr', 'Straßenbau', 'Straßenbäume', 'Städtebaulicher Vertrag'];
             $file = 'Legende.pdf:dc855abd-c8df-11e5-8550-005056ae0004:119994:application/pdf';
             $accessUrl = 'https://bob.beispiel.de?stellungnahmeID=S34992191-830d-4d1d-a136-f38d322b521d';
+            $polygon = '{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Point","coordinates":[1021921.3111764349,6238375.184472408]},"properties":null},{"type":"Feature","geometry":{"type":"Point","coordinates":[1021716.8707572824,6238468.984660008]},"properties":null},{"type":"Feature","geometry":{"type":"Point","coordinates":[1021910.1089616868,6238025.183772408]},"properties":null},{"type":"Feature","geometry":{"type":"Point","coordinates":[1021532.034213939,6237512.782747607]},"properties":null}]}';
         } else {
             throw new \RuntimeException("Version {$version} supported");
         }
@@ -204,6 +207,7 @@ class StatementCreatorTest extends TestCase
         $statementCreated->setVotePla($vote);
         $statementCreated->setTags($tags);
         $statementCreated->setFile($file);
+        $statementCreated->setPolygon($polygon);
         $statementCreated->lock();
 
         return $statementCreated;
@@ -263,11 +267,48 @@ class StatementCreatorTest extends TestCase
 
     protected function validateProcedureXML(string $procedureXml): void
     {
-        $commonHelpers = new CommonHelpers($this->createMock(LoggerInterface::class));
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->any())
+               ->method('warning')
+               ->willReturnCallback(function($message, $context) {
+                   echo "XML Validation Warning: $message\n";
+                   if (is_array($context) && !empty($context)) {
+                       foreach ($context as $error) {
+                           if (is_object($error) && isset($error->message, $error->line)) {
+                               echo "  - " . trim($error->message) . " (Line: {$error->line})\n";
+                           }
+                       }
+                   }
+               });
+        
+        $logger->expects($this->any())
+               ->method('debug')
+               ->willReturnCallback(function($message, $context) {
+                   echo "XML Debug: $message\n";
+                   if (isset($context['error']) && is_object($context['error'])) {
+                       $error = $context['error'];
+                       echo "  Error: " . trim($error->message) . " (Line: {$error->line}, Column: {$error->column})\n";
+                   }
+               });
+        
+        $logger->expects($this->any())
+               ->method('error')
+               ->willReturnCallback(function($message, $context) {
+                   echo "XML Error: $message\n";
+                   if (isset($context['errors']) && is_array($context['errors'])) {
+                       foreach ($context['errors'] as $error) {
+                           if (is_object($error) && isset($error->message, $error->line)) {
+                               echo "  - " . trim($error->message) . " (Line: {$error->line})\n";
+                           }
+                       }
+                   }
+               });
+        
+        $commonHelpers = new CommonHelpers($logger);
 
         $isValid = $commonHelpers->isValidMessage(
             $procedureXml,
-            true,
+            true, // Enable verbose debug
             '',
             AllgemeinStellungnahmeNeuabgegeben0701::class,
         );
