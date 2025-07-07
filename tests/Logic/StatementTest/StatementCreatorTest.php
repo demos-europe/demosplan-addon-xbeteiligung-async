@@ -267,48 +267,11 @@ class StatementCreatorTest extends TestCase
 
     protected function validateProcedureXML(string $procedureXml): void
     {
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->any())
-               ->method('warning')
-               ->willReturnCallback(function($message, $context) {
-                   echo "XML Validation Warning: $message\n";
-                   if (is_array($context) && !empty($context)) {
-                       foreach ($context as $error) {
-                           if (is_object($error) && isset($error->message, $error->line)) {
-                               echo "  - " . trim($error->message) . " (Line: {$error->line})\n";
-                           }
-                       }
-                   }
-               });
-        
-        $logger->expects($this->any())
-               ->method('debug')
-               ->willReturnCallback(function($message, $context) {
-                   echo "XML Debug: $message\n";
-                   if (isset($context['error']) && is_object($context['error'])) {
-                       $error = $context['error'];
-                       echo "  Error: " . trim($error->message) . " (Line: {$error->line}, Column: {$error->column})\n";
-                   }
-               });
-        
-        $logger->expects($this->any())
-               ->method('error')
-               ->willReturnCallback(function($message, $context) {
-                   echo "XML Error: $message\n";
-                   if (isset($context['errors']) && is_array($context['errors'])) {
-                       foreach ($context['errors'] as $error) {
-                           if (is_object($error) && isset($error->message, $error->line)) {
-                               echo "  - " . trim($error->message) . " (Line: {$error->line})\n";
-                           }
-                       }
-                   }
-               });
-        
-        $commonHelpers = new CommonHelpers($logger);
+        $commonHelpers = new CommonHelpers($this->createMock(LoggerInterface::class));
 
         $isValid = $commonHelpers->isValidMessage(
             $procedureXml,
-            true, // Enable verbose debug
+            true,
             '',
             AllgemeinStellungnahmeNeuabgegeben0701::class,
         );
