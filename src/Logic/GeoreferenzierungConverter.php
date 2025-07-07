@@ -90,6 +90,7 @@ class GeoreferenzierungConverter
     {
         $georeferenziertePunkte = new GeoreferenziertePunkteType();
         
+        $pointIndex = 1;
         foreach ($points as $point) {
             if (!isset($point['coordinates']) || !is_array($point['coordinates'])) {
                 continue;
@@ -100,8 +101,9 @@ class GeoreferenzierungConverter
                 continue;
             }
             
-            // Create GML Point
+            // Create GML Point with required gml:id attribute
             $pointType = new PointTypeType();
+            $pointType->setId('point_' . $pointIndex);
             $pointType->setPos([(float) $coordinates[0], (float) $coordinates[1]]);
             
             // Wrap in anonymous type
@@ -109,6 +111,7 @@ class GeoreferenzierungConverter
             $punktAnonymous->setPunkt($pointType);
             
             $georeferenziertePunkte->addToPunkt($punktAnonymous);
+            $pointIndex++;
         }
         
         return $georeferenziertePunkte;
