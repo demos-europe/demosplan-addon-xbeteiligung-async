@@ -35,7 +35,7 @@ class Version20250627120000 extends AbstractMigration
             id CHAR(36) NOT NULL,
             direction VARCHAR(20) NOT NULL,
             target_system VARCHAR(10) NOT NULL,
-            message_type VARCHAR(10) NOT NULL,
+            message_type VARCHAR(50) NOT NULL,
             message_class VARCHAR(100) NULL,
             message_content LONGTEXT NOT NULL,
             procedure_id CHAR(36) NULL,

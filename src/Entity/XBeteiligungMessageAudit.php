@@ -39,7 +39,7 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
     #[ORM\Column(type: 'string', length: 10, nullable: false)]
     private string $targetSystem;
 
-    #[ORM\Column(type: 'string', length: 10, nullable: false)]
+    #[ORM\Column(type: 'string', length: 50, nullable: false)]
     private string $messageType;
 
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
