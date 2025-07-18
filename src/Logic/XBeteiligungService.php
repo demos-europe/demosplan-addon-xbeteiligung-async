@@ -769,21 +769,24 @@ class XBeteiligungService
 
     public function saveProcedureMessage(ProcedureMessage $procedureMessage): void
     {
-        $this->procedureMessageRepository->save($procedureMessage);
-
         // Audit K3 message creation if audit is enabled
         $auditEnabled = $this->parameterBag->get('addon_xbeteiligung_async_enable_audit');
         if ($auditEnabled) {
             $messageType = $this->determineMessageTypeFromContent($procedureMessage->getMessage());
             $planId = $this->extractPlanIdFromXml($procedureMessage->getMessage(), $messageType);
 
-            $this->auditService->auditK3Message(
+            $auditRecord = $this->auditService->auditK3Message(
                 $procedureMessage->getMessage(),
                 $messageType,
                 $procedureMessage->getProcedureId(),
                 $planId
             );
+            
+            // Store audit ID for direct linking
+            $procedureMessage->setAuditId($auditRecord->getId());
         }
+        
+        $this->procedureMessageRepository->save($procedureMessage);
     }
 
     public function saveProcedureMessageOnFlush(ProcedureMessage $procedureMessage): void

@@ -216,4 +216,91 @@ class XBeteiligungAuditServiceUnitTest extends TestCase
         $result = $this->service->findOriginalIncoming401Message('proc-123');
         self::assertNull($result);
     }
+
+    public function testMarkK3MessageAsDelivered(): void
+    {
+        $audit = new XBeteiligungMessageAudit();
+        $audit->setDirection('sent')
+            ->setTargetSystem('k3')
+            ->setMessageType('kommunal.Initiieren.0401')
+            ->setStatus('pending');
+
+        $this->auditRepository->expects($this->exactly(2))
+            ->method('get')
+            ->with('audit-123')
+            ->willReturn($audit);
+
+        $this->auditRepository->expects($this->once())
+            ->method('save')
+            ->with($audit);
+
+        $result = $this->service->markK3MessageAsDelivered('audit-123');
+        self::assertTrue($result);
+        self::assertSame('sent', $audit->getStatus());
+    }
+
+    public function testMarkK3MessageAsDeliveredAlreadyDelivered(): void
+    {
+        $audit = new XBeteiligungMessageAudit();
+        $audit->setDirection('sent')
+            ->setTargetSystem('k3')
+            ->setMessageType('kommunal.Initiieren.0401')
+            ->setStatus('sent');
+
+        $this->auditRepository->expects($this->once())
+            ->method('get')
+            ->with('audit-123')
+            ->willReturn($audit);
+
+        $this->auditRepository->expects($this->never())
+            ->method('save');
+
+        $result = $this->service->markK3MessageAsDelivered('audit-123');
+        self::assertTrue($result);
+    }
+
+    public function testMarkK3MessageAsDeliveredNotFound(): void
+    {
+        $this->auditRepository->expects($this->once())
+            ->method('get')
+            ->with('audit-404')
+            ->willReturn(null);
+
+        $result = $this->service->markK3MessageAsDelivered('audit-404');
+        self::assertFalse($result);
+    }
+
+    public function testMarkK3MessageAsDeliveredWrongTargetSystem(): void
+    {
+        $audit = new XBeteiligungMessageAudit();
+        $audit->setDirection('sent')
+            ->setTargetSystem('cockpit')
+            ->setMessageType('kommunal.Initiieren.0401')
+            ->setStatus('pending');
+
+        $this->auditRepository->expects($this->once())
+            ->method('get')
+            ->with('audit-123')
+            ->willReturn($audit);
+
+        $result = $this->service->markK3MessageAsDelivered('audit-123');
+        self::assertFalse($result);
+    }
+
+    public function testMarkK3MessageAsDeliveredWrongDirection(): void
+    {
+        $audit = new XBeteiligungMessageAudit();
+        $audit->setDirection('received')
+            ->setTargetSystem('k3')
+            ->setMessageType('kommunal.Initiieren.0401')
+            ->setStatus('pending');
+
+        $this->auditRepository->expects($this->once())
+            ->method('get')
+            ->with('audit-123')
+            ->willReturn($audit);
+
+        $result = $this->service->markK3MessageAsDelivered('audit-123');
+        self::assertFalse($result);
+    }
 }

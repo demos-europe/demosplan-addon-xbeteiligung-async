@@ -42,16 +42,21 @@ class ProcedureMessageController extends APIController
             $auditEnabled = $parameterBag->get('addon_xbeteiligung_async_enable_audit');
             if ($auditEnabled) {
                 $procedureMessage = $procedureMessageRepository->get($procedureMessageId);
-                // Find existing audit record for this K3 message
-                $auditRecords = $auditService->findAuditRecordsByProcedureAndTargetSystem(
-                    $procedureMessage->getProcedureId(),
-                    XBeteiligungAuditService::TARGET_SYSTEM_K3
-                );
+                $auditId = $procedureMessage->getAuditId();
 
-                // Mark the most recent audit record as delivered
-                if ([] !== $auditRecords) {
-                    $latestAuditRecord = end($auditRecords);
-                    $auditService->markK3MessageAsDelivered($latestAuditRecord->getId());
+                if (null !== $auditId) {
+                    // Use the direct audit ID link for precise tracking
+                    $success = $auditService->markK3MessageAsDelivered($auditId);
+                    if (!$success) {
+                        $this->logger->warning('Failed to mark K3 message as delivered', [
+                            'procedureMessageId' => $procedureMessageId,
+                            'auditId' => $auditId
+                        ]);
+                    }
+                } else {
+                    $this->logger->warning('No audit ID found for procedure message', [
+                        'procedureMessageId' => $procedureMessageId
+                    ]);
                 }
             }
 

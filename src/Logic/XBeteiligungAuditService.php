@@ -234,11 +234,38 @@ class XBeteiligungAuditService
     }
 
     /**
-     * Mark K3 message as delivered when fetched by K3
+     * Safely mark K3 message as delivered with proper validation
+     * Returns true if successfully marked as delivered, false otherwise
      */
-    public function markK3MessageAsDelivered(string $auditId): void
+    public function markK3MessageAsDelivered(string $auditId): bool
     {
+        $audit = $this->auditRepository->get($auditId);
+
+        if (null === $audit) {
+            $this->logger->warning('XBeteiligung Message Audit: Audit record not found', ['auditId' => $auditId]);
+            return false;
+        }
+
+        if (!$audit->isSentDirection()) {
+            $this->logger->warning('XBeteiligung Message Audit: Audit record is not a sent message', ['auditId' => $auditId]);
+            return false;
+        }
+
+        if ($audit->getTargetSystem() !== self::TARGET_SYSTEM_K3) {
+            $this->logger->warning('XBeteiligung Message Audit: Audit record is not for K3 system', ['auditId' => $auditId]);
+            return false;
+        }
+
+        if ($audit->getStatus() !== self::STATUS_PENDING) {
+            $this->logger->info('XBeteiligung Message Audit: Audit record already processed', [
+                'auditId' => $auditId,
+                'currentStatus' => $audit->getStatus()
+            ]);
+            return $audit->getStatus() === self::STATUS_SENT; // Return true if already sent
+        }
+
         $this->markAsSent($auditId);
+        return true;
     }
 
     /**
