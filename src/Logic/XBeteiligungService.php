@@ -137,6 +137,7 @@ class XBeteiligungService
     public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Initiieren.0201';
     public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Aktualisieren.0202';
     public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Loeschen.0209';
+    public const UNKNOWN_MESSAGE_TYPE = 'unknown';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
     public const MISSING_USER_ERROR_CODE = '0300';
     public const WRONG_ATTACHMENT_FORMAT_ERROR_CODE = '0200';
@@ -1009,7 +1010,7 @@ class XBeteiligungService
             }
         }
 
-        return 'unknown';
+        return self::UNKNOWN_MESSAGE_TYPE;
     }
 
     /**
