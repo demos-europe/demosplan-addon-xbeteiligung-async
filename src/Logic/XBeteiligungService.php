@@ -794,7 +794,8 @@ class XBeteiligungService
         // Audit K3 message creation (for 402 update and 409 delete messages)
         $auditEnabled = $this->parameterBag->get('addon_xbeteiligung_async_enable_audit', false);
         if ($auditEnabled && null !== $this->auditService) {
-            $planId = $this->extractPlanIdFromXml($procedureMessage->getMessage());
+            $messageType = $this->determineMessageTypeFromContent($procedureMessage->getMessage());
+            $planId = $this->extractPlanIdFromXml($procedureMessage->getMessage(), $messageType);
             $auditRecord = $this->auditService->auditK3Message(
                 $procedureMessage->getMessage(),
                 $procedureMessage->getProcedureId(),
