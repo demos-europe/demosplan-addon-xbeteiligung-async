@@ -42,9 +42,6 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
     #[ORM\Column(type: 'string', length: 50, nullable: false)]
     private string $messageType;
 
-    #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private ?string $messageClass = null;
-
     // === Content Storage ===
     #[ORM\Column(type: 'text', nullable: false)]
     private string $messageContent;
@@ -70,9 +67,6 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $errorDetails = null;
-
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $processingNotes = null;
 
     // === Timestamps ===
     #[Gedmo\Timestampable(on: 'create')]
@@ -123,16 +117,6 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
         return $this;
     }
 
-    public function getMessageClass(): ?string
-    {
-        return $this->messageClass;
-    }
-
-    public function setMessageClass(?string $messageClass): self
-    {
-        $this->messageClass = $messageClass;
-        return $this;
-    }
 
     public function getMessageContent(): string
     {
@@ -213,16 +197,6 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
         return $this;
     }
 
-    public function getProcessingNotes(): ?string
-    {
-        return $this->processingNotes;
-    }
-
-    public function setProcessingNotes(?string $processingNotes): self
-    {
-        $this->processingNotes = $processingNotes;
-        return $this;
-    }
 
     public function getCreatedAt(): DateTime
     {
