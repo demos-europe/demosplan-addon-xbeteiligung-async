@@ -52,6 +52,11 @@ class XBeteiligungMessageAudit implements UuidEntityInterface
     #[ORM\Column(type: 'string', length: 36, nullable: true)]
     private ?string $procedureId = null;
 
+    /** 
+     * @var string|null Plan ID as required by XBeteiligung standard
+     * - For procedures created from external systems (Cockpit): contains the external system's planID  
+     * - For procedures created internally in demosplan: contains the demosplan procedure ID (required by standard - planID cannot be empty)
+     */
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $planId = null;
 
