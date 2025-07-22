@@ -791,15 +791,17 @@ class XBeteiligungService
 
     public function saveProcedureMessageOnFlush(ProcedureMessage $procedureMessage): void
     {
-        // Audit K3 message creation (for 402 update and 409 delete messages)
+        // Audit K3 message creation (for 402/409/302/309 messages during flush)
         $auditEnabled = $this->parameterBag->get('addon_xbeteiligung_async_enable_audit', false);
         if ($auditEnabled && null !== $this->auditService) {
             $messageType = $this->determineMessageTypeFromContent($procedureMessage->getMessage());
             $planId = $this->extractPlanIdFromXml($procedureMessage->getMessage(), $messageType);
             $auditRecord = $this->auditService->auditK3Message(
                 $procedureMessage->getMessage(),
+                $messageType,
                 $procedureMessage->getProcedureId(),
-                $planId
+                $planId,
+                true // saveOnFlush to avoid infinite recursion
             );
             
             // Store audit ID for direct linking

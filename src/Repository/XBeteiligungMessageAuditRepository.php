@@ -39,6 +39,13 @@ class XBeteiligungMessageAuditRepository extends ServiceEntityRepository
         $this->getEntityManager()->flush($audit);
     }
 
+    public function saveOnFlush(XBeteiligungMessageAudit $audit): void
+    {
+        $classMeta = $this->getEntityManager()->getClassMetadata(XBeteiligungMessageAudit::class);
+        $this->getEntityManager()->persist($audit);
+        $this->getEntityManager()->getUnitOfWork()->computeChangeSet($classMeta, $audit);
+    }
+
 
     /**
      * Find audit records by procedure ID and target system

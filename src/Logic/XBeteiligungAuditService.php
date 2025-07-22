@@ -46,7 +46,8 @@ class XBeteiligungAuditService
         ?string $procedureId = null,
         ?string $planId = null,
         ?string $responseToMessageId = null,
-        ?string $statementId = null
+        ?string $statementId = null,
+        bool $saveOnFlush = false
     ): XBeteiligungMessageAudit {
         $audit = new XBeteiligungMessageAudit();
         $audit->setDirection($direction);
@@ -62,7 +63,11 @@ class XBeteiligungAuditService
             $audit->setStatus(self::STATUS_PENDING);
         }
 
-        $this->auditRepository->save($audit);
+        if ($saveOnFlush) {
+            $this->auditRepository->saveOnFlush($audit);
+        } else {
+            $this->auditRepository->save($audit);
+        }
 
         $this->logger->info('XBeteiligung Message Audit: Message logged', [
             'auditId' => $audit->getId(),
@@ -221,7 +226,8 @@ class XBeteiligungAuditService
         string $xmlContent,
         string $messageType,
         string $procedureId,
-        ?string $planId = null
+        ?string $planId = null,
+        bool $saveOnFlush = false
     ): XBeteiligungMessageAudit {
         return $this->createAuditRecord(
             self::DIRECTION_SENT,
@@ -229,7 +235,10 @@ class XBeteiligungAuditService
             $xmlContent,
             $messageType,
             $procedureId,
-            $planId
+            $planId,
+            null,
+            null,
+            $saveOnFlush
         );
     }
 
