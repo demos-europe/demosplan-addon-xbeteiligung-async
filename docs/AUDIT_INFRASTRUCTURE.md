@@ -23,7 +23,11 @@ Key fields:
 - `message_content` - Full XML content
 - `procedure_id` - Added when procedure created
 - `plan_id` - Extracted from XML
+- `response_to_message_id` - Links response messages to original
+- `statement_id` - Statement ID for 0701 messages
 - `status` - 'pending', 'processed', 'sent', 'failed'
+- `error_details` - Error information for failed messages
+- `created_at`, `processed_at`, `sent_at` - Timestamp tracking
 
 ## Message Flow
 
@@ -38,18 +42,25 @@ Key fields:
 
 ```php
 // Create audit records
-$auditService->auditReceivedMessage($content, $type, $planId);
-$auditService->auditSentMessage($content, $type, $procedureId, $planId, $responseId, $statementId);
-$auditService->auditK3Message($content, $type, $procedureId, $planId);
+$auditService->auditReceivedMessage($xmlContent, $messageType, $planId, $procedureId, $responseToMessageId);
+$auditService->auditSentMessage($xmlContent, $messageType, $procedureId, $planId, $responseToMessageId, $statementId);
+$auditService->auditK3Message($xmlContent, $messageType, $procedureId, $planId, $saveOnFlush);
 
 // Update status
 $auditService->markAsProcessed($auditId, $procedureId);
 $auditService->markAsSent($auditId);
-$auditService->markAsFailed($auditId);
+$auditService->markAsFailed($auditId, $errorDetails);
 
-// Query
-$auditService->findAuditRecordsByProcedureAndTargetSystem($procedureId, $targetSystem);
-$repository->get($auditId);
+// K3 specific operations
+$success = $auditService->markK3MessageAsDelivered($auditId); // Returns bool
+
+// Update existing audit records
+$auditService->updateAuditWithProcedureId($auditId, $procedureId);
+
+// Query operations
+$auditRecords = $auditService->findAuditRecordsByProcedureAndTargetSystem($procedureId, $targetSystem);
+$originalMessage = $auditService->findOriginalIncoming401Message($procedureId);
+$auditRecord = $repository->get($auditId);
 ```
 
 ## Supported Message Types
@@ -70,9 +81,29 @@ $repository->get($auditId);
 - `sent` - Successfully delivered
 - `failed` - Processing/delivery failed
 
-## Implementation Notes
+## Implementation Details
+
+### saveOnFlush Parameter
+Use `$saveOnFlush = true` when auditing during Doctrine flush events to avoid infinite loops:
+```php
+// During flush events (e.g., in saveProcedureMessageOnFlush)
+$auditService->auditK3Message($content, $type, $procedureId, $planId, true);
+```
+
+### Error Handling
+- All methods gracefully handle missing audit records without throwing exceptions
+- Failed operations are logged with appropriate context
+- K3 delivery marking includes comprehensive validation
+
+### Message Relationships
+- `response_to_message_id` links OK/NOK responses to original 401 messages
+- `statement_id` tracks statements for 701 messages
+- Use `findOriginalIncoming401Message()` to find the correct original message for responses
+
+## Technical Notes
 
 - Migration: `src/DoctrineMigrations/2025/06/Version20250627120000.php`
-- All commonly queried fields are indexed
-- Full XML content stored but not indexed
+- All commonly queried fields are indexed for performance
+- Full XML content stored but not indexed (LONGTEXT)
 - Unit tests: `tests/Logic/XBeteiligungAuditServiceUnitTest.php`
+- Integration points: RabbitMQMessageBroker, XBeteiligungService, ProcedureMessageController
