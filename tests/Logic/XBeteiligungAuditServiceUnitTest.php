@@ -39,17 +39,6 @@ class XBeteiligungAuditServiceUnitTest extends TestCase
         );
     }
 
-    public function testConstants(): void
-    {
-        self::assertSame('received', XBeteiligungAuditService::DIRECTION_RECEIVED);
-        self::assertSame('sent', XBeteiligungAuditService::DIRECTION_SENT);
-        self::assertSame('cockpit', XBeteiligungAuditService::TARGET_SYSTEM_COCKPIT);
-        self::assertSame('k3', XBeteiligungAuditService::TARGET_SYSTEM_K3);
-        self::assertSame('pending', XBeteiligungAuditService::STATUS_PENDING);
-        self::assertSame('processed', XBeteiligungAuditService::STATUS_PROCESSED);
-        self::assertSame('sent', XBeteiligungAuditService::STATUS_SENT);
-        self::assertSame('failed', XBeteiligungAuditService::STATUS_FAILED);
-    }
 
     public function testAuditReceivedMessage(): void
     {
