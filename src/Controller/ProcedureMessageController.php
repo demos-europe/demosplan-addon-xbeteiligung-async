@@ -35,14 +35,14 @@ class ProcedureMessageController extends APIController
         }
 
         try {
-            $message = $procedureMessageRepository->getProcedureMessage($procedureMessageId);
+            $xmlContent = $procedureMessageRepository->getXmlContent($procedureMessageId);
             $procedureMessageRepository->updateObject($procedureMessageId);
 
             // Audit K3 message delivery if audit is enabled
             $auditEnabled = $parameterBag->get('addon_xbeteiligung_async_enable_audit');
             if ($auditEnabled) {
-                $procedureMessage = $procedureMessageRepository->get($procedureMessageId);
-                $auditId = $procedureMessage->getAuditId();
+                $procedureMessageEntity = $procedureMessageRepository->get($procedureMessageId);
+                $auditId = $procedureMessageEntity->getAuditId();
 
                 if (null !== $auditId) {
                     // Use the direct audit ID link for precise tracking
@@ -60,7 +60,7 @@ class ProcedureMessageController extends APIController
                 }
             }
 
-            $response = new Response($message, 200, ['Content-Type' => 'application/xml']);
+            $response = new Response($xmlContent, 200, ['Content-Type' => 'application/xml']);
         } catch (NoResultException|NonUniqueResultException $e) {
             $this->logger->warning('No unique procedure message found for given ID.', [
                 'exception' => $e->getMessage()
