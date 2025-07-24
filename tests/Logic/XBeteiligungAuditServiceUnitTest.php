@@ -149,18 +149,6 @@ class XBeteiligungAuditServiceUnitTest extends TestCase
         $this->service->markAsProcessed('audit-404');
     }
 
-    public function testFindAuditRecordsByProcedureAndTargetSystem(): void
-    {
-        $expectedAudits = [new XBeteiligungMessageAudit()];
-
-        $this->auditRepository->expects($this->once())
-            ->method('findByProcedureIdAndTargetSystem')
-            ->with('proc-123', 'k3')
-            ->willReturn($expectedAudits);
-
-        $result = $this->service->findAuditRecordsByProcedureAndTargetSystem('proc-123', 'k3');
-        self::assertSame($expectedAudits, $result);
-    }
 
     public function testFindOriginalIncoming401Message(): void
     {

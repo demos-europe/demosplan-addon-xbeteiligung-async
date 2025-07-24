@@ -58,9 +58,9 @@ $success = $auditService->markK3MessageAsDelivered($auditId); // Returns bool
 $auditService->updateAuditWithProcedureId($auditId, $procedureId);
 
 // Query operations
-$auditRecords = $auditService->findAuditRecordsByProcedureAndTargetSystem($procedureId, $targetSystem);
 $originalMessage = $auditService->findOriginalIncoming401Message($procedureId);
 $auditRecord = $repository->get($auditId);
+$auditRecords = $repository->findByProcedureIdAndTargetSystem($procedureId, $targetSystem);
 ```
 
 ## Supported Message Types

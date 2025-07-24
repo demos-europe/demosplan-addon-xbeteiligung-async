@@ -280,15 +280,6 @@ class XBeteiligungAuditService
         return true;
     }
 
-    /**
-     * Find audit records by procedure ID and target system
-     *
-     * @return XBeteiligungMessageAudit[]
-     */
-    public function findAuditRecordsByProcedureAndTargetSystem(string $procedureId, string $targetSystem): array
-    {
-        return $this->auditRepository->findByProcedureIdAndTargetSystem($procedureId, $targetSystem);
-    }
 
     /**
      * Find the original incoming 401 message for a procedure from cockpit
