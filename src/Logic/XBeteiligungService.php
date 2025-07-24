@@ -137,7 +137,12 @@ class XBeteiligungService
     public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Initiieren.0201';
     public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Aktualisieren.0202';
     public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Loeschen.0209';
+    public const STATEMENT_MESSAGE_IDENTIFIER = 'allgemein.stellungnahme.Neuabgegeben.0701';
+    public const KOMMUNAL_INITIIEREN_OK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.OK.0411';
+    public const KOMMUNAL_INITIIEREN_NOK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.NOK.0421';
     public const UNKNOWN_MESSAGE_TYPE = 'unknown';
+    public const UNKNOWN_RESPONSE_MESSAGE_TYPE = 'unknown.response';
+    public const AUDIT_ENABLE_PARAMETER = 'addon_xbeteiligung_async_enable_audit';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
     public const MISSING_USER_ERROR_CODE = '0300';
     public const WRONG_ATTACHMENT_FORMAT_ERROR_CODE = '0200';

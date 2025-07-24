@@ -71,7 +71,7 @@ class RabbitMQMessageBroker
             $this->logger->info('Process message', [$message]);
 
             // Audit will be handled in XBeteiligungService where parsed objects are available
-            $auditEnabled = $this->parameterBag->get('addon_xbeteiligung_async_enable_audit');
+            $auditEnabled = $this->parameterBag->get(XBeteiligungService::AUDIT_ENABLE_PARAMETER);
 
             try {
                 $responseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction($message, $auditEnabled);
@@ -171,10 +171,10 @@ class RabbitMQMessageBroker
 
         // Audit statement message (701) with procedure context
         $auditRecord = null;
-        if ($this->parameterBag->get('addon_xbeteiligung_async_enable_audit')) {
+        if ($this->parameterBag->get(XBeteiligungService::AUDIT_ENABLE_PARAMETER)) {
             $auditRecord = $this->auditService->auditSentMessage(
                 $xmlString,
-                'allgemein.stellungnahme.Neuabgegeben.0701', // Statement message type
+                XBeteiligungService::STATEMENT_MESSAGE_IDENTIFIER, // Statement message type
                 $statementCreated->getProcedureId(),
                 $statementCreated->getPlanId(),
                 null, // responseToMessageId
@@ -201,14 +201,14 @@ class RabbitMQMessageBroker
     private function determineResponseMessageType(string $xmlContent): string
     {
         // Check for OK responses
-        if (str_contains($xmlContent, 'kommunal.Initiieren.OK.0411')) {
-            return 'kommunal.Initiieren.OK.0411';
+        if (str_contains($xmlContent, XBeteiligungService::KOMMUNAL_INITIIEREN_OK_MESSAGE_IDENTIFIER)) {
+            return XBeteiligungService::KOMMUNAL_INITIIEREN_OK_MESSAGE_IDENTIFIER;
         }
-        if (str_contains($xmlContent, 'kommunal.Initiieren.NOK.0421')) {
-            return 'kommunal.Initiieren.NOK.0421';
+        if (str_contains($xmlContent, XBeteiligungService::KOMMUNAL_INITIIEREN_NOK_MESSAGE_IDENTIFIER)) {
+            return XBeteiligungService::KOMMUNAL_INITIIEREN_NOK_MESSAGE_IDENTIFIER;
         }
 
         // Default fallback
-        return 'unknown.response';
+        return XBeteiligungService::UNKNOWN_RESPONSE_MESSAGE_TYPE;
     }
 }
