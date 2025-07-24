@@ -30,6 +30,9 @@ class XBeteiligungAuditService
     public const STATUS_SENT = 'sent';
     public const STATUS_FAILED = 'failed';
 
+    // Log message prefixes
+    private const LOG_PREFIX = 'XBeteiligung Message Audit: ';
+
     public function __construct(
         private readonly XBeteiligungMessageAuditRepository $auditRepository,
         private readonly LoggerInterface $logger,
@@ -69,7 +72,7 @@ class XBeteiligungAuditService
             $this->auditRepository->save($audit);
         }
 
-        $this->logger->info('XBeteiligung Message Audit: Message logged', [
+        $this->logger->info(self::LOG_PREFIX . 'Message logged', [
             'auditId' => $audit->getId(),
             'direction' => $direction,
             'targetSystem' => $targetSystem,
@@ -132,7 +135,7 @@ class XBeteiligungAuditService
         $audit = $this->auditRepository->get($auditId);
         if (null === $audit) {
             $this->logger->warning(
-                'XBeteiligung Message Audit: Cannot mark as processed - audit record not found',
+                self::LOG_PREFIX . 'Cannot mark as processed - audit record not found',
                 ['auditId' => $auditId]
             );
             return;
@@ -147,7 +150,7 @@ class XBeteiligungAuditService
 
         $this->auditRepository->save($audit);
 
-        $this->logger->info('XBeteiligung Message Audit: Message marked as processed', [
+        $this->logger->info(self::LOG_PREFIX . 'Message marked as processed', [
             'auditId' => $auditId,
             'procedureId' => $procedureId
         ]);
@@ -161,7 +164,7 @@ class XBeteiligungAuditService
         $audit = $this->auditRepository->get($auditId);
         if (null === $audit) {
             $this->logger->warning(
-                'XBeteiligung Message Audit: Cannot update audit record - not found',
+                self::LOG_PREFIX . 'Cannot update audit record - not found',
                 ['auditId' => $auditId]
             );
             return;
@@ -184,7 +187,7 @@ class XBeteiligungAuditService
                 $audit->setStatus(self::STATUS_SENT);
                 $audit->setSentAt(new DateTime());
             },
-            'XBeteiligung Message Audit: Message marked as sent'
+            self::LOG_PREFIX . 'Message marked as sent'
         );
     }
 
@@ -199,7 +202,7 @@ class XBeteiligungAuditService
                 $audit->setStatus(self::STATUS_FAILED);
                 $audit->setErrorDetails($errorDetails);
             },
-            'XBeteiligung Message Audit: Message marked as failed',
+            self::LOG_PREFIX . 'Message marked as failed',
             ['errorDetails' => $errorDetails]
         );
     }
@@ -214,7 +217,7 @@ class XBeteiligungAuditService
             function (XBeteiligungMessageAudit $audit) use ($procedureId) {
                 $audit->setProcedureId($procedureId);
             },
-            'XBeteiligung Message Audit: Updated audit record with procedure ID',
+            self::LOG_PREFIX . 'Updated audit record with procedure ID',
             ['procedureId' => $procedureId]
         );
     }
@@ -251,22 +254,22 @@ class XBeteiligungAuditService
         $audit = $this->auditRepository->get($auditId);
 
         if (null === $audit) {
-            $this->logger->warning('XBeteiligung Message Audit: Audit record not found', ['auditId' => $auditId]);
+            $this->logger->warning(self::LOG_PREFIX . 'Audit record not found', ['auditId' => $auditId]);
             return false;
         }
 
         if (!$audit->isSentDirection()) {
-            $this->logger->warning('XBeteiligung Message Audit: Audit record is not a sent message', ['auditId' => $auditId]);
+            $this->logger->warning(self::LOG_PREFIX . 'Audit record is not a sent message', ['auditId' => $auditId]);
             return false;
         }
 
         if ($audit->getTargetSystem() !== self::TARGET_SYSTEM_K3) {
-            $this->logger->warning('XBeteiligung Message Audit: Audit record is not for K3 system', ['auditId' => $auditId]);
+            $this->logger->warning(self::LOG_PREFIX . 'Audit record is not for K3 system', ['auditId' => $auditId]);
             return false;
         }
 
         if ($audit->getStatus() !== self::STATUS_PENDING) {
-            $this->logger->info('XBeteiligung Message Audit: Audit record already processed', [
+            $this->logger->info(self::LOG_PREFIX . 'Audit record already processed', [
                 'auditId' => $auditId,
                 'currentStatus' => $audit->getStatus()
             ]);
@@ -300,7 +303,7 @@ class XBeteiligungAuditService
 
         foreach ($auditRecords as $record) {
             if ($record->isReceived() &&
-                'kommunal.Initiieren.0401' === $record->getMessageType() &&
+                XBeteiligungService::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $record->getMessageType() &&
                 $record->getProcedureId() === $procedureId &&
                 $record->getTargetSystem() === self::TARGET_SYSTEM_COCKPIT) {
                 return $record;
