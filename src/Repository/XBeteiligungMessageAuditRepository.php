@@ -13,21 +13,10 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Repository;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
 
 class XBeteiligungMessageAuditRepository extends ServiceEntityRepository
 {
-    public function __construct(
-        private EntityManagerInterface $entityManager,
-        ManagerRegistry $registry,
-        string $entityClass
-    ) {
-        parent::__construct($registry, $entityClass);
-    }
-
     public function get(string $auditId): ?XBeteiligungMessageAudit
     {
         return $this->find($auditId);
