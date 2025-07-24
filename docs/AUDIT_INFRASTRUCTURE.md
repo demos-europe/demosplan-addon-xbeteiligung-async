@@ -31,12 +31,92 @@ Key fields:
 
 ## Message Flow
 
-### Cockpit (RabbitMQ)
-1. Incoming: `received/cockpit/pending` → `processed` (when procedure created)
-2. Outgoing: `sent/cockpit/pending` → `sent` or `failed`
+The XBeteiligung system implements two distinct communication flows with comprehensive audit tracking.
 
-### K3 (REST API) 
-1. Created: `sent/k3/pending` → `sent` (when K3 fetches)
+### Audit Record Notation
+
+Audit records are described using the format `direction/targetSystem/status`:
+
+- **Direction**: 
+  - `received` - Messages coming into demosplan from external systems
+  - `sent` - Messages going out from demosplan to external systems
+
+- **Target System**:
+  - `cockpit` - External planning systems via RabbitMQ
+  - `k3` - K3 system via REST API
+
+- **Status**:
+  - `pending` - Initial status (processing not yet started/completed)
+  - `processed` - Incoming message successfully processed (procedure created)
+  - `sent` - Outgoing message successfully transmitted
+  - `failed` - Processing or transmission failed
+
+Example: `received/cockpit/pending` = Message received from Cockpit system, not yet processed
+
+### Cockpit (RabbitMQ) Flow - Bidirectional External System Communication
+
+**Incoming Message Processing:**
+1. **Message Reception** (`RabbitMQMessageBroker::processMessages()`)
+   - RabbitMQ client polls for messages with routing keys
+   - Initial audit record: `received/cockpit/pending` (default status for received messages)
+   - planId extracted from XML and stored in audit record
+
+2. **Message Processing** (`XBeteiligungService::determineMessageContextAndDelegateAction()`)
+   - XML parsed and message type determined from `messageTypeCode`
+   - **Status Update**: `pending` → `processed` via `markAsProcessed()`
+   - **Success**: Procedure ID linked via `updateAuditWithProcedureId()`
+   - **Failure**: Status becomes `failed` via `markAsFailed()` with error details
+
+**Outgoing Response Processing:**
+1. **Response Generation**
+   - OK/NOK response created based on processing results
+   - New audit record: `sent/cockpit/pending` 
+   - Links to original message via `responseToMessageId`
+
+2. **RabbitMQ Transmission** (`sendRabbitMq()`)
+   - **Success**: Status `pending` → `sent` via `markAsSent()`
+   - **Failure**: Status `pending` → `failed` via `markAsFailed()`
+
+**Statement Messages (701):**
+- Triggered by `StatementCreatedEventInterface`
+- Audit record: `sent/cockpit/pending` with statement ID
+- Same transmission flow as responses
+
+### K3 (REST API) Flow - Event-Driven Message Generation
+
+**Message Creation:**
+1. **Trigger Events** (`XBeteiligungEventSubscriber`)
+   - `PostNewProcedureCreatedEventInterface` → 401/301 messages
+   - Procedure updates → 402/302/409/309 messages
+
+2. **Message Storage**
+   - Messages stored in `ProcedureMessage` entity
+   - Audit record: `sent/k3/pending` 
+   - Initial status always `pending` for K3 messages
+
+3. **Delivery Tracking**
+   - `markK3MessageAsDelivered()` validates and updates: `pending` → `sent`
+   - Includes validation for direction (`sent`), target system (`k3`), and current status
+
+**K3 REST API Access (ProcedureMessageController):**
+- `/api/procedure_message/{procedureMessageId}` (GET) - K3 fetches specific message
+- `/api/new/procedure_message/ids` (GET) - K3 gets list of available messages  
+- `/api/procedure_message/delete/{procedureMessageId}` (GET) - Mark message as deleted
+- `/api/procedure_message/error/{procedureMessageId}` (GET) - Mark message as error
+- Authentication via `authToken` header using `addon_xbeteiligung_async_api_token` parameter
+
+### Status Transition Summary
+
+```
+Received Messages (Cockpit only):
+pending → processed → (linked to procedure)
+
+Sent Messages (Cockpit & K3):
+pending → sent/failed
+
+Statement Messages (Cockpit only):  
+pending → sent/failed (with statement ID tracking)
+```
 
 ## API Usage
 
