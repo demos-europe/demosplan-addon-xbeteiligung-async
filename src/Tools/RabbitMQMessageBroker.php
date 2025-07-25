@@ -174,7 +174,7 @@ class RabbitMQMessageBroker
         if ($this->parameterBag->get(XBeteiligungService::AUDIT_ENABLE_PARAMETER)) {
             $auditRecord = $this->auditService->auditSentMessage(
                 $xmlString,
-                XBeteiligungService::STATEMENT_MESSAGE_IDENTIFIER, // Statement message type
+                XBeteiligungService::NEW_STATEMENT_MESSAGE_IDENTIFIER, // Statement message type
                 $statementCreated->getProcedureId(),
                 $statementCreated->getPlanId(),
                 null, // responseToMessageId
@@ -201,11 +201,11 @@ class RabbitMQMessageBroker
     private function determineResponseMessageType(string $xmlContent): string
     {
         // Check for OK responses
-        if (str_contains($xmlContent, XBeteiligungService::KOMMUNAL_INITIIEREN_OK_MESSAGE_IDENTIFIER)) {
-            return XBeteiligungService::KOMMUNAL_INITIIEREN_OK_MESSAGE_IDENTIFIER;
+        if (str_contains($xmlContent, XBeteiligungService::NEW_KOMMUNAL_OK_MESSAGE_IDENTIFIER)) {
+            return XBeteiligungService::NEW_KOMMUNAL_OK_MESSAGE_IDENTIFIER;
         }
-        if (str_contains($xmlContent, XBeteiligungService::KOMMUNAL_INITIIEREN_NOK_MESSAGE_IDENTIFIER)) {
-            return XBeteiligungService::KOMMUNAL_INITIIEREN_NOK_MESSAGE_IDENTIFIER;
+        if (str_contains($xmlContent, XBeteiligungService::NEW_KOMMUNAL_NOK_MESSAGE_IDENTIFIER)) {
+            return XBeteiligungService::NEW_KOMMUNAL_NOK_MESSAGE_IDENTIFIER;
         }
 
         // Default fallback

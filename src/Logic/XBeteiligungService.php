@@ -125,7 +125,6 @@ class XBeteiligungService
         ]
     ];
 
-    public const NON_EXISTING_CODE = 'work probably in progress';
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
     public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.0401';
@@ -137,9 +136,9 @@ class XBeteiligungService
     public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Initiieren.0201';
     public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Aktualisieren.0202';
     public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Loeschen.0209';
-    public const STATEMENT_MESSAGE_IDENTIFIER = 'allgemein.stellungnahme.Neuabgegeben.0701';
-    public const KOMMUNAL_INITIIEREN_OK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.OK.0411';
-    public const KOMMUNAL_INITIIEREN_NOK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.NOK.0421';
+    public const NEW_STATEMENT_MESSAGE_IDENTIFIER = 'allgemein.stellungnahme.Neuabgegeben.0701';
+    public const NEW_KOMMUNAL_OK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.OK.0411';
+    public const NEW_KOMMUNAL_NOK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.NOK.0421';
     public const UNKNOWN_MESSAGE_TYPE = 'unknown';
     public const UNKNOWN_RESPONSE_MESSAGE_TYPE = 'unknown.response';
     public const AUDIT_ENABLE_PARAMETER = 'addon_xbeteiligung_async_enable_audit';
@@ -787,11 +786,11 @@ class XBeteiligungService
                 $procedureMessage->getProcedureId(),
                 $planId
             );
-            
+
             // Store audit ID for direct linking
             $procedureMessage->setAuditId($auditRecord->getId());
         }
-        
+
         $this->procedureMessageRepository->save($procedureMessage);
     }
 
@@ -809,11 +808,11 @@ class XBeteiligungService
                 $planId,
                 true // saveOnFlush to avoid infinite recursion
             );
-            
+
             // Store audit ID for direct linking
             $procedureMessage->setAuditId($auditRecord->getId());
         }
-        
+
         $this->procedureMessageRepository->saveOnFlush($procedureMessage);
     }
 
