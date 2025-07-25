@@ -21,6 +21,9 @@ class ResponseValue extends ValueObject
     /** XML string */
     protected string $payload;
 
+    /** Procedure ID created during message processing */
+    protected ?string $procedureId = null;
+
     public function getPayload(): string
     {
         return $this->payload;
@@ -29,5 +32,15 @@ class ResponseValue extends ValueObject
     public function setPayload(string $payload): void
     {
         $this->payload = $payload;
+    }
+
+    public function getProcedureId(): ?string
+    {
+        return $this->procedureId;
+    }
+
+    public function setProcedureId(?string $procedureId): void
+    {
+        $this->procedureId = $procedureId;
     }
 }

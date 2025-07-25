@@ -28,6 +28,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
@@ -35,6 +36,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 abstract class XBeteiligungServiceTest extends TestCase
@@ -74,13 +76,15 @@ abstract class XBeteiligungServiceTest extends TestCase
             $globalConfigMock,
             $this->createMock(KommunaleProcedureCreater::class),
             $this->createMock(LoggerInterface::class),
+            $this->createMock(ParameterBagInterface::class),
             $this->createMock( PlanningDocumentsLinkCreator::class),
             $this->procedureMessageRepository,
             $this->procedureNewsService,
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
-            $reusableMessageBlocks
+            $reusableMessageBlocks,
+            $this->createMock(XBeteiligungAuditService::class)
         );
     }
 
