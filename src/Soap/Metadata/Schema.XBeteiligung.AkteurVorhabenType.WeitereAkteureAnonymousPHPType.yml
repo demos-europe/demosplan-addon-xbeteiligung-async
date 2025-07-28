@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenT
             access_type: public_method
             serialized_name: akteur
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getAkteur
                 setter: setAkteur
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenT
             access_type: public_method
             serialized_name: rolle
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getRolle
                 setter: setRolle

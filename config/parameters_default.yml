@@ -31,6 +31,14 @@ parameters:
 
   addon_xbeteiligung_async_rabbitMqRequestIdSend: 'XBeteiligung_Send'
 
+  # === XBeteiligung Message Audit Configuration ===
+  # Enable/disable comprehensive message audit logging
+  addon_xbeteiligung_async_enable_audit: true
+
+  # === Dynamic AGS Routing Configuration ===
+  # Cockpit mandant for incoming message routing
+  addon_xbeteiligung_async_cockpit_mandant: ''
+  
   # Legacy parameters removed - replaced with dynamic AGS routing:
   # addon_xbeteiligung_async_rabbitmq_routing_key_author: 'xyz.0001'
   # addon_xbeteiligung_async_rabbitmq_routing_key_reader: 'xyz.0002'

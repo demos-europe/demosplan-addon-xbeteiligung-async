@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenT
             access_type: public_method
             serialized_name: veranlasser
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getVeranlasser
                 setter: setVeranlasser
@@ -15,12 +15,12 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenT
             access_type: public_method
             serialized_name: weitereAkteure
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getWeitereAkteure
                 setter: setWeitereAkteure
             xml_list:
                 inline: true
                 entry_name: weitereAkteure
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/3'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType\WeitereAkteureAnonymousPHPType>

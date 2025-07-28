@@ -1,7 +1,73 @@
 # Changelog
 
 ## UNRELEASED
-- add building of a routing key for rabbit mq communication
+- Add comprehensive XBeteiligung message audit infrastructure (DPLAN-16006)
+  
+  **Core Infrastructure:**
+  - New XBeteiligungMessageAudit entity with comprehensive audit tracking
+  - XBeteiligungMessageAuditRepository for efficient data access
+  - XBeteiligungAuditService providing centralized audit operations
+  - Database migration with optimized indexes for high-performance querying
+  
+  **Complete Message Coverage:**
+  - Cockpit (RabbitMQ) incoming messages: procedure creation (401) with planId extraction
+  - Cockpit outgoing responses: OK/NOK acknowledgments (411/421) with message linking
+  - Statement messages: new statement submissions (701) with statement ID tracking  
+  - K3 system messages: procedure lifecycle messages (401/402/409/301/302/309)
+  
+  **Audit Features:**
+  - Status lifecycle tracking: pending → processed/sent/failed
+  - Full XML content preservation with metadata (procedure ID, plan ID, statement ID, target system)
+  - Message relationship tracking via responseToMessageId for complete audit trails
+  - Timestamp tracking (created_at, processed_at, sent_at) for performance analysis
+  - Error details capture for failed message processing
+  - Configurable via `addon_xbeteiligung_async_enable_audit` parameter (default: true)
+  
+  **Code Quality Improvements:**
+  - Replace magic strings with service constants across codebase
+  - Improve method naming clarity (getProcedureMessage → getXmlContent)
+  - Remove redundant wrapper methods and unused constructor dependencies
+  - Enhanced constant naming consistency
+  
+  **Documentation & Testing:**
+  - Unit test coverage for XBeteiligungAuditService
+  - Comprehensive technical documentation with message flow details
+
+- Add dynamic AGS-based routing key system for RabbitMQ communication (DPLAN-15764)
+  
+  **Dynamic Routing Implementation:**
+  - Replace static project prefix routing with dynamic AGS (Amtlicher Gemeindeschlüssel) extraction
+  - Outgoing routing: `{project_type}.beteiligung.{autor_ags}.{leser_ags}.{message_type}`
+  - Incoming routing: `{cockpit_mandant}.cockpit.*.*.{message_type}`
+  - Project type mapping: Kommunal→bau, Raumordnung→rog, Planfeststellung→pfv
+  
+  **AGS Data Management:**
+  - New XBeteiligungProcedureAgs entity for storing AGS codes linked to procedures
+  - XBeteiligungProcedureAgsRepository for efficient AGS data access
+  - Transaction-safe AGS extraction and storage via EventSubscriber
+  - Request-scoped AGS context management via XBeteiligungProcedureContextService
+  
+  **Multi-tenant Configuration:**
+  - New cockpit_mandant parameter for incoming message routing
+  - Remove legacy static routing key parameters
+  - Fail-fast error handling with comprehensive logging
+  - XÖV-compliant routing key format implementation
+
+## v0.17 (2025-06-30)
+- Change xbeteiligung standard from 1.3 to 1.2
+- Changed the primary namespace for this addon to XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
+  as we implement the xBeteiligung standard for public participation workflows.
+- Use schema validation within getXmlObject method used in production for test xsds as well.
+- Standardize XML namespace handling and improve readability
+    - Updated all 28 YAML metadata files (10 input + 18 response messages) to use consistent namespace prefixes
+    - Replaced auto-generated namespace prefixes (like `ns-625090a5`) with clean, readable prefixes (`g2g:`, `behoerde:`, `kommunikation:`, `xsi:`)
+    - Corrected XML Schema instance namespace prefix from `xs:` to `xsi:` across all response message files
+    - Added comprehensive `xml_namespaces` configuration to prevent JMS Serializer from generating random namespace prefixes
+    - Removed inconsistent manual namespace handling in favor of unified JMS Serializer approach
+    - Updated documentation with proper namespace configuration examples for both input and response messages
+- Add PATCH REST endpoint `/addon/xbeteiligung/procedure/update` for XBeteiligung procedure updates
+- Refactor and eliminate code duplication between create and update methods in XBeteiligungRestController
+- Enhance test coverage with comprehensive PATCH endpoint tests
 
 ## v0.10.7 (2025-06-14)
 

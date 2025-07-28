@@ -44,6 +44,9 @@ class ProcedureMessage implements UuidEntityInterface
     #[ORM\Column(type: "integer", nullable: false, options: ["default" => 0])]
     private int $requestCount;
 
+    #[ORM\Column(name: 'audit_id', type: 'string', length: 36, nullable: true)]
+    private ?string $auditId = null;
+
     public function __construct(
         string $message,
         bool $deleted,
@@ -101,5 +104,15 @@ class ProcedureMessage implements UuidEntityInterface
     public function getProcedureId(): string
     {
         return $this->procedureId;
+    }
+
+    public function getAuditId(): ?string
+    {
+        return $this->auditId;
+    }
+
+    public function setAuditId(?string $auditId): void
+    {
+        $this->auditId = $auditId;
     }
 }

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/1/3"
+           xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/12"
            xmlns:xoev-code="http://xoev.de/schemata/code/1_0"
-           targetNamespace="https://www.xleitstelle.de/xbeteiligung/1/3"
-           version="1.3"
+           targetNamespace="https://www.xleitstelle.de/xbeteiligung/12"
+           version="1.2"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified">
    <xs:annotation>
@@ -16,11 +16,11 @@
             <beschreibung>Beteiligungsverfahren - OZG</beschreibung>
          </standard>
          <versionStandard>
-            <version>1.3</version>
+            <version>1.2</version>
             <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren nach dem BauGB, dem ROG und in der Planfeststellung</beschreibung>
-            <versionXOEVProfil>3.0.3</versionXOEVProfil>
-            <versionXOEVHandbuch>3.0.2</versionXOEVHandbuch>
-            <versionXGenerator>3.2.3</versionXGenerator>
+            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVHandbuch>2.4</versionXOEVHandbuch>
+            <versionXGenerator>3.1.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP 4</versionModellierungswerkzeug>
             <nameModellierungswerkzeug>MagicDraw</nameModellierungswerkzeug>
          </versionStandard>
@@ -229,6 +229,61 @@
          </xs:restriction>
       </xs:complexContent>
    </xs:complexType>
+   <xs:complexType name="Code.Datumsstatus">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Status des Datums</nameLang>
+               <nameKurz>Status des Datums</nameKurz>
+               <nameTechnisch>datumsstatus</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:datumsstatus</kennung>
+               <beschreibung>Auswahl des Status eines Datums.</beschreibung>
+               <herausgebernameLang>XLeitstelle</herausgebernameLang>
+               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1.0</version>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </code>
+               <beschreibung>
+                  <spaltennameLang>Beschreibung</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </beschreibung>
+            </codelistenspalten>
+            <genutzteCodeSpalte>code</genutzteCodeSpalte>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:restriction base="xoev-code:Code">
+            <xs:sequence>
+               <xs:element name="code" form="unqualified" type="xbeteiligung:datumsstatus"/>
+               <xs:element name="name"
+                           type="xs:normalizedString"
+                           form="unqualified"
+                           minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="listURI"
+                          type="xs:anyURI"
+                          use="optional"
+                          fixed="urn:xoev-de:xleitstelle:codeliste:datumsstatus"/>
+            <xs:attribute name="listVersionID"
+                          type="xs:normalizedString"
+                          use="optional"
+                          fixed="1.0"/>
+         </xs:restriction>
+      </xs:complexContent>
+   </xs:complexType>
    <xs:complexType name="Code.Fehlerart">
       <xs:annotation>
          <xs:appinfo>
@@ -333,10 +388,6 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" type="xs:token" form="unqualified"/>
-               <xs:element name="name"
-                           type="xs:normalizedString"
-                           form="unqualified"
-                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -828,10 +879,6 @@
          <xs:restriction base="xoev-code:Code">
             <xs:sequence>
                <xs:element name="code" type="xs:token" form="unqualified"/>
-               <xs:element name="name"
-                           type="xs:normalizedString"
-                           form="unqualified"
-                           minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="listURI"
                           type="xs:anyURI"
@@ -1160,6 +1207,85 @@
             <xs:annotation>
                <xs:appinfo>
                   <beschreibung>sonstiges</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="datumsstatus">
+      <xs:annotation>
+         <xs:appinfo>
+            <codeliste>
+               <nameLang>Status des Datums</nameLang>
+               <nameKurz>Status des Datums</nameKurz>
+               <nameTechnisch>datumsstatus</nameTechnisch>
+               <kennung>urn:xoev-de:xleitstelle:codeliste:datumsstatus</kennung>
+               <beschreibung>Auswahl des Status eines Datums.</beschreibung>
+               <herausgebernameLang>XLeitstelle</herausgebernameLang>
+               <herausgebernameKurz>XLeitstelle</herausgebernameKurz>
+            </codeliste>
+            <versionCodeliste>
+               <version>1.0</version>
+               <versionCodelistenHandbuch>1.2</versionCodelistenHandbuch>
+            </versionCodeliste>
+            <codelistenspalten>
+               <code>
+                  <spaltennameLang>Code</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>true</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>true</empfohleneCodeSpalte>
+               </code>
+               <beschreibung>
+                  <spaltennameLang>Beschreibung</spaltennameLang>
+                  <datentyp>string</datentyp>
+                  <codeSpalte>false</codeSpalte>
+                  <verwendung>required</verwendung>
+                  <empfohleneCodeSpalte>false</empfohleneCodeSpalte>
+               </beschreibung>
+            </codelistenspalten>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:restriction base="xs:token">
+         <xs:enumeration value="1000">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>initial prognostiziert</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="1200">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>prognostiziert</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="1300">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>berechnet</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="2000">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>berechnet</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="3000">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>geplant</beschreibung>
+               </xs:appinfo>
+            </xs:annotation>
+         </xs:enumeration>
+         <xs:enumeration value="4000">
+            <xs:annotation>
+               <xs:appinfo>
+                  <beschreibung>stattgefunden</beschreibung>
                </xs:appinfo>
             </xs:annotation>
          </xs:enumeration>
