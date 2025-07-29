@@ -19,9 +19,9 @@ use DemosEurope\DemosplanAddon\Utilities\Json;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAgsService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureAgsRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -52,7 +52,7 @@ class RabbitMQMessageBroker
         private readonly StatementCreator $statementCreator,
         private readonly StatementMessageFactory $statementMessageFactory,
         private readonly XBeteiligungService $xBeteiligungService,
-        private readonly XBeteiligungProcedureAgsRepository $procedureAgsRepository,
+        private readonly XBeteiligungAgsService $agsService,
         private readonly XBeteiligungAuditService $auditService,
     ) {
     }
@@ -239,17 +239,17 @@ class RabbitMQMessageBroker
             // Get project type from configuration and map to routing prefix
             $projectType = $this->getProjectType();
 
-            // Get AGS codes from database for the procedure
+            // Get AGS codes from audit XML for the procedure
             $agsData = null;
             if (null !== $procedureId) {
-                $agsData = $this->procedureAgsRepository->getAgsCodesForRouting($procedureId);
+                $agsData = $this->agsService->getAgsCodesForRouting($procedureId);
             }
 
             if (null === $agsData) {
                 $this->logger->error('Cannot send message: No AGS codes found for procedure', [
                     'procedureId' => $procedureId,
                     'messageType' => $messageType,
-                    'reason' => 'Missing AGS codes from database'
+                    'reason' => 'Missing AGS codes from audit XML'
                 ]);
 
                 throw new InvalidArgumentException(
