@@ -102,8 +102,7 @@ class StatementCreatorTest extends TestCase
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
-            $this->createMock(XBeteiligungAuditService::class),
-            $this->createMock(XBeteiligungAgsService::class)
+            $this->createMock(XBeteiligungAuditService::class)
         );
         $this->XBeteiligungService = $xbeteiligungService;
         $this->logger = new Logger();
