@@ -248,50 +248,5 @@ class XBeteiligungIncomingMessageParser
             throw new SchemaException('Error deserializing message as '.$className.': '.$e->getMessage());
         }
     }
-
-    /**
-     * Extract AGS codes from XML message
-     */
-    public function extractAgsCodesFromXmlObject(NachrichtG2GTypeType $xmlObject): array
-    {
-        $autorAgs = null;
-        $leserAgs = null;
-
-        // Get the message header containing autor and leser
-        $messageHead = $xmlObject->getNachrichtenkopfG2g();
-
-        if (null !== $messageHead) {
-            // Extract autor AGS code
-            $autor = $messageHead->getAutor();
-            if (null !== $autor) {
-                $autorAgs = $autor->getKennung();
-            }
-
-            // Extract leser AGS code
-            $leser = $messageHead->getLeser();
-            if (null !== $leser) {
-                $leserAgs = $leser->getKennung();
-            }
-        }
-
-        return [
-            'autor' => $autorAgs,
-            'leser' => $leserAgs
-        ];
-    }
-
-    /**
-     * Validate extracted AGS codes
-     */
-    public function validateAgsCodesForRouting(array $agsCodes): void
-    {
-        if (empty($agsCodes['autor'])) {
-            throw new InvalidArgumentException('Missing autor AGS code in XML message');
-        }
-
-        if (empty($agsCodes['leser'])) {
-            throw new InvalidArgumentException('Missing leser AGS code in XML message');
-        }
-    }
 }
 
