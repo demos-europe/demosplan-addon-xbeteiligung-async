@@ -34,8 +34,3 @@ services:
     DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungMessageAuditRepository:
         arguments:
             $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit'
-
-
-    DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungProcedureContextService:
-        autowire: true
-        autoconfigure: true

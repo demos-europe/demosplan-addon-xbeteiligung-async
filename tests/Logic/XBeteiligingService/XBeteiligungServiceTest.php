@@ -31,7 +31,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAgsService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungProcedureContextService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -81,7 +80,6 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->createMock(ParameterBagInterface::class),
             $this->createMock(PlanningDocumentsLinkCreator::class),
             $this->procedureMessageRepository,
-            $this->createMock(XBeteiligungProcedureContextService::class),
             $this->procedureNewsService,
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),

@@ -28,7 +28,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungProcedureContextService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
@@ -161,7 +160,6 @@ class XBeteiligungService
         private readonly ParameterBagInterface                     $parameterBag,
         private readonly PlanningDocumentsLinkCreator              $planningDocumentsLinkCreator,
         private readonly ProcedureMessageRepository                $procedureMessageRepository,
-        private readonly XBeteiligungProcedureContextService       $procedureContextService,
         private readonly ProcedureNewsServiceInterface             $procedureNewsService,
         private readonly RouterInterface                           $router,
         private readonly XBeteiligungIncomingMessageParser         $incomingMessageParser,
@@ -923,11 +921,6 @@ class XBeteiligungService
 
                 // Extract planId from 401 XML to use as context key
                 $planId = $this->extractPlanIdFrom401Message($xmlObject401);
-
-                // Store AGS codes in context BEFORE procedure creation
-                $this->procedureContextService->storeAgsContext($planId, $agsCodes);
-
-                // Create procedure - the EventSubscriber will handle AGS storage using procedure.getXtaPlanId()
                 $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
 
                 // Mark as processed and update with procedure ID from response
