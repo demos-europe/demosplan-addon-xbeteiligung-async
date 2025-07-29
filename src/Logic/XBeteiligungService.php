@@ -153,19 +153,19 @@ class XBeteiligungService
     public const GENERIC_ERROR_DESCRIPTION = 'Während der Erstellung/Bearbeitung des Verfahrens ist ein Fehler aufgetreten.';
 
     public function __construct(
-        private readonly GisLayerCategoryRepositoryInterface       $gisLayerCategoryRepository,
-        private readonly GlobalConfigInterface                     $globalConfig,
-        private readonly KommunaleProcedureCreater                 $kommunaleProcedureCreater,
-        private readonly LoggerInterface                           $logger,
-        private readonly ParameterBagInterface                     $parameterBag,
-        private readonly PlanningDocumentsLinkCreator              $planningDocumentsLinkCreator,
-        private readonly ProcedureMessageRepository                $procedureMessageRepository,
-        private readonly ProcedureNewsServiceInterface             $procedureNewsService,
-        private readonly RouterInterface                           $router,
-        private readonly XBeteiligungIncomingMessageParser         $incomingMessageParser,
-        private readonly CommonHelpers                             $commonHelpers,
-        private readonly ReusableMessageBlocks                     $reusableMessageBlocks,
-        private readonly XBeteiligungAuditService                  $auditService,
+        private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
+        private readonly GlobalConfigInterface                  $globalConfig,
+        private readonly KommunaleProcedureCreater              $kommunaleProcedureCreater,
+        private readonly LoggerInterface                        $logger,
+        private readonly ParameterBagInterface                  $parameterBag,
+        private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
+        private readonly ProcedureMessageRepository             $procedureMessageRepository,
+        private readonly ProcedureNewsServiceInterface          $procedureNewsService,
+        private readonly RouterInterface                        $router,
+        private readonly XBeteiligungIncomingMessageParser      $incomingMessageParser,
+        private readonly CommonHelpers                          $commonHelpers,
+        private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
+        private readonly XBeteiligungAuditService               $auditService,
     ) {
     }
 
