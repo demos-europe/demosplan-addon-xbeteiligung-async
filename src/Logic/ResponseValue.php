@@ -43,5 +43,4 @@ class ResponseValue extends ValueObject
     {
         $this->procedureId = $procedureId;
     }
-
 }
