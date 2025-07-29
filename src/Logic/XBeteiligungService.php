@@ -916,9 +916,6 @@ class XBeteiligungService
             }
 
             try {
-                // Extract AGS codes BEFORE procedure creation - if this fails, abort everything
-                $agsCodes = $this->extractAndValidateAgsCodesFor401Message($xmlObject401);
-
                 // Extract planId from 401 XML to use as context key
                 $planId = $this->extractPlanIdFrom401Message($xmlObject401);
                 $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
@@ -995,25 +992,6 @@ class XBeteiligungService
     private function determinePlanId(ProcedureInterface $procedure): string
     {
         return '' === $procedure->getXtaPlanId() ? $procedure->getId() : $procedure->getXtaPlanId();
-    }
-
-    /**
-     * Extract and validate AGS codes from 401 XML message (MUST succeed or abort)
-     */
-    private function extractAndValidateAgsCodesFor401Message(KommunalInitiieren0401 $xmlObject401): array
-    {
-        // Extract AGS codes from XML - this MUST succeed
-        $agsCodes = $this->agsService->extractAgsCodesFromXmlObject($xmlObject401);
-
-        // Validate AGS codes - this MUST succeed
-        $this->agsService->validateAgsCodesForRouting($agsCodes);
-
-        $this->logger->info('Successfully extracted AGS codes from 401 message', [
-            'autorAgs' => $agsCodes['autor'],
-            'leserAgs' => $agsCodes['leser']
-        ]);
-
-        return $agsCodes;
     }
 
     /**
