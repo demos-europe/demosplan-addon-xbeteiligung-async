@@ -166,7 +166,6 @@ class XBeteiligungService
         private readonly CommonHelpers                             $commonHelpers,
         private readonly ReusableMessageBlocks                     $reusableMessageBlocks,
         private readonly XBeteiligungAuditService                  $auditService,
-        private readonly XBeteiligungAgsService                    $agsService,
     ) {
     }
 
@@ -916,8 +915,6 @@ class XBeteiligungService
             }
 
             try {
-                // Extract planId from 401 XML to use as context key
-                $planId = $this->extractPlanIdFrom401Message($xmlObject401);
                 $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
 
                 // Mark as processed and update with procedure ID from response
@@ -992,33 +989,6 @@ class XBeteiligungService
     private function determinePlanId(ProcedureInterface $procedure): string
     {
         return '' === $procedure->getXtaPlanId() ? $procedure->getId() : $procedure->getXtaPlanId();
-    }
-
-    /**
-     * Extract planId from 401 XML message to use as context key
-     */
-    private function extractPlanIdFrom401Message(KommunalInitiieren0401 $xmlObject401): string
-    {
-        $nachrichteninhalt = $xmlObject401->getNachrichteninhalt();
-        if (null === $nachrichteninhalt) {
-            throw new \RuntimeException('No nachrichteninhalt found in 401 XML message');
-        }
-
-        $beteiligung = $nachrichteninhalt->getBeteiligung();
-        if (null === $beteiligung) {
-            throw new \RuntimeException('No beteiligung found in 401 XML message');
-        }
-
-        $planId = $beteiligung->getPlanID();
-        if (null === $planId || '' === $planId) {
-            throw new \RuntimeException('No planID found in 401 XML message');
-        }
-
-        $this->logger->info('Extracted planId from 401 XML message', [
-            'planId' => $planId
-        ]);
-
-        return $planId;
     }
 
     /**
