@@ -21,7 +21,6 @@ use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungProcedureContextService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
@@ -39,7 +38,6 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
         private readonly PermissionEvaluatorInterface            $permissionEvaluator,
         private readonly XBeteiligungDebugger                    $xBeteiligungDebugger,
         private readonly XBeteiligungService                     $xBeteiligungService,
-        private readonly XBeteiligungProcedureContextService     $procedureContextService,
         private readonly CacheInterface                          $cache,
         private readonly ParameterBagInterface                   $parameterBag,
         private readonly LoggerInterface                         $cockpitLogger,
