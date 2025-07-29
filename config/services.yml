@@ -23,8 +23,6 @@ services:
         lazy: true
 
     DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker:
-        arguments:
-            $procedureAgsRepository: '@DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureAgsRepository'
         calls:
             - [ 'setClient', [ '@old_sound_rabbit_mq.demos_plan_import_rpc' ] ]
         lazy: true
@@ -37,9 +35,6 @@ services:
         arguments:
             $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit'
 
-    DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureAgsRepository:
-        arguments:
-            $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedureAgs'
 
     DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungProcedureContextService:
         autowire: true
