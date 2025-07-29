@@ -42,10 +42,10 @@
   - Project type mapping: Kommunal→bau, Raumordnung→rog, Planfeststellung→pfv
   
   **AGS Data Management:**
-  - New XBeteiligungProcedureAgs entity for storing AGS codes linked to procedures
-  - XBeteiligungProcedureAgsRepository for efficient AGS data access
-  - Transaction-safe AGS extraction and storage via EventSubscriber
-  - Request-scoped AGS context management via XBeteiligungProcedureContextService
+  - New XBeteiligungAgsService for dynamic AGS extraction from audit XML
+  - Direct AGS extraction from procedure audit messages without database storage
+  - Performance-optimized XML parsing with XÖV-compliant AGS code validation
+  - Clean separation of concerns between audit storage and AGS extraction
   
   **Multi-tenant Configuration:**
   - New cockpit_mandant parameter for incoming message routing
