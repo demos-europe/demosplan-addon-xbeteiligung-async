@@ -24,7 +24,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
-use InvalidArgumentException;
 use JMS\Serializer\Serializer;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
