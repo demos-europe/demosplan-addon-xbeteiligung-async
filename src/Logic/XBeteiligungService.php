@@ -30,7 +30,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCr
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungProcedureContextService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureAgsRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType;
@@ -162,7 +161,6 @@ class XBeteiligungService
         private readonly ParameterBagInterface                     $parameterBag,
         private readonly PlanningDocumentsLinkCreator              $planningDocumentsLinkCreator,
         private readonly ProcedureMessageRepository                $procedureMessageRepository,
-        private readonly XBeteiligungProcedureAgsRepository        $procedureAgsRepository,
         private readonly XBeteiligungProcedureContextService       $procedureContextService,
         private readonly ProcedureNewsServiceInterface             $procedureNewsService,
         private readonly RouterInterface                           $router,
@@ -170,6 +168,7 @@ class XBeteiligungService
         private readonly CommonHelpers                             $commonHelpers,
         private readonly ReusableMessageBlocks                     $reusableMessageBlocks,
         private readonly XBeteiligungAuditService                  $auditService,
+        private readonly XBeteiligungAgsService                    $agsService,
     ) {
     }
 
@@ -1011,10 +1010,10 @@ class XBeteiligungService
     private function extractAndValidateAgsCodesFor401Message(KommunalInitiieren0401 $xmlObject401): array
     {
         // Extract AGS codes from XML - this MUST succeed
-        $agsCodes = $this->incomingMessageParser->extractAgsCodesFromXmlObject($xmlObject401);
+        $agsCodes = $this->agsService->extractAgsCodesFromXmlObject($xmlObject401);
 
         // Validate AGS codes - this MUST succeed
-        $this->incomingMessageParser->validateAgsCodesForRouting($agsCodes);
+        $this->agsService->validateAgsCodesForRouting($agsCodes);
 
         $this->logger->info('Successfully extracted AGS codes from 401 message', [
             'autorAgs' => $agsCodes['autor'],
