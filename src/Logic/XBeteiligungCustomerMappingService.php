@@ -56,33 +56,34 @@ class XBeteiligungCustomerMappingService
     }
 
     /**
-     * Extract the federal state code from an AGS code.
+     * Extract the federal state code from a XöV-Kennung-Code.
      *
-     * AGS codes are structured hierarchically with the first 2 digits representing
-     * the federal state (Bundesland) code.
+     * XöV-Kennung-Code structure: 02 + federal state (2 digits) + rest
+     * For example: 020500200099 -> federal state code is "05" (positions 2-3)
      *
-     * @param string $agsCode The AGS code (minimum 2 digits)
+     * @param string $agsCode The XöV-Kennung-Code (minimum 4 digits)
      * @return string The federal state code (2 digits)
-     * @throws InvalidArgumentException If AGS code is invalid
+     * @throws InvalidArgumentException If XöV code is invalid
      */
     public function extractFederalStateCode(string $agsCode): string
     {
-        if (strlen($agsCode) < 2) {
+        if (strlen($agsCode) < 4) {
             throw new InvalidArgumentException(
-                "AGS code must be at least 2 characters long, got: {$agsCode}"
+                "XöV-Kennung-Code must be at least 4 characters long, got: {$agsCode}"
             );
         }
 
         if (!ctype_digit($agsCode)) {
             throw new InvalidArgumentException(
-                "AGS code must contain only digits, got: {$agsCode}"
+                "XöV-Kennung-Code must contain only digits, got: {$agsCode}"
             );
         }
 
-        $federalStateCode = substr($agsCode, 0, 2);
+        // Extract federal state code from positions 2-3 (3rd and 4th digits)
+        $federalStateCode = substr($agsCode, 2, 2);
 
-        $this->logger->debug('Extracted federal state code from AGS', [
-            'ags_code' => $agsCode,
+        $this->logger->debug('Extracted federal state code from XöV-Kennung-Code', [
+            'xoev_code' => $agsCode,
             'federal_state_code' => $federalStateCode
         ]);
 
@@ -90,11 +91,11 @@ class XBeteiligungCustomerMappingService
     }
 
     /**
-     * Map an AGS code to a customer subdomain.
+     * Map a XöV-Kennung-Code to a customer subdomain.
      *
-     * @param string $agsCode The AGS code
+     * @param string $agsCode The XöV-Kennung-Code
      * @return string The customer subdomain
-     * @throws InvalidArgumentException If AGS code or federal state mapping is invalid
+     * @throws InvalidArgumentException If XöV code or federal state mapping is invalid
      */
     public function mapAgsToCustomerSubdomain(string $agsCode): string
     {
@@ -108,8 +109,8 @@ class XBeteiligungCustomerMappingService
 
         $subdomain = self::FEDERAL_STATE_TO_SUBDOMAIN_MAP[$federalStateCode];
 
-        $this->logger->debug('Mapped AGS code to customer subdomain', [
-            'ags_code' => $agsCode,
+        $this->logger->debug('Mapped XöV-Kennung-Code to customer subdomain', [
+            'xoev_code' => $agsCode,
             'federal_state_code' => $federalStateCode,
             'subdomain' => $subdomain
         ]);
@@ -118,9 +119,9 @@ class XBeteiligungCustomerMappingService
     }
 
     /**
-     * Get a customer entity by AGS code.
+     * Get a customer entity by XöV-Kennung-Code.
      *
-     * @param string $agsCode The AGS code
+     * @param string $agsCode The XöV-Kennung-Code
      *
      * @return CustomerInterface The customer entity
      * @throws Exception
@@ -132,16 +133,16 @@ class XBeteiligungCustomerMappingService
         try {
             $customer = $this->customerService->findCustomerBySubdomain($subdomain);
 
-            $this->logger->info('Successfully mapped AGS code to customer', [
-                'ags_code' => $agsCode,
+            $this->logger->info('Successfully mapped XöV-Kennung-Code to customer', [
+                'xoev_code' => $agsCode,
                 'subdomain' => $subdomain,
                 'customer_id' => $customer->getId()
             ]);
 
             return $customer;
         } catch (Exception $e) {
-            $this->logger->error('Customer not found for AGS code', [
-                'ags_code' => $agsCode,
+            $this->logger->error('Customer not found for XöV-Kennung-Code', [
+                'xoev_code' => $agsCode,
                 'subdomain' => $subdomain,
                 'error' => $e->getMessage()
             ]);

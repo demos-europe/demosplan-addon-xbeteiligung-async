@@ -38,6 +38,8 @@ class RabbitMQMessageBroker
     private const RABBIT_MQ_QUEUE_NAME = 'addon_xbeteiligung_async_rabbitMqQueueName';
     private const RABBIT_MQ_REQUEST_ID_GET = 'addon_xbeteiligung_async_rabbitMqRequestIdGet';
     private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
+    private const XOEV_ORGANISATION_SENDER = 'bdp';    // Beteiligung system (XöV-DvdvOrganisationskategorie)
+    private const XOEV_ORGANISATION_RECEIVER = 'bap';  // Cockpit system (Behördenanwendung Planung)
 
     public function __construct(
         private readonly GlobalConfigInterface $globalConfig,
@@ -104,7 +106,7 @@ class RabbitMQMessageBroker
                     $auditRecordId = $auditRecord->getId();
                 }
 
-                $this->sendRabbitMq($responseObject->getPayload(), $message['messageTypeCode'], false, $responseObject->getProcedureId(), 300, $auditRecordId);
+                $this->sendRabbitMq($responseObject->getPayload(), $message['messageTypeCode'], $responseObject->getProcedureId(), 300, $auditRecordId);
             } catch (InvalidArgumentException $e) {
                 $this->logger->error('Message payload not supported', [$e]);
             } catch (SchemaException $e) {
@@ -123,9 +125,9 @@ class RabbitMQMessageBroker
      * @throws AMQPTimeoutException
      * @throws Exception
      */
-    protected function sendRabbitMq(string $xmlString, string $messageType, bool $isOutgoing, ?string $procedureId = null, int $expiration = 300, ?string $auditRecordId = null): bool
+    protected function sendRabbitMq(string $xmlString, string $messageType, ?string $procedureId = null, int $expiration = 300, ?string $auditRecordId = null): bool
     {
-        $routingKey = $this->buildRoutingKey($messageType, $isOutgoing, $procedureId);
+        $routingKey = $this->buildOutgoingRoutingKey($messageType, $procedureId);
         if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
             $routingKey = '';
         }
@@ -193,7 +195,6 @@ class RabbitMQMessageBroker
         $this->sendRabbitMq(
             $xmlString,
             CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[AllgemeinStellungnahmeNeuabgegeben0701::class]['name'],
-            true,
             $statementCreated->getPlanId(), // Pass procedure ID for AGS lookup
             300,
             $auditRecord?->getId()
@@ -208,20 +209,6 @@ class RabbitMQMessageBroker
     public function setClient(RpcClient $client): void
     {
         $this->client = $client;
-    }
-
-    /**
-     * @throws Exception
-     */
-    private function buildRoutingKey(string $messageType, bool $isOutgoing, ?string $procedureId = null): string
-    {
-        if ($isOutgoing) {
-            // Format: {project_type}.beteiligung.{sender_ags}.{receiver_ags}.{message_type}
-            return $this->buildOutgoingRoutingKey($messageType, $procedureId);
-        }
-
-        // Format: {cockpit_mandant}.cockpit.*.*.{message_type}
-        return $this->buildIncomingRoutingKey($messageType);
     }
 
     /**
@@ -251,19 +238,24 @@ class RabbitMQMessageBroker
                 );
             }
 
-            // Build dynamic routing key with real AGS codes (dots removed for RabbitMQ compatibility)
-            $routingKey = \sprintf(
-                '%s.beteiligung.%s.%s.%s',
+            // Build XBeteiligung routing key format
+            // Format: {project_type}.beteiligung.{sender_organisation}.{sender_ags}.{receiver_organisation}.{receiver_ags}.{message_type}
+            $routingKey = implode('.', [
                 $projectType,
-                str_replace('.', '', $agsData['sender']),
-                str_replace('.', '', $agsData['receiver']),
+                'beteiligung',
+                self::XOEV_ORGANISATION_SENDER,
+                $agsData['sender'],
+                self::XOEV_ORGANISATION_RECEIVER,
+                $agsData['receiver'],
                 $messageType
-            );
+            ]);
 
-            $this->logger->info('Built dynamic outgoing routing key', [
+            $this->logger->info('Built XBeteiligung outgoing routing key', [
                 'routingKey' => $routingKey,
                 'procedureId' => $procedureId,
                 'projectType' => $projectType,
+                'senderOrganisation' => self::XOEV_ORGANISATION_SENDER,
+                'receiverOrganisation' => self::XOEV_ORGANISATION_RECEIVER,
                 'senderAgs' => $agsData['sender'],
                 'receiverAgs' => $agsData['receiver']
             ]);
@@ -283,17 +275,9 @@ class RabbitMQMessageBroker
         }
     }
 
-    private function buildIncomingRoutingKey(?string $messageType = null): string
+    private function buildIncomingRoutingKey(): string
     {
-        $cockpitMandant = $this->getCockpitMandant();
-
-        if (null !== $messageType) {
-            // Specific message type routing: {cockpit_mandant}.cockpit.*.*.{message_type}
-            return \sprintf('%s.cockpit.*.*.%s', $cockpitMandant, $messageType);
-        }
-
-        // General incoming routing: {cockpit_mandant}.cockpit.#
-        return \sprintf('%s.cockpit.#', $cockpitMandant);
+        return '*.cockpit.#';
     }
 
     private function getProjectType(): string
@@ -317,17 +301,6 @@ class RabbitMQMessageBroker
                 sprintf('Unknown procedure message type "%s". Valid values: Kommunal, Raumordnung, Planfeststellung', $procedureType)
             )
         };
-    }
-
-    private function getCockpitMandant(): string
-    {
-        $cockpitMandant = $this->parameterBag->get('addon_xbeteiligung_async_cockpit_mandant');
-
-        if ('' === $cockpitMandant) {
-            throw new InvalidArgumentException('Parameter addon_xbeteiligung_async_cockpit_mandant is not configured');
-        }
-
-        return $cockpitMandant;
     }
 
     /**
