@@ -21,6 +21,10 @@ use Psr\Log\LoggerInterface;
 
 class XBeteiligungCustomerMappingServiceTest extends TestCase
 {
+    private const HAMBURG_AGS_CODE = '02020000000';
+    private const INVALID_LENGTH_ERROR_MESSAGE = 'XöV-Kennung-Code must be at least 4 characters long';
+    private const INVALID_FEDERAL_STATE_ERROR_MESSAGE = 'No subdomain mapping found for federal state code: 00';
+    
     private XBeteiligungCustomerMappingService $sut;
     private CustomerServiceInterface|MockObject $customerService;
     private LoggerInterface|MockObject $logger;
@@ -46,7 +50,7 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
     {
         return [
             'Schleswig-Holstein' => ['02011000000', 'sh'],  // 02 01 1000000
-            'Hamburg' => ['02020000000', 'hh'],             // 02 02 0000000
+            'Hamburg' => [self::HAMBURG_AGS_CODE, 'hh'],             // 02 02 0000000
             'Niedersachsen' => ['02031000000', 'ni'],       // 02 03 1000000
             'Bremen' => ['02040000000', 'hb'],              // 02 04 0000000
             'Nordrhein-Westfalen' => ['02051000000', 'nw'], // 02 05 1000000
@@ -77,7 +81,7 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
     public static function federalStateExtractionProvider(): array
     {
         return [
-            'Hamburg full code' => ['02020000000', '02'],    // 02 02 0000000 -> 02
+            'Hamburg full code' => [self::HAMBURG_AGS_CODE, '02'],    // 02 02 0000000 -> 02
             'Bayern full code' => ['02091000000', '09'],     // 02 09 1000000 -> 09
             'Berlin full code' => ['02111000000', '11'],     // 02 11 1000000 -> 11
             'Short code still works' => ['0205', '05'],      // 02 05 -> 05
@@ -87,7 +91,7 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
 
     public function testGetCustomerByAgsCodeSuccess(): void
     {
-        $agsCode = '02020000000'; // Hamburg (02 02 0000000)
+        $agsCode = self::HAMBURG_AGS_CODE; // Hamburg (02 02 0000000)
         $expectedSubdomain = 'hh';
 
         $customerMock = $this->createMock(CustomerInterface::class);
@@ -106,7 +110,7 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
 
     public function testGetCustomerByAgsCodeCustomerNotFound(): void
     {
-        $agsCode = '02020000000'; // Hamburg (02 02 0000000)
+        $agsCode = self::HAMBURG_AGS_CODE; // Hamburg (02 02 0000000)
         $expectedSubdomain = 'hh';
 
         $exception = new \Exception('Customer not found');
@@ -137,12 +141,12 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
     public static function invalidAgsCodeProvider(): array
     {
         return [
-            'Too short' => ['01', 'XöV-Kennung-Code must be at least 4 characters long'],
-            'Three digits' => ['012', 'XöV-Kennung-Code must be at least 4 characters long'],
-            'Empty string' => ['', 'XöV-Kennung-Code must be at least 4 characters long'],
-            'Invalid federal state' => ['99001000000', 'No subdomain mapping found for federal state code: 00'],
-            'Zero federal state' => ['00001000000', 'No subdomain mapping found for federal state code: 00'],
-            'High federal state' => ['17001000000', 'No subdomain mapping found for federal state code: 00'],
+            'Too short' => ['01', self::INVALID_LENGTH_ERROR_MESSAGE],
+            'Three digits' => ['012', self::INVALID_LENGTH_ERROR_MESSAGE],
+            'Empty string' => ['', self::INVALID_LENGTH_ERROR_MESSAGE],
+            'Invalid federal state' => ['99001000000', self::INVALID_FEDERAL_STATE_ERROR_MESSAGE],
+            'Zero federal state' => ['00001000000', self::INVALID_FEDERAL_STATE_ERROR_MESSAGE],
+            'High federal state' => ['17001000000', self::INVALID_FEDERAL_STATE_ERROR_MESSAGE],
         ];
     }
 
@@ -151,7 +155,7 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
         $invalidAgsCode = '99001000000';
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('No subdomain mapping found for federal state code: 00');
+        $this->expectExceptionMessage(self::INVALID_FEDERAL_STATE_ERROR_MESSAGE);
 
         $this->sut->getCustomerByAgsCode($invalidAgsCode);
     }
@@ -159,7 +163,7 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
     public function testExtractFederalStateCodeSuccess(): void
     {
         // Should not throw exception for valid codes
-        self::assertSame('02', $this->sut->extractFederalStateCode('02020000000'));
+        self::assertSame('02', $this->sut->extractFederalStateCode(self::HAMBURG_AGS_CODE));
         self::assertSame('01', $this->sut->extractFederalStateCode('0201'));
         self::assertSame('16', $this->sut->extractFederalStateCode('02161000000'));
     }
@@ -168,7 +172,7 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
     {
         // Test only the length validation in extractFederalStateCode
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('XöV-Kennung-Code must be at least 4 characters long');
+        $this->expectExceptionMessage(self::INVALID_LENGTH_ERROR_MESSAGE);
 
         $this->sut->extractFederalStateCode('01');
     }
