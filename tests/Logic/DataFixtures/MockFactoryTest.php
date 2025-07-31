@@ -260,7 +260,7 @@ class MockFactoryTest
     public function getXBeteiligungCustomerMappingServiceMock(): XBeteiligungCustomerMappingService|MockObject
     {
         $mock = $this->testCase->createMockObject(XBeteiligungCustomerMappingService::class);
-        $mock->method('getCustomerByAgsCode')->willReturnCallback(function ($agsCode) {
+        $mock->method('getCustomerByAgsCode')->willReturnCallback(function () {
             $customerMock = $this->testCase->createMockObject(\DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface::class);
             $customerMock->method('getId')->willReturn('test-customer-id');
             return $customerMock;
