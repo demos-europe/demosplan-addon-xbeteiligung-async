@@ -34,7 +34,3 @@ parameters:
   # === XBeteiligung Message Audit Configuration ===
   # Enable/disable comprehensive message audit logging
   addon_xbeteiligung_async_enable_audit: true
-
-  # Legacy parameters removed - replaced with dynamic AGS routing:
-  # addon_xbeteiligung_async_rabbitmq_routing_key_author: 'xyz.0001'
-  # addon_xbeteiligung_async_rabbitmq_routing_key_reader: 'xyz.0002'

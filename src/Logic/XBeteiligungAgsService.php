@@ -65,8 +65,8 @@ class XBeteiligungAgsService
 
             $this->logger->info(self::LOG_PREFIX . 'Successfully extracted AGS codes from audit XML', [
                 'procedureId' => $procedureId,
-                'autorAgs' => $agsCodes['autor'],
-                'leserAgs' => $agsCodes['leser']
+                'senderAgs' => $agsCodes['sender'],
+                'receiverAgs' => $agsCodes['receiver']
             ]);
 
             return $agsCodes;
@@ -123,8 +123,8 @@ class XBeteiligungAgsService
         }
 
         return [
-            'autor' => $autorAgs,
-            'leser' => $leserAgs
+            'sender' => $autorAgs,
+            'receiver' => $leserAgs
         ];
     }
 
@@ -133,12 +133,12 @@ class XBeteiligungAgsService
      */
     public function validateAgsCodesForRouting(array $agsCodes): void
     {
-        if (empty($agsCodes['autor'])) {
-            throw new InvalidArgumentException('Missing autor AGS code in XML message');
+        if (empty($agsCodes['sender'])) {
+            throw new InvalidArgumentException('Missing sender AGS code in XML message');
         }
 
-        if (empty($agsCodes['leser'])) {
-            throw new InvalidArgumentException('Missing leser AGS code in XML message');
+        if (empty($agsCodes['receiver'])) {
+            throw new InvalidArgumentException('Missing receiver AGS code in XML message');
         }
     }
 }

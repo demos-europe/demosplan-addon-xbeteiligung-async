@@ -38,12 +38,6 @@ class RabbitMQMessageBroker
     private const RABBIT_MQ_QUEUE_NAME = 'addon_xbeteiligung_async_rabbitMqQueueName';
     private const RABBIT_MQ_REQUEST_ID_GET = 'addon_xbeteiligung_async_rabbitMqRequestIdGet';
     private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
-    // Legacy constants removed - replaced with dynamic AGS routing:
-    // private const RABBIT_MQ_ROUTING_KEY_AUTHOR = 'addon_xbeteiligung_async_rabbitmq_routing_key_author';
-    // private const RABBIT_MQ_ROUTING_KEY_READER = 'addon_xbeteiligung_async_rabbitmq_routing_key_reader';
-    // private const BETEILIGUNG_QUEUE = 'beteiligung'; // for outgoing messages
-    // private const COCKPIT_QUEUE = 'cockpit'; // for incoming messages
-    // private const COCKPIT_SUBDOMAIN = 'init'; // subdomain for incoming cockpit messages
 
     public function __construct(
         private readonly GlobalConfigInterface $globalConfig,
@@ -222,7 +216,7 @@ class RabbitMQMessageBroker
     private function buildRoutingKey(string $messageType, bool $isOutgoing, ?string $procedureId = null): string
     {
         if ($isOutgoing) {
-            // Format: {project_type}.beteiligung.{autor_ags}.{leser_ags}.{message_type}
+            // Format: {project_type}.beteiligung.{sender_ags}.{receiver_ags}.{message_type}
             return $this->buildOutgoingRoutingKey($messageType, $procedureId);
         }
 
@@ -257,12 +251,12 @@ class RabbitMQMessageBroker
                 );
             }
 
-            // Build dynamic routing key with real AGS codes
+            // Build dynamic routing key with real AGS codes (dots removed for RabbitMQ compatibility)
             $routingKey = \sprintf(
                 '%s.beteiligung.%s.%s.%s',
                 $projectType,
-                $agsData['autor'],
-                $agsData['leser'],
+                str_replace('.', '', $agsData['sender']),
+                str_replace('.', '', $agsData['receiver']),
                 $messageType
             );
 
@@ -270,8 +264,8 @@ class RabbitMQMessageBroker
                 'routingKey' => $routingKey,
                 'procedureId' => $procedureId,
                 'projectType' => $projectType,
-                'autorAgs' => $agsData['autor'],
-                'leserAgs' => $agsData['leser']
+                'senderAgs' => $agsData['sender'],
+                'receiverAgs' => $agsData['receiver']
             ]);
 
             return $routingKey;
