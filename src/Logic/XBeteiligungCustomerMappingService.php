@@ -121,7 +121,9 @@ class XBeteiligungCustomerMappingService
      * Get a customer entity by AGS code.
      *
      * @param string $agsCode The AGS code
+     *
      * @return CustomerInterface The customer entity
+     * @throws Exception
      */
     public function getCustomerByAgsCode(string $agsCode): CustomerInterface
     {

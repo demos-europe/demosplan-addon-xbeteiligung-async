@@ -24,6 +24,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtrac
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAgsService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungCustomerMappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -47,6 +48,7 @@ abstract class ProcedureCommonFeatures
         protected readonly TranslatorInterface                $translator,
         protected readonly UserHandlerInterface               $userHandler,
         protected readonly OrgaServiceInterface               $orgaService,
+        protected readonly XBeteiligungAgsService             $agsService,
         protected readonly XBeteiligungCustomerMappingService $customerMappingService,
         protected readonly XBeteiligungMapService             $xbeteiligungMapService,
     )
