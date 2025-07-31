@@ -16,7 +16,7 @@ use RuntimeException;
 
 /**
  * Exception thrown when audit record contains empty XML content.
- * 
+ *
  * This exception is thrown when an audit record exists but contains
  * no XML message content, preventing AGS code extraction.
  */

@@ -16,8 +16,8 @@ use RuntimeException;
 
 /**
  * Exception thrown when AGS code cannot be found in a 401 message.
- * 
- * This exception is thrown when a 401 message (procedure initiation) 
+ *
+ * This exception is thrown when a 401 message (procedure initiation)
  * lacks the required sender AGS code, preventing customer assignment
  * in multi-mandant scenarios.
  */

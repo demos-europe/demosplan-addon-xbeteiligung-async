@@ -16,7 +16,7 @@ use RuntimeException;
 
 /**
  * Exception thrown when a required audit record cannot be found.
- * 
+ *
  * This exception is thrown when AGS code extraction requires an original
  * 401 message audit record but no such record exists for the given procedure.
  */

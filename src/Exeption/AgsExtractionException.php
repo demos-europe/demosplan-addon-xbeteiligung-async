@@ -16,7 +16,7 @@ use RuntimeException;
 
 /**
  * Exception thrown when AGS code extraction from XML fails.
- * 
+ *
  * This exception is thrown when the XML parsing or AGS code extraction
  * process fails, typically due to malformed XML or missing AGS elements.
  */
