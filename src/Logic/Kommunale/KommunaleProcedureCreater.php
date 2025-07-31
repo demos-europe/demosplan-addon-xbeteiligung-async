@@ -35,6 +35,7 @@ use Doctrine\ORM\ORMException;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\AgsCodeNotFoundException;
 use RuntimeException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Webmozart\Assert\Assert;
@@ -317,7 +318,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 return $customer;
             }
 
-            throw new RuntimeException('No sender AGS code found in 401 message');
+            throw new AgsCodeNotFoundException();
         } catch (Exception $exception) {
             $this->logger->error('Failed to get customer based on AGS mapping', [
                 'errorMessage' => $exception->getMessage(),

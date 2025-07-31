@@ -12,6 +12,9 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\AgsExtractionException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\AuditRecordNotFoundException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\EmptyXmlContentException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use Exception;
@@ -48,16 +51,14 @@ class XBeteiligungAgsService
         $auditRecord = $this->auditService->findOriginalIncoming401Message($procedureId);
 
         if (!$auditRecord) {
-            $errorMsg = "No 401 audit record found for procedure: {$procedureId}";
-            $this->logger->error(self::LOG_PREFIX . $errorMsg);
-            throw new RuntimeException($errorMsg);
+            $this->logger->error(self::LOG_PREFIX . "No 401 audit record found for procedure: {$procedureId}");
+            throw new AuditRecordNotFoundException($procedureId);
         }
 
         $xmlContent = $auditRecord->getMessageContent();
         if ('' === $xmlContent) {
-            $errorMsg = "Empty XML content in audit record for procedure: {$procedureId}";
-            $this->logger->error(self::LOG_PREFIX . $errorMsg);
-            throw new RuntimeException($errorMsg);
+            $this->logger->error(self::LOG_PREFIX . "Empty XML content in audit record for procedure: {$procedureId}");
+            throw new EmptyXmlContentException($procedureId);
         }
 
         try {
@@ -71,9 +72,8 @@ class XBeteiligungAgsService
 
             return $agsCodes;
         } catch (Exception $e) {
-            $errorMsg = "Failed to extract AGS codes from audit XML for procedure {$procedureId}: " . $e->getMessage();
-            $this->logger->error(self::LOG_PREFIX . $errorMsg);
-            throw new RuntimeException($errorMsg, 0, $e);
+            $this->logger->error(self::LOG_PREFIX . "Failed to extract AGS codes from audit XML for procedure {$procedureId}: " . $e->getMessage());
+            throw new AgsExtractionException($procedureId, $e);
         }
     }
 

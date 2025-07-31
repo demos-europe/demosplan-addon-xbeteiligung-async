@@ -133,8 +133,7 @@ class RabbitMQMessageBroker
         }
         $this->logger->info('Send Response to RabbitMQ', [
             'xmlString' => $xmlString,
-            'routingKey' => $routingKey,
-            'isOutgoing' => $isOutgoing
+            'routingKey' => $routingKey
         ]);
 
         try {
