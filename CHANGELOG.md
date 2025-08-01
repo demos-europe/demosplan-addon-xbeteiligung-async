@@ -33,6 +33,8 @@
   - Unit test coverage for XBeteiligungAuditService
   - Comprehensive technical documentation with message flow details
 
+- Prevent duplicate procedure update messages during procedure creation by skipping procedures that are scheduled for insertion in the same UnitOfWork
+
 ## v0.17 (2025-06-30)
 - Change xbeteiligung standard from 1.3 to 1.2
 - Changed the primary namespace for this addon to XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
