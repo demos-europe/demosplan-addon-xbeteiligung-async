@@ -15,6 +15,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
@@ -124,7 +125,6 @@ class XBeteiligungService
         ]
     ];
 
-    public const NON_EXISTING_CODE = 'work probably in progress';
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
     public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.0401';
@@ -136,6 +136,12 @@ class XBeteiligungService
     public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Initiieren.0201';
     public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Aktualisieren.0202';
     public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Loeschen.0209';
+    public const NEW_STATEMENT_MESSAGE_IDENTIFIER = 'allgemein.stellungnahme.Neuabgegeben.0701';
+    public const NEW_KOMMUNAL_OK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.OK.0411';
+    public const NEW_KOMMUNAL_NOK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.NOK.0421';
+    public const UNKNOWN_MESSAGE_TYPE = 'unknown';
+    public const UNKNOWN_RESPONSE_MESSAGE_TYPE = 'unknown.response';
+    public const AUDIT_ENABLE_PARAMETER = 'addon_xbeteiligung_async_enable_audit';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
     public const MISSING_USER_ERROR_CODE = '0300';
     public const WRONG_ATTACHMENT_FORMAT_ERROR_CODE = '0200';
@@ -151,6 +157,7 @@ class XBeteiligungService
         private readonly GlobalConfigInterface                  $globalConfig,
         private readonly KommunaleProcedureCreater              $kommunaleProcedureCreater,
         private readonly LoggerInterface                        $logger,
+        private readonly ParameterBagInterface                  $parameterBag,
         private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
         private readonly ProcedureNewsServiceInterface          $procedureNewsService,
@@ -158,6 +165,7 @@ class XBeteiligungService
         private readonly XBeteiligungIncomingMessageParser      $incomingMessageParser,
         private readonly CommonHelpers                          $commonHelpers,
         private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
+        private readonly XBeteiligungAuditService               $auditService,
     ) {
     }
 
@@ -766,11 +774,45 @@ class XBeteiligungService
 
     public function saveProcedureMessage(ProcedureMessage $procedureMessage): void
     {
+        // Audit K3 message creation if audit is enabled
+        $auditEnabled = $this->parameterBag->get('addon_xbeteiligung_async_enable_audit');
+        if ($auditEnabled) {
+            $messageType = $this->determineMessageTypeFromContent($procedureMessage->getMessage());
+            $planId = $this->extractPlanIdFromXml($procedureMessage->getMessage(), $messageType);
+
+            $auditRecord = $this->auditService->auditK3Message(
+                $procedureMessage->getMessage(),
+                $messageType,
+                $procedureMessage->getProcedureId(),
+                $planId
+            );
+
+            // Store audit ID for direct linking
+            $procedureMessage->setAuditId($auditRecord->getId());
+        }
+
         $this->procedureMessageRepository->save($procedureMessage);
     }
 
     public function saveProcedureMessageOnFlush(ProcedureMessage $procedureMessage): void
     {
+        // Audit K3 message creation (for 402/409/302/309 messages during flush)
+        $auditEnabled = $this->parameterBag->get('addon_xbeteiligung_async_enable_audit', false);
+        if ($auditEnabled && null !== $this->auditService) {
+            $messageType = $this->determineMessageTypeFromContent($procedureMessage->getMessage());
+            $planId = $this->extractPlanIdFromXml($procedureMessage->getMessage(), $messageType);
+            $auditRecord = $this->auditService->auditK3Message(
+                $procedureMessage->getMessage(),
+                $messageType,
+                $procedureMessage->getProcedureId(),
+                $planId,
+                true // saveOnFlush to avoid infinite recursion
+            );
+
+            // Store audit ID for direct linking
+            $procedureMessage->setAuditId($auditRecord->getId());
+        }
+
         $this->procedureMessageRepository->saveOnFlush($procedureMessage);
     }
 
@@ -850,8 +892,9 @@ class XBeteiligungService
 
     /**
      * @throws SchemaException
+     * @throws Exception
      */
-    public function determineMessageContextAndDelegateAction(array $message): ResponseValue
+    public function determineMessageContextAndDelegateAction(array $message, bool $auditEnabled = false): ResponseValue
     {
         $payload = $message['messageData'];
         $messageTypeCode = array_key_exists('messageTypeCode', $message) ? $message['messageTypeCode'] : '';
@@ -859,7 +902,36 @@ class XBeteiligungService
         if (self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
             /** @var KommunalInitiieren0401 $xmlObject401 */
             $xmlObject401 = $this->incomingMessageParser->getXmlObject($payload, '401');
-            return $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
+
+            // Audit received message using parsed XML object
+            $auditRecord = null;
+            if ($auditEnabled) {
+                $planId = $xmlObject401->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
+                $auditRecord = $this->auditService->auditReceivedMessage(
+                    $payload,
+                    $messageTypeCode,
+                    $planId
+                );
+            }
+
+            try {
+                $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
+
+                // Mark as processed and update with procedure ID from response
+                if (null !== $auditRecord) {
+                    $this->auditService->markAsProcessed($auditRecord->getId());
+                    if (null !== $response->getProcedureId()) {
+                        $this->auditService->updateAuditWithProcedureId($auditRecord->getId(), $response->getProcedureId());
+                    }
+                }
+
+                return $response;
+            } catch (Exception $e) {
+                if (null !== $auditRecord) {
+                    $this->auditService->markAsFailed($auditRecord->getId(), $e->getMessage());
+                }
+                throw $e;
+            }
         }
         /*
          * The code is for different message types code and we use this thing in future
@@ -917,5 +989,80 @@ class XBeteiligungService
     private function determinePlanId(ProcedureInterface $procedure): string
     {
         return '' === $procedure->getXtaPlanId() ? $procedure->getId() : $procedure->getXtaPlanId();
+    }
+
+    /**
+     * Determine message type from XML content for K3 audit
+     */
+    private function determineMessageTypeFromContent(string $xmlContent): string
+    {
+        $messageTypes = [
+            self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER,
+            self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER,
+            self::DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER,
+            self::NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
+            self::UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
+            self::DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
+            self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
+            self::UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
+            self::DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
+        ];
+
+        foreach ($messageTypes as $messageType) {
+            if (str_contains($xmlContent, $messageType)) {
+                return $messageType;
+            }
+        }
+
+        return self::UNKNOWN_MESSAGE_TYPE;
+    }
+
+    /**
+     * Extract planId from XML content using the incoming message parser
+     */
+    private function extractPlanIdFromXml(string $xmlContent, string $messageType): ?string
+    {
+        try {
+            // Extract planId based on message type structure with proper type casting
+            return match ($messageType) {
+                self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                    /** @var KommunalInitiieren0401 $xmlObject */
+                    $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '401');
+                    return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
+                })(),
+                self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                    /** @var KommunalAktualisieren0402 $xmlObject */
+                    $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '402');
+                    return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
+                })(),
+                self::NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                    /** @var RaumordnungInitiieren0301 $xmlObject */
+                    $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '301');
+                    return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
+                })(),
+                self::UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                    /** @var RaumordnungAktualisieren0302 $xmlObject */
+                    $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '302');
+                    return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
+                })(),
+                self::DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                    /** @var KommunalLoeschen0409 $xmlObject */
+                    $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '409');
+                    return $xmlObject?->getNachrichteninhalt()?->getPlanID();
+                })(),
+                self::DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                    /** @var RaumordnungLoeschen0309 $xmlObject */
+                    $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '309');
+                    return $xmlObject?->getNachrichteninhalt()?->getPlanID();
+                })(),
+                default => null
+            };
+        } catch (Exception $e) {
+            $this->logger->warning('Could not extract planId from K3 message XML', [
+                'messageType' => $messageType,
+                'error' => $e->getMessage()
+            ]);
+            return null;
+        }
     }
 }
