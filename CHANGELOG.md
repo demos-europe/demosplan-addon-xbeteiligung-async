@@ -50,7 +50,6 @@
 - Add PATCH REST endpoint `/addon/xbeteiligung/procedure/update` for XBeteiligung procedure updates
 - Refactor and eliminate code duplication between create and update methods in XBeteiligungRestController
 - Enhance test coverage with comprehensive PATCH endpoint tests
-- Prevent duplicate procedure update messages during procedure creation by skipping procedures that are scheduled for insertion in the same UnitOfWork
 
 ## v0.10.7 (2025-06-14)
 
