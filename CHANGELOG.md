@@ -1,6 +1,39 @@
 # Changelog
 
 ## UNRELEASED
+- Add comprehensive XBeteiligung message audit infrastructure (DPLAN-16006)
+  
+  **Core Infrastructure:**
+  - New XBeteiligungMessageAudit entity with comprehensive audit tracking
+  - XBeteiligungMessageAuditRepository for efficient data access
+  - XBeteiligungAuditService providing centralized audit operations
+  - Database migration with optimized indexes for high-performance querying
+  
+  **Complete Message Coverage:**
+  - Cockpit (RabbitMQ) incoming messages: procedure creation (401) with planId extraction
+  - Cockpit outgoing responses: OK/NOK acknowledgments (411/421) with message linking
+  - Statement messages: new statement submissions (701) with statement ID tracking  
+  - K3 system messages: procedure lifecycle messages (401/402/409/301/302/309)
+  
+  **Audit Features:**
+  - Status lifecycle tracking: pending → processed/sent/failed
+  - Full XML content preservation with metadata (procedure ID, plan ID, statement ID, target system)
+  - Message relationship tracking via responseToMessageId for complete audit trails
+  - Timestamp tracking (created_at, processed_at, sent_at) for performance analysis
+  - Error details capture for failed message processing
+  - Configurable via `addon_xbeteiligung_async_enable_audit` parameter (default: true)
+  
+  **Code Quality Improvements:**
+  - Replace magic strings with service constants across codebase
+  - Improve method naming clarity (getProcedureMessage → getXmlContent)
+  - Remove redundant wrapper methods and unused constructor dependencies
+  - Enhanced constant naming consistency
+  
+  **Documentation & Testing:**
+  - Unit test coverage for XBeteiligungAuditService
+  - Comprehensive technical documentation with message flow details
+
+## v0.17 (2025-06-30)
 - Change xbeteiligung standard from 1.3 to 1.2
 - Changed the primary namespace for this addon to XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
   as we implement the xBeteiligung standard for public participation workflows.

@@ -142,8 +142,10 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     ): ResponseValue
     {
         $procedure = $this->createNewKommunalProcedureFromXBeteiligungMessage($xmlObject401);
+        $response = $this->kommunaleMessageFactory->buildProcedureCreatedResponse411($procedure, $xmlObject401);
+        $response->setProcedureId($procedure->getId());
 
-        return $this->kommunaleMessageFactory->buildProcedureCreatedResponse411($procedure, $xmlObject401);
+        return $response;
     }
 
     /**
