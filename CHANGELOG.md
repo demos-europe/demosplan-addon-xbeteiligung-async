@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.18 (2025-08-04)
 - Add comprehensive XBeteiligung message audit infrastructure (DPLAN-16006)
   
   **Core Infrastructure:**
