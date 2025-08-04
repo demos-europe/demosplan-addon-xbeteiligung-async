@@ -60,9 +60,6 @@ class RabbitMQMessageBroker
     public function processMessages(): void
     {
         $routingKey = $this->buildIncomingRoutingKey();
-        if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
-            $routingKey = '';
-        }
         $this->client->addRequest(
             '',
             $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
