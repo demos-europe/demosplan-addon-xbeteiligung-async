@@ -146,9 +146,7 @@ class RabbitMQMessageBroker
     protected function sendRabbitMq(string $xmlString, string $messageType, ?string $procedureId = null, int $expiration = 300, ?string $auditRecordId = null): bool
     {
         $routingKey = $this->buildOutgoingRoutingKey($messageType, $procedureId);
-        if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
-            $routingKey = '';
-        }
+
         $this->logger->info('Send Response to RabbitMQ', [
             'xmlString' => $xmlString,
             'routingKey' => $routingKey
