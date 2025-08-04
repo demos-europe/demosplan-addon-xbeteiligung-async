@@ -74,7 +74,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
                 $this->rabbitMQMessageBroker->processMessages();
             });
         } catch (Exception $e) {
-            $this->cockpitLogger->warning('failed to get procedure-create messages', [$e]);
+            $this->cockpitLogger->error('Failed to get procedure messages', [$e]);
         }
     }
 
