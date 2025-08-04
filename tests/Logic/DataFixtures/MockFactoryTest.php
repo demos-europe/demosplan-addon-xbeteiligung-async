@@ -272,8 +272,8 @@ class MockFactoryTest
     {
         $mock = $this->testCase->createMockObject(XBeteiligungAgsService::class);
         $mock->method('extractAgsCodesFromXmlObject')->willReturn([
-            'sender' => '02000000000',  // Valid Hamburg AGS code
-            'receiver' => '01001000000'  // Valid Schleswig-Holstein AGS code
+            'sender' => '020200000099',  // Valid Hamburg AGS code (Stage)
+            'receiver' => '020100000099'  // Valid Schleswig-Holstein AGS code (Stage)
         ]);
         return $mock;
     }
