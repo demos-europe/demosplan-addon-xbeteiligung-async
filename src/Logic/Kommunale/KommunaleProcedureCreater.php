@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
+use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
@@ -34,6 +35,8 @@ use Doctrine\ORM\ORMException;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\AgsCodeNotFoundException;
+use RuntimeException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Webmozart\Assert\Assert;
 use function count;
@@ -153,7 +156,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * @throws ConnectionException
      * @throws ORMException
      * @throws FormatException
-     * @throws AddonOrgaNotFoundException
+     * @throws Exception
      */
     public function createNewKommunalProcedureFromXBeteiligungMessage(
         KommunalInitiieren0401 $xmlObject401,
@@ -168,9 +171,20 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             throw new FormatException('Message content is missing');
         }
 
+        // Get mapped customer before transaction
+        $customer = $this->getCustomerFromAgsMapping($xmlObject401);
+
         return $this->transactionService->executeAndFlushInTransaction(
-            function () use ($messageContent) {
+            function () use ($messageContent, $customer) {
                 $procedure = $this->createProcedureEntity($messageContent);
+                $procedure->setCustomer($customer);
+
+                $this->logger->info('Set procedure customer based on AGS mapping for 401 message', [
+                    'procedureId' => $procedure->getId(),
+                    'customerId' => $customer->getId(),
+                    'messageType' => '401'
+                ]);
+
                 $procedureData =  $this->procedurePhaseExtractor->extract($messageContent);
                 $this->setProcedurePhase($procedure, $procedureData);
                 $mapData = $this->xbeteiligungMapService->setMapData($messageContent->getGeltungsbereich());
@@ -279,6 +293,40 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         $procedure->setOrga($orga);
 
         return $procedure;
+    }
+
+    /**
+     * Gets customer based on AGS code extraction from 401 message
+     *
+     * @throws Exception if AGS mapping fails
+     */
+    private function getCustomerFromAgsMapping(KommunalInitiieren0401 $xmlObject401): CustomerInterface
+    {
+        try {
+            $agsCodes = $this->agsService->extractAgsCodesFromXmlObject($xmlObject401);
+            $senderAgs = $agsCodes['sender'];
+
+            if (null !== $senderAgs) {
+                $customer = $this->customerMappingService->getCustomerByAgsCode($senderAgs);
+
+                $this->logger->info('Successfully mapped AGS code to customer for 401 message', [
+                    'senderAgs' => $senderAgs,
+                    'customerId' => $customer->getId(),
+                    'messageType' => '401'
+                ]);
+
+                return $customer;
+            }
+
+            throw new AgsCodeNotFoundException();
+        } catch (Exception $exception) {
+            $this->logger->error('Failed to get customer based on AGS mapping', [
+                'errorMessage' => $exception->getMessage(),
+                'exception' => $exception,
+                'messageType' => '401'
+            ]);
+            throw $exception;
+        }
     }
 
     protected function createProcedureArrayFormatFromBeteiligungType(

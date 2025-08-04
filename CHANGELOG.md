@@ -33,6 +33,27 @@
   - Unit test coverage for XBeteiligungAuditService
   - Comprehensive technical documentation with message flow details
 
+- Add dynamic AGS-based routing key system for RabbitMQ communication (DPLAN-15764)
+  
+  **Dynamic Routing Implementation:**
+  - Replace static project prefix routing with dynamic AGS (Amtlicher Gemeindeschlüssel) extraction
+  - Outgoing routing: `{project_type}.beteiligung.{sender_organisation}.{sender_ags}.{receiver_organisation}.{receiver_ags}.{message_type}`
+  - Incoming routing: `*.cockpit.#` (multi-mandant support)
+  - Example: `bau.beteiligung.bdp.020200000099.bap.020100000099.kommunal.initiieren.0411`
+  - Project type mapping: Kommunal→bau, Raumordnung→rog, Planfeststellung→pfv
+  
+  **AGS Data Management:**
+  - New XBeteiligungAgsService for dynamic AGS extraction from audit XML
+  - Direct AGS extraction from procedure audit messages without database storage
+  - Performance-optimized XML parsing with XÖV-compliant AGS code validation
+  - Clean separation of concerns between audit storage and AGS extraction
+  
+  **Multi-tenant Configuration:**
+  - Multi-mandant incoming routing with `*.cockpit.#` pattern
+  - Remove legacy static routing key parameters
+  - Fail-fast error handling with comprehensive logging
+  - XÖV-compliant routing key format implementation
+
 ## v0.17 (2025-06-30)
 - Change xbeteiligung standard from 1.3 to 1.2
 - Changed the primary namespace for this addon to XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
@@ -82,7 +103,6 @@
   - Fixed constructor parameter issues and method visibility
   - Cleaned up unnecessary property declarations in test classes
   - Updated test XML namespace from `xbeteiligung/12` to `xbeteiligung/1/3` and version from 1.1 to 1.3 to match XSD updates
-
 
 ###  v0.15 (2025-05-27)
 - fix getting map default projection label

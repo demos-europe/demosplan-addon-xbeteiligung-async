@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\CustomerServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterface;
@@ -23,6 +24,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtrac
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAgsService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungCustomerMappingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -31,6 +34,7 @@ abstract class ProcedureCommonFeatures
 {
     public function __construct(
         protected readonly CurrentUserProviderInterface       $currentUserProvider,
+        protected readonly CustomerServiceInterface           $customerService,
         protected readonly EntityManagerInterface             $entityManager,
         protected readonly KommunaleMessageFactory            $kommunaleMessageFactory,
         protected readonly LoggerInterface                    $logger,
@@ -44,6 +48,8 @@ abstract class ProcedureCommonFeatures
         protected readonly TranslatorInterface                $translator,
         protected readonly UserHandlerInterface               $userHandler,
         protected readonly OrgaServiceInterface               $orgaService,
+        protected readonly XBeteiligungAgsService             $agsService,
+        protected readonly XBeteiligungCustomerMappingService $customerMappingService,
         protected readonly XBeteiligungMapService             $xbeteiligungMapService,
     )
     {

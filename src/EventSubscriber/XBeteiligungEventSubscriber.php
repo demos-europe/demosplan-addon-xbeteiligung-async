@@ -26,6 +26,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use Exception;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -34,13 +35,13 @@ use Symfony\Contracts\Cache\ItemInterface;
 class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly PermissionEvaluatorInterface $permissionEvaluator,
-        private readonly XBeteiligungDebugger         $xBeteiligungDebugger,
-        private readonly XBeteiligungService          $xBeteiligungService,
-        private readonly CacheInterface               $cache,
-        private readonly ParameterBagInterface        $parameterBag,
-        private readonly LoggerInterface              $cockpitLogger,
-        private readonly RabbitMQMessageBroker        $rabbitMQMessageBroker,
+        private readonly PermissionEvaluatorInterface            $permissionEvaluator,
+        private readonly XBeteiligungDebugger                    $xBeteiligungDebugger,
+        private readonly XBeteiligungService                     $xBeteiligungService,
+        private readonly CacheInterface                          $cache,
+        private readonly ParameterBagInterface                   $parameterBag,
+        private readonly LoggerInterface                         $cockpitLogger,
+        private readonly RabbitMQMessageBroker                   $rabbitMQMessageBroker,
     ) {
     }
 
@@ -73,7 +74,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
                 $this->rabbitMQMessageBroker->processMessages();
             });
         } catch (Exception $e) {
-            $this->cockpitLogger->warning('failed to get procedure-create messages', [$e]);
+            $this->cockpitLogger->error('Failed to get procedure messages', [$e]);
         }
     }
 
@@ -113,6 +114,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
             $this->createProcedureMessage($xml, $event->getProcedure(), RaumordnungInitiieren0301::class);
         }
     }
+
 
     private function createProcedureMessage(string $xml, ProcedureInterface $procedure, string $messageClass): void
     {
