@@ -21,9 +21,9 @@ use Psr\Log\LoggerInterface;
 
 class XBeteiligungCustomerMappingServiceTest extends TestCase
 {
-    private const HAMBURG_AGS_CODE = '02020000000';
+    private const HAMBURG_AGS_CODE = '020200000099';
     private const INVALID_LENGTH_ERROR_MESSAGE = 'XöV-Kennung-Code must be at least 4 characters long';
-    private const INVALID_FEDERAL_STATE_ERROR_MESSAGE = 'No subdomain mapping found for federal state code: 00';
+    private const INVALID_FEDERAL_STATE_ERROR_MESSAGE = 'No subdomain mapping found for federal state code: 99';
     
     private XBeteiligungCustomerMappingService $sut;
     private CustomerServiceInterface|MockObject $customerService;
@@ -49,22 +49,22 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
     public static function validAgsToCustomerMappingProvider(): array
     {
         return [
-            'Schleswig-Holstein' => ['02011000000', 'sh'],  // 02 01 1000000
-            'Hamburg' => [self::HAMBURG_AGS_CODE, 'hh'],             // 02 02 0000000
-            'Niedersachsen' => ['02031000000', 'ni'],       // 02 03 1000000
-            'Bremen' => ['02040000000', 'hb'],              // 02 04 0000000
-            'Nordrhein-Westfalen' => ['02051000000', 'nw'], // 02 05 1000000
-            'Hessen' => ['02061000000', 'he'],              // 02 06 1000000
-            'Rheinland-Pfalz' => ['02071000000', 'rp'],     // 02 07 1000000
-            'Baden-Württemberg' => ['02081000000', 'bw'],   // 02 08 1000000
-            'Bayern' => ['02091000000', 'by'],              // 02 09 1000000
-            'Saarland' => ['02101000000', 'sl'],            // 02 10 1000000
-            'Berlin' => ['02111000000', 'be'],              // 02 11 1000000
-            'Brandenburg' => ['02121000000', 'bb'],         // 02 12 1000000
-            'Mecklenburg-Vorpommern' => ['02131000000', 'mv'], // 02 13 1000000
-            'Sachsen' => ['02141000000', 'sn'],             // 02 14 1000000
-            'Sachsen-Anhalt' => ['02151000000', 'st'],      // 02 15 1000000
-            'Thüringen' => ['02161000000', 'th'],           // 02 16 1000000
+            'Schleswig-Holstein' => ['020100000099', 'sh'],  // Stage: 02 01 000000 99
+            'Hamburg' => [self::HAMBURG_AGS_CODE, 'hh'],             // Stage: 02 02 000000 99
+            'Niedersachsen' => ['020300000099', 'ni'],       // Stage: 02 03 000000 99
+            'Bremen' => ['020400000099', 'hb'],              // Stage: 02 04 000000 99
+            'Nordrhein-Westfalen' => ['020500000099', 'nw'], // Stage: 02 05 000000 99
+            'Hessen' => ['020600000099', 'he'],              // Stage: 02 06 000000 99
+            'Rheinland-Pfalz' => ['020700000099', 'rp'],     // Stage: 02 07 000000 99
+            'Baden-Württemberg' => ['020800000099', 'bw'],   // Stage: 02 08 000000 99
+            'Bayern' => ['020900000099', 'by'],              // Stage: 02 09 000000 99
+            'Saarland' => ['021000000099', 'sl'],            // Stage: 02 10 000000 99
+            'Berlin' => ['021100000099', 'be'],              // Stage: 02 11 000000 99
+            'Brandenburg' => ['021200000099', 'bb'],         // Stage: 02 12 000000 99
+            'Mecklenburg-Vorpommern' => ['021300000099', 'mv'], // Stage: 02 13 000000 99
+            'Sachsen' => ['021400000099', 'sn'],             // Stage: 02 14 000000 99
+            'Sachsen-Anhalt' => ['021500000099', 'st'],      // Stage: 02 15 000000 99
+            'Thüringen' => ['021600000099', 'th'],           // Stage: 02 16 000000 99
         ];
     }
 
@@ -81,11 +81,11 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
     public static function federalStateExtractionProvider(): array
     {
         return [
-            'Hamburg full code' => [self::HAMBURG_AGS_CODE, '02'],    // 02 02 0000000 -> 02
-            'Bayern full code' => ['02091000000', '09'],     // 02 09 1000000 -> 09
-            'Berlin full code' => ['02111000000', '11'],     // 02 11 1000000 -> 11
-            'Short code still works' => ['0205', '05'],      // 02 05 -> 05
-            'Minimum required digits' => ['0216', '16'],     // 02 16 -> 16
+            'Hamburg full code' => [self::HAMBURG_AGS_CODE, '02'],    // 020200000099 -> 02
+            'Bayern full code' => ['020900000099', '09'],     // 020900000099 -> 09
+            'Berlin full code' => ['021100000099', '11'],     // 021100000099 -> 11
+            'Short code still works' => ['0205', '05'],      // 0205 -> 05
+            'Minimum required digits' => ['0216', '16'],     // 0216 -> 16
         ];
     }
 
@@ -144,15 +144,13 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
             'Too short' => ['01', self::INVALID_LENGTH_ERROR_MESSAGE],
             'Three digits' => ['012', self::INVALID_LENGTH_ERROR_MESSAGE],
             'Empty string' => ['', self::INVALID_LENGTH_ERROR_MESSAGE],
-            'Invalid federal state' => ['99001000000', self::INVALID_FEDERAL_STATE_ERROR_MESSAGE],
-            'Zero federal state' => ['00001000000', self::INVALID_FEDERAL_STATE_ERROR_MESSAGE],
-            'High federal state' => ['17001000000', self::INVALID_FEDERAL_STATE_ERROR_MESSAGE],
+            'Invalid federal state' => ['029900000099', self::INVALID_FEDERAL_STATE_ERROR_MESSAGE],
         ];
     }
 
     public function testGetCustomerByAgsCodeInvalidCode(): void
     {
-        $invalidAgsCode = '99001000000';
+        $invalidAgsCode = '029900000099';
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(self::INVALID_FEDERAL_STATE_ERROR_MESSAGE);
@@ -165,7 +163,7 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
         // Should not throw exception for valid codes
         self::assertSame('02', $this->sut->extractFederalStateCode(self::HAMBURG_AGS_CODE));
         self::assertSame('01', $this->sut->extractFederalStateCode('0201'));
-        self::assertSame('16', $this->sut->extractFederalStateCode('02161000000'));
+        self::assertSame('16', $this->sut->extractFederalStateCode('021600000099'));
     }
 
     public function testExtractFederalStateCodeFailure(): void
