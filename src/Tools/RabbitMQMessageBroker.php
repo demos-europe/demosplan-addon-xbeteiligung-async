@@ -66,12 +66,12 @@ class RabbitMQMessageBroker
         $this->client->addRequest(
             '',
             $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
-            self::RABBIT_MQ_REQUEST_ID_GET,
+            $this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET),
             $routingKey,
             300
         );
         $replies = $this->client->getReplies();
-        $result = Json::decodeToArray($replies[self::RABBIT_MQ_REQUEST_ID_GET]);
+        $result = Json::decodeToArray($replies[$this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET)]);
         $this->logger->info('Got response from RabbitMQ', [$result]);
         foreach ($result as $message) {
             $this->logger->info('Process message', [$message]);
@@ -140,7 +140,7 @@ class RabbitMQMessageBroker
             $this->client->addRequest(
                 $xmlString,
                 $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
-                self::RABBIT_MQ_REQUEST_ID_SEND,
+                $this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_SEND),
                 $routingKey,
                 $expiration
             );
@@ -160,7 +160,7 @@ class RabbitMQMessageBroker
             throw $e;
         }
 
-        return Json::decodeToMatchingType($replies[self::RABBIT_MQ_REQUEST_ID_SEND]);
+        return Json::decodeToMatchingType($replies[$this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_SEND)]);
     }
 
     /**
