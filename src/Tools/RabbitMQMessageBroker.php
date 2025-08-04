@@ -14,7 +14,6 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tools;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
-use DemosEurope\DemosplanAddon\Exception\JsonException;
 use DemosEurope\DemosplanAddon\Utilities\Json;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
@@ -54,21 +53,43 @@ class RabbitMQMessageBroker
     }
 
     /**
-     * @throws JsonException
      * @throws ParameterNotFoundException
+     * @throws Exception
      */
     public function processMessages(): void
     {
         $routingKey = $this->buildIncomingRoutingKey();
-        $this->client->addRequest(
-            '',
-            $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
-            $this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET),
-            $routingKey,
-            300
-        );
-        $replies = $this->client->getReplies();
-        $result = Json::decodeToArray($replies[$this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET)]);
+        try {
+            $this->client->addRequest(
+                '',
+                $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
+                $this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET),
+                $routingKey,
+                300
+            );
+            $replies = $this->client->getReplies();
+        } catch (Exception $e) {
+            $this->logger->error('XBeteiligung Addon - Could not add Request to RabbitMQ', [
+                $e,
+                $e->getMessage(),
+                $e->getTraceAsString()
+            ]);
+
+            throw $e;
+        }
+
+        $this->logger->info('Replies from RabbitMQ', [$replies]);
+        try {
+            $result = Json::decodeToArray($replies[$this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET)]);
+        } catch (Exception $e) {
+            $this->logger->error('XBeteiligung Addon - Could not decode RabbitMQ replies', [
+                $e,
+                $e->getMessage(),
+                $e->getTraceAsString()
+            ]);
+
+            throw $e;
+        }
         $this->logger->info('Got response from RabbitMQ', [$result]);
         foreach ($result as $message) {
             $this->logger->info('Process message', [$message]);
