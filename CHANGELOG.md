@@ -37,8 +37,9 @@
   
   **Dynamic Routing Implementation:**
   - Replace static project prefix routing with dynamic AGS (Amtlicher Gemeindeschlüssel) extraction
-  - Outgoing routing: `{project_type}.beteiligung.{autor_ags}.{leser_ags}.{message_type}`
-  - Incoming routing: `{cockpit_mandant}.cockpit.*.*.{message_type}`
+  - Outgoing routing: `{project_type}.beteiligung.{sender_organisation}.{sender_ags}.{receiver_organisation}.{receiver_ags}.{message_type}`
+  - Incoming routing: `*.cockpit.#` (multi-mandant support)
+  - Example: `bau.beteiligung.bdp.020200000099.bap.020100000099.kommunal.initiieren.0411`
   - Project type mapping: Kommunal→bau, Raumordnung→rog, Planfeststellung→pfv
   
   **AGS Data Management:**
@@ -48,7 +49,7 @@
   - Clean separation of concerns between audit storage and AGS extraction
   
   **Multi-tenant Configuration:**
-  - New cockpit_mandant parameter for incoming message routing
+  - Multi-mandant incoming routing with `*.cockpit.#` pattern
   - Remove legacy static routing key parameters
   - Fail-fast error handling with comprehensive logging
   - XÖV-compliant routing key format implementation
