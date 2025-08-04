@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.19 (2025-08-04)
 - Add rabbitmq timeout parameter
 
 ## v0.18 (2025-08-04)
