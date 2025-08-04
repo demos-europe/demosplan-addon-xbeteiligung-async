@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Add rabbitmq timeout parameter
+
 ## v0.18 (2025-08-04)
 - Add comprehensive XBeteiligung message audit infrastructure (DPLAN-16006)
   

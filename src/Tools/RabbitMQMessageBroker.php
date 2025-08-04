@@ -39,6 +39,7 @@ class RabbitMQMessageBroker
     private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
     private const XOEV_ORGANISATION_SENDER = 'bdp';    // Beteiligung system (XöV-DvdvOrganisationskategorie)
     private const XOEV_ORGANISATION_RECEIVER = 'bap';  // Cockpit system (Behördenanwendung Planung)
+    private const RABBIT_MQ_REQUEST_TIMEOUT = 'addon_xbeteiligung_async_rabbitMqRequestTimeout';
 
     public function __construct(
         private readonly GlobalConfigInterface $globalConfig,
@@ -62,10 +63,10 @@ class RabbitMQMessageBroker
         try {
             $this->client->addRequest(
                 '',
-                $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
+                'init.cockpit',
                 $this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET),
                 $routingKey,
-                300
+                $this->parameterBag->get(self::RABBIT_MQ_REQUEST_TIMEOUT)
             );
             $replies = $this->client->getReplies();
         } catch (Exception $e) {
@@ -124,7 +125,13 @@ class RabbitMQMessageBroker
                     $auditRecordId = $auditRecord->getId();
                 }
 
-                $this->sendRabbitMq($responseObject->getPayload(), $message['messageTypeCode'], $responseObject->getProcedureId(), 300, $auditRecordId);
+                $this->sendRabbitMq(
+                    $responseObject->getPayload(),
+                    $message['messageTypeCode'],
+                    $responseObject->getProcedureId(),
+                    $this->parameterBag->get(self::RABBIT_MQ_REQUEST_TIMEOUT),
+                    $auditRecordId
+                );
             } catch (InvalidArgumentException $e) {
                 $this->logger->error('Message payload not supported', [$e]);
             } catch (SchemaException $e) {
@@ -155,7 +162,7 @@ class RabbitMQMessageBroker
         try {
             $this->client->addRequest(
                 $xmlString,
-                $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
+                'bau.beteiligung',
                 $this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_SEND),
                 $routingKey,
                 $expiration
@@ -211,7 +218,7 @@ class RabbitMQMessageBroker
             $xmlString,
             CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[AllgemeinStellungnahmeNeuabgegeben0701::class]['name'],
             $statementCreated->getPlanId(), // Pass procedure ID for AGS lookup
-            300,
+            $this->parameterBag->get(self::RABBIT_MQ_REQUEST_TIMEOUT),
             $auditRecord?->getId()
         );
 

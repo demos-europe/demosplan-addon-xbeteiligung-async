@@ -21,6 +21,9 @@ parameters:
   # Maximum time in seconds we are allowed to rabbitMQ Message Broker
   addon_xbeteiligung_async_rabbitmq_communication_delay: 300
 
+  # Timeout for RabbitMQ requests in seconds
+  addon_xbeteiligung_async_rabbitMqRequestTimeout: 30
+
   addon_xbeteiligung_async_rabbitMqQueueName: 'XBeteiligungAddon'
 
   addon_xbeteiligung_async_rabbitMqRequestIdGet: 'XBeteiligung_Get'
