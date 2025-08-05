@@ -31,7 +31,7 @@ class Version20230706091408 extends AbstractMigration
     {
         $this->abortIfNotMysql();
 
-        $this->addSql('CREATE TABLE procedure_message (id CHAR(36) NOT NULL, procedure_id CHAR(36) NOT NULL, message LONGTEXT NOT NULL, created_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, modification_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, error TINYINT(1) DEFAULT false NOT NULL, deleted TINYINT(1) DEFAULT false NOT NULL, request_count INT DEFAULT 0 NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET UTF8 COLLATE `UTF8_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE IF NOT EXISTS procedure_message (id CHAR(36) NOT NULL, procedure_id CHAR(36) NOT NULL, message LONGTEXT NOT NULL, created_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, modification_date DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL, error TINYINT(1) DEFAULT false NOT NULL, deleted TINYINT(1) DEFAULT false NOT NULL, request_count INT DEFAULT 0 NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET UTF8 COLLATE `UTF8_unicode_ci` ENGINE = InnoDB');
     }
 
     /**
@@ -40,7 +40,7 @@ class Version20230706091408 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->abortIfNotMysql();
-        $this->addSql('DROP TABLE procedure_message');
+        $this->addSql('DROP TABLE IF EXISTS procedure_message');
     }
 
     /**
