@@ -1,6 +1,9 @@
 # Changelog
 
 ## UNRELEASED
+## v0.20 (2025-08-05)
+- adjust migrations
+
 ## v0.19 (2025-08-04)
 - Add rabbitmq timeout parameter
 
