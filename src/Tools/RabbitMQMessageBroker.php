@@ -14,12 +14,14 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tools;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
-use DemosEurope\DemosplanAddon\Exception\JsonException;
 use DemosEurope\DemosplanAddon\Utilities\Json;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAgsService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
@@ -35,6 +37,9 @@ class RabbitMQMessageBroker
     private const RABBIT_MQ_QUEUE_NAME = 'addon_xbeteiligung_async_rabbitMqQueueName';
     private const RABBIT_MQ_REQUEST_ID_GET = 'addon_xbeteiligung_async_rabbitMqRequestIdGet';
     private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
+    private const XOEV_ORGANISATION_SENDER = 'bdp';    // Beteiligung system (XöV-DvdvOrganisationskategorie)
+    private const XOEV_ORGANISATION_RECEIVER = 'bap';  // Cockpit system (Behördenanwendung Planung)
+    private const RABBIT_MQ_REQUEST_TIMEOUT = 'addon_xbeteiligung_async_rabbitMqRequestTimeout';
 
     public function __construct(
         private readonly GlobalConfigInterface $globalConfig,
@@ -43,29 +48,49 @@ class RabbitMQMessageBroker
         private readonly StatementCreator $statementCreator,
         private readonly StatementMessageFactory $statementMessageFactory,
         private readonly XBeteiligungService $xBeteiligungService,
+        private readonly XBeteiligungAgsService $agsService,
         private readonly XBeteiligungAuditService $auditService,
     ) {
     }
 
     /**
-     * @throws JsonException
      * @throws ParameterNotFoundException
+     * @throws Exception
      */
     public function processMessages(): void
     {
-        $routingKey = $this->globalConfig->getProjectPrefix();
-        if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
-            $routingKey = '';
+        $routingKey = $this->buildIncomingRoutingKey();
+        try {
+            $this->client->addRequest(
+                '',
+                'init.cockpit',
+                $this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET),
+                $routingKey,
+                $this->parameterBag->get(self::RABBIT_MQ_REQUEST_TIMEOUT)
+            );
+            $replies = $this->client->getReplies();
+        } catch (Exception $e) {
+            $this->logger->error('XBeteiligung Addon - Could not add Request to RabbitMQ', [
+                $e,
+                $e->getMessage(),
+                $e->getTraceAsString()
+            ]);
+
+            throw $e;
         }
-        $this->client->addRequest(
-            '',
-            $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
-            self::RABBIT_MQ_REQUEST_ID_GET,
-            $routingKey,
-            300
-        );
-        $replies = $this->client->getReplies();
-        $result = Json::decodeToArray($replies[self::RABBIT_MQ_REQUEST_ID_GET]);
+
+        $this->logger->info('Replies from RabbitMQ', [$replies]);
+        try {
+            $result = Json::decodeToArray($replies[$this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET)]);
+        } catch (Exception $e) {
+            $this->logger->error('XBeteiligung Addon - Could not decode RabbitMQ replies', [
+                $e,
+                $e->getMessage(),
+                $e->getTraceAsString()
+            ]);
+
+            throw $e;
+        }
         $this->logger->info('Got response from RabbitMQ', [$result]);
         foreach ($result as $message) {
             $this->logger->info('Process message', [$message]);
@@ -100,7 +125,13 @@ class RabbitMQMessageBroker
                     $auditRecordId = $auditRecord->getId();
                 }
 
-                $this->sendRabbitMq($responseObject->getPayload(), 300, $auditRecordId);
+                $this->sendRabbitMq(
+                    $responseObject->getPayload(),
+                    $message['messageTypeCode'],
+                    $responseObject->getProcedureId(),
+                    $this->parameterBag->get(self::RABBIT_MQ_REQUEST_TIMEOUT),
+                    $auditRecordId
+                );
             } catch (InvalidArgumentException $e) {
                 $this->logger->error('Message payload not supported', [$e]);
             } catch (SchemaException $e) {
@@ -119,19 +150,20 @@ class RabbitMQMessageBroker
      * @throws AMQPTimeoutException
      * @throws Exception
      */
-    protected function sendRabbitMq(string $xmlString, int $expiration = 300, ?string $auditRecordId = null): bool
+    protected function sendRabbitMq(string $xmlString, string $messageType, ?string $procedureId = null, int $expiration = 300, ?string $auditRecordId = null): bool
     {
-        $routingKey = $this->globalConfig->getProjectPrefix();
-        if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
-            $routingKey = '';
-        }
-        $this->logger->info('Send Response to RabbitMQ', [$xmlString]);
+        $routingKey = $this->buildOutgoingRoutingKey($messageType, $procedureId);
+
+        $this->logger->info('Send Response to RabbitMQ', [
+            'xmlString' => $xmlString,
+            'routingKey' => $routingKey
+        ]);
 
         try {
             $this->client->addRequest(
                 $xmlString,
-                $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
-                self::RABBIT_MQ_REQUEST_ID_SEND,
+                'bau.beteiligung',
+                $this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_SEND),
                 $routingKey,
                 $expiration
             );
@@ -151,7 +183,7 @@ class RabbitMQMessageBroker
             throw $e;
         }
 
-        return Json::decodeToMatchingType($replies[self::RABBIT_MQ_REQUEST_ID_SEND]);
+        return Json::decodeToMatchingType($replies[$this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_SEND)]);
     }
 
     /**
@@ -182,7 +214,13 @@ class RabbitMQMessageBroker
             );
         }
 
-        $this->sendRabbitMq($xmlString, 300, $auditRecord?->getId());
+        $this->sendRabbitMq(
+            $xmlString,
+            CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[AllgemeinStellungnahmeNeuabgegeben0701::class]['name'],
+            $statementCreated->getPlanId(), // Pass procedure ID for AGS lookup
+            $this->parameterBag->get(self::RABBIT_MQ_REQUEST_TIMEOUT),
+            $auditRecord?->getId()
+        );
 
         return $event;
     }
@@ -193,6 +231,98 @@ class RabbitMQMessageBroker
     public function setClient(RpcClient $client): void
     {
         $this->client = $client;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function buildOutgoingRoutingKey(string $messageType, ?string $procedureId): string
+    {
+        try {
+            // Get project type from configuration and map to routing prefix
+            $projectType = $this->getProjectType();
+
+            // Get AGS codes from audit XML for the procedure
+            $agsData = null;
+            if (null !== $procedureId) {
+                $agsData = $this->agsService->getAgsCodesForRouting($procedureId);
+            }
+
+            if (null === $agsData) {
+                $this->logger->error('Cannot send message: No AGS codes found for procedure', [
+                    'procedureId' => $procedureId,
+                    'messageType' => $messageType,
+                    'reason' => 'Missing AGS codes from audit XML'
+                ]);
+
+                throw new InvalidArgumentException(
+                    \sprintf('Cannot build routing key: No AGS codes found for procedure %s', $procedureId ?? 'null')
+                );
+            }
+
+            // Build XBeteiligung routing key format
+            // Format: {project_type}.beteiligung.{sender_organisation}.{sender_ags}.{receiver_organisation}.{receiver_ags}.{message_type}
+            $routingKey = implode('.', [
+                $projectType,
+                'beteiligung',
+                self::XOEV_ORGANISATION_SENDER,
+                $agsData['sender'],
+                self::XOEV_ORGANISATION_RECEIVER,
+                $agsData['receiver'],
+                $messageType
+            ]);
+
+            $this->logger->info('Built XBeteiligung outgoing routing key', [
+                'routingKey' => $routingKey,
+                'procedureId' => $procedureId,
+                'projectType' => $projectType,
+                'senderOrganisation' => self::XOEV_ORGANISATION_SENDER,
+                'receiverOrganisation' => self::XOEV_ORGANISATION_RECEIVER,
+                'senderAgs' => $agsData['sender'],
+                'receiverAgs' => $agsData['receiver']
+            ]);
+
+            return $routingKey;
+
+        } catch (Exception $e) {
+            $this->logger->error('Cannot send message: Failed to build dynamic routing key', [
+                'procedureId' => $procedureId,
+                'messageType' => $messageType,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // Re-throw the exception - do not send message if routing key cannot be built
+            throw $e;
+        }
+    }
+
+    private function buildIncomingRoutingKey(): string
+    {
+        return '*.cockpit.#';
+    }
+
+    private function getProjectType(): string
+    {
+        $procedureMessageType = $this->parameterBag->get('addon_xbeteiligung_async_procedure_message_type');
+
+        if ('' === $procedureMessageType) {
+            throw new InvalidArgumentException('Parameter addon_xbeteiligung_async_procedure_message_type is not configured');
+        }
+
+        return $this->mapProcedureTypeToRoutingPrefix($procedureMessageType);
+    }
+
+    private function mapProcedureTypeToRoutingPrefix(string $procedureType): string
+    {
+        return match (strtolower($procedureType)) {
+            'kommunal' => 'bau',           // Bauleitplanung
+            'raumordnung' => 'rog',        // Raumordnung
+            'planfeststellung' => 'pfv',   // Planfeststellung
+            default => throw new InvalidArgumentException(
+                sprintf('Unknown procedure message type "%s". Valid values: Kommunal, Raumordnung, Planfeststellung', $procedureType)
+            )
+        };
     }
 
     /**
