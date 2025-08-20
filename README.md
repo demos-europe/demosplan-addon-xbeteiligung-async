@@ -203,8 +203,12 @@ comment out `namespace: ...` in [`Schema.Code.CodeType.yml`](src/Soap/Metadata/S
 for the fields `code` and `name`.
 comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml)
 for the fields: `anlagen.xml_list`
+comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungRaumordnungType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungType.yml)
+for the fields: `anlagen.xml_list` (specifically the `entry_name: anlage` namespace configuration)
 comment out `namespace: ...` in [`Schema.XBeteiligung.MetadatenAnlageType.yml`](src/Soap/Metadata/Schema.XBeteiligung.MetadatenAnlageType.yml)
 for the fields: `bezeichnung`, `versionsnummer`, `datum`, `anlageart`, `mimeType` and `anhangOderVerlinkung`
+
+**Important:** The `anlage` elements within `anlagen` collections must NOT have namespace prefixes according to the XBeteiligung XSD schema specification. These elements are defined with `form="unqualified"` in the schema, which means they should appear as `<anlage>` rather than `<xbeteiligung:anlage>`. Failure to comment out the namespace configuration will result in XSD validation errors.
 
 When updating to a new xBeteiligung standard version, update the hardcoded 
 namespace version in `XBeteiligungIncomingMessageParser::validateRequiredNamespace()` 

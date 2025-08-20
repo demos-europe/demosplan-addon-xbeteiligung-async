@@ -1,6 +1,14 @@
 # Changelog
 
 ## UNRELEASED
+
+## v0.20.1 (2025-08-20)
+- fix (refs DPLAN-15681): Fix XML namespace validation for anlage elements
+  - Fixed namespace configuration issue in BeteiligungRaumordnungType that caused `<xbeteiligung:anlage>` elements instead of `<anlage>`
+  - Enhanced all XBeteiligung tests to include attachment validation, improving test coverage for namespace issues  
+  - Updated README with comprehensive namespace configuration documentation for future standard updates
+  - All XBeteiligung service tests now pass XSD validation with proper anlage element structure
+
 ## v0.20 (2025-08-05)
 - adjust migrations
 

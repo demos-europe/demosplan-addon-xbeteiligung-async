@@ -28,6 +28,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeXBauMimeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
@@ -77,7 +79,7 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->createMock(KommunaleProcedureCreater::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock(ParameterBagInterface::class),
-            $this->createMock( PlanningDocumentsLinkCreator::class),
+            $this->createMockedPlanningDocumentsLinkCreator(),
             $this->procedureMessageRepository,
             $this->procedureNewsService,
             $this->createMock(RouterInterface::class),
@@ -203,5 +205,35 @@ abstract class XBeteiligungServiceTest extends TestCase
             $messageClass,
         );
         self::assertTrue($isValid);
+    }
+
+    protected function createMockedPlanningDocumentsLinkCreator(): PlanningDocumentsLinkCreator
+    {
+        $mockPlanningDocumentsLinkCreator = $this->createMock(PlanningDocumentsLinkCreator::class);
+
+        // Create real objects instead of mocks to avoid serialization issues
+        $mimeType1 = new CodeXBauMimeTypeType();
+        $mimeType1->setCode('application/pdf');
+        $mimeType1->setListURI('urn:xoev-de:xbau:codeliste:xbau-mimetypes');
+        $mimeType1->setListVersionID('1.0');
+
+        $attachment1 = new MetadatenAnlageType();
+        $attachment1->setBezeichnung('Test Document.pdf');
+        $attachment1->setMimeType($mimeType1);
+
+        $mimeType2 = new CodeXBauMimeTypeType();
+        $mimeType2->setCode('video/mp4');
+        $mimeType2->setListURI('urn:xoev-de:xbau:codeliste:xbau-mimetypes');
+        $mimeType2->setListVersionID('1.0');
+
+        $attachment2 = new MetadatenAnlageType();
+        $attachment2->setBezeichnung('Test Video.mp4');
+        $attachment2->setMimeType($mimeType2);
+
+        $attachments = [$attachment1, $attachment2];
+        $mockPlanningDocumentsLinkCreator->method('getPlanningDocuments')
+            ->willReturn($attachments);
+
+        return $mockPlanningDocumentsLinkCreator;
     }
 }
