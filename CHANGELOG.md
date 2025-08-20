@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 
+## v0.20.2 (2025-08-20)
+- add logging and add uuid for $requestId
+
 ## v0.20.1 (2025-08-20)
 - fix (refs DPLAN-15681): Fix XML namespace validation for anlage elements
   - Fixed namespace configuration issue in BeteiligungRaumordnungType that caused `<xbeteiligung:anlage>` elements instead of `<anlage>`

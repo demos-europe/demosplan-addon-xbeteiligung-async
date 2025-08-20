@@ -34,14 +34,14 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class RabbitMQMessageBroker
 {
     protected RpcClient $client;
-    private const RABBIT_MQ_QUEUE_NAME = 'addon_xbeteiligung_async_rabbitMqQueueName';
-    private const RABBIT_MQ_REQUEST_ID_GET = 'addon_xbeteiligung_async_rabbitMqRequestIdGet';
+    private const RABBIT_MQ_SERVER = 'init.cockpit'; // exchange
     private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
     private const XOEV_ORGANISATION_SENDER = 'bdp';    // Beteiligung system (XöV-DvdvOrganisationskategorie)
     private const XOEV_ORGANISATION_RECEIVER = 'bap';  // Cockpit system (Behördenanwendung Planung)
     private const RABBIT_MQ_REQUEST_TIMEOUT = 'addon_xbeteiligung_async_rabbitMqRequestTimeout';
 
     public function __construct(
+        private readonly CommonHelpers $commonHelpers,
         private readonly GlobalConfigInterface $globalConfig,
         private readonly LoggerInterface $logger,
         private readonly ParameterBagInterface $parameterBag,
@@ -60,15 +60,22 @@ class RabbitMQMessageBroker
     public function processMessages(): void
     {
         $routingKey = $this->buildIncomingRoutingKey();
+        $requestId = $this->commonHelpers->uuid();
         try {
+            $this->logger->info('XBeteiligung Addon - Adding Request to RabbitMQ', [
+                'message' => '',
+                'server' => self::RABBIT_MQ_SERVER,
+                'requestId' => $requestId,
+                'routingKey' => $routingKey,
+                'timeout' => $this->parameterBag->get(self::RABBIT_MQ_REQUEST_TIMEOUT)
+            ]);
             $this->client->addRequest(
                 '',
-                'init.cockpit',
-                $this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET),
+                self::RABBIT_MQ_SERVER,
+                $requestId,
                 $routingKey,
                 $this->parameterBag->get(self::RABBIT_MQ_REQUEST_TIMEOUT)
             );
-            $replies = $this->client->getReplies();
         } catch (Exception $e) {
             $this->logger->error('XBeteiligung Addon - Could not add Request to RabbitMQ', [
                 $e,
@@ -78,10 +85,27 @@ class RabbitMQMessageBroker
 
             throw $e;
         }
-
+        try {
+            $this->logger->info('XBeteiligung Addon - Try to get replies from rabbitmq.');
+            $replies = $this->client->getReplies();
+        } catch (AMQPTimeoutException $e) {
+            $this->logger->error('XBeteiligung Addon - RabbitMQ request timed out', [
+                $e,
+                $e->getMessage(),
+                $e->getTraceAsString()
+            ]);
+            throw $e;
+        } catch (Exception $e) {
+            $this->logger->error('XBeteiligung Addon - Could not get Replies from RabbitMQ', [
+                $e,
+                $e->getMessage(),
+                $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
         $this->logger->info('Replies from RabbitMQ', [$replies]);
         try {
-            $result = Json::decodeToArray($replies[$this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_GET)]);
+            $result = Json::decodeToArray($replies[$requestId]);
         } catch (Exception $e) {
             $this->logger->error('XBeteiligung Addon - Could not decode RabbitMQ replies', [
                 $e,
@@ -153,17 +177,21 @@ class RabbitMQMessageBroker
     protected function sendRabbitMq(string $xmlString, string $messageType, ?string $procedureId = null, int $expiration = 300, ?string $auditRecordId = null): bool
     {
         $routingKey = $this->buildOutgoingRoutingKey($messageType, $procedureId);
+        $requestId = $this->commonHelpers->uuid();
 
         $this->logger->info('Send Response to RabbitMQ', [
             'xmlString' => $xmlString,
-            'routingKey' => $routingKey
+            'server' => self::RABBIT_MQ_SERVER,
+            'requestId' => $requestId,
+            'routingKey' => $routingKey,
+            'expiration' => $expiration,
         ]);
 
         try {
             $this->client->addRequest(
                 $xmlString,
-                'bau.beteiligung',
-                $this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_SEND),
+                self::RABBIT_MQ_SERVER,
+                $requestId,
                 $routingKey,
                 $expiration
             );
@@ -183,7 +211,7 @@ class RabbitMQMessageBroker
             throw $e;
         }
 
-        return Json::decodeToMatchingType($replies[$this->parameterBag->get(self::RABBIT_MQ_REQUEST_ID_SEND)]);
+        return Json::decodeToMatchingType($replies[$requestId]);
     }
 
     /**
