@@ -1,6 +1,21 @@
 # Changelog
 
 ## UNRELEASED
+- Refactor RabbitMQMessageBroker following Symfony best practices (DPLAN-15764)
+  
+  **Architecture Improvements:**
+  - Extracted XBeteiligungConfiguration for type-safe configuration management
+  - Created XBeteiligungRoutingService for routing key logic separation
+  - Added XBeteiligungMessageTransport for clean RabbitMQ communication abstraction
+  - Implemented XBeteiligungMessageProcessor for centralized message processing
+  - Reduced main class complexity from 370 lines to 140 lines (-62%)
+  
+  **Benefits:**
+  - Single Responsibility Principle compliance across all services
+  - Enhanced testability with clear service boundaries
+  - Type-safe configuration replacing magic string parameters
+  - Improved maintainability and reduced coupling
+  - Preserved all existing functionality while following Symfony patterns
 
 ## v0.20.2 (2025-08-20)
 - add logging and add uuid for $requestId
