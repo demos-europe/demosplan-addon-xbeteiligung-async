@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tools;
 
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Utilities\Json;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
@@ -35,14 +34,12 @@ class RabbitMQMessageBroker
 {
     protected RpcClient $client;
     private const RABBIT_MQ_SERVER = 'init.cockpit'; // exchange
-    private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
     private const XOEV_ORGANISATION_SENDER = 'bdp';    // Beteiligung system (XöV-DvdvOrganisationskategorie)
     private const XOEV_ORGANISATION_RECEIVER = 'bap';  // Cockpit system (Behördenanwendung Planung)
     private const RABBIT_MQ_REQUEST_TIMEOUT = 'addon_xbeteiligung_async_rabbitMqRequestTimeout';
 
     public function __construct(
         private readonly CommonHelpers $commonHelpers,
-        private readonly GlobalConfigInterface $globalConfig,
         private readonly LoggerInterface $logger,
         private readonly ParameterBagInterface $parameterBag,
         private readonly StatementCreator $statementCreator,
