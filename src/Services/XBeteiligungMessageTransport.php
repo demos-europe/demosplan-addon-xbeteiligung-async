@@ -148,4 +148,17 @@ class XBeteiligungMessageTransport
             throw $e;
         }
     }
+
+    /**
+     * Create a direct consumer for specific queue
+     */
+    public function createDirectConsumer(string $queueName): DirectMessageConsumer
+    {
+        return new DirectMessageConsumer(
+            $this->client,
+            $queueName,
+            $this->config,
+            $this->logger
+        );
+    }
 }
