@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Services;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
+use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
 
@@ -23,15 +23,14 @@ use Psr\Log\LoggerInterface;
  */
 class DirectMessageConsumer
 {
-    private ?object $channel = null;
+    private ?AMQPChannel $channel = null;
 
     public function __construct(
         private readonly RpcClient $rpcClient,
         private readonly string $queueName,
-        private readonly XBeteiligungConfiguration $config,
         private readonly LoggerInterface $logger,
     ) {}
-    
+
     /**
      * Consume messages directly from queue using basic_get
      */
@@ -41,58 +40,65 @@ class DirectMessageConsumer
             'queue' => $this->queueName,
             'maxMessages' => $maxMessages
         ]);
-        
+
         $processedCount = 0;
-        
+
         try {
             $this->establishChannel();
-            
+
             // Poll for messages using basic_get (non-blocking)
             for ($i = 0; $i < $maxMessages; $i++) {
                 $message = $this->channel->basic_get($this->queueName);
-                
+
                 if (null === $message) {
                     $this->logger->debug('No more messages in queue');
                     break;
                 }
-                
+
                 try {
+                    $deliveryTag = null;
+                    try {
+                        $deliveryTag = $message->getDeliveryTag();
+                    } catch (\Exception $e) {
+                        $this->logger->warning('Message has no delivery tag', ['error' => $e->getMessage()]);
+                    }
+                    
                     $this->logger->info('Processing message from queue', [
-                        'messageTag' => $message->getDeliveryTag(),
+                        'messageTag' => $deliveryTag,
                         'routingKey' => $message->getRoutingKey(),
                         'bodyLength' => strlen($message->getBody()),
                         'correlationId' => $message->get('correlation_id'),
                         'replyTo' => $message->get('reply_to')
                     ]);
-                    
+
                     // Call the message handler
                     $success = $messageHandler($message);
-                    
-                    if ($success) {
+
+                    if ($success && null !== $deliveryTag) {
                         // ACK the message
-                        $this->channel->basic_ack($message->getDeliveryTag());
+                        $this->channel->basic_ack($deliveryTag);
                         $this->logger->debug('Message ACKed');
                         $processedCount++;
-                    } else {
+                    } elseif (null !== $deliveryTag) {
                         // NACK the message (requeue it)
-                        $this->channel->basic_nack($message->getDeliveryTag(), false, true);
+                        $this->channel->basic_nack($deliveryTag, false, true);
                         $this->logger->debug('Message NACKed and requeued');
                     }
-                    
+
                 } catch (\Exception $e) {
                     $this->logger->error('Message processing failed', [
                         'error' => $e->getMessage(),
-                        'messageTag' => $message->getDeliveryTag() ?? 'unknown',
+                        'messageTag' => $deliveryTag ?? 'unknown',
                         'trace' => $e->getTraceAsString()
                     ]);
-                    
+
                     // NACK on error (requeue for retry)
-                    if ($message->getDeliveryTag()) {
-                        $this->channel->basic_nack($message->getDeliveryTag(), false, true);
+                    if (null !== $deliveryTag) {
+                        $this->channel->basic_nack($deliveryTag, false, true);
                     }
                 }
             }
-            
+
         } catch (\Exception $e) {
             $this->logger->error('Direct queue consumption failed', [
                 'queue' => $this->queueName,
@@ -103,7 +109,7 @@ class DirectMessageConsumer
         } finally {
             $this->closeChannel();
         }
-        
+
         $this->logger->info('Direct consumption finished', [
             'processedMessages' => $processedCount
         ]);
@@ -117,29 +123,29 @@ class DirectMessageConsumer
         try {
             $replyTo = $originalMessage->get('reply_to');
             $correlationId = $originalMessage->get('correlation_id');
-            
+
             if (empty($replyTo)) {
                 $this->logger->debug('No reply_to queue specified, skipping reply');
                 return;
             }
-            
+
             $responseJson = json_encode($responseData);
-            
+
             // Create reply message
             $replyMessage = new AMQPMessage($responseJson, [
                 'correlation_id' => $correlationId,
                 'content_type' => 'application/json'
             ]);
-            
+
             // Publish reply directly to the reply queue
             $this->channel->basic_publish($replyMessage, '', $replyTo);
-            
+
             $this->logger->info('Reply sent successfully', [
                 'replyTo' => $replyTo,
                 'correlationId' => $correlationId,
                 'responseSize' => strlen($responseJson)
             ]);
-            
+
         } catch (\Exception $e) {
             $this->logger->error('Failed to send reply', [
                 'error' => $e->getMessage(),
@@ -160,21 +166,21 @@ class DirectMessageConsumer
             $connectionProperty = $reflection->getProperty('connection');
             $connectionProperty->setAccessible(true);
             $connection = $connectionProperty->getValue($this->rpcClient);
-            
+
             if (null === $connection) {
                 throw new \RuntimeException('RpcClient connection is not established');
             }
-            
+
             // Create a new channel from the existing connection
             $this->channel = $connection->channel();
-            
+
             // Declare queue to ensure it exists (idempotent operation)
             $this->channel->queue_declare($this->queueName, false, true, false, false);
-            
+
             $this->logger->debug('Channel established for direct consumption', [
                 'queue' => $this->queueName
             ]);
-            
+
         } catch (\Exception $e) {
             $this->logger->error('Failed to establish channel', [
                 'queue' => $this->queueName,
@@ -195,7 +201,7 @@ class DirectMessageConsumer
                 $this->channel = null;
                 $this->logger->debug('Channel closed');
             }
-            
+
         } catch (\Exception $e) {
             $this->logger->warning('Error closing channel', [
                 'error' => $e->getMessage()

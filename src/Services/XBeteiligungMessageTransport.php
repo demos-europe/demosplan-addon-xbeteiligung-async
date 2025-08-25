@@ -157,7 +157,6 @@ class XBeteiligungMessageTransport
         return new DirectMessageConsumer(
             $this->client,
             $queueName,
-            $this->config,
             $this->logger
         );
     }
