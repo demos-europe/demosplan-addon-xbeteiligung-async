@@ -108,8 +108,8 @@ class XBeteiligungMessageProcessor
     public function processIncomingMessage(string $messageBody): array
     {
         try {
-            $message = json_decode($messageBody, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
+            $message = json_decode($messageBody, true, 512, JSON_THROW_ON_ERROR);
+            if (JSON_ERROR_NONE !== json_last_error()) {
                 throw new InvalidArgumentException('Invalid JSON message: ' . json_last_error_msg());
             }
 

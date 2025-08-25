@@ -151,11 +151,11 @@ class RabbitMQMessageBroker
                     $this->logger->info('Processing message from queue', [
                         'messageId' => $message->get('message_id'),
                         'routingKey' => $message->get('routing_key'),
-                        'body' => substr($message->body, 0, 200) // First 200 chars
+                        'body' => $message->getBody()
                     ]);
 
                     // Process the message using existing logic
-                    $responseData = $this->messageProcessor->processIncomingMessage($message->body);
+                    $responseData = $this->messageProcessor->processIncomingMessage($message->getBody());
 
                     // Send response back if this was a request that expects a reply
                     if ($message->has('reply_to')) {
@@ -170,7 +170,7 @@ class RabbitMQMessageBroker
 
                     return true; // ACK the message
 
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $this->logger->error('Failed to process queue message', [
                         'error' => $e->getMessage(),
                         'messageId' => $message->get('message_id'),
@@ -186,7 +186,7 @@ class RabbitMQMessageBroker
                 'processedMessages' => $processedCount
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error('Queue consumption failed', [
                 'queue' => $queueName,
                 'error' => $e->getMessage(),
