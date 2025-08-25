@@ -26,6 +26,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinSt
 use Exception;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
+use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
 
 class RabbitMQMessageBroker
@@ -133,58 +134,58 @@ class RabbitMQMessageBroker
      */
     public function processQueueMessages(string $queueName, int $maxMessages = null): void
     {
-        $maxMessages = $maxMessages ?? $this->config->maxMessagesPerCycle;
-        
+        $maxMessages ??= $this->config->maxMessagesPerCycle;
+
         try {
             $this->logger->info('Direct queue consumption started', [
                 'queue' => $queueName,
                 'maxMessages' => $maxMessages
             ]);
-            
+
             // Create direct queue consumer
             $consumer = $this->messageTransport->createDirectConsumer($queueName);
-            
+
             $processedCount = 0;
-            $consumer->consume($maxMessages, function($message) use (&$processedCount, $consumer) {
+            $consumer->consume($maxMessages, function(AMQPMessage $message) use (&$processedCount, $consumer) {
                 try {
                     $this->logger->info('Processing message from queue', [
                         'messageId' => $message->get('message_id'),
                         'routingKey' => $message->get('routing_key'),
                         'body' => substr($message->body, 0, 200) // First 200 chars
                     ]);
-                    
+
                     // Process the message using existing logic
                     $responseData = $this->messageProcessor->processIncomingMessage($message->body);
-                    
+
                     // Send response back if this was a request that expects a reply
                     if ($message->has('reply_to')) {
                         $consumer->sendDirectReply($message, $responseData);
                     }
-                    
+
                     $processedCount++;
                     $this->logger->info('Message processed successfully', [
                         'messageId' => $message->get('message_id'),
                         'processedCount' => $processedCount
                     ]);
-                    
+
                     return true; // ACK the message
-                    
+
                 } catch (\Exception $e) {
                     $this->logger->error('Failed to process queue message', [
                         'error' => $e->getMessage(),
                         'messageId' => $message->get('message_id'),
                         'trace' => $e->getTraceAsString()
                     ]);
-                    
+
                     return false; // NACK the message
                 }
             });
-            
+
             $this->logger->info('Queue consumption completed', [
                 'queue' => $queueName,
                 'processedMessages' => $processedCount
             ]);
-            
+
         } catch (\Exception $e) {
             $this->logger->error('Queue consumption failed', [
                 'queue' => $queueName,
