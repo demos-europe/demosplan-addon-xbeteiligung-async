@@ -156,23 +156,17 @@ class DirectMessageConsumer
     }
 
     /**
-     * Get channel from existing RPC client connection
+     * Get channel from existing RPC client
      */
     private function establishChannel(): void
     {
         try {
-            // Access the connection from the existing RpcClient
-            $reflection = new \ReflectionClass($this->rpcClient);
-            $connectionProperty = $reflection->getProperty('connection');
-            $connectionProperty->setAccessible(true);
-            $connection = $connectionProperty->getValue($this->rpcClient);
+            // Use the existing getChannel() method from RpcClient
+            $this->channel = $this->rpcClient->getChannel();
 
-            if (null === $connection) {
-                throw new \RuntimeException('RpcClient connection is not established');
+            if (null === $this->channel) {
+                throw new \RuntimeException('RpcClient channel could not be established');
             }
-
-            // Create a new channel from the existing connection
-            $this->channel = $connection->channel();
 
             // Declare queue to ensure it exists (idempotent operation)
             $this->channel->queue_declare($this->queueName, false, true, false, false);
