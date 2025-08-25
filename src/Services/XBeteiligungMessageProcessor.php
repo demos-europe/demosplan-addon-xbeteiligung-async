@@ -100,6 +100,78 @@ class XBeteiligungMessageProcessor
     }
 
     /**
+     * Process a single incoming message and return response data.
+     *
+     * @param string $messageBody JSON string containing message data
+     * @return array Response data for sending back to RabbitMQ
+     */
+    public function processIncomingMessage(string $messageBody): array
+    {
+        try {
+            $message = json_decode($messageBody, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new InvalidArgumentException('Invalid JSON message: ' . json_last_error_msg());
+            }
+
+            $this->logger->info('Process single message', [$message]);
+
+            $responseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction(
+                $message,
+                $this->config->auditEnabled
+            );
+
+            // Prepare response data
+            $responseData = [
+                'payload' => $responseObject->getPayload(),
+                'messageTypeCode' => $message['messageTypeCode'] ?? null,
+                'procedureId' => $responseObject->getProcedureId(),
+                'auditRecordId' => null,
+            ];
+
+            // Audit outgoing response message (OK/NOK)
+            if ($this->config->auditEnabled) {
+                $responsePayload = $responseObject->getPayload();
+                $responseMessageType = $this->determineResponseMessageType($responsePayload);
+
+                // Find the original audit record for the incoming 401 message to link the response
+                $originalAuditRecord = null;
+                if (null !== $responseObject->getProcedureId()) {
+                    $originalAuditRecord = $this->auditService->findOriginalIncoming401Message(
+                        $responseObject->getProcedureId()
+                    );
+                }
+
+                $auditRecord = $this->auditService->auditSentMessage(
+                    $responsePayload,
+                    $responseMessageType,
+                    $responseObject->getProcedureId(),
+                    $originalAuditRecord?->getPlanId(), // planId from original incoming message
+                    $originalAuditRecord?->getId() // responseToMessageId - link to original audit record
+                );
+
+                $responseData['auditRecordId'] = $auditRecord->getId();
+            }
+
+            return $responseData;
+
+        } catch (InvalidArgumentException $e) {
+            $this->logger->error('Message payload not supported', [$e]);
+            throw $e;
+        } catch (SchemaException $e) {
+            $this->logger->error('Incoming cockpit Message could not be parsed', [$e]);
+            throw $e;
+        } catch (Exception $e) {
+            $this->logger->error(
+                'XBeteiligung Plugin - Could not execute
+                (new procedure)401/411/421/301/311/321/201/211/221 |
+                (delete procedure)409/419/429/309/319/329/209/219/229 |: ',
+                [$e, $e->getTraceAsString()]
+            );
+            throw $e;
+        }
+    }
+
+    /**
      * Determine message type from XML response content
      */
     private function determineResponseMessageType(string $xmlContent): string
