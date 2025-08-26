@@ -1,7 +1,7 @@
 {
   "name": "demos-europe/demosplan-addon-xbeteiligung-async",
   "description": "This plugin provides Handling of XBeteiligung messages",
-  "version": "vtest1",
+  "version": "v0.1-dev",
   "type": "demosplan-addon",
   "license": "proprietary",
   "autoload": {
