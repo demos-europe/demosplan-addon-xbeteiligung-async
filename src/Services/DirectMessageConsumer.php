@@ -168,8 +168,9 @@ class DirectMessageConsumer
                 throw new \RuntimeException('RpcClient channel could not be established');
             }
 
-            // Declare queue to ensure it exists (idempotent operation)
-            $this->channel->queue_declare($this->queueName, false, true, false, false);
+            // Don't declare queue - assume it already exists in the RabbitMQ setup
+            // Queue declaration would cause PRECONDITION_FAILED if queue type doesn't match
+            // (e.g., existing quorum queue vs classic queue declaration)
 
             $this->logger->debug('Channel established for direct consumption', [
                 'queue' => $this->queueName
