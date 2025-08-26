@@ -149,9 +149,9 @@ class RabbitMQMessageBroker
             $consumer->consume($maxMessages, function(AMQPMessage $message) use (&$processedCount, $consumer) {
                 try {
                     $this->logger->info('Processing message from queue', [
-                        'messageId' => $message->get('message_id'),
-                        'routingKey' => $message->get('routing_key'),
-                        'body' => $message->getBody()
+                        'messageId' => $message->has('message_id') ? $message->get('message_id') : null,
+                        'routingKey' => $message->getRoutingKey(),
+                        'body' => $message->getBody(),
                     ]);
 
                     // Process the message using existing logic
@@ -164,7 +164,7 @@ class RabbitMQMessageBroker
 
                     $processedCount++;
                     $this->logger->info('Message processed successfully', [
-                        'messageId' => $message->get('message_id'),
+                        'messageId' => $message->has('message_id') ? $message->get('message_id') : null,
                         'processedCount' => $processedCount
                     ]);
 
@@ -173,7 +173,7 @@ class RabbitMQMessageBroker
                 } catch (Exception $e) {
                     $this->logger->error('Failed to process queue message', [
                         'error' => $e->getMessage(),
-                        'messageId' => $message->get('message_id'),
+                        'messageId' => $message->has('message_id') ? $message->get('message_id') : null,
                         'trace' => $e->getTraceAsString()
                     ]);
 

@@ -67,8 +67,8 @@ class DirectMessageConsumer
                         'messageTag' => $deliveryTag,
                         'routingKey' => $message->getRoutingKey(),
                         'bodyLength' => strlen($message->getBody()),
-                        'correlationId' => $message->get('correlation_id'),
-                        'replyTo' => $message->get('reply_to')
+                        'correlationId' => $message->has('correlation_id') ? $message->get('correlation_id') : null,
+                        'replyTo' => $message->has('reply_to') ? $message->get('reply_to') : null
                     ]);
 
                     // Call the message handler
@@ -121,8 +121,8 @@ class DirectMessageConsumer
     public function sendDirectReply(AMQPMessage $originalMessage, array $responseData): void
     {
         try {
-            $replyTo = $originalMessage->get('reply_to');
-            $correlationId = $originalMessage->get('correlation_id');
+            $replyTo = $originalMessage->has('reply_to') ? $originalMessage->get('reply_to') : null;
+            $correlationId = $originalMessage->has('correlation_id') ? $originalMessage->get('correlation_id') : null;
 
             if (empty($replyTo)) {
                 $this->logger->debug('No reply_to queue specified, skipping reply');
@@ -149,7 +149,7 @@ class DirectMessageConsumer
         } catch (\Exception $e) {
             $this->logger->error('Failed to send reply', [
                 'error' => $e->getMessage(),
-                'replyTo' => $originalMessage->get('reply_to') ?? 'unknown'
+                'replyTo' => $originalMessage->has('reply_to') ? $originalMessage->get('reply_to') : 'unknown'
             ]);
             throw $e;
         }
