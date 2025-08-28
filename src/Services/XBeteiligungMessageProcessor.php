@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Services;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use Exception;
@@ -50,7 +51,7 @@ class XBeteiligungMessageProcessor
 
                 // Prepare response data
                 $responseData = [
-                    'payload' => $responseObject->getPayload(),
+                    'payload' => $responseObject->getMessageXml(),
                     'messageTypeCode' => $message['messageTypeCode'],
                     'procedureId' => $responseObject->getProcedureId(),
                     'auditRecordId' => null,
@@ -58,9 +59,6 @@ class XBeteiligungMessageProcessor
 
                 // Audit outgoing response message (OK/NOK)
                 if ($this->config->auditEnabled) {
-                    $responsePayload = $responseObject->getPayload();
-                    $responseMessageType = $this->determineResponseMessageType($responsePayload);
-
                     // Find the original audit record for the incoming 401 message to link the response
                     $originalAuditRecord = null;
                     if (null !== $responseObject->getProcedureId()) {
@@ -70,8 +68,8 @@ class XBeteiligungMessageProcessor
                     }
 
                     $auditRecord = $this->auditService->auditSentMessage(
-                        $responsePayload,
-                        $responseMessageType,
+                        $responseObject->getMessageXml(),
+                        $responseObject->getMessageStringIdentifier(),
                         $responseObject->getProcedureId(),
                         $originalAuditRecord?->getPlanId(), // planId from original incoming message
                         $originalAuditRecord?->getId() // responseToMessageId - link to original audit record
@@ -102,37 +100,23 @@ class XBeteiligungMessageProcessor
     /**
      * Process a single incoming message and return response data.
      *
-     * @param string $messageBody JSON string containing message data
-     * @return array Response data for sending back to RabbitMQ
+     * @param string $message string containing xml message
+     *
+     * @return ResponseValue Response data for sending back to RabbitMQ
+     * @throws SchemaException
      */
-    public function processIncomingMessage(string $messageBody): array
+    public function processIncomingMessage(string $message): ResponseValue
     {
         try {
-            $message = json_decode($messageBody, true, 512, JSON_THROW_ON_ERROR);
-            if (JSON_ERROR_NONE !== json_last_error()) {
-                throw new InvalidArgumentException('Invalid JSON message: ' . json_last_error_msg());
-            }
+            $this->logger->debug('Process single message', [$message]);
 
-            $this->logger->info('Process single message', [$message]);
-
-            $responseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction(
+            $responseObject = $this->xBeteiligungService->processXmlMessage(
                 $message,
                 $this->config->auditEnabled
             );
 
-            // Prepare response data
-            $responseData = [
-                'payload' => $responseObject->getPayload(),
-                'messageTypeCode' => $message['messageTypeCode'] ?? null,
-                'procedureId' => $responseObject->getProcedureId(),
-                'auditRecordId' => null,
-            ];
-
             // Audit outgoing response message (OK/NOK)
             if ($this->config->auditEnabled) {
-                $responsePayload = $responseObject->getPayload();
-                $responseMessageType = $this->determineResponseMessageType($responsePayload);
-
                 // Find the original audit record for the incoming 401 message to link the response
                 $originalAuditRecord = null;
                 if (null !== $responseObject->getProcedureId()) {
@@ -142,17 +126,17 @@ class XBeteiligungMessageProcessor
                 }
 
                 $auditRecord = $this->auditService->auditSentMessage(
-                    $responsePayload,
-                    $responseMessageType,
+                    $responseObject->getMessageXml(),
+                    $responseObject->getMessageStringIdentifier(),
                     $responseObject->getProcedureId(),
                     $originalAuditRecord?->getPlanId(), // planId from original incoming message
                     $originalAuditRecord?->getId() // responseToMessageId - link to original audit record
                 );
 
-                $responseData['auditRecordId'] = $auditRecord->getId();
+                $responseObject->setAuditId($auditRecord->getId());
             }
 
-            return $responseData;
+            return $responseObject;
 
         } catch (InvalidArgumentException $e) {
             $this->logger->error('Message payload not supported', [$e]);

@@ -91,7 +91,8 @@ class XBeteiligungAuditService
         string $messageType,
         ?string $planId = null,
         ?string $procedureId = null,
-        ?string $responseToMessageId = null
+        ?string $responseToMessageId = null,
+        ?string $statementId = null
     ): XBeteiligungMessageAudit {
         return $this->createAuditRecord(
             self::DIRECTION_RECEIVED,
@@ -100,7 +101,8 @@ class XBeteiligungAuditService
             $messageType,
             $procedureId,
             $planId,
-            $responseToMessageId
+            $responseToMessageId,
+            $statementId
         );
     }
 

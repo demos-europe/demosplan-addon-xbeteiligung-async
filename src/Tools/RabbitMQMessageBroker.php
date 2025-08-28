@@ -154,13 +154,10 @@ class RabbitMQMessageBroker
                         'body' => $message->getBody(),
                     ]);
 
-                    // Process the message using existing logic
                     $responseData = $this->messageProcessor->processIncomingMessage($message->getBody());
 
-                    // Send response back if this was a request that expects a reply
-                    if ($message->has('reply_to')) {
-                        $consumer->sendDirectReply($message, $responseData);
-                    }
+                    // publish acknowledge message to RabbitMQ
+                    // todo: implement publishing logic
 
                     $processedCount++;
                     $this->logger->info('Message processed successfully', [

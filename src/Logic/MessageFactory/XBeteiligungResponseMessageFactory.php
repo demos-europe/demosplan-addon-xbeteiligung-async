@@ -66,7 +66,7 @@ class XBeteiligungResponseMessageFactory
         $messageClass->setNachrichtenkopfG2g($header);
         $messageClass->setNachrichteninhalt($contentClass);
         $messageXml = SerializerFactory::serializeData($messageClass, $this->logger);
-        $response->setPayload($messageXml);
+        $response->setMessageXml($messageXml);
         $response->lock();
 
         return $response;
