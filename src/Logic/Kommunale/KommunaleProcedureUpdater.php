@@ -49,6 +49,8 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
             );
         }
 
+        // todo: use ProcedureServiceInterface::updateProcedureObject,
+        // and wrap it in transaction (without flush in transaction because update call handles flush)
         // Update procedure with the data from BeteiligungKommunalType
         $procedureUpdated = $this->transactionService->executeAndFlushInTransaction(
             function () use ($beteiligungKommunalType, $procedureToUpdate) {
