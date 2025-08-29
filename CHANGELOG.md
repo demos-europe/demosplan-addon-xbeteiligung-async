@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 
+## v0.21 (2025-08-29)
 **RabbitMQ Direct Operations Implementation**
 
 **DirectMessageConsumer & DirectMessagePublisher:**
