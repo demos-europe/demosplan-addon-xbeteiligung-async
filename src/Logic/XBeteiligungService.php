@@ -18,6 +18,7 @@ use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenNOK0721;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenOK0711;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
@@ -1043,7 +1044,7 @@ class XBeteiligungService
             if ($auditEnabled) {
                 // Find original 701 message to get procedureId, planId and for correlation
                 $original701Message = $this->auditService->findOriginalOutgoing701MessageByStatementId($statementId);
-                
+
                 $auditRecord = $this->auditService->auditReceivedMessage(
                     $messageXml,
                     $messageStringIdentifier,
@@ -1068,12 +1069,13 @@ class XBeteiligungService
             /** @var AllgemeinStellungnahmeNeuabgegebenNOK0721 $newStatementNOK721 */
             $newStatementNOK721 = $this->incomingMessageParser->getXmlObject($messageXml, '721');
             $statementId = $newStatementNOK721->getNachrichteninhalt()?->getStellungnahmeID();
-            $errorMessage = $newStatementNOK721->getNachrichteninhalt()?->getFehler();
+            $errorMessagesArray = $newStatementNOK721->getNachrichteninhalt()?->getFehler();
+            $errorMessagesString = $this->extractErrorDescriptions($errorMessagesArray);
 
             if ($auditEnabled) {
                 // Find original 701 message to get procedureId, planId and for correlation
                 $original701Message = $this->auditService->findOriginalOutgoing701MessageByStatementId($statementId);
-                
+
                 $auditRecord = $this->auditService->auditReceivedMessage(
                     $messageXml,
                     $messageStringIdentifier,
@@ -1082,12 +1084,12 @@ class XBeteiligungService
                     $original701Message?->getId(), // responseToMessageId - link to original 701
                     $statementId
                 );
-                $this->auditService->markAsFailed($auditRecord->getId(), $this->extractErrorDescriptions($errorMessage));
+                $this->auditService->markAsFailed($auditRecord->getId(), $errorMessagesString);
             }
 
             $this->logger->warning('Statement NOK response processed', [
                 'statementId' => $statementId,
-                'errorMessage' => $errorMessage,
+                'errorMessage' => $errorMessagesString,
                 'messageType' => $messageStringIdentifier
             ]);
 
@@ -1173,24 +1175,20 @@ class XBeteiligungService
      * @param mixed $errorMessage Array of FehlerType objects or other value
      * @return string Readable error description
      */
-    private function extractErrorDescriptions($errorMessage): string
+    private function extractErrorDescriptions(array $errorMessage): string
     {
-        if (!is_array($errorMessage)) {
-            return $errorMessage ? (string) $errorMessage : 'Statement rejected by cockpit';
-        }
-
         $errorDescriptions = [];
         foreach ($errorMessage as $fehler) {
             if ($fehler instanceof FehlerType) {
                 $beschreibung = $fehler->getBeschreibung();
-                if (!empty($beschreibung)) {
+                if (null !== $beschreibung) {
                     $errorDescriptions[] = $beschreibung;
                 }
             }
         }
 
-        return !empty($errorDescriptions) 
-            ? implode('; ', $errorDescriptions) 
+        return [] !== $errorDescriptions
+            ? implode('; ', $errorDescriptions)
             : 'Statement rejected by cockpit';
     }
 
