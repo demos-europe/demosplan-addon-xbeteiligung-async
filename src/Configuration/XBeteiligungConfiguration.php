@@ -26,6 +26,8 @@ readonly class XBeteiligungConfiguration
         public string $rabbitMqExchange,
         public string $xoevAddressPrefixKommunal,
         public string $xoevAddressPrefixCockpit,
+        public int $maxMessagesPerCycle,
+        public int $consumerTimeout,
     ) {
         if ($this->requestTimeout <= 0) {
             throw new InvalidArgumentException('Request timeout must be positive');
@@ -61,6 +63,8 @@ readonly class XBeteiligungConfiguration
             'init.cockpit',
             'bdp',
             'bap',
+            $params->get('addon_xbeteiligung_async_max_messages_per_cycle'),
+            $params->get('addon_xbeteiligung_async_consumer_timeout'),
         );
     }
 
@@ -70,6 +74,21 @@ readonly class XBeteiligungConfiguration
             'kommunal' => 'bau',
             'raumordnung' => 'rog',
             'planfeststellung' => 'pfv',
+            default => throw new InvalidArgumentException(
+                sprintf('Unknown procedure message type "%s"', $this->procedureMessageType)
+            )
+        };
+    }
+
+    /**
+     * Get the RabbitMQ queue name based on procedure message type
+     */
+    public function getQueueName(): string
+    {
+        return match (strtolower($this->procedureMessageType)) {
+            'kommunal' => 'bau.beteiligung',
+            'raumordnung' => 'rog.beteiligung',
+            'planfeststellung' => 'pfv.beteiligung',
             default => throw new InvalidArgumentException(
                 sprintf('Unknown procedure message type "%s"', $this->procedureMessageType)
             )

@@ -1,7 +1,36 @@
 # Changelog
 
 ## UNRELEASED
-- Refactor RabbitMQMessageBroker following Symfony best practices (DPLAN-15764)
+
+**RabbitMQ Direct Operations Implementation**
+
+**DirectMessageConsumer & DirectMessagePublisher:**
+
+  - New service implementing direct AMQP queue consumption using `basic_get()`
+  to eliminate RPC timeout issues that were causing 30-second AMQPTimeoutException errors.
+  - New service for publishing messages directly using `basic_publish()` with persistent
+  messaging (delivery_mode: 2) instead of problematic RPC calls.
+
+**Complete RPC Elimination:**
+
+  - Removed timeout-prone RPC request-response pattern from `XBeteiligungMessageTransport`
+  and `RabbitMQMessageBroker`.
+
+**Direct XML Processing:**
+  - Added `processXmlMessage()` method for handling XML messages without intermediate
+  array conversion, returning nullable ResponseValue for acknowledgment-only messages.
+
+**Statement Response Handling:**
+
+  - Implemented proper processing for 711/721 statement acknowledgment messages with audit
+  correlation using `findOriginalOutgoing701MessageByStatementId()`.
+
+**Queue Name Mapping:**
+
+  - Added configuration mapping for procedure types to their respective queues
+  (bau.beteiligung, pfv.beteiligung, rog.beteiligung).
+
+**Refactor RabbitMQMessageBroker following Symfony best practices (DPLAN-15764)**
   
   **Architecture Improvements:**
   - Extracted XBeteiligungConfiguration for type-safe configuration management

@@ -119,7 +119,7 @@ class XBeteiligungRestController extends APIController
             $responseObject = $xBeteiligungService->determineMessageContextAndDelegateAction($message);
 
             // Prepare the XML response
-            $xmlPayload = $responseObject->getPayload();
+            $xmlPayload = $responseObject->getMessageXml();
             $response = new Response($xmlPayload);
             $response->headers->set('Content-Type', 'application/xml');
 
@@ -213,11 +213,11 @@ class XBeteiligungRestController extends APIController
                     return $type;
                 }
             }
-            
+
             // Extract the root element to make a better guess
             if (preg_match('/<([^:\s>]+:)?([^:\s>]+)/', $xmlContent, $matches)) {
                 $rootElement = $matches[2] ?? '';
-                
+
                 // If we found a root element, try to match it against code patterns
                 foreach ($codePatterns as $type => $pattern) {
                     if (preg_match($pattern, $rootElement)) {
@@ -225,7 +225,7 @@ class XBeteiligungRestController extends APIController
                     }
                 }
             }
-            
+
             // As a last resort, check if any of the codes appear in the XML
             foreach ($codePatterns as $type => $pattern) {
                 if (preg_match($pattern, $xmlContent)) {

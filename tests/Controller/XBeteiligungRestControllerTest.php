@@ -102,7 +102,7 @@ class XBeteiligungRestControllerTest extends TestCase
                     ->willThrowException(new \Exception('Service error'));
             } else {
                 $responseValue = new ResponseValue();
-                $responseValue->setPayload($responsePayload);
+                $responseValue->setMessageXml($responsePayload);
 
                 $this->xBeteiligungService->expects($this->once())
                     ->method('determineMessageContextAndDelegateAction')

@@ -91,7 +91,8 @@ class XBeteiligungAuditService
         string $messageType,
         ?string $planId = null,
         ?string $procedureId = null,
-        ?string $responseToMessageId = null
+        ?string $responseToMessageId = null,
+        ?string $statementId = null
     ): XBeteiligungMessageAudit {
         return $this->createAuditRecord(
             self::DIRECTION_RECEIVED,
@@ -100,7 +101,8 @@ class XBeteiligungAuditService
             $messageType,
             $procedureId,
             $planId,
-            $responseToMessageId
+            $responseToMessageId,
+            $statementId
         );
     }
 
@@ -302,5 +304,20 @@ class XBeteiligungAuditService
         }
 
         return null;
+    }
+
+    /**
+     * Find the original outgoing 701 message for a statement
+     */
+    public function findOriginalOutgoing701MessageByStatementId(string $statementId): ?XBeteiligungMessageAudit
+    {
+        $auditRecords = $this->auditRepository->findBy([
+            'statementId' => $statementId,
+            'messageType' => XBeteiligungService::NEW_STATEMENT_MESSAGE_IDENTIFIER,
+            'direction' => self::DIRECTION_SENT
+        ]);
+
+        // Should be unique - there should only be one outgoing 701 message per statement
+        return $auditRecords[0] ?? null;
     }
 }
