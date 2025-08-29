@@ -47,18 +47,22 @@ class RabbitMQMessageBroker
      * @throws AMQPTimeoutException
      * @throws Exception
      */
-    private function sendResponseToRabbitMq(string $xmlString, string $messageType, ?string $procedureId = null, ?string $auditRecordId = null): mixed
+    private function sendResponseToRabbitMq(string $xmlString, string $messageType, ?string $procedureId = null, ?string $auditRecordId = null): bool
     {
         try {
             $routingKey = $this->routingService->buildOutgoingRoutingKey($messageType, $procedureId);
-            $result = $this->messageTransport->sendMessage($xmlString, $routingKey);
+            $success = $this->messageTransport->publishDirectMessage($xmlString, $routingKey);
 
-            // Mark as sent after successful RabbitMQ communication
-            if (null !== $auditRecordId) {
-                $this->auditService->markAsSent($auditRecordId);
+            if ($success) {
+                // Mark as sent after successful RabbitMQ communication
+                if (null !== $auditRecordId) {
+                    $this->auditService->markAsSent($auditRecordId);
+                }
+            } else {
+                throw new Exception('Failed to publish message to RabbitMQ');
             }
 
-            return $result;
+            return $success;
         } catch (Exception $e) {
             // Mark as failed only if RabbitMQ send failed (before markAsSent was called)
             if (null !== $auditRecordId) {
@@ -154,9 +158,14 @@ class RabbitMQMessageBroker
             $responseData = $this->messageProcessor->processIncomingMessage($message->getBody());
             
             if (null !== $responseData) {
-                // publish response message to RabbitMQ
-                // todo: implement publishing logic for responses
-                $this->logger->debug('Response ready for publishing', [
+                // Publish response message to RabbitMQ using new direct publisher
+                $this->sendResponseToRabbitMq(
+                    $responseData->getMessageXml(),
+                    $responseData->getMessageStringIdentifier(),
+                    $responseData->getProcedureId(),
+                    $responseData->getAuditId()
+                );
+                $this->logger->debug('Response published successfully', [
                     'messageType' => $responseData->getMessageStringIdentifier()
                 ]);
             } else {

@@ -12,12 +12,10 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Services;
 
-use DemosEurope\DemosplanAddon\Utilities\Json;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use Exception;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
-use PhpAmqpLib\Exception\AMQPTimeoutException;
 use Psr\Log\LoggerInterface;
 
 class XBeteiligungMessageTransport
@@ -36,46 +34,6 @@ class XBeteiligungMessageTransport
         $this->client = $client;
     }
 
-    /**
-     * Send message to RabbitMQ.
-     *
-     * @throws AMQPTimeoutException
-     * @throws Exception
-     */
-    public function sendMessage(string $xmlString, string $routingKey): mixed
-    {
-        $requestId = $this->commonHelpers->uuid();
-
-        $this->logger->info('Send Response to RabbitMQ', [
-            'xmlString' => $xmlString,
-            'server' => $this->config->rabbitMqExchange,
-            'requestId' => $requestId,
-            'routingKey' => $routingKey,
-            'expiration' => $this->config->requestTimeout,
-        ]);
-
-        try {
-            $this->client->addRequest(
-                $xmlString,
-                $this->config->rabbitMqExchange,
-                $requestId,
-                $routingKey,
-                $this->config->requestTimeout
-            );
-            $replies = $this->client->getReplies();
-
-            $this->logger->info('Replies from RabbitMQ', [$replies]);
-
-            return Json::decodeToMatchingType($replies[$requestId]);
-        } catch (Exception $e) {
-            $this->logger->error('XBeteiligung Addon - Could not send message to RabbitMQ', [
-                $e,
-                $e->getMessage(),
-                $e->getTraceAsString()
-            ]);
-            throw $e;
-        }
-    }
 
     /**
      * Create a direct consumer for specific queue
@@ -87,5 +45,27 @@ class XBeteiligungMessageTransport
             $queueName,
             $this->logger
         );
+    }
+
+    /**
+     * Create a direct publisher for outgoing messages
+     */
+    public function createDirectPublisher(): DirectMessagePublisher
+    {
+        return new DirectMessagePublisher(
+            $this->client,
+            $this->logger
+        );
+    }
+
+    /**
+     * Publish message directly to exchange using basic_publish instead of RPC
+     *
+     * @throws Exception
+     */
+    public function publishDirectMessage(string $xmlString, string $routingKey): bool
+    {
+        $publisher = $this->createDirectPublisher();
+        return $publisher->publish($xmlString, $this->config->rabbitMqExchange, $routingKey);
     }
 }
