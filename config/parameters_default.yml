@@ -35,11 +35,8 @@ parameters:
   addon_xbeteiligung_async_enable_audit: true
 
   # === Direct Queue Consumption Configuration ===
-  # Enable direct queue consumption instead of RPC timeout-prone approach
-  addon_xbeteiligung_async_enable_direct_consumption: true
-  
   # Maximum number of messages to process per maintenance cycle
   addon_xbeteiligung_async_max_messages_per_cycle: 10
-  
+
   # Consumer timeout in seconds for individual message processing
   addon_xbeteiligung_async_consumer_timeout: 5

@@ -26,7 +26,6 @@ readonly class XBeteiligungConfiguration
         public string $rabbitMqExchange,
         public string $xoevAddressPrefixKommunal,
         public string $xoevAddressPrefixCockpit,
-        public bool $directConsumptionEnabled,
         public int $maxMessagesPerCycle,
         public int $consumerTimeout,
     ) {
@@ -64,7 +63,6 @@ readonly class XBeteiligungConfiguration
             'init.cockpit',
             'bdp',
             'bap',
-            $params->get('addon_xbeteiligung_async_enable_direct_consumption'),
             $params->get('addon_xbeteiligung_async_max_messages_per_cycle'),
             $params->get('addon_xbeteiligung_async_consumer_timeout'),
         );

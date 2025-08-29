@@ -70,13 +70,11 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
                 $this->cockpitLogger->info('Starting XBeteiligung maintenance cycle with delay '.$ttl);
                 $item->expiresAfter($ttl);
 
-                if ($this->config->directConsumptionEnabled) {
-                    $queueName = $this->config->getQueueName();
-                    $this->cockpitLogger->info('Processing messages from queue.', [
-                        'queue' => $queueName,
-                    ]);
-                    $this->rabbitMQMessageBroker->processMessages($queueName);
-                }
+                $queueName = $this->config->getQueueName();
+                $this->cockpitLogger->info('Processing messages from queue.', [
+                    'queue' => $queueName,
+                ]);
+                $this->rabbitMQMessageBroker->processMessages($queueName);
             });
         } catch (Exception $e) {
             $this->cockpitLogger->error('Failed to process XBeteiligung messages', [$e]);
