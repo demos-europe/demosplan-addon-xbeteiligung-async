@@ -105,7 +105,7 @@ class XBeteiligungMessageProcessor
      * @return ResponseValue Response data for sending back to RabbitMQ
      * @throws SchemaException
      */
-    public function processIncomingMessage(string $message): ResponseValue
+    public function processIncomingMessage(string $message): ?ResponseValue
     {
         try {
             $this->logger->debug('Process single message', [$message]);
@@ -114,6 +114,12 @@ class XBeteiligungMessageProcessor
                 $message,
                 $this->config->auditEnabled
             );
+
+            // If no response is needed (e.g., for 711/721 acknowledgments), return null
+            if (null === $responseObject) {
+                $this->logger->debug('No response required for this message type');
+                return null;
+            }
 
             // Audit outgoing response message (OK/NOK)
             if ($this->config->auditEnabled) {

@@ -152,8 +152,16 @@ class RabbitMQMessageBroker
     {
         try {
             $responseData = $this->messageProcessor->processIncomingMessage($message->getBody());
-            // publish acknowledge message to RabbitMQ
-            // todo: implement publishing logic
+            
+            if (null !== $responseData) {
+                // publish response message to RabbitMQ
+                // todo: implement publishing logic for responses
+                $this->logger->debug('Response ready for publishing', [
+                    'messageType' => $responseData->getMessageStringIdentifier()
+                ]);
+            } else {
+                $this->logger->debug('No response required - message processed for audit only');
+            }
         } catch (Exception $e) {
             $this->logger->error('Failed to process message.', [
                 'error' => $e->getMessage(),
