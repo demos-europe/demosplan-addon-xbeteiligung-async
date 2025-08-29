@@ -1069,7 +1069,8 @@ class XBeteiligungService
             /** @var AllgemeinStellungnahmeNeuabgegebenNOK0721 $newStatementNOK721 */
             $newStatementNOK721 = $this->incomingMessageParser->getXmlObject($messageXml, '721');
             $statementId = $newStatementNOK721->getNachrichteninhalt()?->getStellungnahmeID();
-            $errorMessage = $newStatementNOK721->getNachrichteninhalt()?->getFehler();
+            $errorMessagesArray = $newStatementNOK721->getNachrichteninhalt()?->getFehler();
+            $errorMessagesString = $this->extractErrorDescriptions($errorMessagesArray);
 
             if ($auditEnabled) {
                 // Find original 701 message to get procedureId, planId and for correlation
@@ -1083,12 +1084,12 @@ class XBeteiligungService
                     $original701Message?->getId(), // responseToMessageId - link to original 701
                     $statementId
                 );
-                $this->auditService->markAsFailed($auditRecord->getId(), $this->extractErrorDescriptions($errorMessage));
+                $this->auditService->markAsFailed($auditRecord->getId(), $errorMessagesString);
             }
 
             $this->logger->warning('Statement NOK response processed', [
                 'statementId' => $statementId,
-                'errorMessage' => $errorMessage,
+                'errorMessage' => $errorMessagesString,
                 'messageType' => $messageStringIdentifier
             ]);
 
