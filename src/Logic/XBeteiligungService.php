@@ -15,6 +15,10 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenNOK0721;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenOK0711;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
@@ -137,6 +141,8 @@ class XBeteiligungService
     public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Aktualisieren.0202';
     public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Loeschen.0209';
     public const NEW_STATEMENT_MESSAGE_IDENTIFIER = 'allgemein.stellungnahme.Neuabgegeben.0701';
+    public const NEW_STATEMENT_OK_MESSAGE_IDENTIFIER = 'allgemein.stellungnahme.Neuabgegeben.OK.0711';
+    public const NEW_STATEMENT_NOK_MESSAGE_IDENTIFIER = 'allgemein.stellungnahme.Neuabgegeben.NOK.0721';
     public const NEW_KOMMUNAL_OK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.OK.0411';
     public const NEW_KOMMUNAL_NOK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.NOK.0421';
     public const UNKNOWN_MESSAGE_TYPE = 'unknown';
@@ -986,6 +992,150 @@ class XBeteiligungService
         throw new InvalidArgumentException('Message payload not supported');
     }
 
+    /**
+     * @throws SchemaException
+     * @throws InvalidArgumentException
+     * @throws Exception
+     */
+    public function processXmlMessage(string $messageXml, bool $auditEnabled = false): ?ResponseValue
+    {
+        $this->logger->debug('Process xml message.', ['messageXml' => $messageXml]);
+        $messageStringIdentifier = $this->determineMessageTypeFromContent($messageXml);
+        $this->logger->debug('Extracted message string identifier.', ['messageStringIdentifier' => $messageStringIdentifier]);
+
+        $auditRecord = null;
+
+        if (self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageStringIdentifier) {
+            /** @var KommunalInitiieren0401 $kommunalInitiieren401 */
+            $kommunalInitiieren401 = $this->incomingMessageParser->getXmlObject($messageXml, '401');
+
+            if ($auditEnabled) {
+                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier);
+            }
+
+            try {
+                $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage(
+                    $kommunalInitiieren401
+                );
+
+                $this->markAuditRecordAsProcessed($auditRecord, $response->getProcedureId());
+
+                return $response;
+            } catch (Exception $e) {
+                $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
+                throw $e;
+            }
+        }
+
+        if (self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageStringIdentifier)
+        {
+            /** @var KommunalAktualisieren0402 $kommunalAktualisieren402 */
+            //$kommunalAktualisieren402 = $this->incomingMessageParser->getXmlObject($messageXml, '402');
+
+            // todo: implement update kommunal procedure handling
+        }
+
+        if (self::NEW_STATEMENT_OK_MESSAGE_IDENTIFIER === $messageStringIdentifier)
+        {
+            /** @var AllgemeinStellungnahmeNeuabgegebenOK0711 $newStatementOK711 */
+            $newStatementOK711 = $this->incomingMessageParser->getXmlObject($messageXml, '711');
+            $statementId = $newStatementOK711->getNachrichteninhalt()?->getStellungnahmeID();
+
+            if ($auditEnabled) {
+                // Find original 701 message to get procedureId, planId and for correlation
+                $original701Message = $this->auditService->findOriginalOutgoing701MessageByStatementId($statementId);
+
+                $auditRecord = $this->auditService->auditReceivedMessage(
+                    $messageXml,
+                    $messageStringIdentifier,
+                    $original701Message?->getPlanId(), // planId from original 701
+                    $original701Message?->getProcedureId(), // procedureId from original 701
+                    $original701Message?->getId(), // responseToMessageId - link to original 701
+                    $statementId
+                );
+                $this->auditService->markAsProcessed($auditRecord->getId());
+            }
+
+            $this->logger->info('Statement OK response processed', [
+                'statementId' => $statementId,
+                'messageType' => $messageStringIdentifier
+            ]);
+
+            // Statement acknowledgments don't require a response - return null
+            return null;
+        }
+
+        if (self::NEW_STATEMENT_NOK_MESSAGE_IDENTIFIER === $messageStringIdentifier) {
+            /** @var AllgemeinStellungnahmeNeuabgegebenNOK0721 $newStatementNOK721 */
+            $newStatementNOK721 = $this->incomingMessageParser->getXmlObject($messageXml, '721');
+            $statementId = $newStatementNOK721->getNachrichteninhalt()?->getStellungnahmeID();
+            $errorMessagesArray = $newStatementNOK721->getNachrichteninhalt()?->getFehler();
+            $errorMessagesString = $this->extractErrorDescriptions($errorMessagesArray);
+
+            if ($auditEnabled) {
+                // Find original 701 message to get procedureId, planId and for correlation
+                $original701Message = $this->auditService->findOriginalOutgoing701MessageByStatementId($statementId);
+
+                $auditRecord = $this->auditService->auditReceivedMessage(
+                    $messageXml,
+                    $messageStringIdentifier,
+                    $original701Message?->getPlanId(), // planId from original 701
+                    $original701Message?->getProcedureId(), // procedureId from original 701
+                    $original701Message?->getId(), // responseToMessageId - link to original 701
+                    $statementId
+                );
+                $this->auditService->markAsFailed($auditRecord->getId(), $errorMessagesString);
+            }
+
+            $this->logger->warning('Statement NOK response processed', [
+                'statementId' => $statementId,
+                'errorMessage' => $errorMessagesString,
+                'messageType' => $messageStringIdentifier
+            ]);
+
+            // Statement acknowledgments don't require a response - return null
+            return null;
+        }
+
+        throw new InvalidArgumentException('Unsupported message type: ' . $messageStringIdentifier);
+    }
+
+    private function createAuditRecordForXmlMessage(
+        string $messageXml,
+        string $messageStringIdentifier
+    ): XBeteiligungMessageAudit
+    {
+        $planId = $this->extractPlanIdFromXml($messageXml, $messageStringIdentifier);
+        return $this->auditService->auditReceivedMessage(
+            $messageXml,
+            $messageStringIdentifier,
+            $planId
+        );
+    }
+
+    private function markAuditRecordAsProcessed(
+        ?XBeteiligungMessageAudit $auditRecord,
+        ?string $procedureId = null
+    ): void
+    {
+        if (null !== $auditRecord) {
+            $this->auditService->markAsProcessed($auditRecord->getId());
+            if (null !== $procedureId) {
+                $this->auditService->updateAuditWithProcedureId($auditRecord->getId(), $procedureId);
+            }
+        }
+    }
+
+    private function markAuditRecordAsFailed(
+        ?XBeteiligungMessageAudit $auditRecord,
+        string $errorMessage
+    ): void
+    {
+        if (null !== $auditRecord) {
+            $this->auditService->markAsFailed($auditRecord->getId(), $errorMessage);
+        }
+    }
+
     private function determinePlanId(ProcedureInterface $procedure): string
     {
         return '' === $procedure->getXtaPlanId() ? $procedure->getId() : $procedure->getXtaPlanId();
@@ -1006,6 +1156,8 @@ class XBeteiligungService
             self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
             self::UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
             self::DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
+            self::NEW_STATEMENT_OK_MESSAGE_IDENTIFIER,
+            self::NEW_STATEMENT_NOK_MESSAGE_IDENTIFIER,
         ];
 
         foreach ($messageTypes as $messageType) {
@@ -1015,6 +1167,29 @@ class XBeteiligungService
         }
 
         return self::UNKNOWN_MESSAGE_TYPE;
+    }
+
+    /**
+     * Extract readable error descriptions from FehlerType array
+     *
+     * @param mixed $errorMessage Array of FehlerType objects or other value
+     * @return string Readable error description
+     */
+    private function extractErrorDescriptions(array $errorMessage): string
+    {
+        $errorDescriptions = [];
+        foreach ($errorMessage as $fehler) {
+            if ($fehler instanceof FehlerType) {
+                $beschreibung = $fehler->getBeschreibung();
+                if (null !== $beschreibung) {
+                    $errorDescriptions[] = $beschreibung;
+                }
+            }
+        }
+
+        return [] !== $errorDescriptions
+            ? implode('; ', $errorDescriptions)
+            : 'Statement rejected by cockpit';
     }
 
     /**

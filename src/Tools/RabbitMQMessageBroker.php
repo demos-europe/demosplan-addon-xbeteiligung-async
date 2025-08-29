@@ -26,6 +26,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinSt
 use Exception;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
+use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
 
 class RabbitMQMessageBroker
@@ -43,45 +44,25 @@ class RabbitMQMessageBroker
     }
 
     /**
-     * @throws Exception
-     */
-    public function processMessages(): void
-    {
-        $routingKey = $this->routingService->buildIncomingRoutingKey();
-
-        // Receive messages from RabbitMQ
-        $messages = $this->messageTransport->receiveMessages($routingKey);
-
-        // Process messages and get response data
-        $responseDataArray = $this->messageProcessor->processIncomingMessages($messages);
-
-        // Send responses back to RabbitMQ
-        foreach ($responseDataArray as $responseData) {
-            $this->sendResponseToRabbitMq(
-                $responseData['payload'],
-                $responseData['messageTypeCode'],
-                $responseData['procedureId'],
-                $responseData['auditRecordId']
-            );
-        }
-    }
-
-    /**
      * @throws AMQPTimeoutException
      * @throws Exception
      */
-    private function sendResponseToRabbitMq(string $xmlString, string $messageType, ?string $procedureId = null, ?string $auditRecordId = null): mixed
+    private function sendResponseToRabbitMq(string $xmlString, string $messageType, ?string $procedureId = null, ?string $auditRecordId = null): bool
     {
         try {
             $routingKey = $this->routingService->buildOutgoingRoutingKey($messageType, $procedureId);
-            $result = $this->messageTransport->sendMessage($xmlString, $routingKey);
+            $success = $this->messageTransport->publishDirectMessage($xmlString, $routingKey);
 
-            // Mark as sent after successful RabbitMQ communication
-            if (null !== $auditRecordId) {
-                $this->auditService->markAsSent($auditRecordId);
+            if ($success) {
+                // Mark as sent after successful RabbitMQ communication
+                if (null !== $auditRecordId) {
+                    $this->auditService->markAsSent($auditRecordId);
+                }
+            } else {
+                throw new Exception('Failed to publish message to RabbitMQ');
             }
 
-            return $result;
+            return $success;
         } catch (Exception $e) {
             // Mark as failed only if RabbitMQ send failed (before markAsSent was called)
             if (null !== $auditRecordId) {
@@ -121,11 +102,86 @@ class RabbitMQMessageBroker
         $this->sendResponseToRabbitMq(
             $xmlString,
             CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[AllgemeinStellungnahmeNeuabgegeben0701::class]['name'],
-            $statementCreated->getPlanId(), // Pass procedure ID for AGS lookup
+            $statementCreated->getProcedureId(),
             $auditRecord?->getId()
         );
 
         return $event;
+    }
+
+    /**
+     * Process messages directly from a specific queue without request-response pattern
+     *
+     * @throws Exception
+     */
+    public function processMessages(string $queueName, int $maxMessages = null): void
+    {
+        $maxMessages ??= $this->config->maxMessagesPerCycle;
+
+        $this->logger->info('Direct queue consumption started', [
+            'queue' => $queueName,
+            'maxMessages' => $maxMessages
+        ]);
+
+        try {
+            // Create direct queue consumer
+            $consumer = $this->messageTransport->createDirectConsumer($queueName);
+
+            $processedCount = 0;
+            $consumer->consume($maxMessages, function(AMQPMessage $message) use (&$processedCount) {
+                $this->processMessage($message, $processedCount);
+            });
+        } catch (Exception $e) {
+            $this->logger->error('Queue consumption failed.', [
+                'queue' => $queueName,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+
+        $this->logger->info('Queue consumption completed.', [
+            'queue' => $queueName,
+            'processedMessages' => $processedCount
+        ]);
+    }
+
+    /**
+     * Process a single message from the queue
+     *
+     * @param AMQPMessage $message The message to process
+     * @param int $processedCount Reference to the counter of processed messages
+     */
+    private function processMessage(AMQPMessage $message, int &$processedCount): void
+    {
+        try {
+            $responseData = $this->messageProcessor->processIncomingMessage($message->getBody());
+
+            if (null !== $responseData) {
+                // Publish response message to RabbitMQ using new direct publisher
+                $this->sendResponseToRabbitMq(
+                    $responseData->getMessageXml(),
+                    $responseData->getMessageStringIdentifier(),
+                    $responseData->getProcedureId(),
+                    $responseData->getAuditId()
+                );
+                $this->logger->debug('Response published successfully', [
+                    'messageType' => $responseData->getMessageStringIdentifier()
+                ]);
+            } else {
+                $this->logger->debug('No response required - message processed for audit only');
+            }
+        } catch (Exception $e) {
+            $this->logger->error('Failed to process message.', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+        $processedCount++;
+        $this->logger->info('Message processed successfully.', [
+            'routingKey' => $message->getRoutingKey(),
+            'processedCount' => $processedCount
+        ]);
     }
 
     /**
@@ -135,5 +191,4 @@ class RabbitMQMessageBroker
     {
         $this->messageTransport->setClient($client);
     }
-
 }

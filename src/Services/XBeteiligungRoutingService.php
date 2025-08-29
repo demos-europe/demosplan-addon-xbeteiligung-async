@@ -60,15 +60,14 @@ class XBeteiligungRoutingService
                     sprintf('Cannot build routing key: No AGS codes found for procedure %s', $procedureId ?? 'null')
                 );
             }
-
             // Build XBeteiligung routing key format
             $routingKey = implode('.', [
                 $projectType,
                 'beteiligung',
                 $this->config->xoevAddressPrefixKommunal,
-                $agsData['sender'],
-                $this->config->xoevAddressPrefixCockpit,
                 $agsData['receiver'],
+                $this->config->xoevAddressPrefixCockpit,
+                $agsData['sender'],
                 $messageType
             ]);
 
