@@ -50,7 +50,7 @@ class DirectMessagePublisher
 
             // Get channel from existing RPC client
             $channel = $this->rpcClient->getChannel();
-            
+
             if (null === $channel) {
                 throw new \RuntimeException('RpcClient channel could not be established');
             }
