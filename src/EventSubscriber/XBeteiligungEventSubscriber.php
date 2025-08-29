@@ -19,6 +19,7 @@ use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInte
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
+use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
@@ -26,8 +27,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use Exception;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -39,7 +38,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
         private readonly XBeteiligungDebugger                    $xBeteiligungDebugger,
         private readonly XBeteiligungService                     $xBeteiligungService,
         private readonly CacheInterface                          $cache,
-        private readonly ParameterBagInterface                   $parameterBag,
+        private readonly XBeteiligungConfiguration               $config,
         private readonly LoggerInterface                         $cockpitLogger,
         private readonly RabbitMQMessageBroker                   $rabbitMQMessageBroker,
     ) {
@@ -60,82 +59,33 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 
     public function handleAddonMaintenanceEvent(AddonMaintenanceEventInterface $event): void
     {
-        if (false === $this->parameterBag->get('addon_xbeteiligung_async_enable_rabbitmq_communication')) {
+        if (false === $this->config->rabbitMqEnabled) {
             $this->cockpitLogger->info('RabbitMQ communication is disabled');
 
             return;
         }
         try {
             $this->cache->get('MessageBrokerDelay', function (ItemInterface $item): void {
-                $ttl = $this->parameterBag->get('addon_xbeteiligung_async_rabbitmq_communication_delay');
+                $ttl = $this->config->communicationDelay;
                 $this->cockpitLogger->info('Starting XBeteiligung maintenance cycle with delay '.$ttl);
                 $item->expiresAfter($ttl);
 
-                // NEW: Process incoming messages from queues first
-                if ($this->parameterBag->get('addon_xbeteiligung_async_enable_direct_consumption')) {
-                    $this->processIncomingQueueMessages();
+                if ($this->config->directConsumptionEnabled) {
+                    $queueName = $this->config->getQueueName();
+                    $this->cockpitLogger->info('Processing messages from queue.', [
+                        'queue' => $queueName,
+                    ]);
+                    $this->rabbitMQMessageBroker->processMessages($queueName);
                 }
-                
-                // EXISTING: Then try to fetch new messages using existing method
-                $this->rabbitMQMessageBroker->processMessages();
             });
         } catch (Exception $e) {
             $this->cockpitLogger->error('Failed to process XBeteiligung messages', [$e]);
         }
     }
 
-    /**
-     * Process messages directly from specific queues without request-response pattern
-     */
-    private function processIncomingQueueMessages(): void
-    {
-        $procedureType = $this->parameterBag->get('addon_xbeteiligung_async_procedure_message_type');
-        
-        if (empty($procedureType)) {
-            $this->cockpitLogger->warning('No procedure message type configured, skipping direct queue consumption');
-            return;
-        }
-
-        try {
-            // Use existing configuration logic to get the appropriate queue name
-            $queueName = $this->getQueueNameForProcedureType($procedureType);
-            
-            $this->cockpitLogger->info('Processing messages from queue', [
-                'queue' => $queueName,
-                'procedureType' => $procedureType
-            ]);
-            
-            // Process messages directly from the target queue
-            $this->rabbitMQMessageBroker->processQueueMessages($queueName);
-            
-        } catch (Exception $e) {
-            $this->cockpitLogger->error('Direct queue consumption failed', [
-                'procedureType' => $procedureType,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            // Don't re-throw - let the existing method try as fallback
-        }
-    }
-
-    /**
-     * Get queue name based on procedure message type
-     */
-    private function getQueueNameForProcedureType(string $procedureType): string
-    {
-        return match (strtolower($procedureType)) {
-            'kommunal' => 'bau.beteiligung',
-            'raumordnung' => 'rog.beteiligung',
-            'planfeststellung' => 'pfv.beteiligung',
-            default => throw new RuntimeException(
-                sprintf('Unknown procedure message type "%s"', $procedureType)
-            )
-        };
-    }
-
     public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): void
     {
-        if (false === $this->parameterBag->get('addon_xbeteiligung_async_enable_rabbitmq_communication')) {
+        if (false === $this->config->rabbitMqEnabled) {
             $this->cockpitLogger->info('RabbitMQ communication is disabled');
 
             return;

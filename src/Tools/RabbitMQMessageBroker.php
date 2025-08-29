@@ -44,30 +44,6 @@ class RabbitMQMessageBroker
     }
 
     /**
-     * @throws Exception
-     */
-    public function processMessages(): void
-    {
-        $routingKey = $this->routingService->buildIncomingRoutingKey();
-
-        // Receive messages from RabbitMQ
-        $messages = $this->messageTransport->receiveMessages($routingKey);
-
-        // Process messages and get response data
-        $responseDataArray = $this->messageProcessor->processIncomingMessages($messages);
-
-        // Send responses back to RabbitMQ
-        foreach ($responseDataArray as $responseData) {
-            $this->sendResponseToRabbitMq(
-                $responseData['payload'],
-                $responseData['messageTypeCode'],
-                $responseData['procedureId'],
-                $responseData['auditRecordId']
-            );
-        }
-    }
-
-    /**
      * @throws AMQPTimeoutException
      * @throws Exception
      */
@@ -131,66 +107,64 @@ class RabbitMQMessageBroker
 
     /**
      * Process messages directly from a specific queue without request-response pattern
+     *
+     * @throws Exception
      */
-    public function processQueueMessages(string $queueName, int $maxMessages = null): void
+    public function processMessages(string $queueName, int $maxMessages = null): void
     {
         $maxMessages ??= $this->config->maxMessagesPerCycle;
 
-        try {
-            $this->logger->info('Direct queue consumption started', [
-                'queue' => $queueName,
-                'maxMessages' => $maxMessages
-            ]);
+        $this->logger->info('Direct queue consumption started', [
+            'queue' => $queueName,
+            'maxMessages' => $maxMessages
+        ]);
 
+        try {
             // Create direct queue consumer
             $consumer = $this->messageTransport->createDirectConsumer($queueName);
 
             $processedCount = 0;
-            $consumer->consume($maxMessages, function(AMQPMessage $message) use (&$processedCount, $consumer) {
-                try {
-                    $this->logger->info('Processing message from queue', [
-                        'messageId' => $message->has('message_id') ? $message->get('message_id') : null,
-                        'routingKey' => $message->getRoutingKey(),
-                        'body' => $message->getBody(),
-                    ]);
-
-                    $responseData = $this->messageProcessor->processIncomingMessage($message->getBody());
-
-                    // publish acknowledge message to RabbitMQ
-                    // todo: implement publishing logic
-
-                    $processedCount++;
-                    $this->logger->info('Message processed successfully', [
-                        'messageId' => $message->has('message_id') ? $message->get('message_id') : null,
-                        'processedCount' => $processedCount
-                    ]);
-
-                    return true; // ACK the message
-
-                } catch (Exception $e) {
-                    $this->logger->error('Failed to process queue message', [
-                        'error' => $e->getMessage(),
-                        'messageId' => $message->has('message_id') ? $message->get('message_id') : null,
-                        'trace' => $e->getTraceAsString()
-                    ]);
-
-                    return false; // NACK the message
-                }
+            $consumer->consume($maxMessages, function(AMQPMessage $message) use (&$processedCount) {
+                $this->processMessage($message, $processedCount);
             });
-
-            $this->logger->info('Queue consumption completed', [
-                'queue' => $queueName,
-                'processedMessages' => $processedCount
-            ]);
-
         } catch (Exception $e) {
-            $this->logger->error('Queue consumption failed', [
+            $this->logger->error('Queue consumption failed.', [
                 'queue' => $queueName,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
             throw $e;
         }
+
+        $this->logger->info('Queue consumption completed.', [
+            'queue' => $queueName,
+            'processedMessages' => $processedCount
+        ]);
+    }
+
+    /**
+     * Process a single message from the queue
+     *
+     * @param AMQPMessage $message The message to process
+     * @param int $processedCount Reference to the counter of processed messages
+     */
+    private function processMessage(AMQPMessage $message, int &$processedCount): void
+    {
+        try {
+            $responseData = $this->messageProcessor->processIncomingMessage($message->getBody());
+            // publish acknowledge message to RabbitMQ
+            // todo: implement publishing logic
+        } catch (Exception $e) {
+            $this->logger->error('Failed to process message.', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+        $processedCount++;
+        $this->logger->info('Message processed successfully.', [
+            'routingKey' => $message->getRoutingKey(),
+            'processedCount' => $processedCount
+        ]);
     }
 
     /**
@@ -200,5 +174,4 @@ class RabbitMQMessageBroker
     {
         $this->messageTransport->setClient($client);
     }
-
 }

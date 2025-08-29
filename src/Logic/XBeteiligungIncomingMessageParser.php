@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenNOK0721;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenOK0711;
@@ -26,10 +25,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
-use JMS\Serializer\Serializer;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
-use function in_array;
 
 class XBeteiligungIncomingMessageParser
 {
