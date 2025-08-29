@@ -102,7 +102,7 @@ class RabbitMQMessageBroker
         $this->sendResponseToRabbitMq(
             $xmlString,
             CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[AllgemeinStellungnahmeNeuabgegeben0701::class]['name'],
-            $statementCreated->getPlanId(), // Pass procedure ID for AGS lookup
+            $statementCreated->getProcedureId(),
             $auditRecord?->getId()
         );
 
@@ -156,7 +156,7 @@ class RabbitMQMessageBroker
     {
         try {
             $responseData = $this->messageProcessor->processIncomingMessage($message->getBody());
-            
+
             if (null !== $responseData) {
                 // Publish response message to RabbitMQ using new direct publisher
                 $this->sendResponseToRabbitMq(
