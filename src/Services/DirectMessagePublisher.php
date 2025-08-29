@@ -38,7 +38,6 @@ class DirectMessagePublisher
         $this->logger->info('Publishing message to RabbitMQ', [
             'exchange' => $exchange,
             'routingKey' => $routingKey,
-            'messageSize' => strlen($messageBody)
         ]);
 
         try {
@@ -48,15 +47,8 @@ class DirectMessagePublisher
                 'delivery_mode' => 2 // Make message persistent
             ]);
 
-            // Get channel from existing RPC client
-            $channel = $this->rpcClient->getChannel();
-
-            if (null === $channel) {
-                throw new \RuntimeException('RpcClient channel could not be established');
-            }
-
             // Publish directly to exchange with routing key
-            $channel->basic_publish($message, $exchange, $routingKey);
+            $this->rpcClient->getChannel()->basic_publish($message, $exchange, $routingKey);
 
             $this->logger->info('Message published successfully', [
                 'exchange' => $exchange,
@@ -69,6 +61,7 @@ class DirectMessagePublisher
             $this->logger->error('Failed to publish message to RabbitMQ', [
                 'exchange' => $exchange,
                 'routingKey' => $routingKey,
+                'amqpMessage' => $message ?? null,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
