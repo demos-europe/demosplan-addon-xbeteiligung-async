@@ -25,8 +25,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtrac
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAgsService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungCustomerMappingService;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;

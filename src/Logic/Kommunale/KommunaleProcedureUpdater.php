@@ -27,8 +27,7 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
      * @throws Exception
      */
     public function updateProcedure(
-        KommunalAktualisieren0402 $kommunalAktualisieren0402,
-        array $messageAttachments
+        KommunalAktualisieren0402 $kommunalAktualisieren0402
     ): ResponseValue {
         $errorTypes = [];
 
@@ -49,27 +48,24 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
             );
         }
 
-        // todo: use ProcedureServiceInterface::updateProcedureObject,
-        // and wrap it in transaction (without flush in transaction because update call handles flush)
-        // Update procedure with the data from BeteiligungKommunalType
-        $procedureUpdated = $this->transactionService->executeAndFlushInTransaction(
-            function () use ($beteiligungKommunalType, $procedureToUpdate) {
-                // Update procedure phases
-                $procedurePhaseData = $this->procedurePhaseExtractor->extract($beteiligungKommunalType);
-                $this->setProcedurePhase($procedureToUpdate, $procedurePhaseData);
-                // Update procedure description and external description
-                $description = $beteiligungKommunalType->getBeschreibungPlanungsanlass() ?? '';
-                $procedureToUpdate->setDesc($description);
-                $procedureToUpdate->setExternalDesc($description);
-                // Update procedure documents
-                $publicDocuments = $beteiligungKommunalType->getBeteiligungOeffentlichkeit()?->getAnlagen();
-                $institutionalDocuments = $beteiligungKommunalType->getBeteiligungOeffentlichkeit()?->getAnlagen();
-                // todo: implement logic to map anlagen to procedure documents
+        // Update procedure phases
+        $procedurePhaseData = $this->procedurePhaseExtractor->extract($beteiligungKommunalType);
+        $this->setProcedurePhase($procedureToUpdate, $procedurePhaseData);
+        // Update procedure description and external description
+        $description = $beteiligungKommunalType->getBeschreibungPlanungsanlass() ?? '';
+        $procedureToUpdate->setDesc($description);
+        $procedureToUpdate->setExternalDesc($description);
+        // Update procedure documents will implemented later
 
-                return $procedureToUpdate;
-            }
-        );
-
+        $connection = $this->entityManager->getConnection();
+        try {
+            $connection->beginTransaction();
+            $procedureUpdated = $this->procedureService->updateProcedureObject($procedureToUpdate);
+            $connection->commit();
+        } catch (Exception $e) {
+            $connection->rollBack();
+            $this->logger->error('Procedure could not be updated.',['errorMessage' => $e->getMessage()]);
+        }
 
         // create OK message for procedure update
         return $this->kommunaleMessageFactory->buildProcedureUpdateOKResponse412(

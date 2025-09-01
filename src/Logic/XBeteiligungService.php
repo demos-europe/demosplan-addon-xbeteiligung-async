@@ -1033,9 +1033,24 @@ class XBeteiligungService
         if (self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageStringIdentifier)
         {
             /** @var KommunalAktualisieren0402 $kommunalAktualisieren402 */
-            //$kommunalAktualisieren402 = $this->incomingMessageParser->getXmlObject($messageXml, '402');
+            $kommunalAktualisieren402 = $this->incomingMessageParser->getXmlObject($messageXml, '402');
 
-            // todo: implement update kommunal procedure handling
+            if ($auditEnabled) {
+                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier);
+            }
+
+            try {
+                $response = $this->kommunaleProcedureUpdater->updateProcedure(
+                    $kommunalAktualisieren402
+                );
+
+                $this->markAuditRecordAsProcessed($auditRecord, $response->getProcedureId());
+
+                return $response;
+            } catch (Exception $e) {
+                $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
+                throw $e;
+            }
         }
 
         if (self::NEW_STATEMENT_OK_MESSAGE_IDENTIFIER === $messageStringIdentifier)
