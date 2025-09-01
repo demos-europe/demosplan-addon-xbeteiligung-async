@@ -29,6 +29,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessag
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
@@ -45,6 +46,7 @@ use JMS\Serializer\Serializer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Log\Logger;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -94,13 +96,15 @@ class StatementCreatorTest extends TestCase
             $this->createMock(KommunaleProcedureCreater::class),
             $this->createMock(KommunaleProcedureUpdater::class),
             $this->createMock(LoggerInterface::class),
+            $this->createMock(ParameterBagInterface::class),
             $this->createMock( PlanningDocumentsLinkCreator::class),
             $this->procedureMessageRepository,
             $this->procedureNewsService,
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
-            $reusableMessageBlocks
+            $reusableMessageBlocks,
+            $this->createMock(XBeteiligungAuditService::class)
         );
         $this->XBeteiligungService = $xbeteiligungService;
         $this->logger = new Logger();

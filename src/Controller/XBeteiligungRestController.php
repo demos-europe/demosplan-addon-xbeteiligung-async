@@ -55,7 +55,39 @@ class XBeteiligungRestController extends APIController
         XBeteiligungService $xBeteiligungService,
         LoggerInterface $logger
     ): Response {
+        return $this->processProcedureRequest($request, $xBeteiligungService, $logger, 'creation');
+    }
 
+    /**
+     * Updates a procedure via XBeteiligung REST API instead of using RabbitMQ.
+     * This endpoint handles procedure update messages (402/302/202).
+     *
+     * @throws JsonException
+     */
+    #[Route(
+        path: '/addon/xbeteiligung/procedure/update',
+        name: 'dplan_addon_xbeteiligung_procedure_update',
+        methods: ['PATCH']
+    )]
+    public function updateProcedure(
+        Request $request,
+        XBeteiligungService $xBeteiligungService,
+        LoggerInterface $logger
+    ): Response {
+        return $this->processProcedureRequest($request, $xBeteiligungService, $logger, 'update');
+    }
+
+    /**
+     * Common logic for processing XBeteiligung procedure requests (create/update).
+     *
+     * @throws JsonException
+     */
+    private function processProcedureRequest(
+        Request $request,
+        XBeteiligungService $xBeteiligungService,
+        LoggerInterface $logger,
+        string $operationType
+    ): Response {
         try {
             // Verify that the request has a valid API token using a custom header specific to XBeteiligung
             if ($this->hasNoValidAuthToken($request->headers->get('X-Addon-XBeteiligung-Authorization'))) {
@@ -77,7 +109,7 @@ class XBeteiligungRestController extends APIController
                 'messageTypeCode' => $messageTypeCode
             ];
 
-            $logger->info('Processing XBeteiligung procedure creation request', [
+            $logger->info("Processing XBeteiligung procedure {$operationType} request", [
                 'messageTypeCode' => $messageTypeCode,
                 'xmlStartsWith' => substr($xmlContent, 0, 200), // First 200 chars for debugging
                 'content_length' => strlen($xmlContent)
@@ -87,30 +119,30 @@ class XBeteiligungRestController extends APIController
             $responseObject = $xBeteiligungService->determineMessageContextAndDelegateAction($message);
 
             // Prepare the XML response
-            $xmlPayload = $responseObject->getPayload();
+            $xmlPayload = $responseObject->getMessageXml();
             $response = new Response($xmlPayload);
             $response->headers->set('Content-Type', 'application/xml');
 
         } catch (Exception $e) {
             // Determine the appropriate status code and message based on the exception type
             $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
-            $message = 'Error processing procedure creation request: ' . $e->getMessage();
+            $message = "Error processing procedure {$operationType} request: " . $e->getMessage();
             $logContext = [$e, $e->getTraceAsString()];
-            $logMessage = 'Error processing procedure creation request';
+            $logMessage = "Error processing procedure {$operationType} request";
 
             if ($e instanceof AccessDeniedException) {
                 // Handle unauthorized access (401 Unauthorized)
                 $statusCode = Response::HTTP_UNAUTHORIZED;
                 $message = 'Unauthorized';
-                $logMessage = 'Unauthorized access attempt to XBeteiligung procedure creation: Invalid X-Addon-XBeteiligung-Authorization header';
+                $logMessage = "Unauthorized access attempt to XBeteiligung procedure {$operationType}: Invalid X-Addon-XBeteiligung-Authorization header";
                 $logContext = [$e];
             } elseif ($e instanceof InvalidArgumentException || $e instanceof SchemaException) {
                 // Handle validation errors (400 Bad Request)
                 $statusCode = Response::HTTP_BAD_REQUEST;
                 $message = $e->getMessage();
                 $logMessage = $e instanceof SchemaException
-                    ? 'XBeteiligung procedure creation message could not be parsed'
-                    : 'XBeteiligung procedure creation payload not supported';
+                    ? "XBeteiligung procedure {$operationType} message could not be parsed"
+                    : "XBeteiligung procedure {$operationType} payload not supported";
                 $logContext = [$e];
             }
 
@@ -181,11 +213,11 @@ class XBeteiligungRestController extends APIController
                     return $type;
                 }
             }
-            
+
             // Extract the root element to make a better guess
             if (preg_match('/<([^:\s>]+:)?([^:\s>]+)/', $xmlContent, $matches)) {
                 $rootElement = $matches[2] ?? '';
-                
+
                 // If we found a root element, try to match it against code patterns
                 foreach ($codePatterns as $type => $pattern) {
                     if (preg_match($pattern, $rootElement)) {
@@ -193,7 +225,7 @@ class XBeteiligungRestController extends APIController
                     }
                 }
             }
-            
+
             // As a last resort, check if any of the codes appear in the XML
             foreach ($codePatterns as $type => $pattern) {
                 if (preg_match($pattern, $xmlContent)) {

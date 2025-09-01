@@ -22,7 +22,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Code\CodeType:
             expose: true
             access_type: public_method
             serialized_name: code
-            xml_element: {}
+            xml_element:
                 # namespace: 'http://xoev.de/schemata/code/1_0'
             accessor:
                 getter: getCode
@@ -32,7 +32,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Code\CodeType:
             expose: true
             access_type: public_method
             serialized_name: name
-            xml_element: {}
+            xml_element:
                 # namespace: 'http://xoev.de/schemata/code/1_0'
             accessor:
                 getter: getName

@@ -12,8 +12,9 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenNOK0721;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenOK0711;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschen0409;
@@ -24,10 +25,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
-use JMS\Serializer\Serializer;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
-use function in_array;
 
 class XBeteiligungIncomingMessageParser
 {
@@ -70,6 +69,14 @@ class XBeteiligungIncomingMessageParser
         '209' => [
             'class' => PlanfeststellungLoeschen0209::class,
             'identifier' => XBeteiligungService::DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
+        ],
+        '711' => [
+            'class' => AllgemeinStellungnahmeNeuabgegebenOK0711::class,
+            'identifier' => XBeteiligungService::NEW_STATEMENT_OK_MESSAGE_IDENTIFIER
+        ],
+        '721' => [
+            'class' => AllgemeinStellungnahmeNeuabgegebenNOK0721::class,
+            'identifier' => XBeteiligungService::NEW_STATEMENT_NOK_MESSAGE_IDENTIFIER
         ],
     ];
 
@@ -183,23 +190,26 @@ class XBeteiligungIncomingMessageParser
         return $simpleXML;
     }
 
+    /**
+     * Validates that the incoming XML contains the expected xBeteiligung namespace.
+     *
+     * The primary namespace for this addon is XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
+     * as we implement the xBeteiligung standard for public participation workflows.
+     *
+     * XPlan namespace (xplanverfahren.de/V14) is for spatial planning data exchange and is often
+     * declared in XML for compatibility but typically unused in actual message content, so it serves as a fallback only.
+     */
     private function validateRequiredNamespace(SimpleXMLElement $simpleXML): void
     {
         $namespaces = $simpleXML->getNamespaces();
         $this->logger->info('XML namespaces', ['namespaces' => $namespaces]);
 
-        // Check for our expected namespace
-        $expectedNamespace = 'http://xplanverfahren.de/'.XBeteiligungResponseMessageFactory::XBETEILIGUNG_VERSION;
-        if (in_array($expectedNamespace, $namespaces, true)) {
-            return;
-        }
-
-        // Also accept the XLeitstelle namespace that may be used in incoming messages
-        $xleitstelleNamespace = 'https://www.xleitstelle.de/xbeteiligung/1';
+        // Check for our primary expected namespace (XLeitstelle xBeteiligung 1.2)
+        $expectedNamespace = 'https://www.xleitstelle.de/xbeteiligung/12';
         foreach ($namespaces as $prefix => $namespace) {
-            if ($namespace === $xleitstelleNamespace) {
-                $this->logger->info('Found acceptable XLeitstelle namespace', [
-                    'namespace' => $xleitstelleNamespace
+            if ($namespace === $expectedNamespace) {
+                $this->logger->info('Found expected XLeitstelle xBeteiligung namespace', [
+                    'namespace' => $expectedNamespace
                 ]);
                 return;
             }
@@ -207,7 +217,6 @@ class XBeteiligungIncomingMessageParser
 
         $this->logger->warning('Missing expected namespace', [
             'expected' => $expectedNamespace,
-            'alternative' => $xleitstelleNamespace,
             'found' => $namespaces
         ]);
     }

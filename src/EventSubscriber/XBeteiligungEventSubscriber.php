@@ -19,6 +19,7 @@ use DemosEurope\DemosplanAddon\Contracts\Events\PostNewProcedureCreatedEventInte
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
+use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
@@ -26,7 +27,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use Exception;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -34,13 +34,13 @@ use Symfony\Contracts\Cache\ItemInterface;
 class XBeteiligungEventSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly PermissionEvaluatorInterface $permissionEvaluator,
-        private readonly XBeteiligungDebugger         $xBeteiligungDebugger,
-        private readonly XBeteiligungService          $xBeteiligungService,
-        private readonly CacheInterface               $cache,
-        private readonly ParameterBagInterface        $parameterBag,
-        private readonly LoggerInterface              $cockpitLogger,
-        private readonly RabbitMQMessageBroker        $rabbitMQMessageBroker,
+        private readonly PermissionEvaluatorInterface            $permissionEvaluator,
+        private readonly XBeteiligungDebugger                    $xBeteiligungDebugger,
+        private readonly XBeteiligungService                     $xBeteiligungService,
+        private readonly CacheInterface                          $cache,
+        private readonly XBeteiligungConfiguration               $config,
+        private readonly LoggerInterface                         $cockpitLogger,
+        private readonly RabbitMQMessageBroker                   $rabbitMQMessageBroker,
     ) {
     }
 
@@ -59,27 +59,31 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 
     public function handleAddonMaintenanceEvent(AddonMaintenanceEventInterface $event): void
     {
-        if (false === $this->parameterBag->get('addon_xbeteiligung_async_enable_rabbitmq_communication')) {
+        if (false === $this->config->rabbitMqEnabled) {
             $this->cockpitLogger->info('RabbitMQ communication is disabled');
 
             return;
         }
         try {
             $this->cache->get('MessageBrokerDelay', function (ItemInterface $item): void {
-                $ttl = $this->parameterBag->get('addon_xbeteiligung_async_rabbitmq_communication_delay');
-                $this->cockpitLogger->info('Fetch RabbitMQ Messages with delay '.$ttl);
+                $ttl = $this->config->communicationDelay;
+                $this->cockpitLogger->info('Starting XBeteiligung maintenance cycle with delay '.$ttl);
                 $item->expiresAfter($ttl);
 
-                $this->rabbitMQMessageBroker->processMessages();
+                $queueName = $this->config->getQueueName();
+                $this->cockpitLogger->info('Processing messages from queue.', [
+                    'queue' => $queueName,
+                ]);
+                $this->rabbitMQMessageBroker->processMessages($queueName);
             });
         } catch (Exception $e) {
-            $this->cockpitLogger->warning('failed to get procedure-create messages', [$e]);
+            $this->cockpitLogger->error('Failed to process XBeteiligung messages', [$e]);
         }
     }
 
     public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): void
     {
-        if (false === $this->parameterBag->get('addon_xbeteiligung_async_enable_rabbitmq_communication')) {
+        if (false === $this->config->rabbitMqEnabled) {
             $this->cockpitLogger->info('RabbitMQ communication is disabled');
 
             return;
@@ -113,6 +117,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
             $this->createProcedureMessage($xml, $event->getProcedure(), RaumordnungInitiieren0301::class);
         }
     }
+
 
     private function createProcedureMessage(string $xml, ProcedureInterface $procedure, string $messageClass): void
     {

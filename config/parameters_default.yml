@@ -21,8 +21,22 @@ parameters:
   # Maximum time in seconds we are allowed to rabbitMQ Message Broker
   addon_xbeteiligung_async_rabbitmq_communication_delay: 300
 
+  # Timeout for RabbitMQ requests in seconds
+  addon_xbeteiligung_async_rabbitMqRequestTimeout: 30
+
   addon_xbeteiligung_async_rabbitMqQueueName: 'XBeteiligungAddon'
 
   addon_xbeteiligung_async_rabbitMqRequestIdGet: 'XBeteiligung_Get'
 
   addon_xbeteiligung_async_rabbitMqRequestIdSend: 'XBeteiligung_Send'
+
+  # === XBeteiligung Message Audit Configuration ===
+  # Enable/disable comprehensive message audit logging
+  addon_xbeteiligung_async_enable_audit: true
+
+  # === Direct Queue Consumption Configuration ===
+  # Maximum number of messages to process per maintenance cycle
+  addon_xbeteiligung_async_max_messages_per_cycle: 10
+
+  # Consumer timeout in seconds for individual message processing
+  addon_xbeteiligung_async_consumer_timeout: 5

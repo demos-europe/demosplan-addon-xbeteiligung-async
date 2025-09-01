@@ -2,8 +2,8 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Entity;
 use DateTime;
-
 use DemosEurope\DemosplanAddon\Contracts\Entities\UuidEntityInterface;
+use DemosEurope\DemosplanAddon\Doctrine\Generator\UuidV4Generator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -18,7 +18,7 @@ class ProcedureMessage implements UuidEntityInterface
     #[ORM\Column(type: 'string', length: 36, nullable: false, options:['fixed' => true])]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(class: \demosplan\DemosPlanCoreBundle\Doctrine\Generator\UuidV4Generator::class)]
+    #[ORM\CustomIdGenerator(class: UuidV4Generator::class)]
     private ?string $id;
 
     #[ORM\Column(name: 'procedure_id', length: 36, type: 'string', nullable: false)]
@@ -43,6 +43,9 @@ class ProcedureMessage implements UuidEntityInterface
 
     #[ORM\Column(type: "integer", nullable: false, options: ["default" => 0])]
     private int $requestCount;
+
+    #[ORM\Column(name: 'audit_id', type: 'string', length: 36, nullable: true)]
+    private ?string $auditId = null;
 
     public function __construct(
         string $message,
@@ -101,5 +104,15 @@ class ProcedureMessage implements UuidEntityInterface
     public function getProcedureId(): string
     {
         return $this->procedureId;
+    }
+
+    public function getAuditId(): ?string
+    {
+        return $this->auditId;
+    }
+
+    public function setAuditId(?string $auditId): void
+    {
+        $this->auditId = $auditId;
     }
 }

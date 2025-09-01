@@ -35,7 +35,8 @@ class KommunaleProcedureHandlerFactory
 
         $commonDependencies = [
             $this->mockFactory->getCurrentUserProviderInterfaceMock(),
-            $this->mockFactory->getEntityManagerMock(), // THIS IS THE CORRECT ORDER - EntityManager must be second!
+            $this->mockFactory->getCustomerServiceInterfaceMock(),
+            $this->mockFactory->getEntityManagerMock(),
             $this->mockFactory->getKommunaleResponseMessageFactory(),
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
@@ -48,6 +49,8 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getTranslatorMock(),
             $this->mockFactory->getUserHandlerMock(),
             $this->mockFactory->getOrgaServiceInterfaceMock(),
+            $this->mockFactory->getXBeteiligungAgsServiceMock(),
+            $this->mockFactory->getXBeteiligungCustomerMappingServiceMock(),
             $mapService
         ];
 

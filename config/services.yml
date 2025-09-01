@@ -22,6 +22,10 @@ services:
     DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAnySimpleTypeHandler:
         lazy: true
 
+    DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration:
+        factory: [ 'DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration', 'fromParameterBag' ]
+        arguments: [ '@parameter_bag' ]
+
     DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker:
         calls:
             - [ 'setClient', [ '@old_sound_rabbit_mq.demos_plan_import_rpc' ] ]
@@ -30,3 +34,7 @@ services:
     DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository:
         arguments:
             $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage'
+
+    DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungMessageAuditRepository:
+        arguments:
+            $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit'
