@@ -44,15 +44,13 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
                 $updatedProcedure
             );
         } catch (XBeteiligungProcedureException $e) {
-            $this->logger->error('XBeteiligung procedure update failed', [
-                'message' => $e->getMessage(),
-                'errorCount' => count($e->getErrorTypes())
+            $this->logger->error(self::PROCEDURE_UPDATE_FAILED_ERROR_DESCRIPTION, [
+                'message' => $e->getMessage()
             ]);
             return $this->buildErrorResponse($e->getErrorTypes(), $message);
         } catch (Exception $e) {
-            $this->logger->error('Unexpected error during procedure update', [
-                'errorMessage' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+            $this->logger->error(self::PROCEDURE_UPDATE_FAILED_ERROR_DESCRIPTION, [
+                'errorMessage' => $e->getMessage()
             ]);
             return $this->buildGenericErrorResponse($e->getMessage(), $message);
         }
@@ -61,7 +59,7 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
     private function validateAndExtractBeteiligung(KommunalAktualisieren0402 $message): BeteiligungKommunalType
     {
         $beteiligungKommunal = $message->getNachrichteninhalt()?->getBeteiligung();
-        
+
         if (null === $beteiligungKommunal) {
             throw new XBeteiligungProcedureException(
                 [$this->getErrorType(
@@ -80,7 +78,7 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         $procedure = $this->procedureService->getProcedure(
             $beteiligungKommunal->getBeteiligungOeffentlichkeit()?->getBeteiligungsID()
         );
-        
+
         if (null === $procedure) {
             $procedure = $this->procedureService->getProcedure(
                 $beteiligungKommunal->getBeteiligungTOEB()?->getBeteiligungsID()
@@ -107,28 +105,28 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         // Update procedure phases
         $procedurePhaseData = $this->procedurePhaseExtractor->extract($beteiligungKommunal);
         $this->setProcedurePhase($procedure, $procedurePhaseData);
-        
+
         // Update procedure description and external description
         $description = $beteiligungKommunal->getBeschreibungPlanungsanlass() ?? '';
         $procedure->setDesc($description);
         $procedure->setExternalDesc($description);
-        
+
         // Update procedure documents will implemented later
     }
 
     private function saveProcedureWithTransaction(ProcedureInterface $procedure): ProcedureInterface
     {
         $connection = $this->entityManager->getConnection();
-        
+
         try {
             $connection->beginTransaction();
             $updatedProcedure = $this->procedureService->updateProcedureObject($procedure);
             $connection->commit();
-            
+
             return $updatedProcedure;
         } catch (Exception $e) {
             $connection->rollBack();
-            
+
             throw new XBeteiligungProcedureException(
                 [$this->getErrorType(
                     XBeteiligungService::GENERIC_ERROR_CODE,
@@ -155,7 +153,7 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
             XBeteiligungService::GENERIC_ERROR_CODE,
             $errorMessage
         )];
-        
+
         return $this->buildErrorResponse($errorTypes, $message);
     }
 }
