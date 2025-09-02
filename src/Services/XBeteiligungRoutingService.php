@@ -20,6 +20,12 @@ use Psr\Log\LoggerInterface;
 
 class XBeteiligungRoutingService
 {
+    /** Test environment AGS code identifier used in development/testing */
+    private const TEST_ENVIRONMENT_AGS_CODE = 'xyz:0001';
+    
+    /** Pre-built routing key part for test environment messages */
+    private const TEST_ENVIRONMENT_ROUTING_PART = 'xyz.00.02.xyz.00.01';
+
     public function __construct(
         private readonly XBeteiligungConfiguration $config,
         private readonly XBeteiligungAgsService $agsService,
@@ -60,8 +66,8 @@ class XBeteiligungRoutingService
                     sprintf('Cannot build routing key: No AGS codes found for procedure %s', $procedureId ?? 'null')
                 );
             }
-            if ('xyz:0001' === $agsData['sender']) {
-                $agsPart = 'xyz.00.02.xyz.00.01';
+            if (self::TEST_ENVIRONMENT_AGS_CODE === $agsData['sender']) {
+                $agsPart = self::TEST_ENVIRONMENT_ROUTING_PART;
             } else {
                 $agsPart = $this->config->xoevAddressPrefixKommunal.'.'.$agsData['receiver'].'.'.
                     $this->config->xoevAddressPrefixCockpit.'.'.$agsData['sender'];
