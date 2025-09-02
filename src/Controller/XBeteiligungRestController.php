@@ -101,22 +101,13 @@ class XBeteiligungRestController extends APIController
                 throw new InvalidArgumentException('Empty request payload');
             }
 
-            // Create a message structure expected by the service
-            // We'll extract the message type from the XML content for logging
-            $messageTypeCode = $this->extractMessageTypeFromXml($xmlContent);
-            $message = [
-                'messageData' => $xmlContent,
-                'messageTypeCode' => $messageTypeCode
-            ];
-
             $logger->info("Processing XBeteiligung procedure {$operationType} request", [
-                'messageTypeCode' => $messageTypeCode,
                 'xmlStartsWith' => substr($xmlContent, 0, 200), // First 200 chars for debugging
                 'content_length' => strlen($xmlContent)
             ]);
 
             // Process the message using the same service that RabbitMQ would use
-            $responseObject = $xBeteiligungService->determineMessageContextAndDelegateAction($message);
+            $responseObject = $xBeteiligungService->processXmlMessage($xmlContent);
 
             // Prepare the XML response
             $xmlPayload = $responseObject->getMessageXml();

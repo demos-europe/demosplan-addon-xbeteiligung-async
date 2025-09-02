@@ -125,17 +125,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         return $this->kommunaleMessageFactory->buildProcedureCreatedErrorResponse421($errorTypes, $xmlObject401);
     }
 
-    private function getErrorType(string $errorCode, string $errorDescription): FehlerType
-    {
-        $errorCodeType = new CodeFehlerartType();
-        $errorCodeType->setCode($errorCode);
-        $errorType = new FehlerType();
-        $errorType->setBeschreibung($errorDescription);
-        $errorType->setArt($errorCodeType);
-
-        return $errorType;
-    }
-
     /**
      * @throws FormatException
      * @throws Exception
@@ -194,40 +183,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 return $procedure;
             }
         );
-    }
-
-    private function setProcedurePhase(
-        ProcedureInterface $procedure,
-        ProcedurePhaseData $procedurePhaseData,
-    ): void {
-        if (null !== $procedurePhaseData->getPublicParticipationPhase()) {
-            $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhase()->getKey());
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationPhase()) {
-            $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhase()->getKey());
-        }
-        if (null !== $procedurePhaseData->getPublicParticipationStartDate()) {
-            $procedure->setPublicParticipationStartDate($procedurePhaseData->getPublicParticipationStartDate());
-        }
-        if (null !== $procedurePhaseData->getPublicParticipationEndDate()) {
-            $procedure->setPublicParticipationEndDate($procedurePhaseData->getPublicParticipationEndDate());
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationStartDate()) {
-            $procedure->setStartDate($procedurePhaseData->getInstitutionParticipationStartDate());
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationEndDate()) {
-            $procedure->setEndDate($procedurePhaseData->getInstitutionParticipationEndDate());
-        }
-        if (null !== $procedurePhaseData->getPublicParticipationIteration()) {
-            $procedure->getPublicParticipationPhaseObject()->setIteration(
-                $procedurePhaseData->getPublicParticipationIteration()
-            );
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationIteration()) {
-            $procedure->getPhaseObject()->setIteration(
-                $procedurePhaseData->getInstitutionParticipationIteration()
-            );
-        }
     }
 
     /**
