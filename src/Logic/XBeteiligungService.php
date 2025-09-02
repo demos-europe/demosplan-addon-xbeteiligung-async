@@ -132,6 +132,9 @@ class XBeteiligungService
 
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
+    
+    /** Statement ID prefix that needs to be removed for database storage */
+    private const STATEMENT_ID_PREFIX = 'ID_';
     public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.0401';
     public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Aktualisieren.0402';
     public const DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Loeschen.0409';
@@ -960,7 +963,9 @@ class XBeteiligungService
         {
             /** @var AllgemeinStellungnahmeNeuabgegebenOK0711 $newStatementOK711 */
             $newStatementOK711 = $this->incomingMessageParser->getXmlObject($messageXml, '711');
-            $statementId = $newStatementOK711->getNachrichteninhalt()?->getStellungnahmeID();
+            $statementId = $this->removeStatementIdPrefix(
+                $newStatementOK711->getNachrichteninhalt()?->getStellungnahmeID()
+            );
 
             if ($auditEnabled) {
                 // Find original 701 message to get procedureId, planId and for correlation
@@ -989,7 +994,9 @@ class XBeteiligungService
         if (self::NEW_STATEMENT_NOK_MESSAGE_IDENTIFIER === $messageStringIdentifier) {
             /** @var AllgemeinStellungnahmeNeuabgegebenNOK0721 $newStatementNOK721 */
             $newStatementNOK721 = $this->incomingMessageParser->getXmlObject($messageXml, '721');
-            $statementId = $newStatementNOK721->getNachrichteninhalt()?->getStellungnahmeID();
+            $statementId = $this->removeStatementIdPrefix(
+                $newStatementNOK721->getNachrichteninhalt()?->getStellungnahmeID()
+            );
             $errorMessagesArray = $newStatementNOK721->getNachrichteninhalt()?->getFehler();
             $errorMessagesString = $this->extractErrorDescriptions($errorMessagesArray);
 
@@ -1088,6 +1095,21 @@ class XBeteiligungService
         }
 
         return self::UNKNOWN_MESSAGE_TYPE;
+    }
+
+    /**
+     * Remove ID_ prefix from statement ID if present
+     * 
+     * @param string|null $statementId The statement ID that may contain ID_ prefix
+     * @return string|null The statement ID without ID_ prefix
+     */
+    private function removeStatementIdPrefix(?string $statementId): ?string
+    {
+        if (null === $statementId) {
+            return null;
+        }
+        
+        return str_replace(self::STATEMENT_ID_PREFIX, '', $statementId);
     }
 
     /**

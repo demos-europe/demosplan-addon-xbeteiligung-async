@@ -2,6 +2,12 @@
 
 ## UNRELEASED
 
+**Statement ID Processing Improvements**
+- Added `removeStatementIdPrefix()` method to remove `ID_` prefix from statement IDs
+- Applied prefix removal to both 0711 (OK) and 0721 (NOK) statement response processing
+- Added `STATEMENT_ID_PREFIX` constant to avoid magic strings
+- Fixed statement ID length issues for database storage
+
 **Kommunale Procedure Update Implementation (DPLAN-15682)**
 - Complete error handling in `KommunaleProcedureUpdater`
 - Moved `getErrorType()` method to `ProcedureCommonFeatures` base class
