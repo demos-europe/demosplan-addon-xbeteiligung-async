@@ -2,6 +2,14 @@
 
 ## UNRELEASED
 
+**Kommunale Procedure Update Implementation (DPLAN-15682)**
+- Complete error handling in `KommunaleProcedureUpdater`
+- Moved `getErrorType()` method to `ProcedureCommonFeatures` base class
+- Updated to use `ProcedureServiceInterface::updateProcedureObject()` with
+direct EntityManager transactions
+- Replaced `determineMessageContextAndDelegateAction()` with streamlined
+`processXmlMessage()` method
+
 ## v0.21 (2025-08-29)
 **RabbitMQ Direct Operations Implementation**
 
