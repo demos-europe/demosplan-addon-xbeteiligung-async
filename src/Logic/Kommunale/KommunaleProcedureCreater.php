@@ -262,7 +262,12 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             $senderAgs = $agsCodes['sender'];
 
             if (null !== $senderAgs) {
-                $customer = $this->customerMappingService->getCustomerByAgsCode($senderAgs);
+                if ('xyz:0001' === $senderAgs) {
+                    $customer = 'hh';
+                } else
+                {
+                    $customer = $this->customerMappingService->getCustomerByAgsCode($senderAgs);
+                }
 
                 $this->logger->info('Successfully mapped AGS code to customer for 401 message', [
                     'senderAgs' => $senderAgs,
