@@ -44,6 +44,11 @@ use function sprintf;
 
 class KommunaleProcedureCreater extends ProcedureCommonFeatures
 {
+    /** Test environment AGS code identifier used in development/testing */
+    private const TEST_ENVIRONMENT_AGS_CODE = 'xyz:0001';
+    
+    /** Default customer subdomain for test environment procedures */
+    private const TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN = 'hh';
 
     /**
      * Creates a procedure from an incoming XBeteiligung message.
@@ -262,7 +267,12 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             $senderAgs = $agsCodes['sender'];
 
             if (null !== $senderAgs) {
-                $customer = $this->customerMappingService->getCustomerByAgsCode($senderAgs);
+                if (self::TEST_ENVIRONMENT_AGS_CODE === $senderAgs) {
+                    $customer = $this->customerService->findCustomerBySubdomain(self::TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN);
+                } else
+                {
+                    $customer = $this->customerMappingService->getCustomerByAgsCode($senderAgs);
+                }
 
                 $this->logger->info('Successfully mapped AGS code to customer for 401 message', [
                     'senderAgs' => $senderAgs,

@@ -2,6 +2,12 @@
 
 ## UNRELEASED
 
+**Routing Key Processing Improvements**
+- Enhanced `XBeteiligungRoutingService::buildOutgoingRoutingKey()` to handle test environment routing keys
+- Added special handling for `xyz:0001` AGS codes in test environment 
+- Improved routing key format generation for both test and production environments
+- Fixed routing key structure to match expected format: `{project}.beteiligung.{agsPart}.{messageType}`
+
 **Kommunale Procedure Update Implementation (DPLAN-15682)**
 - Complete error handling in `KommunaleProcedureUpdater`
 - Moved `getErrorType()` method to `ProcedureCommonFeatures` base class
