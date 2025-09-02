@@ -25,6 +25,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtrac
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeFehlerartType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -87,5 +89,16 @@ abstract class ProcedureCommonFeatures
                 $procedurePhaseData->getInstitutionParticipationIteration()
             );
         }
+    }
+
+    protected function getErrorType(string $errorCode, string $errorDescription): FehlerType
+    {
+        $errorCodeType = new CodeFehlerartType();
+        $errorCodeType->setCode($errorCode);
+        $errorType = new FehlerType();
+        $errorType->setBeschreibung($errorDescription);
+        $errorType->setArt($errorCodeType);
+
+        return $errorType;
     }
 }
