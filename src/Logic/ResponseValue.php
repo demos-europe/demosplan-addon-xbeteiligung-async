@@ -18,9 +18,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ValueObject;
 class ResponseValue extends ValueObject
 {
     /** XML string */
-    protected string $messageXml;
+    protected string $messageXml = '';
 
-    protected string $messageStringIdentifier;
+    protected string $messageStringIdentifier = '';
 
     /** Procedure ID created during message processing */
     protected ?string $procedureId = null;
