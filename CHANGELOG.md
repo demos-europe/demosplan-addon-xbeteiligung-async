@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 
+## v0.22 (2025-09-03)
 **Statement ID Processing Improvements**
 - Added `removeStatementIdPrefix()` method to remove `ID_` prefix from statement IDs
 - Applied prefix removal to both 0711 (OK) and 0721 (NOK) statement response processing
