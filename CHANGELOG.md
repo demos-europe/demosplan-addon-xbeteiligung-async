@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 
+## v0.23 (2025-09-03)
 **Bug Fixes**
 - Fixed uninitialized typed property error in ResponseValue class
 
