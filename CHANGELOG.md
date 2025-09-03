@@ -2,6 +2,9 @@
 
 ## UNRELEASED
 
+**Bug Fixes**
+- Fixed uninitialized typed property error in ResponseValue class
+
 ## v0.22 (2025-09-03)
 **Statement ID Processing Improvements**
 - Added `removeStatementIdPrefix()` method to remove `ID_` prefix from statement IDs
