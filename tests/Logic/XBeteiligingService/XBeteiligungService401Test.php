@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\XBeteiligingService;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 
 class XBeteiligungService401Test extends XBeteiligungServiceTest
@@ -34,5 +36,12 @@ class XBeteiligungService401Test extends XBeteiligungServiceTest
     {
         $procedureXml = $this->sut->createProcedureNew401FromObject($this->testProcedureWithoutBBox);
         $this->validateProcedureXML($procedureXml, KommunalInitiieren0401::class);
+    }
+
+    public function testPlanfeststellungNeu0201(): void
+    {
+        $procedureXml = $this->sut->createXMLFor201($this->testProcedure);
+
+        $this->validateProcedureXML($procedureXml, PlanfeststellungInitiieren0201::class);
     }
 }

@@ -29,7 +29,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Code\CodeType:
                 setter: setCode
             type: string
         name:
-            expose: true
+            expose: false
             access_type: public_method
             serialized_name: name
             xml_element:

@@ -344,6 +344,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'action'                                                        => 'new',
             'r_master'                                                      => 'false',
             'r_copymaster'                                                  => $this->procedureService->getMasterTemplateId(),
+            //this might be different from planfest (might use legacy name)
             'r_procedure_type'                                              => $this->procedureTypeService->getProcedureTypeByName('Bauleitplanung')?->getId(),
             'xtaPlanId'                                                     => $procedureObject->getPlanID(),
         ];

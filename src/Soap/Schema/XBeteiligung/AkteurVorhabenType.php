@@ -23,7 +23,7 @@ class AkteurVorhabenType
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType\WeitereAkteureAnonymousPHPType[] $weitereAkteure
      */
     private $weitereAkteure = [
-        
+
     ];
 
     /**
