@@ -2,6 +2,10 @@
 
 ## UNRELEASED
 
+**Bug Fixes**
+- Added fallback logic for ProcedureType name resolution in KommunaleProcedureCreater
+- Fixed "invalid procedureTypeId value" error by trying production name 'Allgemeine Beteiligung' first, then fallback to test name 'Bauleitplanung'
+
 ## v0.23 (2025-09-03)
 **Bug Fixes**
 - Fixed uninitialized typed property error in ResponseValue class
