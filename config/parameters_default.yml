@@ -11,6 +11,10 @@ parameters:
   # XBeteiligung Async REST API authentication token
   addon_xbeteiligung_async_rest_authentication: ""
 
+  # ProcedureType name to use for XBeteiligung procedure creation
+  # Common values: "Allgemeine Beteiligung" (production), "Bauleitplanung" (test)
+  addon_xbeteiligung_async_procedure_type_name: "Allgemeine Beteiligung"
+
   # String to determine which type of procedure messages should be generated.
   # For Example: Kommunal, Raumordnung or Planfeststellung
   addon_xbeteiligung_async_procedure_message_type: ""

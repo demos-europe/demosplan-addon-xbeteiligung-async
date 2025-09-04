@@ -2,6 +2,12 @@
 
 ## UNRELEASED
 
+**Features**
+- Added configurable procedure type name support via `addon_xbeteiligung_async_procedure_type_name` parameter
+
+**Bug Fixes**
+- Fixed "invalid procedureTypeId value" error by implementing parameter-based procedure type name configuration
+
 ## v0.23 (2025-09-03)
 **Bug Fixes**
 - Fixed uninitialized typed property error in ResponseValue class

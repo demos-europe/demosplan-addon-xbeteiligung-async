@@ -28,6 +28,7 @@ readonly class XBeteiligungConfiguration
         public string $xoevAddressPrefixCockpit,
         public int $maxMessagesPerCycle,
         public int $consumerTimeout,
+        public string $procedureTypeName,
     ) {
         if ($this->requestTimeout <= 0) {
             throw new InvalidArgumentException('Request timeout must be positive');
@@ -50,6 +51,10 @@ readonly class XBeteiligungConfiguration
                 )
             );
         }
+
+        if (empty($this->procedureTypeName)) {
+            throw new InvalidArgumentException('Procedure type name cannot be empty');
+        }
     }
 
     public static function fromParameterBag(ParameterBagInterface $params): self
@@ -65,6 +70,7 @@ readonly class XBeteiligungConfiguration
             'bap',
             $params->get('addon_xbeteiligung_async_max_messages_per_cycle'),
             $params->get('addon_xbeteiligung_async_consumer_timeout'),
+            $params->get('addon_xbeteiligung_async_procedure_type_name'),
         );
     }
 
