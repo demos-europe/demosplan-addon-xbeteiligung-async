@@ -25,6 +25,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtrac
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeFehlerartType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
@@ -53,6 +54,7 @@ abstract class ProcedureCommonFeatures
         protected readonly XBeteiligungAgsService             $agsService,
         protected readonly XBeteiligungCustomerMappingService $customerMappingService,
         protected readonly XBeteiligungMapService             $xbeteiligungMapService,
+        protected readonly XBeteiligungConfiguration          $xbeteiligungConfiguration,
     )
     {
     }

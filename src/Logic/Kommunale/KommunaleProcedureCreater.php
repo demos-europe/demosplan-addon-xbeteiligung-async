@@ -46,8 +46,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     /** Default customer subdomain for test environment procedures */
     private const TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN = 'hh';
 
-    private const PROCEDURE_TYPE_NAME_PROD = 'Allgemeine Beteiligung';
-    private const PROCEDURE_TYPE_NAME_TEST = 'Bauleitplanung';
 
     /**
      * Creates a procedure from an incoming XBeteiligung message.
@@ -314,17 +312,13 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     }
 
     /**
-     * Gets the ProcedureType ID by trying production name first, then test name as fallback
+     * Gets the ProcedureType ID using configured procedure type name
      */
     private function getProcedureTypeId(): ?string
     {
-        // Try production name first
-        $procedureType = $this->procedureTypeService->getProcedureTypeByName(self::PROCEDURE_TYPE_NAME_PROD);
-        
-        if (null === $procedureType) {
-            // Fallback to test name if production name not found
-            $procedureType = $this->procedureTypeService->getProcedureTypeByName(self::PROCEDURE_TYPE_NAME_TEST);
-        }
+        $procedureType = $this->procedureTypeService->getProcedureTypeByName(
+            $this->xbeteiligungConfiguration->procedureTypeName
+        );
         
         return $procedureType?->getId();
     }
