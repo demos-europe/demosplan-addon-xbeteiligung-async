@@ -2,6 +2,8 @@
 
 ## UNRELEASED
 
+## v0.24 (2025-09-04)
+
 **Features**
 - Added configurable procedure type name support via `addon_xbeteiligung_async_procedure_type_name` parameter
 
