@@ -2,9 +2,11 @@
 
 ## UNRELEASED
 
+**Features**
+- Added configurable procedure type name support via `addon_xbeteiligung_async_procedure_type_name` parameter
+
 **Bug Fixes**
-- Added fallback logic for ProcedureType name resolution in KommunaleProcedureCreater
-- Fixed "invalid procedureTypeId value" error by trying production name 'Allgemeine Beteiligung' first, then fallback to test name 'Bauleitplanung'
+- Fixed "invalid procedureTypeId value" error by implementing parameter-based procedure type name configuration
 
 ## v0.23 (2025-09-03)
 **Bug Fixes**
