@@ -25,10 +25,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeFehlerartType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
 use Doctrine\DBAL\ConnectionException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -36,7 +33,6 @@ use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\AgsCodeNotFoundException;
-use RuntimeException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Webmozart\Assert\Assert;
 use function count;
@@ -46,9 +42,12 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
 {
     /** Test environment AGS code identifier used in development/testing */
     private const TEST_ENVIRONMENT_AGS_CODE = 'xyz:0001';
-    
+
     /** Default customer subdomain for test environment procedures */
     private const TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN = 'hh';
+
+    private const PROCEDURE_TYPE_NAME_PROD = 'Allgemeine Beteiligung';
+    private const PROCEDURE_TYPE_NAME_TEST = 'Bauleitplanung';
 
     /**
      * Creates a procedure from an incoming XBeteiligung message.
@@ -309,8 +308,24 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'action'                                                        => 'new',
             'r_master'                                                      => 'false',
             'r_copymaster'                                                  => $this->procedureService->getMasterTemplateId(),
-            'r_procedure_type'                                              => $this->procedureTypeService->getProcedureTypeByName('Bauleitplanung')?->getId(),
+            'r_procedure_type'                                              => $this->getProcedureTypeId(),
             'xtaPlanId'                                                     => $procedureObject->getPlanID(),
         ];
+    }
+
+    /**
+     * Gets the ProcedureType ID by trying production name first, then test name as fallback
+     */
+    private function getProcedureTypeId(): ?string
+    {
+        // Try production name first
+        $procedureType = $this->procedureTypeService->getProcedureTypeByName(self::PROCEDURE_TYPE_NAME_PROD);
+        
+        if (null === $procedureType) {
+            // Fallback to test name if production name not found
+            $procedureType = $this->procedureTypeService->getProcedureTypeByName(self::PROCEDURE_TYPE_NAME_TEST);
+        }
+        
+        return $procedureType?->getId();
     }
 }
