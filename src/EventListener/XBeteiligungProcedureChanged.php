@@ -221,6 +221,9 @@ class XBeteiligungProcedureChanged
         );
     }
 
+    /**
+     * @throws Exception
+     */
     public function onProcedureChanged(ProcedureInterface $procedure): void
     {
         try {
@@ -236,6 +239,7 @@ class XBeteiligungProcedureChanged
                 'line' => $exception->getLine(),
                 'trace' => $exception->getTraceAsString()
             ]);
+            throw $exception;
         }
     }
 

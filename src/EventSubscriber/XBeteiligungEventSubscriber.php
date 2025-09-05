@@ -105,9 +105,13 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
                 'line' => $exception->getLine(),
                 'trace' => $exception->getTraceAsString()
             ]);
+            throw $exception;
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
         try {
@@ -128,6 +132,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
                 'line' => $exception->getLine(),
                 'trace' => $exception->getTraceAsString()
             ]);
+            throw $exception;
         }
     }
 
