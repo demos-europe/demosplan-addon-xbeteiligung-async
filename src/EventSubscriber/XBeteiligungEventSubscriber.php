@@ -92,7 +92,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
             if (!$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())
                 && !$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())
                 && !$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
-                $this->cockpitLogger->info('addon_xbeteiligung_async_procedure_message_type is not set.');
+                $this->cockpitLogger->warning('XBeteiligung statement processing skipped: No procedure message type permissions enabled. Check parameter "addon_xbeteiligung_async_procedure_message_type" - should be one of: "Kommunal", "Raumordnung", or "Planfeststellung".');
 
                 return;
             }
