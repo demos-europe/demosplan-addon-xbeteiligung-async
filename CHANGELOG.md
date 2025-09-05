@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 
+## v0.25 (2025-09-05)
 **Bug Fixes**
 - Fixed division by zero error in WMS URL generation when bounding box has zero width
 - Added comprehensive error logging with try-catch-rethrow blocks in event handlers:
@@ -12,7 +13,6 @@
 - Enhanced logging for debugging collapsed/invalid bounding boxes
 
 ## v0.24 (2025-09-04)
-
 **Features**
 - Added configurable procedure type name support via `addon_xbeteiligung_async_procedure_type_name` parameter
 
