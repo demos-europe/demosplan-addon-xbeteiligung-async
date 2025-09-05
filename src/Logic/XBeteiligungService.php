@@ -77,6 +77,8 @@ class XBeteiligungService
 {
     private const PARTICIPATION_RAUMORDNUNG_PHASE = 'Erwiderung /Planänderung bzw. Auswertung';
     private const WMS_DEFAULT_WIDTH = 512;
+    private const DIMENSION_WIDTH = 'width';
+    private const DIMENSION_HEIGHT = 'height';
 
     private const PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP = [
         'configuration' => [
@@ -637,8 +639,8 @@ class XBeteiligungService
             $baseUrl = $baseLayer?->getUrl();
             
             // Calculate height with division by zero protection
-            $width = $widthAndHeight['width'];
-            $height = $widthAndHeight['height'];
+            $width = $widthAndHeight[self::DIMENSION_WIDTH];
+            $height = $widthAndHeight[self::DIMENSION_HEIGHT];
             $calculatedHeight = self::WMS_DEFAULT_WIDTH; // Default square aspect ratio
             
             if ($width > 0) {
@@ -647,8 +649,8 @@ class XBeteiligungService
             
             if ($width <= 0) {
                 $this->logger->warning('Width is zero or negative in bounding box calculation, using default square aspect ratio', [
-                    'width' => $width,
-                    'height' => $height,
+                    self::DIMENSION_WIDTH => $width,
+                    self::DIMENSION_HEIGHT => $height,
                     'bbox' => $transformedBbox
                 ]);
             }
@@ -773,7 +775,7 @@ class XBeteiligungService
             $height = abs($north - $south);
         }
 
-        return ['width' => $width, 'height' => $height];
+        return [self::DIMENSION_WIDTH => $width, self::DIMENSION_HEIGHT => $height];
     }
 
     public function createProcedureMessage(string $xml, string $procedureId, string $messageClass): ProcedureMessage
