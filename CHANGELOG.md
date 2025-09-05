@@ -2,6 +2,7 @@
 
 ## UNRELEASED
 
+## v0.26 (2025-09-05)
 - adjust rabbitmq exchange
 
 ## v0.25 (2025-09-05)
