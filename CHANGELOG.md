@@ -2,6 +2,15 @@
 
 ## UNRELEASED
 
+**Bug Fixes**
+- Fixed division by zero error in WMS URL generation when bounding box has zero width
+- Added comprehensive error handling with try-catch blocks in event handlers:
+  - `newProcedureCreated()`: Prevents crashes during procedure creation events
+  - `onProcedureChanged()`: Prevents crashes during procedure update/delete events  
+  - `handleStatementCreatedEvent()`: Improved error handling for statement creation events
+- Added `WMS_DEFAULT_WIDTH` constant to replace magic numbers in WMS URL generation
+- Enhanced logging for debugging collapsed/invalid bounding boxes
+
 ## v0.24 (2025-09-04)
 
 **Features**

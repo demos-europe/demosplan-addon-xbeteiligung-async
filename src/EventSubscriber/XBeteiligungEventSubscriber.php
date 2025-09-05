@@ -83,38 +83,51 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 
     public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): void
     {
-        if (false === $this->config->rabbitMqEnabled) {
-            $this->cockpitLogger->info('RabbitMQ communication is disabled');
-
-            return;
-        }
-        if (!$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())
-            && !$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())
-            && !$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
-            $this->cockpitLogger->info('addon_xbeteiligung_async_procedure_message_type is not set.');
-
-            return;
-        }
         try {
+            if (false === $this->config->rabbitMqEnabled) {
+                $this->cockpitLogger->info('RabbitMQ communication is disabled');
+
+                return;
+            }
+            if (!$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())
+                && !$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())
+                && !$this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
+                $this->cockpitLogger->info('addon_xbeteiligung_async_procedure_message_type is not set.');
+
+                return;
+            }
+            
             $this->rabbitMQMessageBroker->handleStatementCreatedEvent($event);
-        } catch (\Exception $e) {
-            $this->cockpitLogger->warning('could not send statementCreated message', [$e]);
+        } catch (Exception $exception) {
+            $this->cockpitLogger->error('XBeteiligung: Error in handleStatementCreatedEvent', [
+                'error' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString()
+            ]);
         }
     }
 
-    /**
-     * @throws Exception
-     */
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
-            $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
-            $this->createProcedureMessage($xml, $event->getProcedure(), KommunalInitiieren0401::class);
-        }
+        try {
+            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
+                $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());
+                $this->createProcedureMessage($xml, $event->getProcedure(), KommunalInitiieren0401::class);
+            }
 
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
-            $xml = $this->xBeteiligungService->createXMLFor301($event->getProcedure());
-            $this->createProcedureMessage($xml, $event->getProcedure(), RaumordnungInitiieren0301::class);
+            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
+                $xml = $this->xBeteiligungService->createXMLFor301($event->getProcedure());
+                $this->createProcedureMessage($xml, $event->getProcedure(), RaumordnungInitiieren0301::class);
+            }
+        } catch (Exception $exception) {
+            $this->cockpitLogger->error('XBeteiligung: Error in newProcedureCreated event handler', [
+                'procedureId' => $event->getProcedure()->getId(),
+                'error' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString()
+            ]);
         }
     }
 
