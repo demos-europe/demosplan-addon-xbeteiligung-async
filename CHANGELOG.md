@@ -2,6 +2,8 @@
 
 ## UNRELEASED
 
+- adjust rabbitmq exchange
+
 ## v0.25 (2025-09-05)
 **Bug Fixes**
 - Fixed division by zero error in WMS URL generation when bounding box has zero width
