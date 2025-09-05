@@ -2,6 +2,15 @@
 
 ## UNRELEASED
 
+**Bug Fixes**
+- Fixed division by zero error in WMS URL generation when bounding box has zero width
+- Added comprehensive error logging with try-catch-rethrow blocks in event handlers:
+  - `newProcedureCreated()`: Logs errors during procedure creation events before rethrowing
+  - `onProcedureChanged()`: Logs errors during procedure update/delete events before rethrowing
+  - `handleStatementCreatedEvent()`: Logs errors during statement creation events before rethrowing
+- Added `WMS_DEFAULT_WIDTH`, `DIMENSION_WIDTH`, and `DIMENSION_HEIGHT` constants to replace magic strings
+- Enhanced logging for debugging collapsed/invalid bounding boxes
+
 ## v0.24 (2025-09-04)
 
 **Features**
