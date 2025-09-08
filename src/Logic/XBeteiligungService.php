@@ -35,6 +35,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
@@ -82,6 +83,9 @@ use Webmozart\Assert\Assert;
 class XBeteiligungService
 {
     private const PARTICIPATION_RAUMORDNUNG_PHASE = 'Erwiderung /Planänderung bzw. Auswertung';
+    private const WMS_DEFAULT_WIDTH = 512;
+    private const DIMENSION_WIDTH = 'width';
+    private const DIMENSION_HEIGHT = 'height';
 
     private const PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP = [
         'configuration' => [
@@ -145,6 +149,9 @@ class XBeteiligungService
 
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
+    
+    /** Statement ID prefix that needs to be removed for database storage */
+    private const STATEMENT_ID_PREFIX = 'ID_';
     public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.0401';
     public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Aktualisieren.0402';
     public const DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Loeschen.0409';
@@ -176,6 +183,7 @@ class XBeteiligungService
         private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
         private readonly GlobalConfigInterface                  $globalConfig,
         private readonly KommunaleProcedureCreater              $kommunaleProcedureCreater,
+        private readonly KommunaleProcedureUpdater              $kommunaleProcedureUpdater,
         private readonly LoggerInterface                        $logger,
         private readonly ParameterBagInterface                  $parameterBag,
         private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
@@ -742,14 +750,32 @@ class XBeteiligungService
             $transformedBbox = implode(',', $transformedBboxArray);
 
             $baseUrl = $baseLayer?->getUrl();
+            
+            // Calculate height with division by zero protection
+            $width = $widthAndHeight[self::DIMENSION_WIDTH];
+            $height = $widthAndHeight[self::DIMENSION_HEIGHT];
+            $calculatedHeight = self::WMS_DEFAULT_WIDTH; // Default square aspect ratio
+            
+            if ($width > 0) {
+                $calculatedHeight = (int)(self::WMS_DEFAULT_WIDTH * $height / $width);
+            }
+            
+            if ($width <= 0) {
+                $this->logger->warning('Width is zero or negative in bounding box calculation, using default square aspect ratio', [
+                    self::DIMENSION_WIDTH => $width,
+                    self::DIMENSION_HEIGHT => $height,
+                    'bbox' => $transformedBbox
+                ]);
+            }
+            
             $urlParams = [
                 'SERVICE' => 'WMS',
                 'VERSION' => $baseLayer?->getLayerVersion(),
                 'REQUEST' => 'GetMap',
                 'FORMAT' => 'image/png',
                 'TRANSPARENT' => 'true',
-                'WIDTH' => '512',
-                'HEIGHT' => (string)(int)(512 * $widthAndHeight['height'] / $widthAndHeight['width']),
+                'WIDTH' => (string)self::WMS_DEFAULT_WIDTH,
+                'HEIGHT' => (string)$calculatedHeight,
                 $crsORsrs => $projectionLabel,
                 'STYLES' => '',
                 'LAYERS' => $baseLayer?->getLayers(),
@@ -862,7 +888,7 @@ class XBeteiligungService
             $height = abs($north - $south);
         }
 
-        return ['width' => $width, 'height' => $height];
+        return [self::DIMENSION_WIDTH => $width, self::DIMENSION_HEIGHT => $height];
     }
 
     public function createProcedureMessage(string $xml, string $procedureId, string $messageClass): ProcedureMessage
@@ -1011,102 +1037,6 @@ class XBeteiligungService
 
     /**
      * @throws SchemaException
-     * @throws Exception
-     */
-    public function determineMessageContextAndDelegateAction(array $message, bool $auditEnabled = false): ResponseValue
-    {
-        $payload = $message['messageData'];
-        $messageTypeCode = array_key_exists('messageTypeCode', $message) ? $message['messageTypeCode'] : '';
-        $this->logger->info('Incoming message type', [$messageTypeCode]);
-        if (self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
-            /** @var KommunalInitiieren0401 $xmlObject401 */
-            $xmlObject401 = $this->incomingMessageParser->getXmlObject($payload, '401');
-
-            // Audit received message using parsed XML object
-            $auditRecord = null;
-            if ($auditEnabled) {
-                $planId = $xmlObject401->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
-                $auditRecord = $this->auditService->auditReceivedMessage(
-                    $payload,
-                    $messageTypeCode,
-                    $planId
-                );
-            }
-
-            try {
-                $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject401);
-
-                // Mark as processed and update with procedure ID from response
-                if (null !== $auditRecord) {
-                    $this->auditService->markAsProcessed($auditRecord->getId());
-                    if (null !== $response->getProcedureId()) {
-                        $this->auditService->updateAuditWithProcedureId($auditRecord->getId(), $response->getProcedureId());
-                    }
-                }
-
-                return $response;
-            } catch (Exception $e) {
-                if (null !== $auditRecord) {
-                    $this->auditService->markAsFailed($auditRecord->getId(), $e->getMessage());
-                }
-                throw $e;
-            }
-        }
-        /*
-         * The code is for different message types code and we use this thing in future
-         * There are not implement yet
-         *
-        if (self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
-            $messageAttachments = $message['messageAttachments'];
-            $xmlObject402 = $this->incomingMessageParser->getXmlObject($payload, 402);
-
-            return $this->updateProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject402, $messageAttachments);
-        }
-        if (str_contains($payload, self::DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER)) {
-            $xmlObject409 = $this->incomingMessageParser->getXmlObject($payload, 409);
-
-            return $this->deleteProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject409);
-        }
-        if (self::NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
-            $messageAttachments = $message['messageAttachments'] ?? [];
-            $xmlObject301 = $this->incomingMessageParser->getXmlObject($payload, 301);
-
-            return $this->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject301, $messageAttachments);
-        }
-        if (self::UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
-            $messageAttachments = $message['messageAttachments'];
-            $xmlObject302 = $this->incomingMessageParser->getXmlObject($payload, 302);
-
-            return $this->updateProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject302, $messageAttachments);
-        }
-        if (str_contains($payload, self::DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER)) {
-            $xmlObject309 = $this->incomingMessageParser->getXmlObject($payload, 309);
-
-            return $this->deleteProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject309);
-        }
-        if (self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
-            $messageAttachments = $message['messageAttachments'] ?? [];
-            $xmlObject201 = $this->incomingMessageParser->getXmlObject($payload, 201);
-
-            return $this->createNewProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject201, $messageAttachments);
-        }
-        if (self::UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageTypeCode) {
-            $messageAttachments = $message['messageAttachments'];
-            $xmlObject202 = $this->incomingMessageParser->getXmlObject($payload, 202);
-
-            return $this->updateProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject202, $messageAttachments);
-        }
-        if (str_contains($payload, self::DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER)) {
-            $xmlObject209 = $this->incomingMessageParser->getXmlObject($payload, 209);
-
-            return $this->deleteProcedureFromXBeteiligungMessageOrErrorMessage($xmlObject209);
-        }
-        */
-        throw new InvalidArgumentException('Message payload not supported');
-    }
-
-    /**
-     * @throws SchemaException
      * @throws InvalidArgumentException
      * @throws Exception
      */
@@ -1145,16 +1075,33 @@ class XBeteiligungService
         if (self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageStringIdentifier)
         {
             /** @var KommunalAktualisieren0402 $kommunalAktualisieren402 */
-            //$kommunalAktualisieren402 = $this->incomingMessageParser->getXmlObject($messageXml, '402');
+            $kommunalAktualisieren402 = $this->incomingMessageParser->getXmlObject($messageXml, '402');
 
-            // todo: implement update kommunal procedure handling
+            if ($auditEnabled) {
+                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier);
+            }
+
+            try {
+                $response = $this->kommunaleProcedureUpdater->updateProcedure(
+                    $kommunalAktualisieren402
+                );
+
+                $this->markAuditRecordAsProcessed($auditRecord, $response->getProcedureId());
+
+                return $response;
+            } catch (Exception $e) {
+                $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
+                throw $e;
+            }
         }
 
         if (self::NEW_STATEMENT_OK_MESSAGE_IDENTIFIER === $messageStringIdentifier)
         {
             /** @var AllgemeinStellungnahmeNeuabgegebenOK0711 $newStatementOK711 */
             $newStatementOK711 = $this->incomingMessageParser->getXmlObject($messageXml, '711');
-            $statementId = $newStatementOK711->getNachrichteninhalt()?->getStellungnahmeID();
+            $statementId = $this->removeStatementIdPrefix(
+                $newStatementOK711->getNachrichteninhalt()?->getStellungnahmeID()
+            );
 
             if ($auditEnabled) {
                 // Find original 701 message to get procedureId, planId and for correlation
@@ -1183,7 +1130,9 @@ class XBeteiligungService
         if (self::NEW_STATEMENT_NOK_MESSAGE_IDENTIFIER === $messageStringIdentifier) {
             /** @var AllgemeinStellungnahmeNeuabgegebenNOK0721 $newStatementNOK721 */
             $newStatementNOK721 = $this->incomingMessageParser->getXmlObject($messageXml, '721');
-            $statementId = $newStatementNOK721->getNachrichteninhalt()?->getStellungnahmeID();
+            $statementId = $this->removeStatementIdPrefix(
+                $newStatementNOK721->getNachrichteninhalt()?->getStellungnahmeID()
+            );
             $errorMessagesArray = $newStatementNOK721->getNachrichteninhalt()?->getFehler();
             $errorMessagesString = $this->extractErrorDescriptions($errorMessagesArray);
 
@@ -1282,6 +1231,21 @@ class XBeteiligungService
         }
 
         return self::UNKNOWN_MESSAGE_TYPE;
+    }
+
+    /**
+     * Remove ID_ prefix from statement ID if present
+     * 
+     * @param string|null $statementId The statement ID that may contain ID_ prefix
+     * @return string|null The statement ID without ID_ prefix
+     */
+    private function removeStatementIdPrefix(?string $statementId): ?string
+    {
+        if (null === $statementId) {
+            return null;
+        }
+        
+        return str_replace(self::STATEMENT_ID_PREFIX, '', $statementId);
     }
 
     /**

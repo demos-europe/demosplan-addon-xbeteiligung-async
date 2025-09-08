@@ -2,6 +2,51 @@
 
 ## UNRELEASED
 
+## v0.26 (2025-09-05)
+- adjust rabbitmq exchange
+
+## v0.25 (2025-09-05)
+**Bug Fixes**
+- Fixed division by zero error in WMS URL generation when bounding box has zero width
+- Added comprehensive error logging with try-catch-rethrow blocks in event handlers:
+  - `newProcedureCreated()`: Logs errors during procedure creation events before rethrowing
+  - `onProcedureChanged()`: Logs errors during procedure update/delete events before rethrowing
+  - `handleStatementCreatedEvent()`: Logs errors during statement creation events before rethrowing
+- Added `WMS_DEFAULT_WIDTH`, `DIMENSION_WIDTH`, and `DIMENSION_HEIGHT` constants to replace magic strings
+- Enhanced logging for debugging collapsed/invalid bounding boxes
+
+## v0.24 (2025-09-04)
+**Features**
+- Added configurable procedure type name support via `addon_xbeteiligung_async_procedure_type_name` parameter
+
+**Bug Fixes**
+- Fixed "invalid procedureTypeId value" error by implementing parameter-based procedure type name configuration
+
+## v0.23 (2025-09-03)
+**Bug Fixes**
+- Fixed uninitialized typed property error in ResponseValue class
+
+## v0.22 (2025-09-03)
+**Statement ID Processing Improvements**
+- Added `removeStatementIdPrefix()` method to remove `ID_` prefix from statement IDs
+- Applied prefix removal to both 0711 (OK) and 0721 (NOK) statement response processing
+- Added `STATEMENT_ID_PREFIX` constant to avoid magic strings
+- Fixed statement ID length issues for database storage
+
+**Routing Key Processing Improvements**
+- Enhanced `XBeteiligungRoutingService::buildOutgoingRoutingKey()` to handle test environment routing keys
+- Added special handling for `xyz:0001` AGS codes in test environment 
+- Improved routing key format generation for both test and production environments
+- Fixed routing key structure to match expected format: `{project}.beteiligung.{agsPart}.{messageType}`
+
+**Kommunale Procedure Update Implementation (DPLAN-15682)**
+- Complete error handling in `KommunaleProcedureUpdater`
+- Moved `getErrorType()` method to `ProcedureCommonFeatures` base class
+- Updated to use `ProcedureServiceInterface::updateProcedureObject()` with
+direct EntityManager transactions
+- Replaced `determineMessageContextAndDelegateAction()` with streamlined
+`processXmlMessage()` method
+
 ## v0.21 (2025-08-29)
 **RabbitMQ Direct Operations Implementation**
 

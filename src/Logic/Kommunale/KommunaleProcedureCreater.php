@@ -25,10 +25,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeFehlerartType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
 use Doctrine\DBAL\ConnectionException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -36,7 +33,6 @@ use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\AgsCodeNotFoundException;
-use RuntimeException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Webmozart\Assert\Assert;
 use function count;
@@ -44,6 +40,12 @@ use function sprintf;
 
 class KommunaleProcedureCreater extends ProcedureCommonFeatures
 {
+    /** Test environment AGS code identifier used in development/testing */
+    private const TEST_ENVIRONMENT_AGS_CODE = 'xyz:0001';
+
+    /** Default customer subdomain for test environment procedures */
+    private const TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN = 'hh';
+
 
     /**
      * Creates a procedure from an incoming XBeteiligung message.
@@ -125,17 +127,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         return $this->kommunaleMessageFactory->buildProcedureCreatedErrorResponse421($errorTypes, $xmlObject401);
     }
 
-    private function getErrorType(string $errorCode, string $errorDescription): FehlerType
-    {
-        $errorCodeType = new CodeFehlerartType();
-        $errorCodeType->setCode($errorCode);
-        $errorType = new FehlerType();
-        $errorType->setBeschreibung($errorDescription);
-        $errorType->setArt($errorCodeType);
-
-        return $errorType;
-    }
-
     /**
      * @throws FormatException
      * @throws Exception
@@ -194,40 +185,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 return $procedure;
             }
         );
-    }
-
-    private function setProcedurePhase(
-        ProcedureInterface $procedure,
-        ProcedurePhaseData $procedurePhaseData,
-    ): void {
-        if (null !== $procedurePhaseData->getPublicParticipationPhase()) {
-            $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhase()->getKey());
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationPhase()) {
-            $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhase()->getKey());
-        }
-        if (null !== $procedurePhaseData->getPublicParticipationStartDate()) {
-            $procedure->setPublicParticipationStartDate($procedurePhaseData->getPublicParticipationStartDate());
-        }
-        if (null !== $procedurePhaseData->getPublicParticipationEndDate()) {
-            $procedure->setPublicParticipationEndDate($procedurePhaseData->getPublicParticipationEndDate());
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationStartDate()) {
-            $procedure->setStartDate($procedurePhaseData->getInstitutionParticipationStartDate());
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationEndDate()) {
-            $procedure->setEndDate($procedurePhaseData->getInstitutionParticipationEndDate());
-        }
-        if (null !== $procedurePhaseData->getPublicParticipationIteration()) {
-            $procedure->getPublicParticipationPhaseObject()->setIteration(
-                $procedurePhaseData->getPublicParticipationIteration()
-            );
-        }
-        if (null !== $procedurePhaseData->getInstitutionParticipationIteration()) {
-            $procedure->getPhaseObject()->setIteration(
-                $procedurePhaseData->getInstitutionParticipationIteration()
-            );
-        }
     }
 
     /**
@@ -307,7 +264,12 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             $senderAgs = $agsCodes['sender'];
 
             if (null !== $senderAgs) {
-                $customer = $this->customerMappingService->getCustomerByAgsCode($senderAgs);
+                if (self::TEST_ENVIRONMENT_AGS_CODE === $senderAgs) {
+                    $customer = $this->customerService->findCustomerBySubdomain(self::TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN);
+                } else
+                {
+                    $customer = $this->customerMappingService->getCustomerByAgsCode($senderAgs);
+                }
 
                 $this->logger->info('Successfully mapped AGS code to customer for 401 message', [
                     'senderAgs' => $senderAgs,
@@ -346,7 +308,20 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'r_copymaster'                                                  => $this->procedureService->getMasterTemplateId(),
             //this might be different from planfest (might use legacy name)
             'r_procedure_type'                                              => $this->procedureTypeService->getProcedureTypeByName('Bauleitplanung')?->getId(),
+            'r_procedure_type'                                              => $this->getProcedureTypeId(),
             'xtaPlanId'                                                     => $procedureObject->getPlanID(),
         ];
+    }
+
+    /**
+     * Gets the ProcedureType ID using configured procedure type name
+     */
+    private function getProcedureTypeId(): ?string
+    {
+        $procedureType = $this->procedureTypeService->getProcedureTypeByName(
+            $this->xbeteiligungConfiguration->procedureTypeName
+        );
+
+        return $procedureType?->getId();
     }
 }
