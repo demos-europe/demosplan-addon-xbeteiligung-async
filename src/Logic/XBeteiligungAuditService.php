@@ -50,6 +50,7 @@ class XBeteiligungAuditService
         ?string $planId = null,
         ?string $responseToMessageId = null,
         ?string $statementId = null,
+        ?string $routingKey = null,
         bool $saveOnFlush = false
     ): XBeteiligungMessageAudit {
         $audit = new XBeteiligungMessageAudit();
@@ -61,6 +62,7 @@ class XBeteiligungAuditService
         $audit->setPlanId($planId);
         $audit->setResponseToMessageId($responseToMessageId);
         $audit->setStatementId($statementId);
+        $audit->setRoutingKey($routingKey);
 
         if (self::DIRECTION_SENT === $direction) {
             $audit->setStatus(self::STATUS_PENDING);
@@ -92,7 +94,8 @@ class XBeteiligungAuditService
         ?string $planId = null,
         ?string $procedureId = null,
         ?string $responseToMessageId = null,
-        ?string $statementId = null
+        ?string $statementId = null,
+        ?string $routingKey = null
     ): XBeteiligungMessageAudit {
         return $this->createAuditRecord(
             self::DIRECTION_RECEIVED,
@@ -102,7 +105,8 @@ class XBeteiligungAuditService
             $procedureId,
             $planId,
             $responseToMessageId,
-            $statementId
+            $statementId,
+            $routingKey
         );
     }
 
@@ -125,7 +129,8 @@ class XBeteiligungAuditService
             $procedureId,
             $planId,
             $responseToMessageId,
-            $statementId
+            $statementId,
+            null,
         );
     }
 
@@ -241,6 +246,7 @@ class XBeteiligungAuditService
             $messageType,
             $procedureId,
             $planId,
+            null,
             null,
             null,
             $saveOnFlush

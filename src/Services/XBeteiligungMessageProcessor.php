@@ -16,6 +16,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfigurat
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
@@ -34,19 +35,20 @@ class XBeteiligungMessageProcessor
     /**
      * Process a single incoming message and return response data.
      *
-     * @param string $message string containing xml message
+     * @param IncomingMessageData $messageData Message data containing xml content and routing key
      *
      * @return ResponseValue Response data for sending back to RabbitMQ
      * @throws SchemaException
      */
-    public function processIncomingMessage(string $message): ?ResponseValue
+    public function processIncomingMessage(IncomingMessageData $messageData): ?ResponseValue
     {
         try {
-            $this->logger->debug('Process single message', [$message]);
+            $this->logger->debug('Process single message', [$messageData->getBody()]);
 
             $responseObject = $this->xBeteiligungService->processXmlMessage(
-                $message,
-                $this->config->auditEnabled
+                $messageData->getBody(),
+                $this->config->auditEnabled,
+                $messageData->getRoutingKey()
             );
 
             // If no response is needed (e.g., for 711/721 acknowledgments), return null

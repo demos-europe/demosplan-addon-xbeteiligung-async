@@ -20,6 +20,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCre
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
@@ -155,7 +156,8 @@ class RabbitMQMessageBroker
     private function processMessage(AMQPMessage $message, int &$processedCount): void
     {
         try {
-            $responseData = $this->messageProcessor->processIncomingMessage($message->getBody());
+            $messageData = new IncomingMessageData($message->getBody(), $message->getRoutingKey());
+            $responseData = $this->messageProcessor->processIncomingMessage($messageData);
 
             if (null !== $responseData) {
                 // Publish response message to RabbitMQ using new direct publisher

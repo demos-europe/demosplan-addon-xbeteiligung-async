@@ -927,7 +927,7 @@ class XBeteiligungService
      * @throws InvalidArgumentException
      * @throws Exception
      */
-    public function processXmlMessage(string $messageXml, bool $auditEnabled = false): ?ResponseValue
+    public function processXmlMessage(string $messageXml, bool $auditEnabled = false, ?string $routingKey = null): ?ResponseValue
     {
         $this->logger->debug('Process xml message.', ['messageXml' => $messageXml]);
         $messageStringIdentifier = $this->determineMessageTypeFromContent($messageXml);
@@ -940,7 +940,7 @@ class XBeteiligungService
             $kommunalInitiieren401 = $this->incomingMessageParser->getXmlObject($messageXml, '401');
 
             if ($auditEnabled) {
-                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier);
+                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier, $routingKey);
             }
 
             try {
@@ -963,7 +963,7 @@ class XBeteiligungService
             $kommunalAktualisieren402 = $this->incomingMessageParser->getXmlObject($messageXml, '402');
 
             if ($auditEnabled) {
-                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier);
+                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier, $routingKey);
             }
 
             try {
@@ -1051,14 +1051,19 @@ class XBeteiligungService
 
     private function createAuditRecordForXmlMessage(
         string $messageXml,
-        string $messageStringIdentifier
+        string $messageStringIdentifier,
+        ?string $routingKey = null
     ): XBeteiligungMessageAudit
     {
         $planId = $this->extractPlanIdFromXml($messageXml, $messageStringIdentifier);
         return $this->auditService->auditReceivedMessage(
             $messageXml,
             $messageStringIdentifier,
-            $planId
+            $planId,
+            null, // procedureId
+            null, // responseToMessageId
+            null, // statementId
+            $routingKey
         );
     }
 
