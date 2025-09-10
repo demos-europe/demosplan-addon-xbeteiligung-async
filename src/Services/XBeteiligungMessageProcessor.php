@@ -16,6 +16,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfigurat
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungOutgoingRoutingKeyBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -28,6 +29,7 @@ class XBeteiligungMessageProcessor
         private readonly XBeteiligungConfiguration $config,
         private readonly XBeteiligungService $xBeteiligungService,
         private readonly XBeteiligungAuditService $auditService,
+        private readonly XBeteiligungOutgoingRoutingKeyBuilder $outgoingRoutingKeyBuilder,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -56,7 +58,10 @@ class XBeteiligungMessageProcessor
                 $this->logger->debug('No response required for this message type');
                 return null;
             }
-
+            $outgoingRoutingKey = $this->outgoingRoutingKeyBuilder->buildFromIncomingRoutingKey(
+                $messageData->getRoutingKey(),
+                $responseObject->getMessageStringIdentifier()
+            );
             // Audit outgoing response message (OK/NOK)
             if ($this->config->auditEnabled) {
                 // Find the original audit record for the incoming 401 message to link the response
@@ -74,7 +79,7 @@ class XBeteiligungMessageProcessor
                     $originalAuditRecord?->getPlanId(), // planId from original incoming message
                     $originalAuditRecord?->getId(), // responseToMessageId - link to original audit record,
                     null, // statementId - not applicable for procedure messages
-                    $messageData->getRoutingKey()
+                    $outgoingRoutingKey
                 );
 
                 $responseObject->setAuditId($auditRecord->getId());
