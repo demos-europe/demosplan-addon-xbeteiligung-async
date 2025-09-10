@@ -41,7 +41,7 @@ class Version20250909000000 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->abortIfNotMysql();
-        
+
         // Check if table and column exist before trying to drop the column
         $this->addSql('ALTER TABLE IF EXISTS xbeteiligung_async_message_audit DROP COLUMN IF EXISTS routing_key');
     }
