@@ -999,7 +999,8 @@ class XBeteiligungService
                     $original701Message?->getPlanId(), // planId from original 701
                     $original701Message?->getProcedureId(), // procedureId from original 701
                     $original701Message?->getId(), // responseToMessageId - link to original 701
-                    $statementId
+                    $statementId,
+                    $routingKey
                 );
                 $this->auditService->markAsProcessed($auditRecord->getId());
             }
@@ -1032,7 +1033,8 @@ class XBeteiligungService
                     $original701Message?->getPlanId(), // planId from original 701
                     $original701Message?->getProcedureId(), // procedureId from original 701
                     $original701Message?->getId(), // responseToMessageId - link to original 701
-                    $statementId
+                    $statementId,
+                    $routingKey
                 );
                 $this->auditService->markAsFailed($auditRecord->getId(), $errorMessagesString);
             }
