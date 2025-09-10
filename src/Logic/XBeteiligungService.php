@@ -135,7 +135,7 @@ class XBeteiligungService
 
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
-    
+
     /** Statement ID prefix that needs to be removed for database storage */
     private const STATEMENT_ID_PREFIX = 'ID_';
     public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.0401';
@@ -637,16 +637,16 @@ class XBeteiligungService
             $transformedBbox = implode(',', $transformedBboxArray);
 
             $baseUrl = $baseLayer?->getUrl();
-            
+
             // Calculate height with division by zero protection
             $width = $widthAndHeight[self::DIMENSION_WIDTH];
             $height = $widthAndHeight[self::DIMENSION_HEIGHT];
             $calculatedHeight = self::WMS_DEFAULT_WIDTH; // Default square aspect ratio
-            
+
             if ($width > 0) {
                 $calculatedHeight = (int)(self::WMS_DEFAULT_WIDTH * $height / $width);
             }
-            
+
             if ($width <= 0) {
                 $this->logger->warning('Width is zero or negative in bounding box calculation, using default square aspect ratio', [
                     self::DIMENSION_WIDTH => $width,
@@ -654,7 +654,7 @@ class XBeteiligungService
                     'bbox' => $transformedBbox
                 ]);
             }
-            
+
             $urlParams = [
                 'SERVICE' => 'WMS',
                 'VERSION' => $baseLayer?->getLayerVersion(),
@@ -945,7 +945,8 @@ class XBeteiligungService
 
             try {
                 $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage(
-                    $kommunalInitiieren401
+                    $kommunalInitiieren401,
+                    $routingKey
                 );
 
                 $this->markAuditRecordAsProcessed($auditRecord, $response->getProcedureId());
@@ -1125,7 +1126,7 @@ class XBeteiligungService
 
     /**
      * Remove ID_ prefix from statement ID if present
-     * 
+     *
      * @param string|null $statementId The statement ID that may contain ID_ prefix
      * @return string|null The statement ID without ID_ prefix
      */
@@ -1134,7 +1135,7 @@ class XBeteiligungService
         if (null === $statementId) {
             return null;
         }
-        
+
         return str_replace(self::STATEMENT_ID_PREFIX, '', $statementId);
     }
 

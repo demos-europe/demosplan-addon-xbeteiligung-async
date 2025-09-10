@@ -33,6 +33,7 @@ use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\AgsCodeNotFoundException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingKeyParser;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Webmozart\Assert\Assert;
 use function count;
@@ -41,7 +42,7 @@ use function sprintf;
 class KommunaleProcedureCreater extends ProcedureCommonFeatures
 {
     /** Test environment AGS code identifier used in development/testing */
-    private const TEST_ENVIRONMENT_AGS_CODE = 'xyz:0001';
+    private const TEST_ENVIRONMENT_AGS_CODE = 'xyz.00.01';
 
     /** Default customer subdomain for test environment procedures */
     private const TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN = 'hh';
@@ -53,11 +54,12 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * If there is any error during the process it will return a Beteiligung2PlanungBeteiligungNeuNOK0421 Object.
      */
     public function createNewProcedureFromXBeteiligungMessageOrErrorMessage(
-        KommunalInitiieren0401 $xmlObject401
+        KommunalInitiieren0401 $xmlObject401,
+        ?string $incomingRoutingKey = null
     ): ResponseValue
     {
         try {
-            return $this->createNewKommunalProcedureFromXBeteiligungMessageWithResponse($xmlObject401);
+            return $this->createNewKommunalProcedureFromXBeteiligungMessageWithResponse($xmlObject401, $incomingRoutingKey);
         } catch (AddonUserNotFoundException $exception) {
             $userLogin = $exception->getUserLogin();
             $message = str_replace('%1$s', $userLogin, XBeteiligungService::MISSING_USER_ERROR_DESCRIPTION);
@@ -132,10 +134,11 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * @throws Exception
      */
     public function createNewKommunalProcedureFromXBeteiligungMessageWithResponse(
-        KommunalInitiieren0401 $xmlObject401
+        KommunalInitiieren0401 $xmlObject401,
+        ?string $incomingRoutingKey = null
     ): ResponseValue
     {
-        $procedure = $this->createNewKommunalProcedureFromXBeteiligungMessage($xmlObject401);
+        $procedure = $this->createNewKommunalProcedureFromXBeteiligungMessage($xmlObject401, $incomingRoutingKey);
         $response = $this->kommunaleMessageFactory->buildProcedureCreatedResponse411($procedure, $xmlObject401);
         $response->setProcedureId($procedure->getId());
 
@@ -151,6 +154,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      */
     public function createNewKommunalProcedureFromXBeteiligungMessage(
         KommunalInitiieren0401 $xmlObject401,
+        ?string $incomingRoutingKey = null
     ): ProcedureInterface
     {
         $messageContent = $xmlObject401->getNachrichteninhalt()?->getBeteiligung();
@@ -163,7 +167,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         }
 
         // Get mapped customer before transaction
-        $customer = $this->getCustomerFromAgsMapping($xmlObject401);
+        $customer = $this->getCustomerFromRoutingKey($incomingRoutingKey);
 
         return $this->transactionService->executeAndFlushInTransaction(
             function () use ($messageContent, $customer) {
@@ -291,6 +295,48 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         }
     }
 
+    /**
+     * Gets customer based on AGS code extraction from routing key
+     *
+     * @throws Exception if AGS mapping fails
+     */
+    private function getCustomerFromRoutingKey(?string $incomingRoutingKey): CustomerInterface
+    {
+        if (null === $incomingRoutingKey) {
+            throw new AgsCodeNotFoundException('Incoming routing key is missing for customer mapping');
+        }
+
+        try {
+            $routingKeyComponents = $this->routingKeyParser->parseRoutingKey($incomingRoutingKey);
+            $senderAgs = $routingKeyComponents->getSenderAgs();
+
+            if (self::TEST_ENVIRONMENT_AGS_CODE === $senderAgs) {
+                $customer = $this->customerService->findCustomerBySubdomain(self::TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN);
+            } else {
+                // Extract federal state code directly from routing key and use customer mapping service
+                $federalStateCode = $this->routingKeyParser->extractFederalStateCodeFromRoutingKey($incomingRoutingKey);
+                $customer = $this->customerMappingService->getCustomerByFederalStateCode($federalStateCode);
+            }
+
+            $this->logger->info('Successfully mapped AGS code to customer from routing key for 401 message', [
+                'senderAgs' => $senderAgs,
+                'customerId' => $customer->getId(),
+                'messageType' => '401',
+                'routingKey' => $incomingRoutingKey
+            ]);
+
+            return $customer;
+        } catch (Exception $exception) {
+            $this->logger->error('Failed to get customer based on routing key mapping', [
+                'errorMessage' => $exception->getMessage(),
+                'exception' => $exception,
+                'messageType' => '401',
+                'routingKey' => $incomingRoutingKey
+            ]);
+            throw $exception;
+        }
+    }
+
     protected function createProcedureArrayFormatFromBeteiligungType(
         BeteiligungKommunalType $procedureObject,
         OrgaInterface $orga
@@ -319,7 +365,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         $procedureType = $this->procedureTypeService->getProcedureTypeByName(
             $this->xbeteiligungConfiguration->procedureTypeName
         );
-        
+
         return $procedureType?->getId();
     }
 }

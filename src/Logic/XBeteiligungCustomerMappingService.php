@@ -150,4 +150,42 @@ class XBeteiligungCustomerMappingService
             throw $e;
         }
     }
+
+    /**
+     * Get a customer entity by federal state code.
+     *
+     * @param string $federalStateCode The federal state code (2 digits)
+     * @return CustomerInterface The customer entity
+     * @throws Exception
+     */
+    public function getCustomerByFederalStateCode(string $federalStateCode): CustomerInterface
+    {
+        if (!array_key_exists($federalStateCode, self::FEDERAL_STATE_TO_SUBDOMAIN_MAP)) {
+            throw new InvalidArgumentException(
+                "No subdomain mapping found for federal state code: {$federalStateCode}"
+            );
+        }
+
+        $subdomain = self::FEDERAL_STATE_TO_SUBDOMAIN_MAP[$federalStateCode];
+
+        try {
+            $customer = $this->customerService->findCustomerBySubdomain($subdomain);
+
+            $this->logger->info('Successfully mapped federal state code to customer', [
+                'federal_state_code' => $federalStateCode,
+                'subdomain' => $subdomain,
+                'customer_id' => $customer->getId()
+            ]);
+
+            return $customer;
+        } catch (Exception $e) {
+            $this->logger->error('Customer not found for federal state code', [
+                'federal_state_code' => $federalStateCode,
+                'subdomain' => $subdomain,
+                'error' => $e->getMessage()
+            ]);
+
+            throw $e;
+        }
+    }
 }

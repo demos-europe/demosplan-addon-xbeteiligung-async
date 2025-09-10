@@ -72,7 +72,9 @@ class XBeteiligungMessageProcessor
                     $responseObject->getMessageStringIdentifier(),
                     $responseObject->getProcedureId(),
                     $originalAuditRecord?->getPlanId(), // planId from original incoming message
-                    $originalAuditRecord?->getId() // responseToMessageId - link to original audit record
+                    $originalAuditRecord?->getId(), // responseToMessageId - link to original audit record,
+                    null, // statementId - not applicable for procedure messages
+                    $messageData->getRoutingKey()
                 );
 
                 $responseObject->setAuditId($auditRecord->getId());

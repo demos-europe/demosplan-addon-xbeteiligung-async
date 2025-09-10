@@ -119,7 +119,8 @@ class XBeteiligungAuditService
         ?string $procedureId = null,
         ?string $planId = null,
         ?string $responseToMessageId = null,
-        ?string $statementId = null
+        ?string $statementId = null,
+        ?string $routingKey = null
     ): XBeteiligungMessageAudit {
         return $this->createAuditRecord(
             self::DIRECTION_SENT,
@@ -130,7 +131,7 @@ class XBeteiligungAuditService
             $planId,
             $responseToMessageId,
             $statementId,
-            null,
+            $routingKey,
         );
     }
 
@@ -226,6 +227,21 @@ class XBeteiligungAuditService
             },
             self::LOG_PREFIX . 'Updated audit record with procedure ID',
             ['procedureId' => $procedureId]
+        );
+    }
+
+    /**
+     * Set outgoing routing key in audit record
+     */
+    public function setOutgoingRoutingKey(string $auditId, string $outgoingRoutingKey): void
+    {
+        $this->updateAuditRecord(
+            $auditId,
+            function (XBeteiligungMessageAudit $audit) use ($outgoingRoutingKey) {
+                $audit->setRoutingKey($outgoingRoutingKey);
+            },
+            self::LOG_PREFIX . 'Updated audit record with outgoing routing key',
+            ['outgoingRoutingKey' => $outgoingRoutingKey]
         );
     }
 
