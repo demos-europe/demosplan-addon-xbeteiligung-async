@@ -1,6 +1,10 @@
 # Changelog
 
 ## UNRELEASED
+**XBeteiligung Phase Code Updates (DPLAN-16588)**
+- Updated participation phase codes: 5300/4300 → 5200/4200
+- Renamed phase 'earlyparticipation' to 'renewparticipation' for institution procedures
+- Added new 'discussiondate' phase (code 5400/4400) for both participation types
 
 ## v0.26 (2025-09-05)
 - adjust rabbitmq exchange

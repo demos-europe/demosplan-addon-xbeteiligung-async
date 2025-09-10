@@ -85,17 +85,17 @@ class XBeteiligungService
             'code' => '5000',
             'name' => 'Konfiguration betroffene Öffentlichkeit',
         ],
+        'participation' => [
+            'code' => '5200',
+            'name' => self::PARTICIPATION_RAUMORDNUNG_PHASE,
+        ],
+        'discussiondate' => [
+            'code' => '5400',
+            'name' => 'Erörterungstermin',
+        ],
         'earlyparticipation' => [
             'code' => '5500',
             'name' => 'Erneute Anhörung Betroffener (Öffentlichkeit) (Durchlaufnummer)',
-        ],
-        'participation' => [
-            'code' => '5300',
-            'name' => self::PARTICIPATION_RAUMORDNUNG_PHASE,
-        ],
-        'anotherparticipation' => [
-            'code' => '5300',
-            'name' => self::PARTICIPATION_RAUMORDNUNG_PHASE,
         ],
         'evaluating' => [
             'code' => '5600',
@@ -111,17 +111,17 @@ class XBeteiligungService
             'code' => '4000',
             'name' => 'Konfiguration TöB',
         ],
-        'earlyparticipation' => [
+        'participation' => [
+            'code' => '4200',
+            'name' => self::PARTICIPATION_RAUMORDNUNG_PHASE,
+        ],
+        'renewparticipation' => [
             'code' => '4500',
             'name' => 'Erneute Anhörung TöB (Durchlaufnummer)',
         ],
-        'participation' => [
-            'code' => '4300',
-            'name' => self::PARTICIPATION_RAUMORDNUNG_PHASE,
-        ],
-        'anotherparticipation' => [
-            'code' => '4300',
-            'name' => self::PARTICIPATION_RAUMORDNUNG_PHASE,
+        'discussiondate' => [
+            'code' => '4400',
+            'name' => 'Erörterungstermin',
         ],
         'evaluating' => [
             'code' => '4600',
