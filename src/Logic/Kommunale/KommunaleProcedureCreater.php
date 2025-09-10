@@ -307,10 +307,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         }
 
         try {
-            $routingKeyComponents = $this->routingKeyParser->parseRoutingKey($incomingRoutingKey);
-            $senderAgs = $routingKeyComponents->getSenderAgs();
-
-            if (self::TEST_ENVIRONMENT_AGS_CODE === $senderAgs) {
+            if (str_contains($incomingRoutingKey, self::TEST_ENVIRONMENT_AGS_CODE)) {
                 $customer = $this->customerService->findCustomerBySubdomain(self::TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN);
             } else {
                 // Extract federal state code directly from routing key and use customer mapping service
@@ -319,7 +316,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             }
 
             $this->logger->info('Successfully mapped AGS code to customer from routing key for 401 message', [
-                'senderAgs' => $senderAgs,
                 'customerId' => $customer->getId(),
                 'messageType' => '401',
                 'routingKey' => $incomingRoutingKey
