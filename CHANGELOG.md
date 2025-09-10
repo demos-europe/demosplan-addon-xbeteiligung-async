@@ -1,8 +1,6 @@
 # Changelog
 
 ## UNRELEASED
-
-## v0.27 (2025-09-09)
 **XBeteiligung Phase Code Updates (DPLAN-16588)**
 - Updated participation phase codes: 5300/4300 → 5200/4200
 - Renamed phase 'earlyparticipation' to 'renewparticipation' for institution procedures
