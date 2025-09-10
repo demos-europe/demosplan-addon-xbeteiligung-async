@@ -637,16 +637,16 @@ class XBeteiligungService
             $transformedBbox = implode(',', $transformedBboxArray);
 
             $baseUrl = $baseLayer?->getUrl();
-            
+
             // Calculate height with division by zero protection
             $width = $widthAndHeight[self::DIMENSION_WIDTH];
             $height = $widthAndHeight[self::DIMENSION_HEIGHT];
             $calculatedHeight = self::WMS_DEFAULT_WIDTH; // Default square aspect ratio
-            
+
             if ($width > 0) {
                 $calculatedHeight = (int)(self::WMS_DEFAULT_WIDTH * $height / $width);
             }
-            
+
             if ($width <= 0) {
                 $this->logger->warning('Width is zero or negative in bounding box calculation, using default square aspect ratio', [
                     self::DIMENSION_WIDTH => $width,
@@ -654,7 +654,7 @@ class XBeteiligungService
                     'bbox' => $transformedBbox
                 ]);
             }
-            
+
             $urlParams = [
                 'SERVICE' => 'WMS',
                 'VERSION' => $baseLayer?->getLayerVersion(),
@@ -927,7 +927,7 @@ class XBeteiligungService
      * @throws InvalidArgumentException
      * @throws Exception
      */
-    public function processXmlMessage(string $messageXml, bool $auditEnabled = false): ?ResponseValue
+    public function processXmlMessage(string $messageXml, bool $auditEnabled = false, ?string $routingKey = null): ?ResponseValue
     {
         $this->logger->debug('Process xml message.', ['messageXml' => $messageXml]);
         $messageStringIdentifier = $this->determineMessageTypeFromContent($messageXml);
@@ -940,12 +940,13 @@ class XBeteiligungService
             $kommunalInitiieren401 = $this->incomingMessageParser->getXmlObject($messageXml, '401');
 
             if ($auditEnabled) {
-                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier);
+                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier, $routingKey);
             }
 
             try {
                 $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage(
-                    $kommunalInitiieren401
+                    $kommunalInitiieren401,
+                    $routingKey
                 );
 
                 $this->markAuditRecordAsProcessed($auditRecord, $response->getProcedureId());
@@ -963,7 +964,7 @@ class XBeteiligungService
             $kommunalAktualisieren402 = $this->incomingMessageParser->getXmlObject($messageXml, '402');
 
             if ($auditEnabled) {
-                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier);
+                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier, $routingKey);
             }
 
             try {
@@ -998,7 +999,8 @@ class XBeteiligungService
                     $original701Message?->getPlanId(), // planId from original 701
                     $original701Message?->getProcedureId(), // procedureId from original 701
                     $original701Message?->getId(), // responseToMessageId - link to original 701
-                    $statementId
+                    $statementId,
+                    $routingKey
                 );
                 $this->auditService->markAsProcessed($auditRecord->getId());
             }
@@ -1031,7 +1033,8 @@ class XBeteiligungService
                     $original701Message?->getPlanId(), // planId from original 701
                     $original701Message?->getProcedureId(), // procedureId from original 701
                     $original701Message?->getId(), // responseToMessageId - link to original 701
-                    $statementId
+                    $statementId,
+                    $routingKey
                 );
                 $this->auditService->markAsFailed($auditRecord->getId(), $errorMessagesString);
             }
@@ -1051,14 +1054,19 @@ class XBeteiligungService
 
     private function createAuditRecordForXmlMessage(
         string $messageXml,
-        string $messageStringIdentifier
+        string $messageStringIdentifier,
+        ?string $routingKey = null
     ): XBeteiligungMessageAudit
     {
         $planId = $this->extractPlanIdFromXml($messageXml, $messageStringIdentifier);
         return $this->auditService->auditReceivedMessage(
             $messageXml,
             $messageStringIdentifier,
-            $planId
+            $planId,
+            null, // procedureId
+            null, // responseToMessageId
+            null, // statementId
+            $routingKey
         );
     }
 
@@ -1120,7 +1128,7 @@ class XBeteiligungService
 
     /**
      * Remove ID_ prefix from statement ID if present
-     * 
+     *
      * @param string|null $statementId The statement ID that may contain ID_ prefix
      * @return string|null The statement ID without ID_ prefix
      */

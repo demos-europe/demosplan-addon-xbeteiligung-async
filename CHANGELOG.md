@@ -1,6 +1,14 @@
 # Changelog
 
 ## UNRELEASED
+**Routing Key Architecture Implementation**
+- Add routing key field to XBeteiligungMessageAudit entity for complete message traceability
+- Implement comprehensive routing key parsing and building system with XBeteiligungRoutingKeyParser and XBeteiligungOutgoingRoutingKeyBuilder services
+- Replace XML-based AGS extraction with routing key-based customer identification and message routing
+- Add complete unit test coverage for routing key services with extensive data providers and validation
+- Create IncomingMessageData DTO and RoutingKeyComponents value object for structured routing key handling
+- Update message processing architecture to preserve routing keys throughout the entire workflow
+- Enhance audit system to store both incoming and outgoing routing keys for complete audit trails
 
 ## v0.27 (2025-09-10)
 **XBeteiligung Phase Code Updates (DPLAN-16588)**

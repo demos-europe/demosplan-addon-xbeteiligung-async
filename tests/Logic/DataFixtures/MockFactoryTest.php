@@ -38,6 +38,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\Planfeststellun
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAgsService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungCustomerMappingService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingKeyParser;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\RoutingKeyComponents;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -265,6 +267,38 @@ class MockFactoryTest
             $customerMock->method('getId')->willReturn('test-customer-id');
             return $customerMock;
         });
+        
+        // Mock the new getCustomerByFederalStateCode method
+        $mock->method('getCustomerByFederalStateCode')->willReturnCallback(function () {
+            $customerMock = $this->testCase->createMockObject(\DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface::class);
+            $customerMock->method('getId')->willReturn('test-customer-id');
+            return $customerMock;
+        });
+        
+        return $mock;
+    }
+
+    public function getXBeteiligungRoutingKeyParserMock(): XBeteiligungRoutingKeyParser|MockObject
+    {
+        $mock = $this->testCase->createMockObject(XBeteiligungRoutingKeyParser::class);
+        
+        // Mock parseRoutingKey to return test routing components
+        $mock->method('parseRoutingKey')->willReturnCallback(function (string $routingKey) {
+            // Parse a test routing key: nrw.cockpit.bap.02.05.00200099.bdp.02.05.00200099.kommunal.initiieren.0401
+            return new RoutingKeyComponents(
+                mandant: 'nrw',
+                direction: 'cockpit', 
+                dvdvOrg1: 'bap',
+                agsCode1: '02.05.00200099',
+                dvdvOrg2: 'bdp',
+                agsCode2: '02.05.00200099',
+                messageIdentifier: 'kommunal.initiieren.0401'
+            );
+        });
+        
+        // Mock extractFederalStateCodeFromRoutingKey to return test federal state
+        $mock->method('extractFederalStateCodeFromRoutingKey')->willReturn('05');
+        
         return $mock;
     }
 

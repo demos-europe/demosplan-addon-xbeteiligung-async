@@ -20,8 +20,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCre
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
-use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungOutgoingRoutingKeyBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use Exception;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
@@ -35,7 +36,7 @@ class RabbitMQMessageBroker
         private readonly XBeteiligungConfiguration $config,
         private readonly XBeteiligungMessageProcessor $messageProcessor,
         private readonly XBeteiligungMessageTransport $messageTransport,
-        private readonly XBeteiligungRoutingService $routingService,
+        private readonly XBeteiligungOutgoingRoutingKeyBuilder $outgoingRoutingKeyBuilder,
         private readonly LoggerInterface $logger,
         private readonly StatementCreator $statementCreator,
         private readonly StatementMessageFactory $statementMessageFactory,
@@ -47,10 +48,19 @@ class RabbitMQMessageBroker
      * @throws AMQPTimeoutException
      * @throws Exception
      */
-    private function sendResponseToRabbitMq(string $xmlString, string $messageType, ?string $procedureId = null, ?string $auditRecordId = null): bool
+    private function sendResponseToRabbitMq(string $xmlString, string $messageType, ?string $auditRecordId = null, ?string $incomingRoutingKey = null): bool
     {
         try {
-            $routingKey = $this->routingService->buildOutgoingRoutingKey($messageType, $procedureId);
+            $routingKey = $this->outgoingRoutingKeyBuilder->buildFromIncomingRoutingKey(
+                $incomingRoutingKey,
+                $messageType
+            );
+
+            // Set outgoing routing key in audit record
+            if (null !== $auditRecordId) {
+                $this->auditService->setOutgoingRoutingKey($auditRecordId, $routingKey);
+            }
+
             $success = $this->messageTransport->publishDirectMessage($xmlString, $routingKey);
 
             if ($success) {
@@ -99,11 +109,15 @@ class RabbitMQMessageBroker
             );
         }
 
+        // Get original incoming routing key from audit for routing key-based outgoing message
+        $originalAuditRecord = $this->auditService->findOriginalIncoming401Message($statementCreated->getProcedureId());
+        $incomingRoutingKey = $originalAuditRecord?->getRoutingKey();
+
         $this->sendResponseToRabbitMq(
             $xmlString,
             CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[AllgemeinStellungnahmeNeuabgegeben0701::class]['name'],
-            $statementCreated->getProcedureId(),
-            $auditRecord?->getId()
+            $auditRecord?->getId(),
+            $incomingRoutingKey
         );
 
         return $event;
@@ -155,15 +169,16 @@ class RabbitMQMessageBroker
     private function processMessage(AMQPMessage $message, int &$processedCount): void
     {
         try {
-            $responseData = $this->messageProcessor->processIncomingMessage($message->getBody());
+            $messageData = new IncomingMessageData($message->getBody(), $message->getRoutingKey());
+            $responseData = $this->messageProcessor->processIncomingMessage($messageData);
 
             if (null !== $responseData) {
                 // Publish response message to RabbitMQ using new direct publisher
                 $this->sendResponseToRabbitMq(
                     $responseData->getMessageXml(),
                     $responseData->getMessageStringIdentifier(),
-                    $responseData->getProcedureId(),
-                    $responseData->getAuditId()
+                    $responseData->getAuditId(),
+                    $message->getRoutingKey()
                 );
                 $this->logger->debug('Response published successfully', [
                     'messageType' => $responseData->getMessageStringIdentifier()
