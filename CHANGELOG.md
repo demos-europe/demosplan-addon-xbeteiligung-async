@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+
+## v0.28 (2025-09-10)
 **Routing Key Architecture Implementation**
 - Add routing key field to XBeteiligungMessageAudit entity for complete message traceability
 - Implement comprehensive routing key parsing and building system with XBeteiligungRoutingKeyParser and XBeteiligungOutgoingRoutingKeyBuilder services
