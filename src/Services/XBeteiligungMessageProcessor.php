@@ -16,6 +16,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfigurat
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungOutgoingRoutingKeyBuilder;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
@@ -27,6 +29,7 @@ class XBeteiligungMessageProcessor
         private readonly XBeteiligungConfiguration $config,
         private readonly XBeteiligungService $xBeteiligungService,
         private readonly XBeteiligungAuditService $auditService,
+        private readonly XBeteiligungOutgoingRoutingKeyBuilder $outgoingRoutingKeyBuilder,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -34,19 +37,20 @@ class XBeteiligungMessageProcessor
     /**
      * Process a single incoming message and return response data.
      *
-     * @param string $message string containing xml message
+     * @param IncomingMessageData $messageData Message data containing xml content and routing key
      *
      * @return ResponseValue Response data for sending back to RabbitMQ
      * @throws SchemaException
      */
-    public function processIncomingMessage(string $message): ?ResponseValue
+    public function processIncomingMessage(IncomingMessageData $messageData): ?ResponseValue
     {
         try {
-            $this->logger->debug('Process single message', [$message]);
+            $this->logger->debug('Process single message', [$messageData->getBody()]);
 
             $responseObject = $this->xBeteiligungService->processXmlMessage(
-                $message,
-                $this->config->auditEnabled
+                $messageData->getBody(),
+                $this->config->auditEnabled,
+                $messageData->getRoutingKey()
             );
 
             // If no response is needed (e.g., for 711/721 acknowledgments), return null
@@ -54,7 +58,10 @@ class XBeteiligungMessageProcessor
                 $this->logger->debug('No response required for this message type');
                 return null;
             }
-
+            $outgoingRoutingKey = $this->outgoingRoutingKeyBuilder->buildFromIncomingRoutingKey(
+                $messageData->getRoutingKey(),
+                $responseObject->getMessageStringIdentifier()
+            );
             // Audit outgoing response message (OK/NOK)
             if ($this->config->auditEnabled) {
                 // Find the original audit record for the incoming 401 message to link the response
@@ -70,7 +77,9 @@ class XBeteiligungMessageProcessor
                     $responseObject->getMessageStringIdentifier(),
                     $responseObject->getProcedureId(),
                     $originalAuditRecord?->getPlanId(), // planId from original incoming message
-                    $originalAuditRecord?->getId() // responseToMessageId - link to original audit record
+                    $originalAuditRecord?->getId(), // responseToMessageId - link to original audit record,
+                    null, // statementId - not applicable for procedure messages
+                    $outgoingRoutingKey
                 );
 
                 $responseObject->setAuditId($auditRecord->getId());

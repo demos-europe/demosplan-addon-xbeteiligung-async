@@ -21,10 +21,10 @@ use Psr\Log\LoggerInterface;
 class XBeteiligungRoutingService
 {
     /** Test environment AGS code identifier used in development/testing */
-    private const TEST_ENVIRONMENT_AGS_CODE = 'xyz:0001';
-    
+    public const TEST_ENVIRONMENT_AGS_CODE = 'xyz.00.01';
+
     /** Pre-built routing key part for test environment messages */
-    private const TEST_ENVIRONMENT_ROUTING_PART = 'xyz.00.02.xyz.00.01';
+    public const TEST_ENVIRONMENT_ROUTING_PART = 'xyz.00.02.xyz.00.01';
 
     public function __construct(
         private readonly XBeteiligungConfiguration $config,

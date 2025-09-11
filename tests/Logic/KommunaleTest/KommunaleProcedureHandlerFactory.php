@@ -68,7 +68,8 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getXBeteiligungAgsServiceMock(),
             $this->mockFactory->getXBeteiligungCustomerMappingServiceMock(),
             $mapService,
-            $configuration
+            $configuration,
+            $this->mockFactory->getXBeteiligungRoutingKeyParserMock()
         ];
 
         switch ($handlerType) {
