@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType\BeteiligungPlanfeststellungTOEBArtAnonymousPHPType:
+    properties:
+        beteiligungPlanfeststellungFormalTOEB:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungPlanfeststellungFormalTOEB
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBeteiligungPlanfeststellungFormalTOEB
+                setter: setBeteiligungPlanfeststellungFormalTOEB
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType
+        beteiligungPlanfeststellungInformellTOEB:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungPlanfeststellungInformellTOEB
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBeteiligungPlanfeststellungInformellTOEB
+                setter: setBeteiligungPlanfeststellungInformellTOEB
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeBeteiligungPlanfeststellungInformellTOEBType

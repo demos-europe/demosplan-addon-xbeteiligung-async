@@ -11,7 +11,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung;
 class BeteiligungPlanfeststellungType
 {
     /**
-     * Am Planungsvorhaben beteiligte Akteure.
+     * Hier sind Informationen zu den am Planungsvorhaben beteiligten Akteuren zu übermitteln. Mindestens der Veranlasser ist zu benennen.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType $akteurVorhaben
      */
@@ -25,7 +25,7 @@ class BeteiligungPlanfeststellungType
     private $planID = null;
 
     /**
-     * Hier ist der Name des Planverfahrens zu übermitteln.
+     * Hier ist der Name des Planvorhabens zu übermitteln.
      *
      * @var string $planname
      */
@@ -41,16 +41,23 @@ class BeteiligungPlanfeststellungType
     /**
      * Hier kann die Art des Planverfahrens übermittelt werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType $planart
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType $planartPlanfeststellung
      */
-    private $planart = null;
+    private $planartPlanfeststellung = null;
+
+    /**
+     * Hier ist der Verfahrensschritt zu übermitteln.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType $verfahrensschrittPlanfeststellung
+     */
+    private $verfahrensschrittPlanfeststellung = null;
 
     /**
      * Hier kann die Art des Beteiligungsverfahrens übermittelt werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensartPlanfeststellungType $verfahrensart
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensartPlanfeststellungType $verfahrensartPlanfeststellung
      */
-    private $verfahrensart = null;
+    private $verfahrensartPlanfeststellung = null;
 
     /**
      * Hier kann die fachliche Beschreibung des Planverfahrens übermittelt werden.
@@ -60,21 +67,7 @@ class BeteiligungPlanfeststellungType
     private $beschreibungPlanungsanlass = null;
 
     /**
-     * Hier ist der Verfahrensschritt zu übermitteln.
-     *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType $verfahrensschritt
-     */
-    private $verfahrensschritt = null;
-
-    /**
-     * Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.
-     *
-     * @var int $durchgang
-     */
-    private $durchgang = null;
-
-    /**
-     * URL eines Kartendienstes
+     * Hier kann zur Visualisierung der Flächenabgrenzung eine URL auf einen Kartendienst übermittelt werden.
      *
      * @var string $flaechenabgrenzungUrl
      */
@@ -95,36 +88,6 @@ class BeteiligungPlanfeststellungType
     private $raeumlicheBeschreibung = null;
 
     /**
-     * Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
-     *
-     * @var \DateTime $bekanntmachung
-     */
-    private $bekanntmachung = null;
-
-    /**
-     * Hier können aktuelle Mitteilungen übermittelt werden.
-     *
-     * @var string[] $aktuelleMitteilung
-     */
-    private $aktuelleMitteilung = [
-        
-    ];
-
-    /**
-     * Zeitraum (Beginn und Ende) einer Beteiligungsphase.
-     *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType $zeitraum
-     */
-    private $zeitraum = null;
-
-    /**
-     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
-     *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType $veroeffentlichungszeitraum
-     */
-    private $veroeffentlichungszeitraum = null;
-
-    /**
      * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
      *
      * @var string $beteiligungURL
@@ -132,16 +95,23 @@ class BeteiligungPlanfeststellungType
     private $beteiligungURL = null;
 
     /**
-     * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
+     * Hier können Angaben zur Beteiligung der Öffentlichkeit gemacht werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType[] $anlagen
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType $beteiligungOeffentlichkeit
      */
-    private $anlagen = null;
+    private $beteiligungOeffentlichkeit = null;
+
+    /**
+     * Hier können Angaben zur Beteiligung der Träger öffentlicher Belange gemacht werden.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType $beteiligungTOEB
+     */
+    private $beteiligungTOEB = null;
 
     /**
      * Gets as akteurVorhaben
      *
-     * Am Planungsvorhaben beteiligte Akteure.
+     * Hier sind Informationen zu den am Planungsvorhaben beteiligten Akteuren zu übermitteln. Mindestens der Veranlasser ist zu benennen.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType
      */
@@ -153,7 +123,7 @@ class BeteiligungPlanfeststellungType
     /**
      * Sets a new akteurVorhaben
      *
-     * Am Planungsvorhaben beteiligte Akteure.
+     * Hier sind Informationen zu den am Planungsvorhaben beteiligten Akteuren zu übermitteln. Mindestens der Veranlasser ist zu benennen.
      *
      * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType $akteurVorhaben
      * @return self
@@ -193,7 +163,7 @@ class BeteiligungPlanfeststellungType
     /**
      * Gets as planname
      *
-     * Hier ist der Name des Planverfahrens zu übermitteln.
+     * Hier ist der Name des Planvorhabens zu übermitteln.
      *
      * @return string
      */
@@ -205,7 +175,7 @@ class BeteiligungPlanfeststellungType
     /**
      * Sets a new planname
      *
-     * Hier ist der Name des Planverfahrens zu übermitteln.
+     * Hier ist der Name des Planvorhabens zu übermitteln.
      *
      * @param string $planname
      * @return self
@@ -243,54 +213,80 @@ class BeteiligungPlanfeststellungType
     }
 
     /**
-     * Gets as planart
+     * Gets as planartPlanfeststellung
      *
      * Hier kann die Art des Planverfahrens übermittelt werden.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType
      */
-    public function getPlanart()
+    public function getPlanartPlanfeststellung()
     {
-        return $this->planart;
+        return $this->planartPlanfeststellung;
     }
 
     /**
-     * Sets a new planart
+     * Sets a new planartPlanfeststellung
      *
      * Hier kann die Art des Planverfahrens übermittelt werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType $planart
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType $planartPlanfeststellung
      * @return self
      */
-    public function setPlanart(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType $planart = null)
+    public function setPlanartPlanfeststellung(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType $planartPlanfeststellung = null)
     {
-        $this->planart = $planart;
+        $this->planartPlanfeststellung = $planartPlanfeststellung;
         return $this;
     }
 
     /**
-     * Gets as verfahrensart
+     * Gets as verfahrensschrittPlanfeststellung
+     *
+     * Hier ist der Verfahrensschritt zu übermitteln.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType
+     */
+    public function getVerfahrensschrittPlanfeststellung()
+    {
+        return $this->verfahrensschrittPlanfeststellung;
+    }
+
+    /**
+     * Sets a new verfahrensschrittPlanfeststellung
+     *
+     * Hier ist der Verfahrensschritt zu übermitteln.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType $verfahrensschrittPlanfeststellung
+     * @return self
+     */
+    public function setVerfahrensschrittPlanfeststellung(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType $verfahrensschrittPlanfeststellung)
+    {
+        $this->verfahrensschrittPlanfeststellung = $verfahrensschrittPlanfeststellung;
+        return $this;
+    }
+
+    /**
+     * Gets as verfahrensartPlanfeststellung
      *
      * Hier kann die Art des Beteiligungsverfahrens übermittelt werden.
      *
      * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensartPlanfeststellungType
      */
-    public function getVerfahrensart()
+    public function getVerfahrensartPlanfeststellung()
     {
-        return $this->verfahrensart;
+        return $this->verfahrensartPlanfeststellung;
     }
 
     /**
-     * Sets a new verfahrensart
+     * Sets a new verfahrensartPlanfeststellung
      *
      * Hier kann die Art des Beteiligungsverfahrens übermittelt werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensartPlanfeststellungType $verfahrensart
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensartPlanfeststellungType $verfahrensartPlanfeststellung
      * @return self
      */
-    public function setVerfahrensart(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensartPlanfeststellungType $verfahrensart = null)
+    public function setVerfahrensartPlanfeststellung(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensartPlanfeststellungType $verfahrensartPlanfeststellung = null)
     {
-        $this->verfahrensart = $verfahrensart;
+        $this->verfahrensartPlanfeststellung = $verfahrensartPlanfeststellung;
         return $this;
     }
 
@@ -321,61 +317,9 @@ class BeteiligungPlanfeststellungType
     }
 
     /**
-     * Gets as verfahrensschritt
-     *
-     * Hier ist der Verfahrensschritt zu übermitteln.
-     *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType
-     */
-    public function getVerfahrensschritt()
-    {
-        return $this->verfahrensschritt;
-    }
-
-    /**
-     * Sets a new verfahrensschritt
-     *
-     * Hier ist der Verfahrensschritt zu übermitteln.
-     *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType $verfahrensschritt
-     * @return self
-     */
-    public function setVerfahrensschritt(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType $verfahrensschritt)
-    {
-        $this->verfahrensschritt = $verfahrensschritt;
-        return $this;
-    }
-
-    /**
-     * Gets as durchgang
-     *
-     * Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.
-     *
-     * @return int
-     */
-    public function getDurchgang()
-    {
-        return $this->durchgang;
-    }
-
-    /**
-     * Sets a new durchgang
-     *
-     * Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.
-     *
-     * @param int $durchgang
-     * @return self
-     */
-    public function setDurchgang($durchgang)
-    {
-        $this->durchgang = $durchgang;
-        return $this;
-    }
-
-    /**
      * Gets as flaechenabgrenzungUrl
      *
-     * URL eines Kartendienstes
+     * Hier kann zur Visualisierung der Flächenabgrenzung eine URL auf einen Kartendienst übermittelt werden.
      *
      * @return string
      */
@@ -387,7 +331,7 @@ class BeteiligungPlanfeststellungType
     /**
      * Sets a new flaechenabgrenzungUrl
      *
-     * URL eines Kartendienstes
+     * Hier kann zur Visualisierung der Flächenabgrenzung eine URL auf einen Kartendienst übermittelt werden.
      *
      * @param string $flaechenabgrenzungUrl
      * @return self
@@ -451,150 +395,6 @@ class BeteiligungPlanfeststellungType
     }
 
     /**
-     * Gets as bekanntmachung
-     *
-     * Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
-     *
-     * @return \DateTime
-     */
-    public function getBekanntmachung()
-    {
-        return $this->bekanntmachung;
-    }
-
-    /**
-     * Sets a new bekanntmachung
-     *
-     * Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).
-     *
-     * @param \DateTime $bekanntmachung
-     * @return self
-     */
-    public function setBekanntmachung(\DateTime $bekanntmachung)
-    {
-        $this->bekanntmachung = $bekanntmachung;
-        return $this;
-    }
-
-    /**
-     * Adds as aktuelleMitteilung
-     *
-     * Hier können aktuelle Mitteilungen übermittelt werden.
-     *
-     * @return self
-     * @param string $aktuelleMitteilung
-     */
-    public function addToAktuelleMitteilung($aktuelleMitteilung)
-    {
-        $this->aktuelleMitteilung[] = $aktuelleMitteilung;
-        return $this;
-    }
-
-    /**
-     * isset aktuelleMitteilung
-     *
-     * Hier können aktuelle Mitteilungen übermittelt werden.
-     *
-     * @param int|string $index
-     * @return bool
-     */
-    public function issetAktuelleMitteilung($index)
-    {
-        return isset($this->aktuelleMitteilung[$index]);
-    }
-
-    /**
-     * unset aktuelleMitteilung
-     *
-     * Hier können aktuelle Mitteilungen übermittelt werden.
-     *
-     * @param int|string $index
-     * @return void
-     */
-    public function unsetAktuelleMitteilung($index)
-    {
-        unset($this->aktuelleMitteilung[$index]);
-    }
-
-    /**
-     * Gets as aktuelleMitteilung
-     *
-     * Hier können aktuelle Mitteilungen übermittelt werden.
-     *
-     * @return string[]
-     */
-    public function getAktuelleMitteilung()
-    {
-        return $this->aktuelleMitteilung;
-    }
-
-    /**
-     * Sets a new aktuelleMitteilung
-     *
-     * Hier können aktuelle Mitteilungen übermittelt werden.
-     *
-     * @param string[] $aktuelleMitteilung
-     * @return self
-     */
-    public function setAktuelleMitteilung(array $aktuelleMitteilung = null)
-    {
-        $this->aktuelleMitteilung = $aktuelleMitteilung;
-        return $this;
-    }
-
-    /**
-     * Gets as zeitraum
-     *
-     * Zeitraum (Beginn und Ende) einer Beteiligungsphase.
-     *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType
-     */
-    public function getZeitraum()
-    {
-        return $this->zeitraum;
-    }
-
-    /**
-     * Sets a new zeitraum
-     *
-     * Zeitraum (Beginn und Ende) einer Beteiligungsphase.
-     *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType $zeitraum
-     * @return self
-     */
-    public function setZeitraum(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType $zeitraum)
-    {
-        $this->zeitraum = $zeitraum;
-        return $this;
-    }
-
-    /**
-     * Gets as veroeffentlichungszeitraum
-     *
-     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
-     *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType
-     */
-    public function getVeroeffentlichungszeitraum()
-    {
-        return $this->veroeffentlichungszeitraum;
-    }
-
-    /**
-     * Sets a new veroeffentlichungszeitraum
-     *
-     * Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.
-     *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType $veroeffentlichungszeitraum
-     * @return self
-     */
-    public function setVeroeffentlichungszeitraum(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType $veroeffentlichungszeitraum = null)
-    {
-        $this->veroeffentlichungszeitraum = $veroeffentlichungszeitraum;
-        return $this;
-    }
-
-    /**
      * Gets as beteiligungURL
      *
      * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
@@ -621,68 +421,54 @@ class BeteiligungPlanfeststellungType
     }
 
     /**
-     * Adds as anlage
+     * Gets as beteiligungOeffentlichkeit
      *
-     * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
+     * Hier können Angaben zur Beteiligung der Öffentlichkeit gemacht werden.
      *
-     * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType $anlage
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType
      */
-    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType $anlage)
+    public function getBeteiligungOeffentlichkeit()
     {
-        $this->anlagen[] = $anlage;
+        return $this->beteiligungOeffentlichkeit;
+    }
+
+    /**
+     * Sets a new beteiligungOeffentlichkeit
+     *
+     * Hier können Angaben zur Beteiligung der Öffentlichkeit gemacht werden.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType $beteiligungOeffentlichkeit
+     * @return self
+     */
+    public function setBeteiligungOeffentlichkeit(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType $beteiligungOeffentlichkeit = null)
+    {
+        $this->beteiligungOeffentlichkeit = $beteiligungOeffentlichkeit;
         return $this;
     }
 
     /**
-     * isset anlagen
+     * Gets as beteiligungTOEB
      *
-     * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
+     * Hier können Angaben zur Beteiligung der Träger öffentlicher Belange gemacht werden.
      *
-     * @param int|string $index
-     * @return bool
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType
      */
-    public function issetAnlagen($index)
+    public function getBeteiligungTOEB()
     {
-        return isset($this->anlagen[$index]);
+        return $this->beteiligungTOEB;
     }
 
     /**
-     * unset anlagen
+     * Sets a new beteiligungTOEB
      *
-     * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
+     * Hier können Angaben zur Beteiligung der Träger öffentlicher Belange gemacht werden.
      *
-     * @param int|string $index
-     * @return void
-     */
-    public function unsetAnlagen($index)
-    {
-        unset($this->anlagen[$index]);
-    }
-
-    /**
-     * Gets as anlagen
-     *
-     * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
-     *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType[]
-     */
-    public function getAnlagen()
-    {
-        return $this->anlagen;
-    }
-
-    /**
-     * Sets a new anlagen
-     *
-     * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
-     *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType[] $anlagen
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType $beteiligungTOEB
      * @return self
      */
-    public function setAnlagen(array $anlagen = null)
+    public function setBeteiligungTOEB(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType $beteiligungTOEB = null)
     {
-        $this->anlagen = $anlagen;
+        $this->beteiligungTOEB = $beteiligungTOEB;
         return $this;
     }
 }
