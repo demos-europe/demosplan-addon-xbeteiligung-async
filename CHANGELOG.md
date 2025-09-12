@@ -1,6 +1,9 @@
 # Changelog
 
 ## UNRELEASED
+**XBeteiligung Standard Update Version 1.2**
+- The 1.2 version seems to be a living standard with ongoing updates.
+- Updated XSD files to the latest versions available on ado.
 
 **XSD Validation Fixes**
 - Fixed XSD validation failures in XBeteiligung message factory by implementing default fallback codes

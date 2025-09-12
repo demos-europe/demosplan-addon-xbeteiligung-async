@@ -1,4 +1,4 @@
-DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType:
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType:
     properties:
         beteiligungsID:
             expose: true
@@ -68,17 +68,17 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKomm
                 inline: false
                 entry_name: anlage
                 skip_when_empty: true
-#                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
-        beteiligungKommunalOeffentlichkeitArt:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+        beteiligungPlanfeststellungTOEBArt:
             expose: true
             access_type: public_method
-            serialized_name: beteiligungKommunalOeffentlichkeitArt
+            serialized_name: beteiligungPlanfeststellungTOEBArt
             xml_element:
                 namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
-                getter: getBeteiligungKommunalOeffentlichkeitArt
-                setter: setBeteiligungKommunalOeffentlichkeitArt
-            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType
+                getter: getBeteiligungPlanfeststellungTOEBArt
+                setter: setBeteiligungPlanfeststellungTOEBArt
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType\BeteiligungPlanfeststellungTOEBArtAnonymousPHPType
         veroeffentlichungszeitraum:
             expose: true
             access_type: public_method
