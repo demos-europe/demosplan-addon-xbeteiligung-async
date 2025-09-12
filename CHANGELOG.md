@@ -1,6 +1,9 @@
 # Changelog
 
 ## UNRELEASED
+- fix token length check
+- improve logging
+
 ## v0.32 (2025-09-12)
 - fix mysql 5.7 compatibility
 
