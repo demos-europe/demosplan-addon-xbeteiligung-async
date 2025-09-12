@@ -33,6 +33,14 @@ use JsonException;
 class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 {
     /**
+     * Default fallback codes for XBeteiligung mappings
+     */
+    private const DEFAULT_STATUS_CODE = '1000'; // "neue Stellungnahme" - most common starting state
+    private const DEFAULT_STATEMENT_ART_CODE = '9999'; // "sonstiges" - catch-all for unknown types
+    private const DEFAULT_FEEDBACK_CODE = '1000'; // "E-Mail" - most common feedback method
+    private const DEFAULT_PRIORITY_CODE = '3'; // "nicht vergeben" - priority not assigned
+    private const DEFAULT_CONSIDERATION_CODE = '5000'; // "Die Stellungnahme wird zur Kenntnis genommen."
+    /**
      * Builds a valid XBeteiligungsmessage as a response of creating a statement.
      *
      * @throws Exception
@@ -150,7 +158,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
     private function statusDerStellungnahme($statusDerStellungnahme): string
     {
-        $statusDerStellungnahmeCode = '';
         $statusDerStellungnahmeMapping = [
             'new'                => '1000', //neue Stellungnahme
             'processing'         => '2000', //in Bearbeitung befindliche Stellungnahme
@@ -158,56 +165,75 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
             'statementFinalSent' => '4000', //Schlussmitteilung einer Stellungnahme wurde versendet
         ];
         if (array_key_exists($statusDerStellungnahme, $statusDerStellungnahmeMapping)) {
-            $statusDerStellungnahmeCode = $statusDerStellungnahmeMapping[$statusDerStellungnahme];
+            return $statusDerStellungnahmeMapping[$statusDerStellungnahme];
         }
-        return $statusDerStellungnahmeCode;
+
+        // Default fallback when no mapping is found to avoid empty code field
+        // which would cause XSD validation to fail
+        $this->logger->warning(
+            'Unknown status value encountered in XBeteiligung mapping',
+            ['value' => $statusDerStellungnahme, 'fallback' => self::DEFAULT_STATUS_CODE]
+        );
+        return self::DEFAULT_STATUS_CODE; // "neue Stellungnahme" - most common starting state
     }
 
     private function getArtOfStatement($artOfStatement): string
     {
-        $artOfStatementCode = '';
         $artOfStatementMapping = [
             'anonym'     => '1000',
             'namentlich' => '2000',
             'sonstiges'  => '9999',
         ];
         if (array_key_exists($artOfStatement, $artOfStatementMapping)) {
-            $artOfStatementCode = $artOfStatementMapping[$artOfStatement];
+            return $artOfStatementMapping[$artOfStatement];
         }
-        return $artOfStatementCode;
+
+        // Default fallback when no mapping is found to avoid empty code field
+        // which would cause XSD validation to fail
+        $this->logger->warning(
+            'Unknown statement art value encountered in XBeteiligung mapping',
+            ['value' => $artOfStatement, 'fallback' => self::DEFAULT_STATEMENT_ART_CODE]
+        );
+        return self::DEFAULT_STATEMENT_ART_CODE; // "sonstiges" - catch-all for unknown types
     }
 
     private function getArtOfFeedback($artOfFeedback): string
     {
-        $artOfFeedbackCode = '';
         $artOfFeedbackMapping = [
             'email' => '1000',
             'post' => '2000',
         ];
         if (array_key_exists($artOfFeedback, $artOfFeedbackMapping)) {
-            $artOfFeedbackCode = $artOfFeedbackMapping[$artOfFeedback];
+            return $artOfFeedbackMapping[$artOfFeedback];
         }
-        return $artOfFeedbackCode;
+
+        // Default fallback when no mapping is found to avoid empty code field
+        // which would cause XSD validation to fail
+        $this->logger->warning(
+            'Unknown feedback value encountered in XBeteiligung mapping',
+            ['value' => $artOfFeedback, 'fallback' => self::DEFAULT_FEEDBACK_CODE]
+        );
+        return self::DEFAULT_FEEDBACK_CODE; // "E-Mail" - most common feedback method
     }
 
     private function getPriority($priority): string
     {
-        $priorityCode = '';
         $priorityMapping = [
             'A-Punkt'        => '1',
             'B-Punkt'        => '2',
             '' => '3', // means not assigned
         ];
         if (array_key_exists($priority, $priorityMapping)) {
-            $priorityCode = $priorityMapping[$priority];
-        } else {
-            $this->logger->warning(
-                'tried to map a statement-priority that could not be mapped.',
-                ['givenPriority' => $priority]
-            );
+            return $priorityMapping[$priority];
         }
 
-        return $priorityCode;
+        // Default fallback when no mapping is found to avoid empty code field
+        // which would cause XSD validation to fail
+        $this->logger->warning(
+            'Unknown priority value encountered in XBeteiligung mapping',
+            ['value' => $priority, 'fallback' => self::DEFAULT_PRIORITY_CODE]
+        );
+        return self::DEFAULT_PRIORITY_CODE; // "nicht vergeben" - priority not assigned
     }
 
     /**
@@ -257,7 +283,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
     private function getAbwaegungVorschlag($abwaegungVorschlag): string
     {
-        $abwaegungVorschlagCode = '';
         $abwaegungVorschlagMapping = [
             'following'      => '1000',
             'followed'       => '2000',
@@ -266,11 +291,16 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
             'acknowledge'    => '5000',
         ];
         if (array_key_exists($abwaegungVorschlag, $abwaegungVorschlagMapping)) {
-            $abwaegungVorschlagCode = $abwaegungVorschlagMapping[$abwaegungVorschlag];
-        } else {
-            $this->logger->warning('the stn-vote-pla could be matched to a corresponding code.');
+            return $abwaegungVorschlagMapping[$abwaegungVorschlag];
         }
-        return $abwaegungVorschlagCode;
+
+        // Default fallback when no mapping is found to avoid empty code field
+        // which would cause XSD validation to fail
+        $this->logger->warning(
+            'Unknown consideration proposal value encountered in XBeteiligung mapping',
+            ['value' => $abwaegungVorschlag, 'fallback' => self::DEFAULT_CONSIDERATION_CODE]
+        );
+        return self::DEFAULT_CONSIDERATION_CODE; // "Die Stellungnahme wird zur Kenntnis genommen."
     }
 
     /**
