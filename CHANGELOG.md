@@ -1,6 +1,9 @@
 # Changelog
 
 ## UNRELEASED
+## v0.30 (2025-09-12)
+- technical release
+
 ## v0.29 (2025-09-12)
 - Enforce minimum auth token length for rest api access
 **XBeteiligung Standard Update Version 1.2**
