@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- fix mysql 5.7 compatibility
+
 ## v0.31 (2025-09-12)
 - keep php 8.1 compatibility
 
