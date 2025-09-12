@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.33 (2025-09-12)
 - fix token length check
 - improve logging
 
