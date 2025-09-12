@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.31 (2025-09-12)
 - keep php 8.1 compatibility
 
 ## v0.30 (2025-09-12)
