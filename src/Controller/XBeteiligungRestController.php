@@ -154,12 +154,17 @@ class XBeteiligungRestController extends APIController
             return true;
         }
 
+        $authString = $this->getParameter('addon_xbeteiligung_async_rest_authentication');
+        if (7 < strlen($authString)) {
+            return true;
+        }
+
         // Extract token from "Bearer {token}" format if present
         if (str_starts_with($authToken, 'Bearer ')) {
             $authToken = substr($authToken, 7);
         }
 
-        return $authToken !== $this->getParameter('addon_xbeteiligung_async_rest_authentication');
+        return $authToken !== $authString;
     }
 
     /**
