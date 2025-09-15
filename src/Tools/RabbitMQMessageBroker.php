@@ -12,101 +12,74 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tools;
 
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
-use DemosEurope\DemosplanAddon\Exception\JsonException;
-use DemosEurope\DemosplanAddon\Utilities\Json;
+use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungOutgoingRoutingKeyBuilder;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use Exception;
-use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
-use InvalidArgumentException;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
+use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class RabbitMQMessageBroker
 {
-    protected RpcClient $client;
-    private const RABBIT_MQ_QUEUE_NAME = 'addon_xbeteiligung_async_rabbitMqQueueName';
-    private const RABBIT_MQ_REQUEST_ID_GET = 'addon_xbeteiligung_async_rabbitMqRequestIdGet';
-    private const RABBIT_MQ_REQUEST_ID_SEND = 'addon_xbeteiligung_async_rabbitMqRequestIdSend';
-
     public function __construct(
-        private readonly GlobalConfigInterface $globalConfig,
+        private readonly XBeteiligungConfiguration $config,
+        private readonly XBeteiligungMessageProcessor $messageProcessor,
+        private readonly XBeteiligungMessageTransport $messageTransport,
+        private readonly XBeteiligungOutgoingRoutingKeyBuilder $outgoingRoutingKeyBuilder,
         private readonly LoggerInterface $logger,
-        private readonly ParameterBagInterface $parameterBag,
         private readonly StatementCreator $statementCreator,
         private readonly StatementMessageFactory $statementMessageFactory,
-        private readonly XBeteiligungService $xBeteiligungService,
+        private readonly XBeteiligungAuditService $auditService,
     ) {
-    }
-
-    /**
-     * @throws JsonException
-     * @throws ParameterNotFoundException
-     */
-    public function processMessages(): void
-    {
-        $routingKey = $this->globalConfig->getProjectPrefix();
-        if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
-            $routingKey = '';
-        }
-        $this->client->addRequest(
-            '',
-            $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
-            self::RABBIT_MQ_REQUEST_ID_GET,
-            $routingKey,
-            300
-        );
-        $replies = $this->client->getReplies();
-        $result = Json::decodeToArray($replies[self::RABBIT_MQ_REQUEST_ID_GET]);
-        $this->logger->info('Got response from RabbitMQ', [$result]);
-        foreach ($result as $message) {
-            $this->logger->info('Process message', [$message]);
-            try {
-                $responseObject = $this->xBeteiligungService->determineMessageContextAndDelegateAction($message);
-                $this->sendRabbitMq($responseObject->getPayload());
-            } catch (InvalidArgumentException $e) {
-                $this->logger->error('Message payload not supported', [$e]);
-            } catch (SchemaException $e) {
-                $this->logger->error('Incoming cockpit Message could not be parsed', [$e]);
-            } catch (Exception $e) {
-                $this->logger->error(
-                    'XBeteiligung Plugin - Could not execute
-                    (new procedure)401/411/421/301/311/321/201/211/221 |
-                    (delete procedure)409/419/429/309/319/329/209/219/229 |: ', [$e, $e->getTraceAsString()]
-                );
-            }
-        }
     }
 
     /**
      * @throws AMQPTimeoutException
      * @throws Exception
      */
-    protected function sendRabbitMq(string $xmlString, int $expiration = 300): bool
+    private function sendResponseToRabbitMq(string $xmlString, string $messageType, ?string $auditRecordId = null, ?string $incomingRoutingKey = null): bool
     {
-        $routingKey = $this->globalConfig->getProjectPrefix();
-        if ($this->globalConfig->isMessageQueueRoutingDisabled()) {
-            $routingKey = '';
+        try {
+            $routingKey = $this->outgoingRoutingKeyBuilder->buildFromIncomingRoutingKey(
+                $incomingRoutingKey,
+                $messageType
+            );
+
+            // Set outgoing routing key in audit record
+            if (null !== $auditRecordId) {
+                $this->auditService->setOutgoingRoutingKey($auditRecordId, $routingKey);
+            }
+
+            $success = $this->messageTransport->publishDirectMessage($xmlString, $routingKey);
+
+            if ($success) {
+                // Mark as sent after successful RabbitMQ communication
+                if (null !== $auditRecordId) {
+                    $this->auditService->markAsSent($auditRecordId);
+                }
+            } else {
+                throw new Exception('Failed to publish message to RabbitMQ');
+            }
+
+            return $success;
+        } catch (Exception $e) {
+            // Mark as failed only if RabbitMQ send failed (before markAsSent was called)
+            if (null !== $auditRecordId) {
+                $this->auditService->markAsFailed($auditRecordId, $e->getMessage());
+            }
+            throw $e;
         }
-        $this->logger->info('Send Response to RabbitMQ', [$xmlString]);
-        $this->client->addRequest(
-            $xmlString,
-            $this->parameterBag->get(self::RABBIT_MQ_QUEUE_NAME),
-            self::RABBIT_MQ_REQUEST_ID_SEND,
-            $routingKey,
-            $expiration
-        );
-        $replies = $this->client->getReplies();
-
-        $this->logger->info('Replies from RabbitMQ', [$replies]);
-
-        return Json::decodeToMatchingType($replies[self::RABBIT_MQ_REQUEST_ID_SEND]);
     }
 
     /**
@@ -115,17 +88,115 @@ class RabbitMQMessageBroker
     public function handleStatementCreatedEvent(StatementCreatedEventInterface $event): ?StatementCreatedEventInterface
     {
         $statementCreated = $this->statementCreator->getStatementCreatedFromEvent($event);
-        if ($statementCreated->getPlanId() === null) {
+        if (null === $statementCreated->getPlanId()) {
             $this->logger->error('StatementCreatedEvent has no planId', [$statementCreated]);
             return null;
         }
-        // this technically returns a response which is currently unused
 
         $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
         $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
-        $this->sendRabbitMq($xmlString);
+
+        // Audit statement message (701) with procedure context
+        $auditRecord = null;
+        if ($this->config->auditEnabled) {
+            $auditRecord = $this->auditService->auditSentMessage(
+                $xmlString,
+                XBeteiligungService::NEW_STATEMENT_MESSAGE_IDENTIFIER, // Statement message type
+                $statementCreated->getProcedureId(),
+                $statementCreated->getPlanId(),
+                null, // responseToMessageId
+                $statementCreated->getPublicId() // statementId
+            );
+        }
+
+        // Get original incoming routing key from audit for routing key-based outgoing message
+        $originalAuditRecord = $this->auditService->findOriginalIncoming401Message($statementCreated->getProcedureId());
+        $incomingRoutingKey = $originalAuditRecord?->getRoutingKey();
+
+        $this->sendResponseToRabbitMq(
+            $xmlString,
+            CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[AllgemeinStellungnahmeNeuabgegeben0701::class]['name'],
+            $auditRecord?->getId(),
+            $incomingRoutingKey
+        );
 
         return $event;
+    }
+
+    /**
+     * Process messages directly from a specific queue without request-response pattern
+     *
+     * @throws Exception
+     */
+    public function processMessages(string $queueName, int $maxMessages = null): void
+    {
+        $maxMessages ??= $this->config->maxMessagesPerCycle;
+
+        $this->logger->info('Direct queue consumption started', [
+            'queue' => $queueName,
+            'maxMessages' => $maxMessages
+        ]);
+
+        try {
+            // Create direct queue consumer
+            $consumer = $this->messageTransport->createDirectConsumer($queueName);
+
+            $processedCount = 0;
+            $consumer->consume($maxMessages, function(AMQPMessage $message) use (&$processedCount) {
+                $this->processMessage($message, $processedCount);
+            });
+        } catch (Exception $e) {
+            $this->logger->error('Queue consumption failed.', [
+                'queue' => $queueName,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
+        }
+
+        $this->logger->info('Queue consumption completed.', [
+            'queue' => $queueName,
+            'processedMessages' => $processedCount
+        ]);
+    }
+
+    /**
+     * Process a single message from the queue
+     *
+     * @param AMQPMessage $message The message to process
+     * @param int $processedCount Reference to the counter of processed messages
+     */
+    private function processMessage(AMQPMessage $message, int &$processedCount): void
+    {
+        try {
+            $messageData = new IncomingMessageData($message->getBody(), $message->getRoutingKey());
+            $responseData = $this->messageProcessor->processIncomingMessage($messageData);
+
+            if (null !== $responseData) {
+                // Publish response message to RabbitMQ using new direct publisher
+                $this->sendResponseToRabbitMq(
+                    $responseData->getMessageXml(),
+                    $responseData->getMessageStringIdentifier(),
+                    $responseData->getAuditId(),
+                    $message->getRoutingKey()
+                );
+                $this->logger->debug('Response published successfully', [
+                    'messageType' => $responseData->getMessageStringIdentifier()
+                ]);
+            } else {
+                $this->logger->debug('No response required - message processed for audit only');
+            }
+        } catch (Exception $e) {
+            $this->logger->error('Failed to process message.', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+        $processedCount++;
+        $this->logger->info('Message processed successfully.', [
+            'routingKey' => $message->getRoutingKey(),
+            'processedCount' => $processedCount
+        ]);
     }
 
     /**
@@ -133,6 +204,6 @@ class RabbitMQMessageBroker
      */
     public function setClient(RpcClient $client): void
     {
-        $this->client = $client;
+        $this->messageTransport->setClient($client);
     }
 }

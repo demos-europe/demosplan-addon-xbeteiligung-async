@@ -23,11 +23,13 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
@@ -44,6 +46,7 @@ use JMS\Serializer\Serializer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Log\Logger;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -53,7 +56,7 @@ class StatementCreatorTest extends TestCase
     protected Logger $logger;
     protected Serializer $serializer;
     protected XBeteiligungService $XBeteiligungService;
-    
+
     private MockFactoryTest $mockFactory;
     protected MockObject $permissionEvaluator;
     protected MockObject $gisLayerCategoryRepository;
@@ -81,24 +84,27 @@ class StatementCreatorTest extends TestCase
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
         $reusableMessageBlocks =
             new ReusableMessageBlocks(new CommonHelpers($this->createMock(LoggerInterface::class)));
-            
+
         $globalConfigMock = $this->createMock(GlobalConfigInterface::class);
         $globalConfigMock->method('getMapDefaultProjection')->willReturn([
             'label' => 'EPSG:3857',
         ]);
-            
+
         $xbeteiligungService = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
             $globalConfigMock,
             $this->createMock(KommunaleProcedureCreater::class),
+            $this->createMock(KommunaleProcedureUpdater::class),
             $this->createMock(LoggerInterface::class),
+            $this->createMock(ParameterBagInterface::class),
             $this->createMock( PlanningDocumentsLinkCreator::class),
             $this->procedureMessageRepository,
             $this->procedureNewsService,
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
-            $reusableMessageBlocks
+            $reusableMessageBlocks,
+            $this->createMock(XBeteiligungAuditService::class)
         );
         $this->XBeteiligungService = $xbeteiligungService;
         $this->logger = new Logger();

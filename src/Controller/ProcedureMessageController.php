@@ -2,9 +2,11 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Controller;
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Controller\APIController;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -23,6 +25,8 @@ class ProcedureMessageController extends APIController
     )]
     public function showNewImportableProcedureMessage(
         ProcedureMessageRepository $procedureMessageRepository,
+        ParameterBagInterface $parameterBag,
+        XBeteiligungAuditService $auditService,
         Request $request,
         string $procedureMessageId
     ): Response {
@@ -31,9 +35,32 @@ class ProcedureMessageController extends APIController
         }
 
         try {
-            $message = $procedureMessageRepository->getProcedureMessage($procedureMessageId);
+            $xmlContent = $procedureMessageRepository->getXmlContent($procedureMessageId);
             $procedureMessageRepository->updateObject($procedureMessageId);
-            $response = new Response($message, 200, ['Content-Type' => 'application/xml']);
+
+            // Audit K3 message delivery if audit is enabled
+            $auditEnabled = $parameterBag->get('addon_xbeteiligung_async_enable_audit');
+            if ($auditEnabled) {
+                $procedureMessageEntity = $procedureMessageRepository->get($procedureMessageId);
+                $auditId = $procedureMessageEntity->getAuditId();
+
+                if (null !== $auditId) {
+                    // Use the direct audit ID link for precise tracking
+                    $success = $auditService->markK3MessageAsDelivered($auditId);
+                    if (!$success) {
+                        $this->logger->warning('Failed to mark K3 message as delivered', [
+                            'procedureMessageId' => $procedureMessageId,
+                            'auditId' => $auditId
+                        ]);
+                    }
+                } else {
+                    $this->logger->warning('No audit ID found for procedure message', [
+                        'procedureMessageId' => $procedureMessageId
+                    ]);
+                }
+            }
+
+            $response = new Response($xmlContent, 200, ['Content-Type' => 'application/xml']);
         } catch (NoResultException|NonUniqueResultException $e) {
             $this->logger->warning('No unique procedure message found for given ID.', [
                 'exception' => $e->getMessage()

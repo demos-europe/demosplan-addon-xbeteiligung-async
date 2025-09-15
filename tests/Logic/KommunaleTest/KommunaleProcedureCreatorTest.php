@@ -87,7 +87,8 @@ class KommunaleProcedureCreatorTest extends TestCase
 
         self::assertInstanceOf(KommunalInitiieren0401::class, $inputMsgObj);
         // Act
-        $procedure = $this->sut->createNewKommunalProcedureFromXBeteiligungMessage($inputMsgObj);
+        $testRoutingKey = 'nrw.cockpit.bap.02.05.00200099.bdp.02.05.00200099.kommunal.initiieren.0401';
+        $procedure = $this->sut->createNewKommunalProcedureFromXBeteiligungMessage($inputMsgObj, $testRoutingKey);
         $inputMsgContent = $inputMsgObj->getNachrichteninhalt()->getBeteiligung();
 
         self::assertNotNull($inputMsgContent);

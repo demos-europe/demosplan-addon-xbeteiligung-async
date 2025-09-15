@@ -101,25 +101,16 @@ class XBeteiligungRestController extends APIController
                 throw new InvalidArgumentException('Empty request payload');
             }
 
-            // Create a message structure expected by the service
-            // We'll extract the message type from the XML content for logging
-            $messageTypeCode = $this->extractMessageTypeFromXml($xmlContent);
-            $message = [
-                'messageData' => $xmlContent,
-                'messageTypeCode' => $messageTypeCode
-            ];
-
             $logger->info("Processing XBeteiligung procedure {$operationType} request", [
-                'messageTypeCode' => $messageTypeCode,
                 'xmlStartsWith' => substr($xmlContent, 0, 200), // First 200 chars for debugging
                 'content_length' => strlen($xmlContent)
             ]);
 
             // Process the message using the same service that RabbitMQ would use
-            $responseObject = $xBeteiligungService->determineMessageContextAndDelegateAction($message);
+            $responseObject = $xBeteiligungService->processXmlMessage($xmlContent);
 
             // Prepare the XML response
-            $xmlPayload = $responseObject->getPayload();
+            $xmlPayload = $responseObject->getMessageXml();
             $response = new Response($xmlPayload);
             $response->headers->set('Content-Type', 'application/xml');
 
@@ -160,15 +151,24 @@ class XBeteiligungRestController extends APIController
     private function hasNoValidAuthToken(?string $authToken): bool
     {
         if (empty($authToken)) {
+            $this->logger->warning('Missing X-Addon-XBeteiligung-Authorization header');
+            return true;
+        }
+
+        $authString = $this->getParameter('addon_xbeteiligung_async_rest_authentication');
+        if (strlen($authString) < 7) {
+            $this->logger->warning('Invalid authentication token configured - must be 7 at least characters');
             return true;
         }
 
         // Extract token from "Bearer {token}" format if present
         if (str_starts_with($authToken, 'Bearer ')) {
+            $this->logger->info('Extracting token from Bearer scheme');
             $authToken = substr($authToken, 7);
+            $this->logger->info('Extracted token length: ' . strlen($authToken));
         }
 
-        return $authToken !== $this->getParameter('addon_xbeteiligung_async_rest_authentication');
+        return $authToken !== $authString;
     }
 
     /**
@@ -213,11 +213,11 @@ class XBeteiligungRestController extends APIController
                     return $type;
                 }
             }
-            
+
             // Extract the root element to make a better guess
             if (preg_match('/<([^:\s>]+:)?([^:\s>]+)/', $xmlContent, $matches)) {
                 $rootElement = $matches[2] ?? '';
-                
+
                 // If we found a root element, try to match it against code patterns
                 foreach ($codePatterns as $type => $pattern) {
                     if (preg_match($pattern, $rootElement)) {
@@ -225,7 +225,7 @@ class XBeteiligungRestController extends APIController
                     }
                 }
             }
-            
+
             // As a last resort, check if any of the codes appear in the XML
             foreach ($codePatterns as $type => $pattern) {
                 if (preg_match($pattern, $xmlContent)) {

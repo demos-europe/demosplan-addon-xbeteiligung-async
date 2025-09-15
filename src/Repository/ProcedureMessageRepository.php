@@ -69,7 +69,7 @@ class ProcedureMessageRepository extends ServiceEntityRepository
      * @return string
      * @throws Exception
      */
-    public function getProcedureMessage(string $procedureMessageID): string
+    public function getXmlContent(string $procedureMessageID): string
     {
         /** @var ProcedureMessage $procedureMessage **/
         $procedureMessage = $this->get($procedureMessageID);

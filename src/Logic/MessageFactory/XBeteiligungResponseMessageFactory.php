@@ -66,7 +66,13 @@ class XBeteiligungResponseMessageFactory
         $messageClass->setNachrichtenkopfG2g($header);
         $messageClass->setNachrichteninhalt($contentClass);
         $messageXml = SerializerFactory::serializeData($messageClass, $this->logger);
-        $response->setPayload($messageXml);
+        $response->setMessageXml($messageXml);
+        
+        // Set message string identifier from class mapping
+        $messageClassName = $messageClass::class;
+        $messageIdentifier = CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[$messageClassName]['name'] ?? '';
+        $response->setMessageStringIdentifier($messageIdentifier);
+        
         $response->lock();
 
         return $response;

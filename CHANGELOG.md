@@ -1,6 +1,214 @@
 # Changelog
 
 ## UNRELEASED
+## v0.33 (2025-09-12)
+- fix token length check
+- improve logging
+
+## v0.32 (2025-09-12)
+- fix mysql 5.7 compatibility
+
+## v0.31 (2025-09-12)
+- keep php 8.1 compatibility
+
+## v0.30 (2025-09-12)
+- technical release
+
+## v0.29 (2025-09-12)
+- Enforce minimum auth token length for rest api access
+**XBeteiligung Standard Update Version 1.2**
+- The 1.2 version seems to be a living standard with ongoing updates.
+- Updated XSD files to the latest versions available on ado.
+
+**XSD Validation Fixes**
+- Fixed XSD validation failures in XBeteiligung message factory by implementing default fallback codes
+- Resolved empty code field issues in StatementMessageFactory mapping functions:
+  - `statusDerStellungnahme()`: Default fallback to '1000' (neue Stellungnahme) 
+  - `getArtOfStatement()`: Default fallback to '9999' (sonstiges)
+  - `getArtOfFeedback()`: Default fallback to '1000' (E-Mail)
+  - `getPriority()`: Default fallback to '3' (nicht vergeben)
+  - `getAbwaegungVorschlag()`: Default fallback to '5000' (Die Stellungnahme wird zur Kenntnis genommen)
+- Fixed Raumordnung procedure phase mapping with fallback to '5000' (Konfiguration betroffene Öffentlichkeit)
+- Added comprehensive logging for unknown mapping values with fallback information
+- All fallback codes comply with XBeteiligung XSD enumeration requirements
+
+## v0.28 (2025-09-10)
+**Routing Key Architecture Implementation**
+- Add routing key field to XBeteiligungMessageAudit entity for complete message traceability
+- Implement comprehensive routing key parsing and building system with XBeteiligungRoutingKeyParser and XBeteiligungOutgoingRoutingKeyBuilder services
+- Replace XML-based AGS extraction with routing key-based customer identification and message routing
+- Add complete unit test coverage for routing key services with extensive data providers and validation
+- Create IncomingMessageData DTO and RoutingKeyComponents value object for structured routing key handling
+- Update message processing architecture to preserve routing keys throughout the entire workflow
+- Enhance audit system to store both incoming and outgoing routing keys for complete audit trails
+
+## v0.27 (2025-09-10)
+**XBeteiligung Phase Code Updates (DPLAN-16588)**
+- Updated participation phase codes: 5300/4300 → 5200/4200
+- Renamed phase 'earlyparticipation' to 'renewparticipation' for institution procedures
+- Added new 'discussiondate' phase (code 5400/4400) for both participation types
+
+## v0.26 (2025-09-05)
+- adjust rabbitmq exchange
+
+## v0.25 (2025-09-05)
+**Bug Fixes**
+- Fixed division by zero error in WMS URL generation when bounding box has zero width
+- Added comprehensive error logging with try-catch-rethrow blocks in event handlers:
+  - `newProcedureCreated()`: Logs errors during procedure creation events before rethrowing
+  - `onProcedureChanged()`: Logs errors during procedure update/delete events before rethrowing
+  - `handleStatementCreatedEvent()`: Logs errors during statement creation events before rethrowing
+- Added `WMS_DEFAULT_WIDTH`, `DIMENSION_WIDTH`, and `DIMENSION_HEIGHT` constants to replace magic strings
+- Enhanced logging for debugging collapsed/invalid bounding boxes
+
+## v0.24 (2025-09-04)
+**Features**
+- Added configurable procedure type name support via `addon_xbeteiligung_async_procedure_type_name` parameter
+
+**Bug Fixes**
+- Fixed "invalid procedureTypeId value" error by implementing parameter-based procedure type name configuration
+
+## v0.23 (2025-09-03)
+**Bug Fixes**
+- Fixed uninitialized typed property error in ResponseValue class
+
+## v0.22 (2025-09-03)
+**Statement ID Processing Improvements**
+- Added `removeStatementIdPrefix()` method to remove `ID_` prefix from statement IDs
+- Applied prefix removal to both 0711 (OK) and 0721 (NOK) statement response processing
+- Added `STATEMENT_ID_PREFIX` constant to avoid magic strings
+- Fixed statement ID length issues for database storage
+
+**Routing Key Processing Improvements**
+- Enhanced `XBeteiligungRoutingService::buildOutgoingRoutingKey()` to handle test environment routing keys
+- Added special handling for `xyz:0001` AGS codes in test environment 
+- Improved routing key format generation for both test and production environments
+- Fixed routing key structure to match expected format: `{project}.beteiligung.{agsPart}.{messageType}`
+
+**Kommunale Procedure Update Implementation (DPLAN-15682)**
+- Complete error handling in `KommunaleProcedureUpdater`
+- Moved `getErrorType()` method to `ProcedureCommonFeatures` base class
+- Updated to use `ProcedureServiceInterface::updateProcedureObject()` with
+direct EntityManager transactions
+- Replaced `determineMessageContextAndDelegateAction()` with streamlined
+`processXmlMessage()` method
+
+## v0.21 (2025-08-29)
+**RabbitMQ Direct Operations Implementation**
+
+**DirectMessageConsumer & DirectMessagePublisher:**
+
+  - New service implementing direct AMQP queue consumption using `basic_get()`
+  to eliminate RPC timeout issues that were causing 30-second AMQPTimeoutException errors.
+  - New service for publishing messages directly using `basic_publish()` with persistent
+  messaging (delivery_mode: 2) instead of problematic RPC calls.
+
+**Complete RPC Elimination:**
+
+  - Removed timeout-prone RPC request-response pattern from `XBeteiligungMessageTransport`
+  and `RabbitMQMessageBroker`.
+
+**Direct XML Processing:**
+  - Added `processXmlMessage()` method for handling XML messages without intermediate
+  array conversion, returning nullable ResponseValue for acknowledgment-only messages.
+
+**Statement Response Handling:**
+
+  - Implemented proper processing for 711/721 statement acknowledgment messages with audit
+  correlation using `findOriginalOutgoing701MessageByStatementId()`.
+
+**Queue Name Mapping:**
+
+  - Added configuration mapping for procedure types to their respective queues
+  (bau.beteiligung, pfv.beteiligung, rog.beteiligung).
+
+**Refactor RabbitMQMessageBroker following Symfony best practices (DPLAN-15764)**
+  
+  **Architecture Improvements:**
+  - Extracted XBeteiligungConfiguration for type-safe configuration management
+  - Created XBeteiligungRoutingService for routing key logic separation
+  - Added XBeteiligungMessageTransport for clean RabbitMQ communication abstraction
+  - Implemented XBeteiligungMessageProcessor for centralized message processing
+  - Reduced main class complexity from 370 lines to 140 lines (-62%)
+  
+  **Benefits:**
+  - Single Responsibility Principle compliance across all services
+  - Enhanced testability with clear service boundaries
+  - Type-safe configuration replacing magic string parameters
+  - Improved maintainability and reduced coupling
+  - Preserved all existing functionality while following Symfony patterns
+
+## v0.20.2 (2025-08-20)
+- add logging and add uuid for $requestId
+
+## v0.20.1 (2025-08-20)
+- fix (refs DPLAN-15681): Fix XML namespace validation for anlage elements
+  - Fixed namespace configuration issue in BeteiligungRaumordnungType that caused `<xbeteiligung:anlage>` elements instead of `<anlage>`
+  - Enhanced all XBeteiligung tests to include attachment validation, improving test coverage for namespace issues  
+  - Updated README with comprehensive namespace configuration documentation for future standard updates
+  - All XBeteiligung service tests now pass XSD validation with proper anlage element structure
+
+## v0.20 (2025-08-05)
+- adjust migrations
+
+## v0.19 (2025-08-04)
+- Add rabbitmq timeout parameter
+
+## v0.18 (2025-08-04)
+- Add comprehensive XBeteiligung message audit infrastructure (DPLAN-16006)
+  
+  **Core Infrastructure:**
+  - New XBeteiligungMessageAudit entity with comprehensive audit tracking
+  - XBeteiligungMessageAuditRepository for efficient data access
+  - XBeteiligungAuditService providing centralized audit operations
+  - Database migration with optimized indexes for high-performance querying
+  
+  **Complete Message Coverage:**
+  - Cockpit (RabbitMQ) incoming messages: procedure creation (401) with planId extraction
+  - Cockpit outgoing responses: OK/NOK acknowledgments (411/421) with message linking
+  - Statement messages: new statement submissions (701) with statement ID tracking  
+  - K3 system messages: procedure lifecycle messages (401/402/409/301/302/309)
+  
+  **Audit Features:**
+  - Status lifecycle tracking: pending → processed/sent/failed
+  - Full XML content preservation with metadata (procedure ID, plan ID, statement ID, target system)
+  - Message relationship tracking via responseToMessageId for complete audit trails
+  - Timestamp tracking (created_at, processed_at, sent_at) for performance analysis
+  - Error details capture for failed message processing
+  - Configurable via `addon_xbeteiligung_async_enable_audit` parameter (default: true)
+  
+  **Code Quality Improvements:**
+  - Replace magic strings with service constants across codebase
+  - Improve method naming clarity (getProcedureMessage → getXmlContent)
+  - Remove redundant wrapper methods and unused constructor dependencies
+  - Enhanced constant naming consistency
+  
+  **Documentation & Testing:**
+  - Unit test coverage for XBeteiligungAuditService
+  - Comprehensive technical documentation with message flow details
+
+- Add dynamic AGS-based routing key system for RabbitMQ communication (DPLAN-15764)
+  
+  **Dynamic Routing Implementation:**
+  - Replace static project prefix routing with dynamic AGS (Amtlicher Gemeindeschlüssel) extraction
+  - Outgoing routing: `{project_type}.beteiligung.{sender_organisation}.{sender_ags}.{receiver_organisation}.{receiver_ags}.{message_type}`
+  - Incoming routing: `*.cockpit.#` (multi-mandant support)
+  - Example: `bau.beteiligung.bdp.020200000099.bap.020100000099.kommunal.initiieren.0411`
+  - Project type mapping: Kommunal→bau, Raumordnung→rog, Planfeststellung→pfv
+  
+  **AGS Data Management:**
+  - New XBeteiligungAgsService for dynamic AGS extraction from audit XML
+  - Direct AGS extraction from procedure audit messages without database storage
+  - Performance-optimized XML parsing with XÖV-compliant AGS code validation
+  - Clean separation of concerns between audit storage and AGS extraction
+  
+  **Multi-tenant Configuration:**
+  - Multi-mandant incoming routing with `*.cockpit.#` pattern
+  - Remove legacy static routing key parameters
+  - Fail-fast error handling with comprehensive logging
+  - XÖV-compliant routing key format implementation
+
+## v0.17 (2025-06-30)
 - Change xbeteiligung standard from 1.3 to 1.2
 - Changed the primary namespace for this addon to XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
   as we implement the xBeteiligung standard for public participation workflows.
@@ -49,7 +257,6 @@
   - Fixed constructor parameter issues and method visibility
   - Cleaned up unnecessary property declarations in test classes
   - Updated test XML namespace from `xbeteiligung/12` to `xbeteiligung/1/3` and version from 1.1 to 1.3 to match XSD updates
-
 
 ###  v0.15 (2025-05-27)
 - fix getting map default projection label

@@ -24,6 +24,8 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Form\Procedure\AbstractProcedureFormTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\CustomerServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterface;
@@ -34,6 +36,10 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtrac
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAgsService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungCustomerMappingService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingKeyParser;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\RoutingKeyComponents;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -246,5 +252,63 @@ class MockFactoryTest
     public function getXBeteiligungMapServiceMock(): XBeteiligungMapService|MockObject
     {
         return $this->testCase->createMockObject(XBeteiligungMapService::class);
+    }
+
+    public function getCustomerServiceInterfaceMock(): CustomerServiceInterface|MockObject
+    {
+        return $this->testCase->createMockObject(CustomerServiceInterface::class);
+    }
+
+    public function getXBeteiligungCustomerMappingServiceMock(): XBeteiligungCustomerMappingService|MockObject
+    {
+        $mock = $this->testCase->createMockObject(XBeteiligungCustomerMappingService::class);
+        $mock->method('getCustomerByAgsCode')->willReturnCallback(function () {
+            $customerMock = $this->testCase->createMockObject(\DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface::class);
+            $customerMock->method('getId')->willReturn('test-customer-id');
+            return $customerMock;
+        });
+        
+        // Mock the new getCustomerByFederalStateCode method
+        $mock->method('getCustomerByFederalStateCode')->willReturnCallback(function () {
+            $customerMock = $this->testCase->createMockObject(\DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface::class);
+            $customerMock->method('getId')->willReturn('test-customer-id');
+            return $customerMock;
+        });
+        
+        return $mock;
+    }
+
+    public function getXBeteiligungRoutingKeyParserMock(): XBeteiligungRoutingKeyParser|MockObject
+    {
+        $mock = $this->testCase->createMockObject(XBeteiligungRoutingKeyParser::class);
+        
+        // Mock parseRoutingKey to return test routing components
+        $mock->method('parseRoutingKey')->willReturnCallback(function (string $routingKey) {
+            // Parse a test routing key: nrw.cockpit.bap.02.05.00200099.bdp.02.05.00200099.kommunal.initiieren.0401
+            return new RoutingKeyComponents(
+                mandant: 'nrw',
+                direction: 'cockpit', 
+                dvdvOrg1: 'bap',
+                agsCode1: '02.05.00200099',
+                dvdvOrg2: 'bdp',
+                agsCode2: '02.05.00200099',
+                messageIdentifier: 'kommunal.initiieren.0401'
+            );
+        });
+        
+        // Mock extractFederalStateCodeFromRoutingKey to return test federal state
+        $mock->method('extractFederalStateCodeFromRoutingKey')->willReturn('05');
+        
+        return $mock;
+    }
+
+    public function getXBeteiligungAgsServiceMock(): XBeteiligungAgsService|MockObject
+    {
+        $mock = $this->testCase->createMockObject(XBeteiligungAgsService::class);
+        $mock->method('extractAgsCodesFromXmlObject')->willReturn([
+            'sender' => '020200000099',  // Valid Hamburg AGS code (Stage)
+            'receiver' => '020100000099'  // Valid Schleswig-Holstein AGS code (Stage)
+        ]);
+        return $mock;
     }
 }

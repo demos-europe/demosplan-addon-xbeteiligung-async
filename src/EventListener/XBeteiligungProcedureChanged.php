@@ -25,6 +25,7 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\UnitOfWork;
 use Exception;
+use Psr\Log\LoggerInterface;
 
 #[AsDoctrineListener(Events::onFlush)]
 class XBeteiligungProcedureChanged
@@ -35,7 +36,8 @@ class XBeteiligungProcedureChanged
     public function __construct(
         private readonly PermissionEvaluatorInterface  $permissionEvaluator,
         private readonly XBeteiligungDebugger $xBeteiligungDebugger,
-        private readonly XBeteiligungService $xBeteiligungService
+        private readonly XBeteiligungService $xBeteiligungService,
+        private readonly LoggerInterface $logger
     )
     {
     }
@@ -224,9 +226,21 @@ class XBeteiligungProcedureChanged
      */
     public function onProcedureChanged(ProcedureInterface $procedure): void
     {
-        $procedure->getDeleted()
-            ? $this->onProcedureSoftDeleted($procedure)
-            : $this->onProcedureUpdated($procedure);
+        try {
+            $procedure->getDeleted()
+                ? $this->onProcedureSoftDeleted($procedure)
+                : $this->onProcedureUpdated($procedure);
+        } catch (Exception $exception) {
+            $this->logger->error('XBeteiligung: Error in onProcedureChanged event handler', [
+                'procedureId' => $procedure->getId(),
+                'isDeleted' => $procedure->getDeleted(),
+                'error' => $exception->getMessage(),
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'trace' => $exception->getTraceAsString()
+            ]);
+            throw $exception;
+        }
     }
 
     /** The procedure still exists, only a delte flag is set.

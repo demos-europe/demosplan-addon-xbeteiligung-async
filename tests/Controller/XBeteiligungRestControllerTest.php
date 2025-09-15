@@ -98,27 +98,21 @@ class XBeteiligungRestControllerTest extends TestCase
         if (!empty($xmlData)) {
             if ($shouldThrowException) {
                 $this->xBeteiligungService->expects($this->once())
-                    ->method('determineMessageContextAndDelegateAction')
+                    ->method('processXmlMessage')
                     ->willThrowException(new \Exception('Service error'));
             } else {
                 $responseValue = new ResponseValue();
-                $responseValue->setPayload($responsePayload);
+                $responseValue->setMessageXml($responsePayload);
 
                 $this->xBeteiligungService->expects($this->once())
-                    ->method('determineMessageContextAndDelegateAction')
-                    ->with($this->callback(function($message) use ($xmlData, $expectedMessageType) {
-                        return is_array($message)
-                            && isset($message['messageData'])
-                            && $message['messageData'] === $xmlData
-                            && isset($message['messageTypeCode'])
-                            && $message['messageTypeCode'] === $expectedMessageType;
-                    }))
+                    ->method('processXmlMessage')
+                    ->with($xmlData)
                     ->willReturn($responseValue);
             }
         } else {
             // For empty payload, service should never be called
             $this->xBeteiligungService->expects($this->never())
-                ->method('determineMessageContextAndDelegateAction');
+                ->method('processXmlMessage');
         }
 
         // Execute controller method
