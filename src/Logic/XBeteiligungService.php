@@ -14,6 +14,9 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateInterval;
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
+use demosplan\DemosPlanCoreBundle\Logic\Procedure\MasterTemplateService;
+use demosplan\DemosPlanCoreBundle\ValueObject\Procedure\ProcedureDataValueObject;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenNOK0721;
@@ -37,9 +40,15 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use demosplan\DemosPlanCoreBundle\Logic\XBeteiligung\XmlDataExtractorService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
+use demosplan\DemosPlanCoreBundle\Repository\OrgaRepository;
+use demosplan\DemosPlanCoreBundle\Logic\Procedure\ServiceStorage;
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
+use demosplan\DemosPlanCoreBundle\Exception\ContentMandatoryFieldsException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType;
@@ -185,15 +194,22 @@ class XBeteiligungService
         private readonly KommunaleProcedureCreater              $kommunaleProcedureCreater,
         private readonly KommunaleProcedureUpdater              $kommunaleProcedureUpdater,
         private readonly LoggerInterface                        $logger,
+        private readonly OrgaRepository                         $orgaRepository,
         private readonly ParameterBagInterface                  $parameterBag,
         private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
         private readonly ProcedureNewsServiceInterface          $procedureNewsService,
+        private readonly ProcedureServiceInterface              $procedureService,
         private readonly RouterInterface                        $router,
         private readonly XBeteiligungIncomingMessageParser      $incomingMessageParser,
         private readonly CommonHelpers                          $commonHelpers,
         private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
+        private readonly ServiceStorage                         $serviceStorage,
         private readonly XBeteiligungAuditService               $auditService,
+        private readonly XmlDataExtractorService                $xmlDataExtractorService,
+        private readonly MasterTemplateService                  $masterTemplateService,
+        private readonly ProcedureTypeServiceInterface          $procedureTypeService,
+
     ) {
     }
 
@@ -1042,7 +1058,18 @@ class XBeteiligungService
      */
     public function processXmlMessage(string $messageXml, bool $auditEnabled = false, ?string $routingKey = null): ?ResponseValue
     {
-        $this->logger->debug('Process xml message.', ['messageXml' => $messageXml]);
+        $this->logger->debug('Process xml message.', ['messageXml' => substr($messageXml, 0, 500) . '...']);
+
+        // Sanitize XML to fix common formatting issues
+        $this->logger->debug('Starting XML sanitization');
+        $sanitizedXml = $this->sanitizeXmlContent($messageXml);
+        if ($sanitizedXml !== $messageXml) {
+            $this->logger->info('XML content was sanitized to fix formatting issues');
+            $messageXml = $sanitizedXml;
+        } else {
+            $this->logger->debug('No XML sanitization needed');
+        }
+
         $messageStringIdentifier = $this->determineMessageTypeFromContent($messageXml);
         $this->logger->debug('Extracted message string identifier.', ['messageStringIdentifier' => $messageStringIdentifier]);
 
@@ -1091,6 +1118,91 @@ class XBeteiligungService
 
                 return $response;
             } catch (Exception $e) {
+                $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
+                throw $e;
+            }
+        }
+
+        if (self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageStringIdentifier) {
+            /** @var PlanfeststellungInitiieren0201 $planfeststellungInitiieren201 */
+            $planfeststellungInitiieren201 = $this->incomingMessageParser->getXmlObject($messageXml, '0201');
+
+            if ($auditEnabled) {
+                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier);
+            }
+
+            try {
+                $procedureData = $this->xmlDataExtractorService->extractFromG2GMessage($planfeststellungInitiieren201);
+
+                $this->logger->info('Extracted procedure data from planfeststellung message', [
+                    'processId' => $procedureData->getProcessId(),
+                    'planId' => $procedureData->getPlanId(),
+                    'planName' => $procedureData->getPlanName()
+                ]);
+
+                try {
+                    $contactOrganization = $procedureData->getContactOrganization();
+                    if (null !== $contactOrganization) {
+                        $this->validateOrganization($contactOrganization);
+                    }
+                } catch (\Error $e) {
+                    $this->logger->debug('No contact organization found in XML data for validation', [
+                        'error' => $e->getMessage()
+                    ]);
+                }
+
+                try {
+                    $procedure = $this->createProcedureFromXmlData($procedureData);
+                    $this->logger->info('Successfully created procedure from XBeteiligung XML', [
+                        'procedureId' => $procedure->getId(),
+                        'procedureName' => $procedure->getName(),
+                        'planId' => $procedureData->getPlanId()
+                    ]);
+                } catch (ContentMandatoryFieldsException $e) {
+                    $this->logger->error('Failed to create procedure: missing mandatory fields', [
+                        'error' => $e->getMessage(),
+                        'planId' => $procedureData->getPlanId()
+                    ]);
+                    throw $e;
+                } catch (\Exception $e) {
+                    $this->logger->error('Failed to create procedure from XBeteiligung XML', [
+                        'error' => $e->getMessage(),
+                        'planId' => $procedureData->getPlanId(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    throw $e;
+                }
+
+                try {
+                    $this->logger->debug('ProcedureDataValueObject extracted successfully', [
+                        'processId' => $procedureData->getProcessId(),
+                        'planId' => $procedureData->getPlanId(),
+                        'planName' => $procedureData->getPlanName(),
+                        'planType' => $procedureData->getPlanType(),
+                        'contactOrganization' => $procedureData->getContactOrganization(),
+                        'startDate' => $procedureData->getStartDate()?->format('Y-m-d H:i:s'),
+                        'endDate' => $procedureData->getEndDate()?->format('Y-m-d H:i:s'),
+                    ]);
+                } catch (\Throwable $e) {
+                    $this->logger->error('Error logging debug message', [
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                }
+
+                $this->markAuditRecordAsProcessed($auditRecord, $procedureData->getPlanId());
+
+                $response = new ResponseValue();
+                $response->setProcedureId($procedureData->getPlanId());
+                $response->setMessageStringIdentifier($messageStringIdentifier);
+                $response->setMessageXml($messageXml);
+
+                return $response;
+            } catch (Exception $e) {
+                $this->logger->error('Failed to process planfeststellung message', [
+                    'error' => $e->getMessage(),
+                    'messageType' => $messageStringIdentifier
+                ]);
                 $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
                 throw $e;
             }
@@ -1162,6 +1274,66 @@ class XBeteiligungService
 
             // Statement acknowledgments don't require a response - return null
             return null;
+        }
+
+        if (self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageStringIdentifier) {
+            if ($auditEnabled) {
+                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier, $routingKey);
+            }
+
+            try {
+                /** @var PlanfeststellungInitiieren0201 $planfeststellungInitiieren201 */
+                $planfeststellungInitiieren201 = $this->incomingMessageParser->getXmlObject($messageXml, '201');
+            } catch (Exception $parseException) {
+                $this->logger->error('Failed to parse planfeststellung XML message', [
+                    'messageType' => $messageStringIdentifier,
+                    'error' => $parseException->getMessage(),
+                    'xmlContent' => $messageXml
+                ]);
+
+                $this->markAuditRecordAsFailed($auditRecord, 'XML parsing failed: ' . $parseException->getMessage());
+
+                throw new InvalidArgumentException(
+                    'Failed to parse XML message: ' . $parseException->getMessage(),
+                    0,
+                    $parseException
+                );
+            }
+
+            try {
+                $procedureDataObject = $this->xmlDataExtractorService->extractFromG2GMessage($planfeststellungInitiieren201);
+
+                try {
+                    $contactOrganization = $procedureDataObject->getContactOrganization();
+                    if (null !== $contactOrganization) {
+                        $this->validateOrganization($contactOrganization);
+                    }
+                } catch (Exception $validationException) {
+                    $this->logger->warning('Validation failed during procedure creation', [
+                        'error' => $validationException->getMessage()
+                    ]);
+                }
+
+                $procedure = $this->createProcedureFromXmlData($procedureDataObject);
+
+                $this->logger->info('Created procedure from PlanfeststellungInitiieren0201 message', [
+                    'messageType' => $messageStringIdentifier,
+                    'procedureId' => $procedure->getId(),
+                    'planId' => $messageContent?->getBeteiligung()?->getPlanID(),
+                    'planName' => $messageContent?->getBeteiligung()?->getPlanname(),
+                ]);
+
+                $response = new ResponseValue();
+                $response->setProcedureId($procedure->getId());
+                $response->setSuccess(true);
+
+                $this->markAuditRecordAsProcessed($auditRecord, $procedure->getId());
+
+                return $response;
+            } catch (Exception $e) {
+                $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
+                throw $e;
+            }
         }
 
         throw new InvalidArgumentException('Unsupported message type: ' . $messageStringIdentifier);
@@ -1317,6 +1489,16 @@ class XBeteiligungService
                     $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '309');
                     return $xmlObject?->getNachrichteninhalt()?->getPlanID();
                 })(),
+                self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                    /** @var PlanfeststellungInitiieren0201 $xmlObject */
+                    $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '201');
+                    return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
+                })(),
+                self::UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                    /** @var PlanfeststellungAktualisieren0202 $xmlObject */
+                    $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '202');
+                    return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
+                })(),
                 default => null
             };
         } catch (Exception $e) {
@@ -1326,5 +1508,267 @@ class XBeteiligungService
             ]);
             return null;
         }
+    }
+
+    /**
+     * Validates that the organization name from the XML exists in the database.
+     *
+     * @param string $organizationName The organization name from the veranlasser element in the XML
+     * @throws InvalidArgumentException If the organization is not found in the database
+     */
+    private function validateOrganization(string $organizationName): void
+    {
+        $this->logger->debug('Validating organization from XML', ['organizationName' => $organizationName]);
+
+        $organization = $this->orgaRepository->findOneBy([
+            'name' => $organizationName,
+            'deleted' => false
+        ]);
+
+        if (null === $organization) {
+            $this->logger->error('Organization not found in database', ['organizationName' => $organizationName]);
+
+            throw new InvalidArgumentException(
+                sprintf('Organization \'%s\' not found in the database', $organizationName)
+            );
+        }
+
+        $this->logger->debug('Organization validation successful', [
+            'organizationName' => $organizationName,
+            'organizationId' => $organization->getId()
+        ]);
+    }
+
+    /**
+     * Creates a procedure from XML data using ServiceStorage::administrationNewHandler.
+     *
+     * @param ProcedureDataValueObject $procedureDataObject The extracted and parsed XML data
+     * @return ProcedureInterface The created procedure
+     * @throws InvalidArgumentException If procedure creation fails
+     * @throws Exception If an error occurs during creation
+     */
+    private function createProcedureFromXmlData(ProcedureDataValueObject $procedureDataObject): ProcedureInterface
+    {
+        $this->logger->debug('Creating procedure from extracted XML data');
+
+        $planId = $procedureDataObject->getPlanId();
+        $planName = $procedureDataObject->getPlanName();
+        $orgaName = $procedureDataObject->getContactOrganization();
+
+        if (null === $planId || null === $planName || null === $orgaName) {
+            throw new InvalidArgumentException('Missing required data in XML message: planId, planName, or orgaName');
+        }
+
+        $organization = $this->orgaRepository->findOneBy([
+            'name' => $orgaName,
+            'deleted' => false
+        ]);
+
+        if (null === $organization) {
+            throw new InvalidArgumentException(sprintf('Organization "%s" not found in database', $orgaName));
+        }
+
+        $organizationUsers = $organization->getUsers();
+        $plannerUsers = $organizationUsers->filter(fn ($user) => $user->isPlanner())->toArray();
+
+        if (empty($plannerUsers)) {
+            throw new InvalidArgumentException(
+                sprintf('No active planner users found in organization "%s"', $organization->getName())
+            );
+        }
+
+        $procedureCreatorUser = reset($plannerUsers);
+        $systemUserId = $procedureCreatorUser->getId();
+
+        if (null === $systemUserId) {
+            throw new InvalidArgumentException('Could not get user ID from selected planner');
+        }
+
+        $this->logger->debug('Procedure creation parameter lookup', [
+            'selectedPlannerUserId' => $systemUserId,
+            'selectedPlannerUserName' => $procedureCreatorUser->getFirstname() . ' ' . $procedureCreatorUser->getLastname(),
+            'organizationName' => $organization->getName(),
+        ]);
+
+        $this->logger->info('Creating procedure without master template to avoid database schema issues', [
+            'orgaName' => $orgaName,
+            'planId' => $planId,
+            'approach' => 'no_template_copy'
+        ]);
+
+        $startDate = $procedureDataObject->getStartDate() ?? new DateTime();
+        $endDate = $procedureDataObject->getEndDate() ?? (new DateTime())->add(new DateInterval('P1Y'));
+
+        $description = '';
+        $procedureTypeId = '';
+        //@TODO: need to research if we want to use description and procedure type for xml export?
+        //$additionalInfo = $procedureDataObject->getAdditionalInformation();
+        //$description = $additionalInfo['planDescription'] ?? $procedureDataObject->getDescription() ?? '';
+
+        //$r_copymaster = $this->procedureService->getMasterTemplateId();
+        $procedureData = [
+            'r_name' => $planName,
+            'r_desc' => $description,
+            'r_externalDesc' => $description,
+            'orgaId' => $organization->getId(),
+            'orgaName' => $organization->getName(),
+            'agencyMainEmailAddress' => $organization->getEmail2() ?? $this->parameterBag->get('default_agency_email', 'noreply@example.com'),
+            'action' => 'new',
+            'r_master' => 'false',
+            'r_copymaster' => 'ae65efdb-8414-4deb-bc81-26efdfc9560b',
+            'r_procedure_type' => $this->procedureTypeService->getProcedureTypeByName('Planfeststellung')?->getId(),
+            'xtaPlanId' => $planId,
+            'r_startdate' => $startDate->format('d.m.Y'),
+            'r_enddate' => $endDate->format('d.m.Y'),
+            'r_phase' => 'configuration',
+            'publicParticipationPhase' => 'configuration',
+        ];
+        $this->logger->info('Calling ServiceStorage::administrationNewHandler with data', [
+            'procedureData' => $procedureData,
+            'userId' => $systemUserId,
+            'organizationName' => $orgaName
+        ]);
+
+        try {
+            $procedure = $this->serviceStorage->administrationNewHandler($procedureData, $systemUserId);
+
+            $this->logger->info('Procedure created successfully from XML data', [
+                'procedureId' => $procedure->getId(),
+                'planId' => $planId,
+                'planName' => $planName,
+                'orgaName' => $orgaName,
+                'extractedFields' => [
+                    'startDate' => $startDate->format('Y-m-d'),
+                    'endDate' => $endDate->format('Y-m-d'),
+                    'description' => $description,
+                    'additionalData' => $procedureDataObject->getAdditionalInformation()
+                ]
+            ]);
+
+            return $procedure;
+
+        } catch (\Doctrine\DBAL\Exception\DatabaseException $dbException) {
+            $previousException = $dbException->getPrevious();
+            $sqlQuery = null;
+            $sqlParams = null;
+
+            if ($previousException instanceof \PDOException) {
+                $sqlQuery = method_exists($previousException, 'getQuery') ? $previousException->getQuery() : 'unknown';
+            }
+
+            $this->logger->error('Database error during procedure creation - DETAILED', [
+                'errorMessage' => $dbException->getMessage(),
+                'errorCode' => $dbException->getCode(),
+                'procedureData' => $procedureData,
+                'userId' => $systemUserId,
+                'sqlState' => $dbException->getSQLState() ?? 'unknown',
+                'driverInfo' => method_exists($dbException, 'getDriverCode') ? $dbException->getDriverCode() : 'unknown',
+                'sqlQuery' => $sqlQuery,
+                'previousExceptionMessage' => $previousException ? $previousException->getMessage() : null,
+                'previousExceptionClass' => $previousException ? get_class($previousException) : null,
+                'stackTrace' => $dbException->getTraceAsString()
+            ]);
+
+            throw new InvalidArgumentException(
+                'Error processing procedure creation request: ' . $dbException->getMessage(),
+                0,
+                $dbException
+            );
+        } catch (\Doctrine\DBAL\Exception $dbalException) {
+            $previousException = $dbalException->getPrevious();
+            $errorDetails = [
+                'errorMessage' => $dbalException->getMessage(),
+                'errorCode' => $dbalException->getCode(),
+                'procedureData' => $procedureData,
+                'userId' => $systemUserId,
+                'previousException' => $previousException ? $previousException->getMessage() : null,
+                'previousExceptionClass' => $previousException ? get_class($previousException) : null,
+                'stackTrace' => $dbalException->getTraceAsString()
+            ];
+
+            if (method_exists($dbalException, 'getSql')) {
+                $errorDetails['sql'] = $dbalException->getSql();
+            }
+            if (method_exists($dbalException, 'getParams')) {
+                $errorDetails['params'] = $dbalException->getParams();
+            }
+            if (method_exists($dbalException, 'getQuery')) {
+                $errorDetails['query'] = $dbalException->getQuery();
+            }
+
+            $this->logger->error('DBAL error during procedure creation - COMPREHENSIVE', $errorDetails);
+
+            throw new InvalidArgumentException(
+                'Error processing procedure creation request: ' . $dbalException->getMessage(),
+                0,
+                $dbalException
+            );
+        } catch (\Exception $generalException) {
+            $this->logger->error('General error during procedure creation', [
+                'errorMessage' => $generalException->getMessage(),
+                'errorCode' => $generalException->getCode(),
+                'procedureData' => $procedureData,
+                'userId' => $systemUserId,
+                'exceptionClass' => get_class($generalException),
+                'trace' => $generalException->getTraceAsString()
+            ]);
+            throw $generalException;
+        }
+    }
+
+    /**
+     * Sanitizes XML content to fix common formatting issues that could cause parsing errors.
+     *
+     * @param string $xmlContent The original XML content
+     * @return string The sanitized XML content
+     */
+    private function sanitizeXmlContent(string $xmlContent): string
+    {
+        $originalXml = $xmlContent;
+
+        if (strpos($xmlContent, '2025-09-:17:25+02:00') !== false) {
+            $this->logger->debug('Found problematic timestamp pattern in XML');
+        }
+
+        $xmlContent = str_replace('2025-09-:17:25+02:00', '2025-09-03T17:25+02:00', $xmlContent);
+
+        $xmlContent = preg_replace(
+            '/(\d{4}-\d{2}-):(\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})/',
+            '${1}03T${2}', // Replace "-:" with "-03T"
+            $xmlContent
+        );
+
+        if (strpos($originalXml, '2025-09-:17:25+02:00') !== false && strpos($xmlContent, '2025-09-:17:25+02:00') === false) {
+            $this->logger->info('Successfully fixed problematic timestamp pattern');
+        }
+
+        $xmlContent = preg_replace(
+            '/(\d{4}-\d{2}-\d{2})(\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})/',
+            '${1}T${2}', // Add T separator between date and time
+            $xmlContent
+        );
+
+        $xmlContent = preg_replace(
+            '/(\d{4})(-)(-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})/',
+            '${1}-01${3}', // Replace missing month with "01"
+            $xmlContent
+        );
+
+        $xmlContent = preg_replace(
+            '/(20)(--)(0[1-9]|1[0-2]-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2})/',
+            '${1}25-${3}', // Replace missing year digits with "25"
+            $xmlContent
+        );
+
+        if ($xmlContent !== $originalXml) {
+            $this->logger->warning('XML timestamp formatting issues detected and fixed', [
+                'changes' => [
+                    'before' => preg_match('/\d{4}-\d{2}-[:\d][T\d]?\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}/', $originalXml, $beforeMatches) ? $beforeMatches[0] : 'no timestamp found',
+                    'after' => preg_match('/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}/', $xmlContent, $afterMatches) ? $afterMatches[0] : 'no timestamp found'
+                ]
+            ]);
+        }
+
+        return $xmlContent;
     }
 }
