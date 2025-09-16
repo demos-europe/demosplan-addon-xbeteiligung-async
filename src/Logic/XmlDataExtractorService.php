@@ -56,7 +56,7 @@ class XmlDataExtractorService
         $messageContent = $this->getMessageContent($xmlObject);
         if (null === $messageContent) {
             $this->logger->warning('No message content found in XML object', ['class' => $xmlObjectClass]);
-            return $procedureData->lock();
+            return $procedureData;
         }
 
         $this->extractProcessId($messageContent, $procedureData);
@@ -72,7 +72,7 @@ class XmlDataExtractorService
             'class' => $xmlObjectClass
         ]);
 
-        return $procedureData->lock();
+        return $procedureData;
     }
 
     /**
@@ -130,7 +130,7 @@ class XmlDataExtractorService
             $additionalInfo['testMessage'] = $xmlObject->getTest();
         }
 
-        $procedureData->setProperty('additionalInformation', $additionalInfo);
+        $procedureData->setAdditionalInformation($additionalInfo);
     }
 
     /**
@@ -159,7 +159,7 @@ class XmlDataExtractorService
             if (null !== $processId) {
                 $processIdValue = $this->nameExtractor->extractContactValue($processId);
                 if (null !== $processIdValue) {
-                    $procedureData->setProperty('processId', $processIdValue);
+                    $procedureData->setProcessId($processIdValue);
                 }
             }
         }
@@ -217,17 +217,17 @@ class XmlDataExtractorService
     {
         $planId = $participation->getPlanID();
         if (null !== $planId) {
-            $procedureData->setProperty('planId', $planId);
+            $procedureData->setPlanId($planId);
         }
 
         $planName = $participation->getPlanname();
         if (null !== $planName) {
-            $procedureData->setProperty('planName', $planName);
+            $procedureData->setPlanName($planName);
         }
 
         $workingTitle = $participation->getArbeitstitel();
         if (null !== $workingTitle) {
-            $procedureData->setProperty('workingTitle', $workingTitle);
+            $procedureData->setWorkingTitle($workingTitle);
         }
 
         $planType = $participation->getPlanart();
@@ -235,7 +235,7 @@ class XmlDataExtractorService
             $planTypeValue = method_exists($planType, 'getValue')
                 ? $planType->getValue()
                 : (property_exists($planType, 'value') ? $planType->value : null);
-            $procedureData->setProperty('planType', $planTypeValue);
+            $procedureData->setPlanType($planTypeValue);
         }
     }
 
@@ -248,7 +248,7 @@ class XmlDataExtractorService
             $participationType = $participation->getBeteiligungsart();
             if (null !== $participationType) {
                 $participationTypeValue = method_exists($participationType, 'getValue') ? $participationType->getValue() : null;
-                $procedureData->setProperty('participationType', $participationTypeValue);
+                $procedureData->setParticipationType($participationTypeValue);
             }
         }
 
@@ -256,7 +256,7 @@ class XmlDataExtractorService
             $proceduralStep = $participation->getVerfahrensschritt();
             if (null !== $proceduralStep) {
                 $proceduralStepValue = method_exists($proceduralStep, 'getValue') ? $proceduralStep->getValue() : (string) $proceduralStep;
-                $procedureData->setProperty('proceduralStep', $proceduralStepValue);
+                $procedureData->setProceduralStep($proceduralStepValue);
             }
         }
     }
@@ -274,7 +274,7 @@ class XmlDataExtractorService
                     if (null !== $startDateRaw) {
                         $startDate = $this->parseDateTime($startDateRaw);
                         if (null !== $startDate) {
-                            $procedureData->setProperty('startDate', $startDate);
+                            $procedureData->setStartDate($startDate);
                         }
                     }
                 }
@@ -284,7 +284,7 @@ class XmlDataExtractorService
                     if (null !== $endDateRaw) {
                         $endDate = $this->parseDateTime($endDateRaw);
                         if (null !== $endDate) {
-                            $procedureData->setProperty('endDate', $endDate);
+                            $procedureData->setEndDate($endDate);
                         }
                     }
                 }
@@ -299,7 +299,7 @@ class XmlDataExtractorService
             if (null !== $startDateRaw) {
                 $startDate = $this->parseDateTime($startDateRaw);
                 if (null !== $startDate) {
-                    $procedureData->setProperty('startDate', $startDate);
+                    $procedureData->setStartDate($startDate);
                 }
             }
         }
@@ -312,7 +312,7 @@ class XmlDataExtractorService
             if (null !== $endDateRaw) {
                 $endDate = $this->parseDateTime($endDateRaw);
                 if (null !== $endDate) {
-                    $procedureData->setProperty('endDate', $endDate);
+                    $procedureData->setEndDate($endDate);
                 }
             }
         }
@@ -322,7 +322,7 @@ class XmlDataExtractorService
             if (null !== $bekanntmachungRaw) {
                 $bekanntmachung = $this->parseDateTime($bekanntmachungRaw);
                 if (null !== $bekanntmachung) {
-                    $procedureData->setProperty('announcementDate', $bekanntmachung);
+                    $procedureData->setAnnouncementDate($bekanntmachung);
                 }
             }
         }
@@ -357,7 +357,7 @@ class XmlDataExtractorService
             $veranlasser = $projectActor->getVeranlasser();
             $nameValue = $this->nameExtractor->extractOrganizationName($veranlasser);
             if (null !== $nameValue) {
-                $procedureData->setProperty('contactOrganization', $nameValue);
+                $procedureData->setContactOrganization($nameValue);
                 $this->logger->debug('Extracted organization name from veranlasser', [
                     'organizationName' => $nameValue
                 ]);
@@ -373,10 +373,10 @@ class XmlDataExtractorService
                     try {
                         $existingOrgName = $procedureData->getContactOrganization();
                         if (null === $existingOrgName) {
-                            $procedureData->setProperty('contactOrganization', $nameValue);
+                            $procedureData->setContactOrganization($nameValue);
                         }
                     } catch (\Error $e) {
-                        $procedureData->setProperty('contactOrganization', $nameValue);
+                        $procedureData->setContactOrganization($nameValue);
                     }
                 }
             }
@@ -397,14 +397,14 @@ class XmlDataExtractorService
     {
         $personName = $this->nameExtractor->extractPersonName($contactPerson);
         if (null !== $personName) {
-            $procedureData->setProperty('contactPerson', $personName);
+            $procedureData->setContactPerson($personName);
         }
 
         if (method_exists($contactPerson, 'getEmail')) {
             $email = $contactPerson->getEmail();
             $emailValue = $this->nameExtractor->extractContactValue($email);
             if (null !== $emailValue) {
-                $procedureData->setProperty('contactEmail', $emailValue);
+                $procedureData->setContactEmail($emailValue);
             }
         }
 
@@ -412,7 +412,7 @@ class XmlDataExtractorService
             $phone = $contactPerson->getTelefon();
             $phoneValue = $this->nameExtractor->extractContactValue($phone);
             if (null !== $phoneValue) {
-                $procedureData->setProperty('contactPhone', $phoneValue);
+                $procedureData->setContactPhone($phoneValue);
             }
         }
     }
@@ -436,7 +436,7 @@ class XmlDataExtractorService
             $location = $participation->getOrtslage();
             if (null !== $location) {
                 $locationValue = method_exists($location, 'getValue') ? $location->getValue() : null;
-                $procedureData->setProperty('location', $locationValue);
+                $procedureData->setLocation($locationValue);
                 $additionalInfo['location'] = $locationValue;
             }
         }
@@ -445,7 +445,7 @@ class XmlDataExtractorService
             $description = $participation->getBeschreibung();
             if (null !== $description) {
                 $descriptionValue = method_exists($description, 'getValue') ? $description->getValue() : (string) $description;
-                $procedureData->setProperty('description', $descriptionValue);
+                $procedureData->setDescription($descriptionValue);
                 $additionalInfo['description'] = $descriptionValue;
             }
         }
@@ -454,7 +454,7 @@ class XmlDataExtractorService
             $planDescription = $participation->getBeschreibungPlanungsanlass();
             if (null !== $planDescription) {
                 $planDescriptionValue = method_exists($planDescription, 'getValue') ? $planDescription->getValue() : (string) $planDescription;
-                $procedureData->setProperty('planDescription', $planDescriptionValue);
+                $procedureData->setPlanDescription($planDescriptionValue);
                 $additionalInfo['planDescription'] = $planDescriptionValue;
             }
         }
@@ -463,7 +463,7 @@ class XmlDataExtractorService
             $areaUrl = $participation->getFlaechenabgrenzungUrl();
             if (null !== $areaUrl) {
                 $areaUrlValue = method_exists($areaUrl, 'getValue') ? $areaUrl->getValue() : (string) $areaUrl;
-                $procedureData->setProperty('areaDelimitationUrl', $areaUrlValue);
+                $procedureData->setAreaDelimitationUrl($areaUrlValue);
                 $additionalInfo['areaDelimitationUrl'] = $areaUrlValue;
             }
         }
@@ -472,7 +472,7 @@ class XmlDataExtractorService
             $jurisdiction = $participation->getGeltungsbereich();
             if (null !== $jurisdiction) {
                 $jurisdictionValue = method_exists($jurisdiction, 'getValue') ? $jurisdiction->getValue() : (string) $jurisdiction;
-                $procedureData->setProperty('jurisdiction', $jurisdictionValue);
+                $procedureData->setJurisdiction($jurisdictionValue);
                 $additionalInfo['jurisdiction'] = $jurisdictionValue;
             }
         }
@@ -481,7 +481,7 @@ class XmlDataExtractorService
             $spatialDescription = $participation->getRaeumlicheBeschreibung();
             if (null !== $spatialDescription) {
                 $spatialDescriptionValue = method_exists($spatialDescription, 'getValue') ? $spatialDescription->getValue() : (string) $spatialDescription;
-                $procedureData->setProperty('spatialDescription', $spatialDescriptionValue);
+                $procedureData->setSpatialDescription($spatialDescriptionValue);
                 $additionalInfo['spatialDescription'] = $spatialDescriptionValue;
             }
         }
@@ -490,7 +490,7 @@ class XmlDataExtractorService
             $participationUrl = $participation->getBeteiligungURL();
             if (null !== $participationUrl) {
                 $participationUrlValue = method_exists($participationUrl, 'getValue') ? $participationUrl->getValue() : (string) $participationUrl;
-                $procedureData->setProperty('participationUrl', $participationUrlValue);
+                $procedureData->setParticipationUrl($participationUrlValue);
                 $additionalInfo['participationUrl'] = $participationUrlValue;
             }
         }
@@ -499,7 +499,7 @@ class XmlDataExtractorService
             $durchgang = $participation->getDurchgang();
             if (null !== $durchgang) {
                 $durchgangValue = method_exists($durchgang, 'getValue') ? $durchgang->getValue() : (int) $durchgang;
-                $procedureData->setProperty('iteration', $durchgangValue);
+                $procedureData->setIteration($durchgangValue);
                 $additionalInfo['iteration'] = $durchgangValue;
             }
         }
@@ -511,12 +511,12 @@ class XmlDataExtractorService
 
             if (null !== $website) {
                 $websiteValue = method_exists($website, 'getValue') ? $website->getValue() : (string) $website;
-                $procedureData->setProperty('websiteUrl', $websiteValue);
+                $procedureData->setWebsiteUrl($websiteValue);
                 $additionalInfo['websiteUrl'] = $websiteValue;
             }
         }
 
-        $procedureData->setProperty('additionalInformation', $additionalInfo);
+        $procedureData->setAdditionalInformation($additionalInfo);
     }
 
     /**
