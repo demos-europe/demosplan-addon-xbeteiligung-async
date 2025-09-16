@@ -7,20 +7,18 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
 use DemosEurope\DemosplanAddon\Contracts\Events\AddonMaintenanceEventInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSubscriber;
-use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
-use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest\KommunaleProcedureHandlerFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\TestCase;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Channel\AMQPChannel;
 use Psr\Log\NullLogger;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Tests\Base\FunctionalTestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+
 
 class RabbitMQMessageProcessingIntegrationTest extends TestCase
 {
-    private GenericContainer $rabbitMQContainer;
+
     private AMQPStreamConnection $connection;
     private AMQPChannel $channel;
     private string $exchangeName = 'bau.beteiligung';
@@ -367,7 +365,7 @@ class RabbitMQMessageProcessingIntegrationTest extends TestCase
         $cockpitLogger = new NullLogger();
 
         // Create simple cache
-        $cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
+        $cache = new ArrayAdapter();
 
         // Create real RabbitMQMessageBroker with real config and logger, mock complex dependencies
         $messageProcessor = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor::class)->disableOriginalConstructor()->getMock();
@@ -377,7 +375,7 @@ class RabbitMQMessageProcessingIntegrationTest extends TestCase
         $statementMessageFactory = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory::class)->disableOriginalConstructor()->getMock();
         $auditService = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService::class)->disableOriginalConstructor()->getMock();
 
-        $rabbitMQMessageBroker = new \DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker(
+        $rabbitMQMessageBroker = new RabbitMQMessageBroker(
             $config,
             $messageProcessor,
             $messageTransport,
