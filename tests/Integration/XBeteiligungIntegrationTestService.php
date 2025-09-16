@@ -9,7 +9,10 @@ use DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSub
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
+use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
+use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use demosplan\DemosPlanCoreBundle\Logic\Procedure\ServiceStorage;
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonIntegrationTestInterface;
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonTestResult;
@@ -58,7 +61,8 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
         $realEventSubscriber = $container->get(XBeteiligungEventSubscriber::class);
         $entityManager = $container->get(EntityManagerInterface::class);
 
-        echo "✅ Got REAL XBeteiligungEventSubscriber: " . get_class($realEventSubscriber) . "\n";
+        // Configure the RabbitMQ transport to use the same connection as our test
+        $this->configureRabbitMQTransport($container);
 
         // Count procedures before processing
         $initialCount = $this->getProcedureCount($entityManager);
@@ -76,12 +80,12 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
             $entityManager->getConnection()->beginTransaction();
             echo "🔄 Started database transaction\n";
 
-            // Create simple maintenance event to trigger message processing (like production)
+            // Create maintenance event to trigger message processing (like production)
             $maintenanceEvent = new class implements AddonMaintenanceEventInterface {
                 public function getAddonName(): string { return 'XBeteiligung'; }
             };
 
-            echo "🚀 Triggering REAL XBeteiligung event processing...\n";
+            echo "🚀 Calling REAL XBeteiligung event processing...\n";
             echo "🎯 Calling XBeteiligungEventSubscriber::handleAddonMaintenanceEvent()\n";
 
             // This is the REAL production flow - event subscriber processes all messages
@@ -99,47 +103,6 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
 
             if ($auditId) {
                 echo "✅ Found audit entry from event processing: {$auditId}\n";
-            } else {
-                echo "⚠️ No audit entries found from event processing\n";
-
-                // If event subscriber didn't process messages, fall back to direct processing
-                if ($messageCountAfterEvent > 0) {
-                    echo "🔧 Falling back to direct message processing...\n";
-
-                    // Get the message processor for fallback
-                    $realMessageProcessor = $container->get(XBeteiligungMessageProcessor::class);
-
-                    // Process one message directly to ensure we get audit entries
-                    if ($message = $this->channel->basic_get($this->queueName, true)) {
-                        echo "📦 Got message from queue for direct processing\n";
-
-                        $messageData = new IncomingMessageData(
-                            $message->getBody(),
-                            $message->getRoutingKey()
-                        );
-
-                        // Process message directly
-                        $result = $realMessageProcessor->processIncomingMessage($messageData);
-                        echo "✅ Direct fallback processing completed: " . ($result === null ? 'null' : get_class($result)) . "\n";
-
-                        // Extract audit ID from direct processing result
-                        if ($result instanceof ResponseValue) {
-                            $auditId = $result->getAuditId();
-                            $messageIdentifier = $result->getMessageStringIdentifier();
-
-                            echo "📋 Fallback ResponseValue details:\n";
-                            echo "   Procedure ID: " . ($result->getProcedureId() ?? 'null') . "\n";
-                            echo "   Message String Identifier: {$messageIdentifier}\n";
-                            echo "   Audit ID: {$auditId}\n";
-                            echo "   Has Message XML: " . (!empty($result->getMessageXml()) ? 'yes' : 'no') . "\n";
-
-                            // Verify this is a validation failure (NOK response)
-                            if (str_contains($messageIdentifier, 'NOK')) {
-                                echo "✅ Expected validation failure detected: {$messageIdentifier}\n";
-                            }
-                        }
-                    }
-                }
             }
 
             // Commit transaction
@@ -230,6 +193,59 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
             $this->connection->close();
         }
         echo "🧹 Cleaned up RabbitMQ connections\n";
+    }
+
+    /**
+     * Configure the RabbitMQ transport service to use the same connection as our test
+     */
+    private function configureRabbitMQTransport(ContainerInterface $container): void
+    {
+        echo "🔧 Configuring RabbitMQ transport to use test connection...\n";
+
+        // Get the transport service and message broker
+        $transport = $container->get(XBeteiligungMessageTransport::class);
+        $messageBroker = $container->get(RabbitMQMessageBroker::class);
+
+        // Create a mock RpcClient that uses our test connection
+        $rpcClient = new class($this->connection, $this->channel) extends RpcClient {
+            private AMQPStreamConnection $testConnection;
+            private AMQPChannel $testChannel;
+
+            public function __construct(AMQPStreamConnection $connection, AMQPChannel $channel)
+            {
+                $this->testConnection = $connection;
+                $this->testChannel = $channel;
+                // Don't call parent constructor to avoid creating another connection
+            }
+
+            public function getChannel(): AMQPChannel
+            {
+                return $this->testChannel;
+            }
+
+            public function addRequest($msgBody, $server, $requestId = null, $routingKey = '', $expiration = 0): void
+            {
+                // Implementation not needed for our test
+            }
+
+            public function getReplies(): array
+            {
+                // Implementation not needed for our test
+                return [];
+            }
+
+            protected function getReply($msgBody, $requestId)
+            {
+                // Implementation not needed for our test
+                return null;
+            }
+        };
+
+        // Configure the transport to use our test RPC client
+        $transport->setClient($rpcClient);
+        $messageBroker->setClient($rpcClient);
+
+        echo "✅ RabbitMQ transport configured with test connection\n";
     }
 
     private function setupRabbitMQTopology(): void
