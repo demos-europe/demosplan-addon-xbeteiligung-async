@@ -151,15 +151,24 @@ class XBeteiligungRestController extends APIController
     private function hasNoValidAuthToken(?string $authToken): bool
     {
         if (empty($authToken)) {
+            $this->logger->warning('Missing X-Addon-XBeteiligung-Authorization header');
+            return true;
+        }
+
+        $authString = $this->getParameter('addon_xbeteiligung_async_rest_authentication');
+        if (strlen($authString) < 7) {
+            $this->logger->warning('Invalid authentication token configured - must be 7 at least characters');
             return true;
         }
 
         // Extract token from "Bearer {token}" format if present
         if (str_starts_with($authToken, 'Bearer ')) {
+            $this->logger->info('Extracting token from Bearer scheme');
             $authToken = substr($authToken, 7);
+            $this->logger->info('Extracted token length: ' . strlen($authToken));
         }
 
-        return $authToken !== $this->getParameter('addon_xbeteiligung_async_rest_authentication');
+        return $authToken !== $authString;
     }
 
     /**

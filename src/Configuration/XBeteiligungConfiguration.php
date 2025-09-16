@@ -15,20 +15,20 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Configuration;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
-readonly class XBeteiligungConfiguration
+class XBeteiligungConfiguration
 {
     public function __construct(
-        public bool $rabbitMqEnabled,
-        public int $requestTimeout,
-        public int $communicationDelay,
-        public string $procedureMessageType,
-        public bool $auditEnabled,
-        public string $rabbitMqExchange,
-        public string $xoevAddressPrefixKommunal,
-        public string $xoevAddressPrefixCockpit,
-        public int $maxMessagesPerCycle,
-        public int $consumerTimeout,
-        public string $procedureTypeName,
+        public readonly bool $rabbitMqEnabled,
+        public readonly int $requestTimeout,
+        public readonly int $communicationDelay,
+        public readonly string $procedureMessageType,
+        public readonly bool $auditEnabled,
+        public readonly string $rabbitMqExchange,
+        public readonly string $xoevAddressPrefixKommunal,
+        public readonly string $xoevAddressPrefixCockpit,
+        public readonly int $maxMessagesPerCycle,
+        public readonly int $consumerTimeout,
+        public readonly string $procedureTypeName,
     ) {
         if ($this->requestTimeout <= 0) {
             throw new InvalidArgumentException('Request timeout must be positive');

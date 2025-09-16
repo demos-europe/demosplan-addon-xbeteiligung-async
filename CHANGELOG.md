@@ -1,6 +1,36 @@
 # Changelog
 
 ## UNRELEASED
+## v0.33 (2025-09-12)
+- fix token length check
+- improve logging
+
+## v0.32 (2025-09-12)
+- fix mysql 5.7 compatibility
+
+## v0.31 (2025-09-12)
+- keep php 8.1 compatibility
+
+## v0.30 (2025-09-12)
+- technical release
+
+## v0.29 (2025-09-12)
+- Enforce minimum auth token length for rest api access
+**XBeteiligung Standard Update Version 1.2**
+- The 1.2 version seems to be a living standard with ongoing updates.
+- Updated XSD files to the latest versions available on ado.
+
+**XSD Validation Fixes**
+- Fixed XSD validation failures in XBeteiligung message factory by implementing default fallback codes
+- Resolved empty code field issues in StatementMessageFactory mapping functions:
+  - `statusDerStellungnahme()`: Default fallback to '1000' (neue Stellungnahme) 
+  - `getArtOfStatement()`: Default fallback to '9999' (sonstiges)
+  - `getArtOfFeedback()`: Default fallback to '1000' (E-Mail)
+  - `getPriority()`: Default fallback to '3' (nicht vergeben)
+  - `getAbwaegungVorschlag()`: Default fallback to '5000' (Die Stellungnahme wird zur Kenntnis genommen)
+- Fixed Raumordnung procedure phase mapping with fallback to '5000' (Konfiguration betroffene Öffentlichkeit)
+- Added comprehensive logging for unknown mapping values with fallback information
+- All fallback codes comply with XBeteiligung XSD enumeration requirements
 
 ## v0.28 (2025-09-10)
 **Routing Key Architecture Implementation**

@@ -439,11 +439,19 @@ class XBeteiligungService
         $codeType = new  CodeVerfahrensschrittRaumordnungType();
         $codeType->setListVersionID('1.0');
         $codeType->setListURI($listUri);
-        $procedurePhaseCode = '';
-        $procedurePhaseName = '';
+
         if (array_key_exists($publicParticipationPhase, self::PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP)) {
             $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP[$publicParticipationPhase]['code'];
             $procedurePhaseName = self::PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP[$publicParticipationPhase]['name'];
+        } else {
+            // Default fallback when no mapping is found to avoid empty code field
+            // which would cause XSD validation to fail
+            $this->logger->warning(
+                'Unknown public participation phase encountered in XBeteiligung Raumordnung mapping',
+                ['value' => $publicParticipationPhase, 'fallback' => '5000']
+            );
+            $procedurePhaseCode = '5000'; // "Konfiguration betroffene Öffentlichkeit" - most common starting phase
+            $procedurePhaseName = 'Konfiguration betroffene Öffentlichkeit';
         }
 
         $codeType->setCode($procedurePhaseCode);

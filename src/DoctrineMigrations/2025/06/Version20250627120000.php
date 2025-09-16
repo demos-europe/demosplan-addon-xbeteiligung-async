@@ -58,8 +58,10 @@ class Version20250627120000 extends AbstractMigration
             INDEX idx_statement_id (statement_id)
         ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE = InnoDB');
 
-        // Add audit_id column to procedure_message table
-        $this->addSql('ALTER TABLE IF EXISTS procedure_message ADD COLUMN audit_id VARCHAR(36) NULL');
+        // Add audit_id column to procedure_message table if it doesn't exist
+        if ($schema->hasTable('procedure_message') && !$schema->getTable('procedure_message')->hasColumn('audit_id')) {
+            $this->addSql('ALTER TABLE procedure_message ADD COLUMN audit_id VARCHAR(36) NULL');
+        }
     }
 
     /**
@@ -70,8 +72,10 @@ class Version20250627120000 extends AbstractMigration
         $this->abortIfNotMysql();
         $this->addSql('DROP TABLE IF EXISTS xbeteiligung_async_message_audit');
 
-        // Remove audit_id column from procedure_message table
-        $this->addSql('ALTER TABLE IF EXISTS procedure_message DROP COLUMN IF EXISTS audit_id');
+        // Remove audit_id column from procedure_message table if it exists
+        if ($schema->hasTable('procedure_message') && $schema->getTable('procedure_message')->hasColumn('audit_id')) {
+            $this->addSql('ALTER TABLE procedure_message DROP COLUMN audit_id');
+        }
     }
 
     /**
