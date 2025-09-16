@@ -12,14 +12,18 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnhangOderVerlinkungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\AnlageValueObject;
+use Exception;
 use Psr\Log\LoggerInterface;
 
 /**
  * Extracts attachment data (Anlagen) from XBeteiligung messages.
- * Handles both public participation (Öffentlichkeitsbeteiligung) and TOEB attachments.
+ * Handles both Kommunal and Planfeststellung participation types.
+ * Supports both public participation (Öffentlichkeitsbeteiligung) and TOEB attachments.
  */
 class AnlagenExtractor
 {
@@ -28,23 +32,23 @@ class AnlagenExtractor
     }
 
     /**
-     * Extracts all attachments from a BeteiligungKommunalType message.
+     * Extracts all attachments from either BeteiligungKommunalType or BeteiligungPlanfeststellungType.
      * Returns an array of AnlageValueObject instances from both public and TOEB participation.
      *
      * @return AnlageValueObject[]
      */
-    public function extract(BeteiligungKommunalType $beteiligungKommunal): array
+    public function extract(BeteiligungKommunalType|BeteiligungPlanfeststellungType $beteiligung): array
     {
         $anlagen = [];
 
         $anlagen = array_merge(
             $anlagen,
-            $this->extractPublicParticipationAttachments($beteiligungKommunal)
+            $this->extractPublicParticipationAttachments($beteiligung)
         );
 
         $anlagen = array_merge(
             $anlagen,
-            $this->extractToebAttachments($beteiligungKommunal)
+            $this->extractToebAttachments($beteiligung)
         );
 
         $this->logger->info('Extracted attachments from XBeteiligung message', [
@@ -59,15 +63,15 @@ class AnlagenExtractor
      *
      * @return AnlageValueObject[]
      */
-    private function extractPublicParticipationAttachments(BeteiligungKommunalType $beteiligungKommunal): array
+    private function extractPublicParticipationAttachments(BeteiligungKommunalType|BeteiligungPlanfeststellungType $beteiligung): array
     {
-        $beteiligungOeffentlichkeit = $beteiligungKommunal->getBeteiligungOeffentlichkeit();
+        $beteiligungOeffentlichkeit = $beteiligung->getBeteiligungOeffentlichkeit();
         if (null === $beteiligungOeffentlichkeit) {
             return [];
         }
 
         $oeffentlichkeitsAnlagen = $beteiligungOeffentlichkeit->getAnlagen();
-        return $this->processAttachmentArray($oeffentlichkeitsAnlagen, 'public participation');
+        return $this->processAttachmentArray($oeffentlichkeitsAnlagen);
     }
 
     /**
@@ -75,15 +79,15 @@ class AnlagenExtractor
      *
      * @return AnlageValueObject[]
      */
-    private function extractToebAttachments(BeteiligungKommunalType $beteiligungKommunal): array
+    private function extractToebAttachments(BeteiligungKommunalType|BeteiligungPlanfeststellungType $beteiligung): array
     {
-        $beteiligungTOEB = $beteiligungKommunal->getBeteiligungTOEB();
+        $beteiligungTOEB = $beteiligung->getBeteiligungTOEB();
         if (null === $beteiligungTOEB) {
             return [];
         }
 
         $toebAnlagen = $beteiligungTOEB->getAnlagen();
-        return $this->processAttachmentArray($toebAnlagen, 'TOEB');
+        return $this->processAttachmentArray($toebAnlagen);
     }
 
     /**
@@ -92,7 +96,7 @@ class AnlagenExtractor
      * @param MetadatenAnlageType[]|null $anlagenArray
      * @return AnlageValueObject[]
      */
-    private function processAttachmentArray(?array $anlagenArray, string $participationType): array
+    private function processAttachmentArray(?array $anlagenArray): array
     {
         if (null === $anlagenArray || !is_array($anlagenArray)) {
             return [];
@@ -102,8 +106,8 @@ class AnlagenExtractor
         foreach ($anlagenArray as $anlage) {
             try {
                 $anlagen[] = $this->createAnlageValueObject($anlage);
-            } catch (\Exception $e) {
-                $this->logger->warning("Failed to extract {$participationType} attachment", [
+            } catch (Exception $e) {
+                $this->logger->warning('Failed to extract attachment', [
                     'error' => $e->getMessage(),
                     'attachment_title' => $anlage?->getBezeichnung(),
                 ]);
@@ -118,78 +122,61 @@ class AnlagenExtractor
      */
     private function createAnlageValueObject(MetadatenAnlageType $metadatenAnlage): AnlageValueObject
     {
-        $attachmentData = $this->extractAttachmentData($metadatenAnlage);
         $anlageart = $metadatenAnlage->getAnlageart()?->getCode();
         $mimeType = $metadatenAnlage->getMimeType()?->getCode();
 
-        return new AnlageValueObject(
+        $anlage = new AnlageValueObject(
             bezeichnung: $metadatenAnlage->getBezeichnung(),
             versionsnummer: $metadatenAnlage->getVersionsnummer(),
             datum: $metadatenAnlage->getDatum(),
             anlageart: $anlageart,
             mimeType: $mimeType,
-            dokumentId: $attachmentData['dokumentId'],
-            dateiname: $attachmentData['dateiname'],
-            url: $attachmentData['url'],
-            dokument: $attachmentData['dokument'],
-            isAnhang: $attachmentData['isAnhang'],
-            isVerlinkung: $attachmentData['isVerlinkung'],
-            isBase64: $attachmentData['isBase64']
+            dokument: $metadatenAnlage->getDokument()
         );
+
+        $anhangOderVerlinkung = $metadatenAnlage->getAnhangOderVerlinkung();
+        if (null !== $anhangOderVerlinkung) {
+            $this->processAnhangData($anhangOderVerlinkung, $anlage);
+            $this->processVerlinkungData($anhangOderVerlinkung, $anlage);
+        }
+
+        $this->setBase64Flag($anlage);
+
+        return $anlage;
     }
 
     /**
-     * Extracts attachment-specific data from MetadatenAnlageType.
+     * Sets the Base64 flag if document content is provided.
      */
-    private function extractAttachmentData(MetadatenAnlageType $metadatenAnlage): array
+    private function setBase64Flag(AnlageValueObject $anlage): void
     {
-        $anhangOderVerlinkung = $metadatenAnlage->getAnhangOderVerlinkung();
-
-        $data = [
-            'isAnhang' => false,
-            'isVerlinkung' => false,
-            'isBase64' => false,
-            'dokumentId' => null,
-            'dateiname' => null,
-            'url' => null,
-            'dokument' => $metadatenAnlage->getDokument(),
-        ];
-
-        if (null !== $anhangOderVerlinkung) {
-            $this->processAnhangData($anhangOderVerlinkung, $data);
-            $this->processVerlinkungData($anhangOderVerlinkung, $data);
+        if ($anlage->hasContent()) {
+            $anlage->setIsBase64(true);
         }
-
-        // Check if document is provided as base64 content within the message
-        if (null !== $data['dokument'] && $data['dokument'] !== '') {
-            $data['isBase64'] = true;
-        }
-
-        return $data;
     }
 
     /**
      * Processes attachment (Anhang) data.
      */
-    private function processAnhangData($anhangOderVerlinkung, array &$data): void
+    private function processAnhangData(AnhangOderVerlinkungType $anhangOderVerlinkung, AnlageValueObject $anlage): void
     {
         $anhang = $anhangOderVerlinkung->getAnhang();
         if (null !== $anhang) {
-            $data['isAnhang'] = true;
-            $data['dokumentId'] = $anhang->getDokumentid();
-            $data['dateiname'] = $anhang->getDateiname();
+            $anlage->setIsAnhang(true);
+            $anlage->setDokumentId($anhang->getDokumentid());
+            $anlage->setDateiname($anhang->getDateiname());
         }
     }
 
     /**
      * Processes link (Verlinkung) data.
      */
-    private function processVerlinkungData($anhangOderVerlinkung, array &$data): void
+    private function processVerlinkungData(AnhangOderVerlinkungType $anhangOderVerlinkung, AnlageValueObject $anlage): void
     {
         $uriVerlinkung = $anhangOderVerlinkung->getUriVerlinkung();
-        if (null !== $uriVerlinkung && $uriVerlinkung !== '') {
-            $data['isVerlinkung'] = true;
-            $data['url'] = $uriVerlinkung;
+        if (null !== $uriVerlinkung && '' !== $uriVerlinkung) {
+            $anlage->setIsVerlinkung(true);
+            $anlage->setUrl($uriVerlinkung);
         }
     }
 }

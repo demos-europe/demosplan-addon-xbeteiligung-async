@@ -29,9 +29,9 @@ class AnlageValueObject
     private ?string $dateiname;
     private ?string $url;
     private ?string $dokument;
-    private bool $isAnhang;
-    private bool $isVerlinkung;
-    private bool $isBase64;
+    private bool $isAnhang = false;
+    private bool $isVerlinkung = false;
+    private bool $isBase64 = false;
 
     public function __construct(
         ?string $bezeichnung,
@@ -39,26 +39,14 @@ class AnlageValueObject
         ?DateTime $datum,
         ?string $anlageart,
         ?string $mimeType,
-        ?string $dokumentId,
-        ?string $dateiname,
-        ?string $url,
-        ?string $dokument,
-        bool $isAnhang,
-        bool $isVerlinkung,
-        bool $isBase64
+        ?string $dokument
     ) {
         $this->bezeichnung = $bezeichnung;
         $this->versionsnummer = $versionsnummer;
         $this->datum = $datum;
         $this->anlageart = $anlageart;
         $this->mimeType = $mimeType;
-        $this->dokumentId = $dokumentId;
-        $this->dateiname = $dateiname;
-        $this->url = $url;
         $this->dokument = $dokument;
-        $this->isAnhang = $isAnhang;
-        $this->isVerlinkung = $isVerlinkung;
-        $this->isBase64 = $isBase64;
     }
 
     public function getFileName(): ?string
@@ -123,11 +111,41 @@ class AnlageValueObject
 
     public function hasContent(): bool
     {
-        return $this->dokument !== null && $this->dokument !== '';
+        return null !== $this->dokument && '' !== $this->dokument;
     }
 
     public function hasUrl(): bool
     {
-        return $this->url !== null && $this->url !== '';
+        return null !== $this->url && '' !== $this->url;
+    }
+
+    public function setDokumentId(?string $dokumentId): void
+    {
+        $this->dokumentId = $dokumentId;
+    }
+
+    public function setDateiname(?string $dateiname): void
+    {
+        $this->dateiname = $dateiname;
+    }
+
+    public function setUrl(?string $url): void
+    {
+        $this->url = $url;
+    }
+
+    public function setIsAnhang(bool $isAnhang): void
+    {
+        $this->isAnhang = $isAnhang;
+    }
+
+    public function setIsVerlinkung(bool $isVerlinkung): void
+    {
+        $this->isVerlinkung = $isVerlinkung;
+    }
+
+    public function setIsBase64(bool $isBase64): void
+    {
+        $this->isBase64 = $isBase64;
     }
 }
