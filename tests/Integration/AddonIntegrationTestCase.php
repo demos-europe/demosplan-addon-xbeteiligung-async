@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
+namespace Tests\Core\Integration;
 
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonIntegrationTestInterface;
 use Tests\Base\FunctionalTestCase;
@@ -10,37 +10,55 @@ use Tests\Base\FunctionalTestCase;
 class AddonIntegrationTestCase extends FunctionalTestCase
 {
     /**
-     * Get all addon integration test services by auto-discovering them
+     * Get all addon integration test services using the existing addon registry
      * @return AddonIntegrationTestInterface[]
      */
     private function getAddonTests(): array
     {
         $addonTests = [];
 
-        echo "🔍 Auto-discovering addon integration test services\n";
+        echo "🔍 Discovering addon integration tests using project structure\n";
 
-        // Scan all addon directories for integration test services
-        $addonBasePath = '/srv/www/addonDev';
+        try {
+            $container = self::getContainer();
 
-        if (!is_dir($addonBasePath)) {
-            echo "❌ Addon base directory does not exist: {$addonBasePath}\n";
-            return $addonTests;
-        }
+            // Use Symfony's kernel to get project directory (committed pattern)
+            $projectDir = $container->getParameter('kernel.project_dir');
+            echo "📁 Project directory: {$projectDir}\n";
 
-        $addonDirs = glob($addonBasePath . '/demosplan-addon-*');
+            // Look for addon directories using committed patterns
+            $addonBasePaths = [
+                $projectDir . '/addonDev',  // Development addons
+                $projectDir . '/addons',    // Production addons
+            ];
 
-        foreach ($addonDirs as $addonDir) {
-            $addonName = basename($addonDir);
-            echo "🔍 Scanning addon: {$addonName}\n";
+            foreach ($addonBasePaths as $addonBasePath) {
+                if (!is_dir($addonBasePath)) {
+                    echo "⏭️ Skipping non-existent path: {$addonBasePath}\n";
+                    continue;
+                }
 
-            $integrationTestFiles = glob($addonDir . '/tests/Integration/*IntegrationTestService.php');
+                echo "🔍 Scanning addon path: {$addonBasePath}\n";
+                $addonDirs = glob($addonBasePath . '/demosplan-addon-*');
 
-            foreach ($integrationTestFiles as $testFile) {
-                $testService = $this->loadAddonIntegrationTest($testFile);
-                if ($testService) {
-                    $addonTests[] = $testService;
+                foreach ($addonDirs as $addonDir) {
+                    $addonName = basename($addonDir);
+                    echo "🔍 Found addon: {$addonName} at {$addonDir}\n";
+
+                    $integrationTestFiles = glob($addonDir . '/tests/Integration/*IntegrationTestService.php');
+                    echo "   Found " . count($integrationTestFiles) . " integration test files\n";
+
+                    foreach ($integrationTestFiles as $testFile) {
+                        $testService = $this->loadAddonIntegrationTest($testFile);
+                        if ($testService) {
+                            $addonTests[] = $testService;
+                        }
+                    }
                 }
             }
+
+        } catch (\Exception $e) {
+            echo "❌ Error discovering addons: " . $e->getMessage() . "\n";
         }
 
         echo "✅ Found " . count($addonTests) . " addon integration test services\n";
