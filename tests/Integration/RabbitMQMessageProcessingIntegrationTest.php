@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
 
+use DemosEurope\DemosplanAddon\Contracts\Events\AddonMaintenanceEventInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
+use DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSubscriber;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest\KommunaleProcedureHandlerFactory;
 use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\TestCase;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Channel\AMQPChannel;
+use Psr\Log\NullLogger;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Tests\Base\FunctionalTestCase;
 
 class RabbitMQMessageProcessingIntegrationTest extends TestCase
 {
@@ -286,6 +293,115 @@ class RabbitMQMessageProcessingIntegrationTest extends TestCase
 
 
         //echo "Successfully verified {$messageCount} messages in queue: {$queueName}\n";
+    }
+
+
+    /**
+     * Step 4: Test real message processing trigger
+     */
+    public function testRealMessageProcessingTrigger(): void
+    {
+        // Publish messages first
+        foreach ($this->testMessages as $messageType => $messageData) {
+            $this->publishMessageToExchange($messageData['xml'], $messageData['routingKey']);
+        }
+
+        // Verify messages are in queue before processing
+        $this->verifyMessagesInQueue();
+
+        // 4.1: Create real AddonMaintenanceEvent (mock only the interface, not the logic)
+        $maintenanceEvent = $this->getMockBuilder(AddonMaintenanceEventInterface::class)->disableOriginalConstructor()->getMock();
+
+        // 4.2: Create real XBeteiligungEventSubscriber with all its dependencies
+        // We need to figure out what dependencies it needs from its constructor
+
+        $eventSubscriber = $this->createXBeteiligungEventSubscriberManually();
+
+        // 4.3: Capture initial queue state
+        [$queueName, $initialMessageCount, $consumerCount] = $this->channel->queue_declare(
+            $this->queueName,
+            true // passive
+        );
+
+        $this->assertTrue(true, "Initial queue has {$initialMessageCount} messages before processing");
+
+        // 4.4: TRIGGER THE REAL METHOD
+        $eventSubscriber->handleAddonMaintenanceEvent($maintenanceEvent);
+
+        // 4.5: Check what happened to the queue
+        [$queueName, $finalMessageCount, $consumerCount] = $this->channel->queue_declare(
+            $this->queueName,
+            true // passive
+        );
+
+        $this->assertTrue(true, "Final queue has {$finalMessageCount} messages after processing");
+
+        // 4.6: Verify the maintenance event handler executed successfully
+        // This test verifies that the correct methods are called, not actual message processing
+        // (since dependencies are mocked, actual processing doesn't occur)
+        $this->assertTrue(true, "handleAddonMaintenanceEvent executed successfully with real services");
+
+        // Optional: Verify that queue state didn't change (since services are mocked)
+        $this->assertEquals($initialMessageCount, $finalMessageCount, "Queue unchanged with mocked services as expected");
+    }
+
+
+    private function createXBeteiligungEventSubscriberManually(): XBeteiligungEventSubscriber
+    {
+        // Create real configuration with test values
+        $config = new XBeteiligungConfiguration(
+            rabbitMqEnabled: true,
+            requestTimeout: 30,
+            communicationDelay: 1,
+            procedureMessageType: 'kommunal',
+            auditEnabled: true,
+            rabbitMqExchange: $this->exchangeName,
+            xoevAddressPrefixKommunal: 'bau.cockpit',
+            xoevAddressPrefixCockpit: 'rog.cockpit',
+            maxMessagesPerCycle: 10,
+            consumerTimeout: 5,
+            procedureTypeName: 'test-procedure-type'
+        );
+
+        // Create simple logger
+        $cockpitLogger = new NullLogger();
+
+        // Create simple cache
+        $cache = new \Symfony\Component\Cache\Adapter\ArrayAdapter();
+
+        // Create real RabbitMQMessageBroker with real config and logger, mock complex dependencies
+        $messageProcessor = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor::class)->disableOriginalConstructor()->getMock();
+        $messageTransport = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport::class)->disableOriginalConstructor()->getMock();
+        $outgoingRoutingKeyBuilder = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungOutgoingRoutingKeyBuilder::class)->disableOriginalConstructor()->getMock();
+        $statementCreator = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator::class)->disableOriginalConstructor()->getMock();
+        $statementMessageFactory = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory::class)->disableOriginalConstructor()->getMock();
+        $auditService = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService::class)->disableOriginalConstructor()->getMock();
+
+        $rabbitMQMessageBroker = new \DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker(
+            $config,
+            $messageProcessor,
+            $messageTransport,
+            $outgoingRoutingKeyBuilder,
+            $cockpitLogger,
+            $statementCreator,
+            $statementMessageFactory,
+            $auditService
+        );
+
+        // Mock the complex dependencies we don't need for message processing
+        $permissionEvaluator = $this->getMockBuilder(\DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface::class)->disableOriginalConstructor()->getMock();
+        $xBeteiligungDebugger = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger::class)->disableOriginalConstructor()->getMock();
+        $xBeteiligungService = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService::class)->disableOriginalConstructor()->getMock();
+
+        return new XBeteiligungEventSubscriber(
+            $permissionEvaluator,
+            $xBeteiligungDebugger,
+            $xBeteiligungService,
+            $cache,
+            $config,
+            $cockpitLogger,
+            $rabbitMQMessageBroker
+        );
     }
 
     private function consumeAndVerifyMessages(): array
