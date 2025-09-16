@@ -5,8 +5,17 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
 
 use DemosEurope\DemosplanAddon\Contracts\Events\AddonMaintenanceEventInterface;
+use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
+use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSubscriber;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungOutgoingRoutingKeyBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use PhpAmqpLib\Message\AMQPMessage;
 use PHPUnit\Framework\TestCase;
@@ -368,12 +377,12 @@ class RabbitMQMessageProcessingIntegrationTest extends TestCase
         $cache = new ArrayAdapter();
 
         // Create real RabbitMQMessageBroker with real config and logger, mock complex dependencies
-        $messageProcessor = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor::class)->disableOriginalConstructor()->getMock();
-        $messageTransport = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport::class)->disableOriginalConstructor()->getMock();
-        $outgoingRoutingKeyBuilder = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungOutgoingRoutingKeyBuilder::class)->disableOriginalConstructor()->getMock();
-        $statementCreator = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator::class)->disableOriginalConstructor()->getMock();
-        $statementMessageFactory = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory::class)->disableOriginalConstructor()->getMock();
-        $auditService = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService::class)->disableOriginalConstructor()->getMock();
+        $messageProcessor = $this->getMockBuilder(XBeteiligungMessageProcessor::class)->disableOriginalConstructor()->getMock();
+        $messageTransport = $this->getMockBuilder(XBeteiligungMessageTransport::class)->disableOriginalConstructor()->getMock();
+        $outgoingRoutingKeyBuilder = $this->getMockBuilder(XBeteiligungOutgoingRoutingKeyBuilder::class)->disableOriginalConstructor()->getMock();
+        $statementCreator = $this->getMockBuilder(StatementCreator::class)->disableOriginalConstructor()->getMock();
+        $statementMessageFactory = $this->getMockBuilder(StatementMessageFactory::class)->disableOriginalConstructor()->getMock();
+        $auditService = $this->getMockBuilder(XBeteiligungAuditService::class)->disableOriginalConstructor()->getMock();
 
         $rabbitMQMessageBroker = new RabbitMQMessageBroker(
             $config,
@@ -387,9 +396,9 @@ class RabbitMQMessageProcessingIntegrationTest extends TestCase
         );
 
         // Mock the complex dependencies we don't need for message processing
-        $permissionEvaluator = $this->getMockBuilder(\DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface::class)->disableOriginalConstructor()->getMock();
-        $xBeteiligungDebugger = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger::class)->disableOriginalConstructor()->getMock();
-        $xBeteiligungService = $this->getMockBuilder(\DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService::class)->disableOriginalConstructor()->getMock();
+        $permissionEvaluator = $this->getMockBuilder(PermissionEvaluatorInterface::class)->disableOriginalConstructor()->getMock();
+        $xBeteiligungDebugger = $this->getMockBuilder(XBeteiligungDebugger::class)->disableOriginalConstructor()->getMock();
+        $xBeteiligungService = $this->getMockBuilder(XBeteiligungService::class)->disableOriginalConstructor()->getMock();
 
         return new XBeteiligungEventSubscriber(
             $permissionEvaluator,
