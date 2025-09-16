@@ -31,8 +31,10 @@ class Version20250909000000 extends AbstractMigration
     {
         $this->abortIfNotMysql();
 
-        // Check if table exists before trying to alter it
-        $this->addSql('ALTER TABLE IF EXISTS xbeteiligung_async_message_audit ADD COLUMN routing_key VARCHAR(255) NULL AFTER message_content');
+        // Add routing_key column if table exists and column doesn't exist
+        if ($schema->hasTable('xbeteiligung_async_message_audit') && !$schema->getTable('xbeteiligung_async_message_audit')->hasColumn('routing_key')) {
+            $this->addSql('ALTER TABLE xbeteiligung_async_message_audit ADD COLUMN routing_key VARCHAR(255) NULL AFTER message_content');
+        }
     }
 
     /**
@@ -42,8 +44,10 @@ class Version20250909000000 extends AbstractMigration
     {
         $this->abortIfNotMysql();
 
-        // Check if table and column exist before trying to drop the column
-        $this->addSql('ALTER TABLE IF EXISTS xbeteiligung_async_message_audit DROP COLUMN IF EXISTS routing_key');
+        // Remove routing_key column if table and column exist
+        if ($schema->hasTable('xbeteiligung_async_message_audit') && $schema->getTable('xbeteiligung_async_message_audit')->hasColumn('routing_key')) {
+            $this->addSql('ALTER TABLE xbeteiligung_async_message_audit DROP COLUMN routing_key');
+        }
     }
 
     /**

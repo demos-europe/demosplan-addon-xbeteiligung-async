@@ -18,7 +18,7 @@
          </standard>
          <versionStandard>
             <version>1.2</version>
-            <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren nach dem BauGB, dem ROG und in der Planfeststellung</beschreibung>
+            <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren nach dem BauGB, dem ROG und in der Planfeststellung. Die Version 1.2.1 beinhaltet ausschließlich Korrekturen an den Nachrichten zur Planfeststellung, die bisher nicht produktiv genutzt wurden.</beschreibung>
             <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.4</versionXOEVHandbuch>
             <versionXGenerator>3.1.1</versionXGenerator>

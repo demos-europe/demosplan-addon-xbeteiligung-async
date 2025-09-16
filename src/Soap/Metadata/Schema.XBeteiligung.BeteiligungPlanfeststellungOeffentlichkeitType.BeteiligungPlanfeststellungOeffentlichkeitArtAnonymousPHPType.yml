@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType\BeteiligungPlanfeststellungOeffentlichkeitArtAnonymousPHPType:
+    properties:
+        beteiligungPlanfeststellungFormalOeffentlichkeit:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungPlanfeststellungFormalOeffentlichkeit
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBeteiligungPlanfeststellungFormalOeffentlichkeit
+                setter: setBeteiligungPlanfeststellungFormalOeffentlichkeit
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType
+        beteiligungPlanfeststellungInformellOeffentlichkeit:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungPlanfeststellungInformellOeffentlichkeit
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getBeteiligungPlanfeststellungInformellOeffentlichkeit
+                setter: setBeteiligungPlanfeststellungInformellOeffentlichkeit
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeBeteiligungPlanfeststellungInformellOeffentlichkeitType

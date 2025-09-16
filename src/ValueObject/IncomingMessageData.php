@@ -15,11 +15,11 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\ValueObject;
 /**
  * Data Transfer Object for incoming message data from RabbitMQ
  */
-readonly class IncomingMessageData
+class IncomingMessageData
 {
     public function __construct(
-        public string $body,
-        public ?string $routingKey = null
+        public readonly string $body,
+        public readonly ?string $routingKey = null
     ) {
     }
 

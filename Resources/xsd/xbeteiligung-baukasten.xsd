@@ -20,7 +20,7 @@
          </standard>
          <versionStandard>
             <version>1.2</version>
-            <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren nach dem BauGB, dem ROG und in der Planfeststellung</beschreibung>
+            <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren nach dem BauGB, dem ROG und in der Planfeststellung. Die Version 1.2.1 beinhaltet ausschließlich Korrekturen an den Nachrichten zur Planfeststellung, die bisher nicht produktiv genutzt wurden.</beschreibung>
             <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
             <versionXOEVHandbuch>2.4</versionXOEVHandbuch>
             <versionXGenerator>3.1.1</versionXGenerator>
@@ -490,7 +490,7 @@
       <xs:sequence>
          <xs:element name="akteurVorhaben" type="xbeteiligung:AkteurVorhaben">
             <xs:annotation>
-               <xs:documentation>Am Planungsvorhaben beteiligte Akteure.</xs:documentation>
+               <xs:documentation>Hier sind Informationen zu den am Planungsvorhaben beteiligten Akteuren zu übermitteln. Mindestens der Veranlasser ist zu benennen.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="planID" type="xs:token">
@@ -500,7 +500,7 @@
          </xs:element>
          <xs:element name="planname" type="din91379:datatypeC">
             <xs:annotation>
-               <xs:documentation>Hier ist der Name des Planverfahrens zu übermitteln.</xs:documentation>
+               <xs:documentation>Hier ist der Name des Planvorhabens zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="arbeitstitel" minOccurs="0" type="din91379:datatypeC">
@@ -508,14 +508,20 @@
                <xs:documentation>Hier kann der Arbeitstitel übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="planart"
+         <xs:element name="planartPlanfeststellung"
                      minOccurs="0"
                      type="xbeteiligung:Code.PlanartPlanfeststellung">
             <xs:annotation>
                <xs:documentation>Hier kann die Art des Planverfahrens übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="verfahrensart"
+         <xs:element name="verfahrensschrittPlanfeststellung"
+                     type="xbeteiligung:Code.VerfahrensschrittPlanfeststellung">
+            <xs:annotation>
+               <xs:documentation>Hier ist der Verfahrensschritt zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="verfahrensartPlanfeststellung"
                      minOccurs="0"
                      type="xbeteiligung:Code.VerfahrensartPlanfeststellung">
             <xs:annotation>
@@ -529,20 +535,9 @@
                <xs:documentation>Hier kann die fachliche Beschreibung des Planverfahrens übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="verfahrensschritt"
-                     type="xbeteiligung:Code.VerfahrensschrittPlanfeststellung">
-            <xs:annotation>
-               <xs:documentation>Hier ist der Verfahrensschritt zu übermitteln.</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="durchgang" type="xs:positiveInteger">
-            <xs:annotation>
-               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.</xs:documentation>
-            </xs:annotation>
-         </xs:element>
          <xs:element name="flaechenabgrenzungUrl" minOccurs="0" type="xs:anyURI">
             <xs:annotation>
-               <xs:documentation>URL eines Kartendienstes</xs:documentation>
+               <xs:documentation>Hier kann zur Visualisierung der Flächenabgrenzung eine URL auf einen Kartendienst übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="geltungsbereich" type="din91379:datatypeC">
@@ -555,42 +550,23 @@
                <xs:documentation>Hier ist der räumliche Geltungsbereich zu beschreiben.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="bekanntmachung" type="xbeteiligung:Tagesdatum">
-            <xs:annotation>
-               <xs:documentation>Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="aktuelleMitteilung"
-                     minOccurs="0"
-                     maxOccurs="unbounded"
-                     type="xs:string">
-            <xs:annotation>
-               <xs:documentation>Hier können aktuelle Mitteilungen übermittelt werden.</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="zeitraum" type="xbeteiligung:Zeitraum">
-            <xs:annotation>
-               <xs:documentation>Zeitraum (Beginn und Ende) einer Beteiligungsphase.</xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="veroeffentlichungszeitraum"
-                     minOccurs="0"
-                     type="xbeteiligung:Zeitraum">
-            <xs:annotation>
-               <xs:documentation>Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.</xs:documentation>
-            </xs:annotation>
-         </xs:element>
          <xs:element name="beteiligungURL" minOccurs="0" type="xs:anyURI">
             <xs:annotation>
                <xs:documentation>Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
-         <xs:element name="anlagen"
+         <xs:element name="beteiligungOeffentlichkeit"
                      minOccurs="0"
-                     maxOccurs="unbounded"
-                     type="xbeteiligung:Anlagen">
+                     type="xbeteiligung:BeteiligungPlanfeststellungOeffentlichkeit">
             <xs:annotation>
-               <xs:documentation>Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.</xs:documentation>
+               <xs:documentation>Hier können Angaben zur Beteiligung der Öffentlichkeit gemacht werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beteiligungTOEB"
+                     minOccurs="0"
+                     type="xbeteiligung:BeteiligungPlanfeststellungTOEB">
+            <xs:annotation>
+               <xs:documentation>Hier können Angaben zur Beteiligung der Träger öffentlicher Belange gemacht werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
       </xs:sequence>
@@ -703,6 +679,148 @@
                      type="xbeteiligung:AnlagenLink">
             <xs:annotation>
                <xs:documentation>Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert. Für die Übermittlung an die Beteiligungs-DB ist nur die Übermittlung von Links auf Unterlagen zulässig.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="BeteiligungPlanfeststellungOeffentlichkeit">
+      <xs:annotation>
+         <xs:documentation>Dieser Datentyp enthält alle Informationen zu einem Beteiligungsverfahren im Rahmen der kommunalen Bauleitplanung.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="beteiligungsID" minOccurs="0" type="din91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Hier muss eine Zeichenkette übermittelt werden, die zur Zuordnung von Stellungnahmen zu einzelnen Beteiligungsverfahren genutzt werden kann.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="durchgang" type="xs:positiveInteger">
+            <xs:annotation>
+               <xs:documentation>Hier ist die Durchgangsnummer des Verfahrens zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="bekanntmachung" type="xbeteiligung:Tagesdatum">
+            <xs:annotation>
+               <xs:documentation>Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="aktuelleMitteilung"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xs:string">
+            <xs:annotation>
+               <xs:documentation>Hier können aktuelle Mitteilungen übermittelt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="zeitraum" type="xbeteiligung:Zeitraum">
+            <xs:annotation>
+               <xs:documentation>Zeitraum (Beginn und Ende) einer Beteiligungsphase.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="anlagen"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Anlagen">
+            <xs:annotation>
+               <xs:documentation>Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beteiligungPlanfeststellungOeffentlichkeitArt">
+            <xs:annotation>
+               <xs:documentation>Hier ist zu übermitteln, um welche Art der Öffentlichkeitsbeteiligung es sich handelt.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+               <xs:choice>
+                  <xs:element name="beteiligungPlanfeststellungFormalOeffentlichkeit"
+                              type="xbeteiligung:Code.VerfahrensschrittPlanfeststellung">
+                     <xs:annotation>
+                        <xs:documentation>Hier ist zu übermitteln, ob es sich um eine frühzeitige Öffentlichkeitsbeteiligung (4000) oder eine digitale Veröffentlichung (6000) handelt.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="beteiligungPlanfeststellungInformellOeffentlichkeit"
+                              type="xbeteiligung:Code.BeteiligungPlanfeststellungInformellOeffentlichkeit">
+                     <xs:annotation>
+                        <xs:documentation>Hier kann die Art des informellen Verfahrens zur Beteiligung der Öffentlichkeit übermittelt werden.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:choice>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="veroeffentlichungszeitraum"
+                     minOccurs="0"
+                     type="xbeteiligung:Zeitraum">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+   <xs:complexType name="BeteiligungPlanfeststellungTOEB">
+      <xs:annotation>
+         <xs:documentation>Dieser Datentyp enthält alle Informationen zu einem Beteiligungsverfahren im Rahmen der kommunalen Bauleitplanung.</xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:element name="beteiligungsID" minOccurs="0" type="din91379:datatypeC">
+            <xs:annotation>
+               <xs:documentation>Hier muss eine Zeichenkette übermittelt werden, die zur Zuordnung von Stellungnahmen zu einzelnen Beteiligungsverfahren genutzt werden kann.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="durchgang" type="xs:positiveInteger">
+            <xs:annotation>
+               <xs:documentation>Hier ist die Durchgangsnummer des Verfahrens zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="bekanntmachung" type="xbeteiligung:Tagesdatum">
+            <xs:annotation>
+               <xs:documentation>Termin, zu dem der Start der Beteiligung bekannt gemacht wird (mind. eine Woche vor Start der Beteiligung).</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="aktuelleMitteilung"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xs:string">
+            <xs:annotation>
+               <xs:documentation>Hier können aktuelle Mitteilungen übermittelt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="zeitraum" type="xbeteiligung:Zeitraum">
+            <xs:annotation>
+               <xs:documentation>Zeitraum (Beginn und Ende) einer Beteiligungsphase.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="anlagen"
+                     minOccurs="0"
+                     maxOccurs="unbounded"
+                     type="xbeteiligung:Anlagen">
+            <xs:annotation>
+               <xs:documentation>Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="beteiligungPlanfeststellungTOEBArt">
+            <xs:annotation>
+               <xs:documentation>Hier ist zu übermitteln, um welche Art der Beteiligung der Träger öffentlicher Belange es sich handelt.</xs:documentation>
+            </xs:annotation>
+            <xs:complexType>
+               <xs:choice>
+                  <xs:element name="beteiligungPlanfeststellungFormalTOEB"
+                              type="xbeteiligung:Code.VerfahrensschrittPlanfeststellung">
+                     <xs:annotation>
+                        <xs:documentation>Hier ist zu übermitteln, ob es sich um eine frühzeitige Behördenbeteiligung (2000) oder eine Beteiligung der Träger öffentlicher Belange (5000) handelt.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+                  <xs:element name="beteiligungPlanfeststellungInformellTOEB"
+                              type="xbeteiligung:Code.BeteiligungPlanfeststellungInformellTOEB">
+                     <xs:annotation>
+                        <xs:documentation>Hier kann die Art des informellen Verfahrens zur Beteiligung der Träger öffentlicher Belange übermittelt werden.</xs:documentation>
+                     </xs:annotation>
+                  </xs:element>
+               </xs:choice>
+            </xs:complexType>
+         </xs:element>
+         <xs:element name="veroeffentlichungszeitraum"
+                     minOccurs="0"
+                     type="xbeteiligung:Zeitraum">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Zeitraum (Beginn und Ende) übermittelt werden, für den die Dokumente zu einer Beteiligungsphase öffentlich bereitgestellt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
       </xs:sequence>
