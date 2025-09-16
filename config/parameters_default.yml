@@ -17,13 +17,13 @@ parameters:
 
   # String to determine which type of procedure messages should be generated.
   # For Example: Kommunal, Raumordnung or Planfeststellung
-  addon_xbeteiligung_async_procedure_message_type: ""
+  addon_xbeteiligung_async_procedure_message_type: "kommunal"
 
   # Use for incoming messages from rabbitMQ
-  addon_xbeteiligung_async_enable_rabbitmq_communication: false
+  addon_xbeteiligung_async_enable_rabbitmq_communication: true
 
   # Maximum time in seconds we are allowed to rabbitMQ Message Broker
-  addon_xbeteiligung_async_rabbitmq_communication_delay: 300
+  addon_xbeteiligung_async_rabbitmq_communication_delay: 1
 
   # Timeout for RabbitMQ requests in seconds
   addon_xbeteiligung_async_rabbitMqRequestTimeout: 30
