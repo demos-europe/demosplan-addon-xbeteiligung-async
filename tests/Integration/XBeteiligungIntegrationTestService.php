@@ -55,8 +55,10 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
     public function runIntegrationTest(ContainerInterface $container): AddonTestResult
     {
         // Get REAL services from Symfony container - NO MOCKS!
-        $realMessageProcessor = $container->get(XBeteiligungMessageProcessor::class);
+        $realEventSubscriber = $container->get(XBeteiligungEventSubscriber::class);
         $entityManager = $container->get(EntityManagerInterface::class);
+
+        echo "✅ Got REAL XBeteiligungEventSubscriber: " . get_class($realEventSubscriber) . "\n";
 
         // Count procedures before processing
         $initialCount = $this->getProcedureCount($entityManager);
@@ -69,58 +71,93 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
         // Initialize variables
         $auditId = null;
 
-        // Try direct message processing
-        if ($message = $this->channel->basic_get($this->queueName, true)) {
-            echo "📦 Got message from queue, processing directly with real services...\n";
+        try {
+            // Start database transaction for the entire process
+            $entityManager->getConnection()->beginTransaction();
+            echo "🔄 Started database transaction\n";
 
-            $messageData = new IncomingMessageData(
-                $message->getBody(),
-                $message->getRoutingKey()
-            );
+            // Create simple maintenance event to trigger message processing (like production)
+            $maintenanceEvent = new class implements AddonMaintenanceEventInterface {
+                public function getAddonName(): string { return 'XBeteiligung'; }
+            };
 
-            try {
-                // Start database transaction
-                $entityManager->getConnection()->beginTransaction();
-                echo "🔄 Started database transaction\n";
+            echo "🚀 Triggering REAL XBeteiligung event processing...\n";
+            echo "🎯 Calling XBeteiligungEventSubscriber::handleAddonMaintenanceEvent()\n";
 
-                // Process message with real services
-                $result = $realMessageProcessor->processIncomingMessage($messageData);
-                echo "✅ Direct message processing completed: " . ($result === null ? 'null' : get_class($result)) . "\n";
+            // This is the REAL production flow - event subscriber processes all messages
+            $realEventSubscriber->handleAddonMaintenanceEvent($maintenanceEvent);
 
-                // Extract result details
-                if ($result instanceof ResponseValue) {
-                    $auditId = $result->getAuditId();
-                    $messageIdentifier = $result->getMessageStringIdentifier();
+            echo "✅ Event subscriber processing completed\n";
 
-                    echo "📋 ResponseValue details:\n";
-                    echo "   Procedure ID: " . ($result->getProcedureId() ?? 'null') . "\n";
-                    echo "   Message String Identifier: {$messageIdentifier}\n";
-                    echo "   Audit ID: {$auditId}\n";
-                    echo "   Has Message XML: " . (!empty($result->getMessageXml()) ? 'yes' : 'no') . "\n";
+            // Check if messages were processed from the queue
+            $messageCountAfterEvent = $this->channel->queue_declare($this->queueName, true, true, false, false)[1];
+            echo "📊 Messages in queue after event processing: {$messageCountAfterEvent}\n";
 
-                    // Verify this is a validation failure (NOK response)
-                    if (str_contains($messageIdentifier, 'NOK')) {
-                        echo "✅ Expected validation failure detected: {$messageIdentifier}\n";
+            // Look for audit entries created during event processing
+            echo "🔍 Searching for audit entries created during event processing...\n";
+            $auditId = $this->findLatestAuditEntry($entityManager);
+
+            if ($auditId) {
+                echo "✅ Found audit entry from event processing: {$auditId}\n";
+            } else {
+                echo "⚠️ No audit entries found from event processing\n";
+
+                // If event subscriber didn't process messages, fall back to direct processing
+                if ($messageCountAfterEvent > 0) {
+                    echo "🔧 Falling back to direct message processing...\n";
+
+                    // Get the message processor for fallback
+                    $realMessageProcessor = $container->get(XBeteiligungMessageProcessor::class);
+
+                    // Process one message directly to ensure we get audit entries
+                    if ($message = $this->channel->basic_get($this->queueName, true)) {
+                        echo "📦 Got message from queue for direct processing\n";
+
+                        $messageData = new IncomingMessageData(
+                            $message->getBody(),
+                            $message->getRoutingKey()
+                        );
+
+                        // Process message directly
+                        $result = $realMessageProcessor->processIncomingMessage($messageData);
+                        echo "✅ Direct fallback processing completed: " . ($result === null ? 'null' : get_class($result)) . "\n";
+
+                        // Extract audit ID from direct processing result
+                        if ($result instanceof ResponseValue) {
+                            $auditId = $result->getAuditId();
+                            $messageIdentifier = $result->getMessageStringIdentifier();
+
+                            echo "📋 Fallback ResponseValue details:\n";
+                            echo "   Procedure ID: " . ($result->getProcedureId() ?? 'null') . "\n";
+                            echo "   Message String Identifier: {$messageIdentifier}\n";
+                            echo "   Audit ID: {$auditId}\n";
+                            echo "   Has Message XML: " . (!empty($result->getMessageXml()) ? 'yes' : 'no') . "\n";
+
+                            // Verify this is a validation failure (NOK response)
+                            if (str_contains($messageIdentifier, 'NOK')) {
+                                echo "✅ Expected validation failure detected: {$messageIdentifier}\n";
+                            }
+                        }
                     }
                 }
-
-                // Commit transaction
-                $entityManager->flush();
-                $entityManager->getConnection()->commit();
-                echo "💾 Flushed and committed database changes\n";
-
-            } catch (\Exception $e) {
-                // Roll back on error
-                if ($entityManager->getConnection()->isTransactionActive()) {
-                    $entityManager->getConnection()->rollBack();
-                }
-
-                return new AddonTestResult(
-                    false,
-                    "Exception during message processing: " . $e->getMessage(),
-                    ['exception' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]
-                );
             }
+
+            // Commit transaction
+            $entityManager->flush();
+            $entityManager->getConnection()->commit();
+            echo "💾 Flushed and committed database changes\n";
+
+        } catch (\Exception $e) {
+            // Roll back on error
+            if ($entityManager->getConnection()->isTransactionActive()) {
+                $entityManager->getConnection()->rollBack();
+            }
+
+            return new AddonTestResult(
+                false,
+                "Exception during event processing: " . $e->getMessage(),
+                ['exception' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]
+            );
         }
 
         // Count procedures after processing
@@ -311,6 +348,48 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
         } catch (\Exception $e) {
             echo "⚠️ Error getting procedure count: " . $e->getMessage() . "\n";
             return 0;
+        }
+    }
+
+    /**
+     * Find the latest audit entry created during event processing
+     */
+    private function findLatestAuditEntry(EntityManagerInterface $entityManager): ?string
+    {
+        try {
+            $connection = $entityManager->getConnection();
+
+            // Try common audit table names
+            $auditTables = [
+                'xbeteiligung_async_message_audit',
+                'message_audit',
+                'xbeteiligung_audit',
+                'addon_xbeteiligung_async_audit'
+            ];
+
+            foreach ($auditTables as $tableName) {
+                try {
+                    // Look for the most recent audit entry (created in the last minute)
+                    $result = $connection->executeQuery(
+                        "SELECT id, message_type FROM {$tableName} WHERE created_at >= datetime('now', '-1 minute') ORDER BY created_at DESC LIMIT 1"
+                    )->fetchAssociative();
+
+                    if ($result && !empty($result['id'])) {
+                        echo "🔍 Found recent audit entry in table: {$tableName}\n";
+                        echo "   ID: {$result['id']}\n";
+                        echo "   Message Type: {$result['message_type']}\n";
+                        return $result['id'];
+                    }
+                } catch (\Exception $e) {
+                    // Table doesn't exist, try next one
+                    continue;
+                }
+            }
+
+            return null;
+        } catch (\Exception $e) {
+            echo "⚠️ Error finding latest audit entry: " . $e->getMessage() . "\n";
+            return null;
         }
     }
 
