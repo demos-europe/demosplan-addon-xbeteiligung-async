@@ -169,7 +169,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         // Get mapped customer before transaction
         $customer = $this->getCustomerFromRoutingKey($incomingRoutingKey);
 
-        return $this->transactionService->executeAndFlushInTransaction(
+        $result = $this->transactionService->executeAndFlushInTransaction(
             function () use ($messageContent, $customer) {
                 $procedure = $this->createProcedureEntity($messageContent);
                 $procedure->setCustomer($customer);
@@ -182,6 +182,9 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
 
                 $procedureData =  $this->procedurePhaseExtractor->extract($messageContent);
                 $this->setProcedurePhase($procedure, $procedureData);
+
+                $anlagenData = $this->anlagenExtractor->extract($messageContent);
+
                 $mapData = $this->xbeteiligungMapService->setMapData($messageContent->getGeltungsbereich());
                 $procedure->getSettings()->setTerritory($mapData->getTerritory());
                 $procedure->getSettings()->setBoundingBox($mapData->getBbox());
@@ -189,6 +192,10 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 return $procedure;
             }
         );
+
+        Assert::isInstanceOf($result, ProcedureInterface::class);
+
+        return $result;
     }
 
     /**
