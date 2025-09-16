@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure;
 
 use DateTime;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\AnlageValueObject;
 
 /**
  * Value object to hold procedure data extracted from XML messages.
@@ -44,6 +45,10 @@ class ProcedureDataValueObject
     private ?string $participationUrl;
     private ?int $iteration;
     private array $additionalInformation = [];
+    /**
+     * @var AnlageValueObject[]
+     */
+    private array $anlagen = [];
 
     public function __construct()
     {
@@ -287,6 +292,22 @@ class ProcedureDataValueObject
     public function setIteration(?int $iteration): void
     {
         $this->iteration = $iteration;
+    }
+
+    /**
+     * @return AnlageValueObject[]
+     */
+    public function getAnlagen(): array
+    {
+        return $this->anlagen;
+    }
+
+    /**
+     * @param AnlageValueObject[] $anlagen
+     */
+    public function setAnlagen(array $anlagen): void
+    {
+        $this->anlagen = $anlagen;
     }
 
 }
