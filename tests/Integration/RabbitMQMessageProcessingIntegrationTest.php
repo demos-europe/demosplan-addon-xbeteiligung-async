@@ -50,6 +50,8 @@ class RabbitMQMessageProcessingIntegrationTest extends TestCase
                 $messageData['routingKey']
             );
         }
+        // Give RabbitMQ time to establish bindings
+        usleep(100000); // 100ms delay
 
         // Verify messages were published and routed to queue
         $this->verifyMessagesInQueue();
@@ -96,6 +98,8 @@ class RabbitMQMessageProcessingIntegrationTest extends TestCase
     protected function tearDown(): void
     {
         if (isset($this->channel)) {
+            // Purge all messages from the test queue
+            $this->channel->queue_purge($this->queueName);
             $this->channel->close();
         }
         if (isset($this->connection)) {
