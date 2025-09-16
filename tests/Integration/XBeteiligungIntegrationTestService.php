@@ -6,6 +6,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
 
 use DemosEurope\DemosplanAddon\Contracts\Events\AddonMaintenanceEventInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSubscriber;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
@@ -54,16 +55,8 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
     public function runIntegrationTest(ContainerInterface $container): AddonTestResult
     {
         // Get REAL services from Symfony container - NO MOCKS!
-        $realServiceStorage = $container->get(ServiceStorage::class);
-        $realXBeteiligungService = $container->get(XBeteiligungService::class);
         $realMessageProcessor = $container->get(XBeteiligungMessageProcessor::class);
-        $realEventSubscriber = $container->get(XBeteiligungEventSubscriber::class);
         $entityManager = $container->get(EntityManagerInterface::class);
-
-        echo "✅ Got REAL ServiceStorage: " . get_class($realServiceStorage) . "\n";
-        echo "✅ Got REAL XBeteiligungService: " . get_class($realXBeteiligungService) . "\n";
-        echo "✅ Got REAL XBeteiligungMessageProcessor: " . get_class($realMessageProcessor) . "\n";
-        echo "✅ Got REAL XBeteiligungEventSubscriber: " . get_class($realEventSubscriber) . "\n";
 
         // Count procedures before processing
         $initialCount = $this->getProcedureCount($entityManager);
@@ -95,7 +88,7 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
                 echo "✅ Direct message processing completed: " . ($result === null ? 'null' : get_class($result)) . "\n";
 
                 // Extract result details
-                if ($result instanceof \DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue) {
+                if ($result instanceof ResponseValue) {
                     $auditId = $result->getAuditId();
                     $messageIdentifier = $result->getMessageStringIdentifier();
 
