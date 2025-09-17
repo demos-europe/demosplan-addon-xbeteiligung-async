@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
 
 use DemosEurope\DemosplanAddon\Contracts\Events\AddonMaintenanceEventInterface;
+use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSubscriber;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor;
@@ -20,6 +22,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
+use Psr\Log\NullLogger;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterface
@@ -28,6 +32,8 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
     private ?AMQPChannel $channel = null;
     private string $exchangeName = 'bau.beteiligung';
     private string $queueName = 'bau.beteiligung';
+
+    private ?\DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory $xmlFactory;
 
     public function getAddonName(): string
     {
@@ -41,6 +47,41 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
 
     public function setupTestData(ContainerInterface $container): void
     {
+        // Manually require the factory file (following the same pattern as this integration test loading)
+        $factoryFile = __DIR__ .
+            '/../DataFactory/XBeteiligung401TestFactory.php';
+
+        if (!class_exists('DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataF
+  actory\XBeteiligung401TestFactory')) {
+            if (!file_exists($factoryFile)) {
+                throw new RuntimeException("Factory file not found:
+  {$factoryFile}");
+            }
+
+            echo "📁 Manually requiring XBeteiligung401TestFactory\n";
+            require_once $factoryFile;
+
+            if (!class_exists('DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory')) {
+                echo "❌ Available classes after require:\n";
+                $classes = get_declared_classes();
+                foreach ($classes as $class) {
+                    if (strpos($class, 'XBeteiligung') !== false) {
+                        echo "  - {$class}\n";
+                    }
+                }
+                throw new RuntimeException("Factory class not available after requiring file");
+            }
+            echo "✅ Factory class loaded successfully\n";
+        }
+
+
+        // Initialize XML factory for dynamic test data generation
+        $commonHelpers = new CommonHelpers(new NullLogger());
+        $this->xmlFactory = new \DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory(
+            __DIR__ . '/../..',  // Point to the addon root directory
+            $commonHelpers
+        );
+
         // Setup RabbitMQ connection
         $this->connection = new AMQPStreamConnection(
             '172.22.255.5', // RabbitMQ host from docker-compose
@@ -268,16 +309,19 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
 
     private function publishTestMessages(): void
     {
-        $kommunalMessage = $this->createKommunalMessage();
+        // Generate XML using our factory
+        $scenarioName = 'quickborn_minimal';
+        $xml = $this->xmlFactory->createXML($scenarioName, true);
 
-        $message1 = new AMQPMessage($kommunalMessage, ['delivery_mode' => 2]);
+
+        $message1 = new AMQPMessage($xml, ['delivery_mode' => 2]);
         $this->channel->basic_publish(
             $message1,
             $this->exchangeName,
             'bau.cockpit.bap.02.05.00200099.bdp.02.05.00200099.kommunal.Initiieren.0401'
         );
 
-        $message2 = new AMQPMessage($kommunalMessage, ['delivery_mode' => 2]);
+        $message2 = new AMQPMessage($xml, ['delivery_mode' => 2]);
         $this->channel->basic_publish(
             $message2,
             $this->exchangeName,
@@ -285,58 +329,6 @@ class XBeteiligungIntegrationTestService implements AddonIntegrationTestInterfac
         );
 
         usleep(100000); // 100ms delay
-    }
-
-    private function createKommunalMessage(): string
-    {
-        return '<?xml version="1.0" encoding="UTF-8"?>
-        <kommunal.Initiieren.0401
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xmlns:xbg="https://www.xleitstelle.de/xbeteiligung/12"
-            xmlns="https://www.xleitstelle.de/xbeteiligung/12"
-            xmlns:xbd="http://www.xleitstelle.de/xbau/12"
-            produkt="demosplan"
-            produkthersteller="DEMOS plan GmbH"
-            produktversion="1.1"
-            standard="xBeteiligung"
-            version="1.3">
-            <nachrichtenkopf>
-                <identifikationNachricht>
-                    <nachrichtenUUID>550e8400-e29b-41d4-a716-446655440000</nachrichtenUUID>
-                    <zeitstempelErstellung>2024-01-15T10:30:00.000Z</zeitstempelErstellung>
-                </identifikationNachricht>
-                <autor>
-                    <behoerde>
-                        <nameBehoerde xmlns="http://www.xleitstelle.de/xbau/12">Test Municipality</nameBehoerde>
-                        <anschrift xmlns="http://www.xleitstelle.de/xbau/12">
-                            <strasse>Test Street</strasse>
-                            <hausnummer>123</hausnummer>
-                            <postleitzahl>12345</postleitzahl>
-                            <ort>Test City</ort>
-                        </anschrift>
-                    </behoerde>
-                </autor>
-                <leser>
-                    <behoerde>
-                        <nameBehoerde xmlns="http://www.xleitstelle.de/xbau/12">DemosPlan System</nameBehoerde>
-                        <anschrift xmlns="http://www.xleitstelle.de/xbau/12">
-                            <strasse>Demo Street</strasse>
-                            <hausnummer>456</hausnummer>
-                            <postleitzahl>67890</postleitzahl>
-                            <ort>Demo City</ort>
-                        </anschrift>
-                    </behoerde>
-                </leser>
-            </nachrichtenkopf>
-            <nachrichteninhalt>
-                <vorgangsID>TEST-VORGANG-401-2024</vorgangsID>
-                <beteiligung>
-                    <planID>test-plan-12345</planID>
-                    <planname>Test Procedure Kommunal REAL SERVICE</planname>
-                    <planbeschreibung>Test procedure created by REAL XBeteiligung services</planbeschreibung>
-                </beteiligung>
-            </nachrichteninhalt>
-        </kommunal.Initiieren.0401>';
     }
 
     private function getProcedureCount(EntityManagerInterface $entityManager): int
