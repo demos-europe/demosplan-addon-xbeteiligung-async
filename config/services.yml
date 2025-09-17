@@ -23,8 +23,16 @@ services:
     DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAnySimpleTypeHandler:
         lazy: true
 
-    # Integration Test Service for Core Framework - explicit registration
-    DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration\XBeteiligungIntegrationTestService:
+    # Integration Test Services for Core Framework - explicit registration
+    # Old single service (temporarily disabled)
+    # DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration\XBeteiligungIntegrationTestService:
+    #     autowire: true
+    #     autoconfigure: true
+    #     public: false
+    #     tags: ['addon_integration_test']
+
+    # New scenario-based services
+    DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration\XBeteiligungValidScenariosIntegrationTestService:
         autowire: true
         autoconfigure: true
         public: false
