@@ -31,10 +31,11 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
     protected function getTestScenarios(): array
     {
         return [
-            // Start with the simplest valid scenario first
-            ['quickborn_minimal', true],
+            // Use test-specific scenario with existing test organization
+            ['test_minimal', true],
 
-            // Can add more scenarios later:
+            // Original scenarios are for production-like environments:
+            // ['quickborn_minimal', true],  // Fails: "Stadt Quickborn" org doesn't exist in test DB
             // ['quickborn_comprehensive', true],
             // ['buero_flachennutzung', true],
             // ['quickborn_with_attachments', true],
@@ -46,28 +47,91 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
      *
      * For valid scenarios, we expect:
      * - At least one procedure to be created
+     * - Created procedures match scenario expectations
      * - Audit entries to be logged
      * - No validation errors
      */
-    protected function validateTestResult(int $initialCount, int $finalCount, ?string $auditId): AddonTestResult
+    protected function validateTestResult(array $createdProcedures, ?string $auditId): AddonTestResult
     {
-        $proceduresCreated = $finalCount - $initialCount;
+        $proceduresCreated = count($createdProcedures);
 
         // For valid scenarios, we EXPECT procedures to be created
         if ($proceduresCreated <= 0) {
             return new AddonTestResult(
                 false,
-                "Expected procedures to be created for valid scenarios, but {$proceduresCreated} were created",
+                "Expected procedures to be created for valid scenarios, but none were created",
                 [
-                    'initial_count' => $initialCount,
-                    'final_count' => $finalCount,
-                    'procedures_created' => $proceduresCreated,
+                    'procedures_found' => $proceduresCreated,
                     'audit_id' => $auditId,
-                    'expected_behavior' => 'procedure_creation'
+                    'expected_behavior' => 'procedure_creation',
+                    'test_type' => 'valid_scenarios'
                 ],
                 $auditId,
-                $initialCount,
-                $finalCount
+                0,
+                0
+            );
+        }
+
+        // Debug: Show all created procedures
+        echo "🔍 DEBUG: Created procedures:\n";
+        foreach ($createdProcedures as $i => $procedure) {
+            echo "   [$i] Name: '{$procedure->getName()}', Org: '{$procedure->getOrga()->getName()}'\n";
+        }
+
+        // Validate each created procedure against scenario expectations
+        $scenarios = $this->getTestScenarios();
+        $validationResults = [];
+        $validationErrors = [];
+
+        foreach ($scenarios as [$scenarioName, $isValid]) {
+            // Find procedures that should match this scenario
+            echo "🔍 DEBUG: Looking for scenario '{$scenarioName}' procedures...\n";
+
+            $matchingProcedures = array_filter($createdProcedures, function($procedure) use ($scenarioName, $isValid) {
+                try {
+                    $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
+                    $expectedName = $scenarioInfo['plan_name'] ?? 'NOT_SET';
+                    $actualName = $procedure->getName();
+
+                    echo "🔍 DEBUG: Comparing procedure '{$actualName}' vs expected '{$expectedName}'\n";
+
+                    return isset($scenarioInfo['plan_name']) && $procedure->getName() === $scenarioInfo['plan_name'];
+                } catch (\Exception $e) {
+                    echo "🚨 DEBUG: Exception in scenario matching: {$e->getMessage()}\n";
+                    return false;
+                }
+            });
+
+            if (empty($matchingProcedures)) {
+                $validationErrors[] = "No procedure found for scenario '{$scenarioName}'";
+                continue;
+            }
+
+            foreach ($matchingProcedures as $procedure) {
+                $validationResult = $this->validateProcedureAgainstScenario($procedure, $scenarioName, $isValid);
+                $validationResults[] = $validationResult;
+
+                if (!$validationResult['success']) {
+                    $validationErrors = array_merge($validationErrors, $validationResult['errors']);
+                }
+            }
+        }
+
+        // If we have validation errors, return failure with details
+        if (!empty($validationErrors)) {
+            return new AddonTestResult(
+                false,
+                "Created procedures don't match scenario expectations: " . implode('; ', $validationErrors),
+                [
+                    'procedures_created' => $proceduresCreated,
+                    'validation_errors' => $validationErrors,
+                    'created_procedure_names' => array_map(fn($p) => $p->getName(), $createdProcedures),
+                    'created_procedure_orgs' => array_map(fn($p) => $p->getOrga()->getName(), $createdProcedures),
+                    'test_type' => 'valid_scenarios'
+                ],
+                $auditId,
+                0,
+                $proceduresCreated
             );
         }
 
@@ -77,35 +141,47 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
                 false,
                 "No audit entry was created during message processing",
                 [
-                    'initial_count' => $initialCount,
-                    'final_count' => $finalCount,
                     'procedures_created' => $proceduresCreated,
                     'expected_audit' => true,
                     'actual_audit' => false
                 ],
                 null,
-                $initialCount,
-                $finalCount
+                0,
+                $proceduresCreated
             );
         }
 
         // Success! Valid scenarios worked as expected
-        $scenarios = $this->getTestScenarios();
         $scenarioCount = count($scenarios);
+        $procedureDetails = [];
+
+        foreach ($createdProcedures as $procedure) {
+            $procedureDetails[] = [
+                'id' => $procedure->getId(),
+                'name' => $procedure->getName(),
+                'organization' => $procedure->getOrga()->getName()
+            ];
+        }
 
         return new AddonTestResult(
             true,
-            "Valid scenarios successfully processed: {$proceduresCreated} procedures created",
+            "Valid scenarios successfully created and validated {$proceduresCreated} procedures",
             [
                 'procedures_created' => $proceduresCreated,
                 'scenarios_tested' => $scenarioCount,
                 'audit_entry_verified' => 'YES',
                 'validation_passed' => 'YES',
-                'test_type' => 'valid_scenarios'
+                'test_type' => 'valid_scenarios',
+                'procedure_details' => $procedureDetails,
+                'validation_results' => array_map(fn($r) => [
+                    'scenario' => $r['scenario'],
+                    'success' => $r['success'],
+                    'procedure_name' => $r['procedure']->getName()
+                ], $validationResults)
             ],
             $auditId,
-            $initialCount,
-            $finalCount
+            0,
+            $proceduresCreated
         );
     }
 }
