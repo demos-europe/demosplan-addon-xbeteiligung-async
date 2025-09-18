@@ -384,33 +384,36 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
             $xml = $this->xmlFactory->createXML($scenarioName, $isValid);
 
-            // Get scenario info for debugging
-            $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
-            echo "   Description: {$scenarioInfo['description']}\n";
-
-            // Get full scenario data to access all fields including org_name
-            $fullScenarioData = $this->getFullScenario($scenarioName, $isValid);
-
-            // Debug: Show organization name in scenario and verify it matches created org
-            $this->debugOrga($fullScenarioData, $xml);
-
-            // Debug: Show first 500 chars of XML to check content
-            $this->debugFirstChar($xml);
-
-            // Debug: Show the full section with organization name to understand structure
-            $this->debugFullOrgaSecion($xml);
-
-            // Debug: Extract and show the organization name that will be used for lookup
-            $this->debugXml($xml);
-
-            if (!$isValid && isset($scenarioInfo['expected_error'])) {
-                echo "   Expected error: {$scenarioInfo['expected_error']}\n";
-            }
+            $this->debugPublishingMessage($xml, $scenarioName, $isValid);
 
             $this->publishMessage($xml, $scenarioName);
         }
 
         usleep(100000); // 100ms delay after all messages
+    }
+    private function debugPublishingMessage($xml, $scenarioName, $isValid) {
+        // Get scenario info for debugging
+        $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
+        echo "   Description: {$scenarioInfo['description']}\n";
+
+        // Get full scenario data to access all fields including org_name
+        $fullScenarioData = $this->getFullScenario($scenarioName, $isValid);
+
+        // Debug: Show organization name in scenario and verify it matches created org
+        $this->debugOrga($fullScenarioData, $xml);
+
+        // Debug: Show first 500 chars of XML to check content
+        $this->debugFirstChar($xml);
+
+        // Debug: Show the full section with organization name to understand structure
+        $this->debugFullOrgaSecion($xml);
+
+        // Debug: Extract and show the organization name that will be used for lookup
+        $this->debugXml($xml);
+
+        if (!$isValid && isset($scenarioInfo['expected_error'])) {
+            echo "   Expected error: {$scenarioInfo['expected_error']}\n";
+        }
     }
 
     private function getFullScenario($scenarioName, $isValid) {
