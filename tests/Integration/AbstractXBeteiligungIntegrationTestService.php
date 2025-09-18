@@ -810,24 +810,19 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         $errors = [];
 
         // Validate name
-        if (isset($scenarioData['plan_name'])) {
-            $expected = $scenarioData['plan_name'];
-            $actual = $procedure->getName();
-
-            $this->assertions->assertEquals($expected, $actual, "Expected procedure name '{$expected}', got '{$actual}' for scenario '{$scenarioName}'");
-            echo "✅ Procedure name assertion passed: '{$actual}'\n";
-        }
+        $expected = $scenarioData['plan_name'];
+        $actual = $procedure->getName();
+        $this->assertions->assertEquals($expected, $actual, "Expected procedure name '{$expected}', got '{$actual}' for scenario '{$scenarioName}'");
+        echo "✅ Procedure name assertion passed: '{$actual}'\n";
 
         // Validate organization using the dynamically created organization
         $expectedOrg = $this->getOrganizationForScenario($scenarioName, $isValid);
-        if ($expectedOrg) {
-            $expectedOrgId = $expectedOrg->getId();
-            $actualOrgId = $procedure->getOrga()->getId();
+        $expectedOrgId = $expectedOrg->getId();
+        $actualOrgId = $procedure->getOrga()->getId();
 
-            $this->assertions->assertEquals($expectedOrgId, $actualOrgId,
-                "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrgId}), got '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId}) for scenario '{$scenarioName}'");
-            echo "✅ Procedure organization assertion passed: '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})\n";
-        }
+        $this->assertions->assertEquals($expectedOrgId, $actualOrgId,
+            "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrgId}), got '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId}) for scenario '{$scenarioName}'");
+        echo "✅ Procedure organization assertion passed: '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})\n";
 
         // Validate description (using arbeitstitel as fallback)
         $expectedDescription = $scenarioData['beschreibung_planungsanlass'] ?? $scenarioData['arbeitstitel'] ?? null;
@@ -1007,25 +1002,20 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function getOrganizationForScenario(string $scenarioName, bool $isValid = true): ?OrgaInterface
     {
-        try {
-            $scenarioInfo = $this->getFullScenario($scenarioName, $isValid);
-            $orgName = $scenarioInfo['org_name'] ?? null;
+        $scenarioInfo = $this->getFullScenario($scenarioName, $isValid);
+        $orgName = $scenarioInfo['org_name'] ?? null;
 
-            if (!$orgName) {
-                echo "⚠️ Scenario '{$scenarioName}' has no org_name defined\n";
-                return null;
-            }
-
-            if (isset($this->createdOrganizations[$orgName])) {
-                return $this->createdOrganizations[$orgName];
-            }
-
-            echo "⚠️ Organization '{$orgName}' not found in created entities for scenario '{$scenarioName}'\n";
-            return null;
-        } catch (\Exception $e) {
-            echo "⚠️ Failed to get organization for scenario '{$scenarioName}': {$e->getMessage()}\n";
+        if (!$orgName) {
+            echo "⚠️ Scenario '{$scenarioName}' has no org_name defined\n";
             return null;
         }
+
+        if (isset($this->createdOrganizations[$orgName])) {
+            return $this->createdOrganizations[$orgName];
+        }
+
+        echo "⚠️ Organization '{$orgName}' not found in created entities for scenario '{$scenarioName}'\n";
+        return null;
     }
 
     /**
