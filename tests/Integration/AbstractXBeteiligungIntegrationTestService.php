@@ -49,6 +49,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     protected ?AMQPChannel $channel = null;
     protected string $exchangeName = 'bau.beteiligung';
     protected string $queueName = 'bau.beteiligung';
+    const FACTORY_CLASS_NAME = 'DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory';
 
     protected ?\DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory $xmlFactory = null;
 
@@ -102,9 +103,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     public function runIntegrationTest(ContainerInterface $container): AddonTestResult
     {
         echo "🔧 INTEGRATION_DEBUG: Starting runIntegrationTest with fixes...\n";
-
-        // Skip all EntityManager refresh attempts - use services as-is like direct test
-        echo "🔧 INTEGRATION_DEBUG: Using services without modification (like direct test)...\n";
 
         // Configure the RabbitMQ transport to use the same connection as our test
         $this->configureRabbitMQTransport($container);
@@ -316,7 +314,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function loadXmlFactory(): void
     {
-        $factoryClassName = 'DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory';
+        $factoryClassName = self::FACTORY_CLASS_NAME;
 
         if (!class_exists($factoryClassName)) {
             throw new RuntimeException("Factory class not found via autoloader: {$factoryClassName}");
