@@ -10,6 +10,67 @@ use Tests\Base\FunctionalTestCase;
 
 class AddonIntegrationTestCase extends FunctionalTestCase
 {
+
+    /**
+     * Test all registered addon integrations
+     */
+    public function testAddonIntegrations(): void
+    {
+        $container = self::getContainer();
+        $addonTests = $this->getAddonTests();
+
+        $testsRun = 0;
+        $testsPassed = 0;
+        $testsFailed = 0;
+
+        foreach ($addonTests as $addonTest) {
+            $testsRun++;
+            echo "**** Running {$addonTest->getAddonName()} - {$addonTest->getTestName()} **** \n ";
+
+            try {
+                // Setup test data
+                $addonTest->setupTestData($container);
+
+                // Run the integration test
+                $result = $addonTest->runIntegrationTest($container);
+
+                // Cleanup test data
+                $addonTest->cleanupTestData($container);
+
+                if ($result->isSuccess()) {
+                    $testsPassed++;
+
+                    $this->debugSuccessTestResult($result);
+
+                    // Assert success
+                    $this->assertTrue($result->isSuccess(), $result->getMessage());
+                } else {
+                    $testsFailed++;
+                    echo "❌ FAILED: {$result->getMessage()}\n";
+                    $this->fail($result->getMessage());
+                }
+            } catch (Exception $e) {
+                $testsFailed++;
+                echo "💥 EXCEPTION: {$e->getMessage()}\n";
+
+                // Always cleanup on exception
+                try {
+                    $addonTest->cleanupTestData($container);
+                } catch (Exception $cleanupException) {
+                    echo "⚠️ CLEANUP ERROR: {$cleanupException->getMessage()}\n";
+                }
+
+                throw $e;
+            }
+        }
+
+        $this->debugTestSummary($testsRun, $testsPassed, $testsFailed);
+
+        // Final assertion
+        $this->assertEquals(0, $testsFailed, "Some addon integration tests failed");
+        $this->assertGreaterThan(0, $testsRun, "No addon integration tests were discovered");
+    }
+
     /**
      * Get all addon integration test services using the existing addon registry
      * @return AddonIntegrationTestInterface[]
@@ -141,66 +202,6 @@ class AddonIntegrationTestCase extends FunctionalTestCase
         }
 
         return $namespace . '\\' . $className;
-    }
-
-    /**
-     * Test all registered addon integrations
-     */
-    public function testAddonIntegrations(): void
-    {
-        $container = self::getContainer();
-        $addonTests = $this->getAddonTests();
-
-        $testsRun = 0;
-        $testsPassed = 0;
-        $testsFailed = 0;
-
-        foreach ($addonTests as $addonTest) {
-            $testsRun++;
-            echo "**** Running {$addonTest->getAddonName()} - {$addonTest->getTestName()} **** \n ";
-
-            try {
-                // Setup test data
-                $addonTest->setupTestData($container);
-
-                // Run the integration test
-                $result = $addonTest->runIntegrationTest($container);
-
-                // Cleanup test data
-                $addonTest->cleanupTestData($container);
-
-                if ($result->isSuccess()) {
-                    $testsPassed++;
-
-                    $this->debugSuccessTestResult($result);
-
-                    // Assert success
-                    $this->assertTrue($result->isSuccess(), $result->getMessage());
-                } else {
-                    $testsFailed++;
-                    echo "❌ FAILED: {$result->getMessage()}\n";
-                    $this->fail($result->getMessage());
-                }
-            } catch (Exception $e) {
-                $testsFailed++;
-                echo "💥 EXCEPTION: {$e->getMessage()}\n";
-
-                // Always cleanup on exception
-                try {
-                    $addonTest->cleanupTestData($container);
-                } catch (Exception $cleanupException) {
-                    echo "⚠️ CLEANUP ERROR: {$cleanupException->getMessage()}\n";
-                }
-
-                throw $e;
-            }
-        }
-
-        $this->debugTestSummary($testsRun, $testsPassed, $testsFailed);
-
-        // Final assertion
-        $this->assertEquals(0, $testsFailed, "Some addon integration tests failed");
-        $this->assertGreaterThan(0, $testsRun, "No addon integration tests were discovered");
     }
 
     private function debugSuccessTestResult($result){
