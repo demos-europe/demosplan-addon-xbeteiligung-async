@@ -394,26 +394,9 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             $getScenarioDataMethod->setAccessible(true);
             $fullScenarioData = $getScenarioDataMethod->invoke($this->xmlFactory, $scenarioName, $isValid);
 
-            // Debug: Show organization name in scenario and verify it matches created org
-            if (isset($fullScenarioData['org_name'])) {
-                echo "   🏢 Scenario org name: '{$fullScenarioData['org_name']}'\n";
-                echo "   🏢 Created org name: '{$this->testOrganization->getName()}'\n";
-                echo "   🔍 Names match: " . ($fullScenarioData['org_name'] === $this->testOrganization->getName() ? 'YES' : 'NO') . "\n";
+            $this->debugOrga($fullScenarioData, $xml);
 
-                // Debug: Check if ORG_NAME is in the generated XML
-                if (strpos($xml, 'TestOrg XBeteiligung') !== false) {
-                    echo "   ✅ Organization name found in generated XML\n";
-                } else {
-                    echo "   ❌ Organization name NOT found in generated XML\n";
-                    // Look for ORG_NAME placeholder not being replaced
-                    if (strpos($xml, '{{ORG_NAME}}') !== false) {
-                        echo "   ⚠️ Unreplaced {{ORG_NAME}} placeholder found in XML\n";
-                    }
-                }
-            } else {
-                echo "   ⚠️ No org_name in full scenario data\n";
-                echo "   📋 Available fields: " . implode(', ', array_keys($fullScenarioData)) . "\n";
-            }
+            //fdsfs
 
             // Debug: Show first 500 chars of XML to check content
             echo "   📄 XML preview: " . substr($xml, 0, 500) . "...\n";
@@ -447,6 +430,29 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         }
 
         usleep(100000); // 100ms delay after all messages
+    }
+
+    private function debugOrga( $fullScenarioData, $xml): void {
+        // Debug: Show organization name in scenario and verify it matches created org
+        if (isset($fullScenarioData['org_name'])) {
+            echo "   🏢 Scenario org name: '{$fullScenarioData['org_name']}'\n";
+            echo "   🏢 Created org name: '{$this->testOrganization->getName()}'\n";
+            echo "   🔍 Names match: " . ($fullScenarioData['org_name'] === $this->testOrganization->getName() ? 'YES' : 'NO') . "\n";
+
+            // Debug: Check if ORG_NAME is in the generated XML
+            if (strpos($xml, 'TestOrg XBeteiligung') !== false) {
+                echo "   ✅ Organization name found in generated XML\n";
+            } else {
+                echo "   ❌ Organization name NOT found in generated XML\n";
+                // Look for ORG_NAME placeholder not being replaced
+                if (strpos($xml, '{{ORG_NAME}}') !== false) {
+                    echo "   ⚠️ Unreplaced {{ORG_NAME}} placeholder found in XML\n";
+                }
+            }
+        } else {
+            echo "   ⚠️ No org_name in full scenario data\n";
+            echo "   📋 Available fields: " . implode(', ', array_keys($fullScenarioData)) . "\n";
+        }
     }
 
     private function debugXml($xml): void {
