@@ -809,26 +809,13 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             $scenarioData = $this->getFullScenario($scenarioName, $isValid);
             $errors = [];
 
-            echo "🔍 DEBUG: Validating procedure '{$procedure->getName()}' against scenario '{$scenarioName}'" .
-                 ($this->useAssertions ? " (ASSERTION MODE)" : " (ERROR COLLECTION MODE)") . "\n";
-
             // Validate name
             if (isset($scenarioData['plan_name'])) {
                 $expected = $scenarioData['plan_name'];
                 $actual = $procedure->getName();
 
-                if ($this->useAssertions) {
-                    // ASSERTION MODE: Fail immediately
-                    $this->assertions->assertEquals($expected, $actual, "Expected procedure name '{$expected}', got '{$actual}' for scenario '{$scenarioName}'");
-                    echo "✅ Procedure name assertion passed: '{$actual}'\n";
-                } else {
-                    // ERROR COLLECTION MODE: Current behavior
-                    if ($expected !== $actual) {
-                        $errors[] = "Expected name '{$expected}', got '{$actual}'";
-                    } else {
-                        echo "✅ Procedure name matches: '{$actual}'\n";
-                    }
-                }
+                $this->assertions->assertEquals($expected, $actual, "Expected procedure name '{$expected}', got '{$actual}' for scenario '{$scenarioName}'");
+                echo "✅ Procedure name assertion passed: '{$actual}'\n";
             }
 
             // Validate organization using the dynamically created organization
@@ -837,19 +824,9 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                 $expectedOrgId = $expectedOrg->getId();
                 $actualOrgId = $procedure->getOrga()->getId();
 
-                if ($this->useAssertions) {
-                    // ASSERTION MODE: Fail immediately
-                    $this->assertions->assertEquals($expectedOrgId, $actualOrgId,
-                        "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrgId}), got '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId}) for scenario '{$scenarioName}'");
-                    echo "✅ Procedure organization assertion passed: '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})\n";
-                } else {
-                    // ERROR COLLECTION MODE: Current behavior
-                    if ($expectedOrgId !== $actualOrgId) {
-                        $errors[] = "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrgId}), got '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})";
-                    } else {
-                        echo "✅ Procedure organization matches: '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})\n";
-                    }
-                }
+                $this->assertions->assertEquals($expectedOrgId, $actualOrgId,
+                    "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrgId}), got '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId}) for scenario '{$scenarioName}'");
+                echo "✅ Procedure organization assertion passed: '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})\n";
             }
 
             // Validate description (using arbeitstitel as fallback)
@@ -857,28 +834,9 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             if ($expectedDescription && method_exists($procedure, 'getDescription')) {
                 $actualDescription = $procedure->getDescription();
 
-                if ($this->useAssertions) {
-                    // ASSERTION MODE: Fail immediately
-                    $this->assertions->assertEquals($expectedDescription, $actualDescription,
-                        "Expected description '{$expectedDescription}', got '{$actualDescription}' for scenario '{$scenarioName}'");
-                    echo "✅ Procedure description assertion passed\n";
-                } else {
-                    // ERROR COLLECTION MODE: Current behavior
-                    if ($actualDescription !== $expectedDescription) {
-                        $errors[] = "Expected description '{$expectedDescription}', got '{$actualDescription}'";
-                    }
-                }
-            }
-
-            // Final status messages
-            if ($this->useAssertions) {
-                echo "✅ All assertions passed for scenario '{$scenarioName}'\n";
-            } else {
-                if (empty($errors)) {
-                    echo "✅ All validations passed for scenario '{$scenarioName}'\n";
-                } else {
-                    echo "❌ Validation errors for scenario '{$scenarioName}': " . implode('; ', $errors) . "\n";
-                }
+                $this->assertions->assertEquals($expectedDescription, $actualDescription,
+                    "Expected description '{$expectedDescription}', got '{$actualDescription}' for scenario '{$scenarioName}'");
+                echo "✅ Procedure description assertion passed\n";
             }
 
             return [
