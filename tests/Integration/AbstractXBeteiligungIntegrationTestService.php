@@ -165,23 +165,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             $auditId = $this->findLatestAuditEntry($entityManager);
 
             if ($auditId) {
-                echo "✅ Found audit entry from event processing: {$auditId}\n";
-
-                // Check for error details in audit entry that might explain why procedure creation failed
-                $auditDetails = $this->getAuditEntryDetails($entityManager, $auditId);
-                if ($auditDetails) {
-                    if (isset($auditDetails['error_details']) && !empty($auditDetails['error_details'])) {
-                        echo "❌ Audit entry contains error details: {$auditDetails['error_details']}\n";
-                    }
-                    if (isset($auditDetails['status']) && $auditDetails['status'] !== 'processed') {
-                        echo "⚠️ Audit entry status: {$auditDetails['status']}\n";
-                    }
-                    if (empty($auditDetails['procedure_id'])) {
-                        echo "⚠️ No procedure_id in audit entry - procedure creation likely failed\n";
-                    } else {
-                        echo "✅ Audit entry has procedure_id: {$auditDetails['procedure_id']}\n";
-                    }
-                }
+                $this->debugAuditDetails($auditId, $entityManager);
             }
 
             // Commit transaction
@@ -192,9 +176,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                 echo "💾 Flushed and committed database changes\n";
             } else {
                 echo "⚠️ EntityManager was closed during XBeteiligung processing\n";
-                echo "   This suggests an exception occurred during procedure creation\n";
-                echo "   However, message was processed (audit entry exists)\n";
-
                 // Try to commit/rollback the connection if it's still active
                 if ($entityManager->getConnection()->isTransactionActive()) {
                     try {
@@ -206,22 +187,13 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                 }
             }
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Roll back on error
             if ($entityManager->getConnection()->isTransactionActive()) {
                 $entityManager->getConnection()->rollBack();
             }
 
-            echo "💥 Exception during message processing: {$e->getMessage()}\n";
-            echo "   File: {$e->getFile()}:{$e->getLine()}\n";
-            echo "   EntityManager open: " . ($entityManager->isOpen() ? 'YES' : 'NO') . "\n";
-
-            // Show the full stack trace for debugging
-            echo "🔍 Stack trace:\n";
-            $stackLines = explode("\n", $e->getTraceAsString());
-            foreach (array_slice($stackLines, 0, 10) as $line) {
-                echo "   {$line}\n";
-            }
+            $this->debugDatabaseException($entityManager, $e);
 
             return new AddonTestResult(
                 false,
@@ -244,15 +216,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         $createdProcedures = $this->findNewlyCreatedProcedures($initialProcedures, $finalProcedures);
         $proceduresCreated = count($createdProcedures);
 
-        echo "📊 Final relevant procedures: " . count($finalProcedures) . "\n";
-        echo "✨ Procedures created by REAL services: {$proceduresCreated}\n";
-
-        if (!empty($createdProcedures)) {
-            echo "📋 Created procedures:\n";
-            foreach ($createdProcedures as $procedure) {
-                echo "   - ID: {$procedure->getId()}, Name: {$procedure->getName()}, Org: {$procedure->getOrga()->getName()}\n";
-            }
-        }
+        $this->debugProcedureDetails($finalProcedures, $proceduresCreated, $createdProcedures);
 
         // Verify audit entry was created if we have an audit ID
         if ($auditId && !$this->verifyAuditEntry($entityManager, $auditId)) {
@@ -284,6 +248,51 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     private function debugProcessMessageException($e) {
         echo "🚨 INTEGRATION_DEBUG: Exception during direct processing: {$e->getMessage()}\n";
         echo "🚨 INTEGRATION_DEBUG: Exception type: " . get_class($e) . "\n";
+    }
+
+    private function debugAuditDetails($auditId, $entityManager) {
+        echo "✅ Found audit entry from event processing: {$auditId}\n";
+
+        // Check for error details in audit entry that might explain why procedure creation failed
+        $auditDetails = $this->getAuditEntryDetails($entityManager, $auditId);
+        if ($auditDetails) {
+            if (isset($auditDetails['error_details']) && !empty($auditDetails['error_details'])) {
+                echo "❌ Audit entry contains error details: {$auditDetails['error_details']}\n";
+            }
+            if (isset($auditDetails['status']) && $auditDetails['status'] !== 'processed') {
+                echo "⚠️ Audit entry status: {$auditDetails['status']}\n";
+            }
+            if (empty($auditDetails['procedure_id'])) {
+                echo "⚠️ No procedure_id in audit entry - procedure creation likely failed\n";
+            } else {
+                echo "✅ Audit entry has procedure_id: {$auditDetails['procedure_id']}\n";
+            }
+        }
+    }
+
+    private function debugDatabaseException($entityManager, $e) {
+        echo "💥 Exception during message processing: {$e->getMessage()}\n";
+        echo "   File: {$e->getFile()}:{$e->getLine()}\n";
+        echo "   EntityManager open: " . ($entityManager->isOpen() ? 'YES' : 'NO') . "\n";
+
+        // Show the full stack trace for debugging
+        echo "🔍 Stack trace:\n";
+        $stackLines = explode("\n", $e->getTraceAsString());
+        foreach (array_slice($stackLines, 0, 10) as $line) {
+            echo "   {$line}\n";
+        }
+    }
+
+    private function debugProcedureDetails($finalProcedures, $proceduresCreated, $createdProcedures) {
+        echo "📊 Final relevant procedures: " . count($finalProcedures) . "\n";
+        echo "✨ Procedures created by REAL services: {$proceduresCreated}\n";
+
+        if (!empty($createdProcedures)) {
+            echo "📋 Created procedures:\n";
+            foreach ($createdProcedures as $procedure) {
+                echo "   - ID: {$procedure->getId()}, Name: {$procedure->getName()}, Org: {$procedure->getOrga()->getName()}\n";
+            }
+        }
     }
 
     public function cleanupTestData(ContainerInterface $container): void
