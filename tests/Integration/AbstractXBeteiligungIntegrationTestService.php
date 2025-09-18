@@ -29,6 +29,7 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 use PhpAmqpLib\Message\AMQPMessage;
 use Psr\Log\NullLogger;
+use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -388,7 +389,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             echo "   Description: {$scenarioInfo['description']}\n";
 
             // Get full scenario data to access all fields including org_name
-            $reflection = new \ReflectionClass($this->xmlFactory);
+            $reflection = new ReflectionClass($this->xmlFactory);
             $getScenarioDataMethod = $reflection->getMethod('getScenarioData');
             $getScenarioDataMethod->setAccessible(true);
             $fullScenarioData = $getScenarioDataMethod->invoke($this->xmlFactory, $scenarioName, $isValid);
@@ -436,24 +437,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                 }
             }
 
-            // Debug: Extract and show the organization name that will be used for lookup
-            try {
-                $xmlDoc = new \DOMDocument();
-                $xmlDoc->loadXML($xml);
-                $xpath = new \DOMXPath($xmlDoc);
-                $xpath->registerNamespace('xbd', 'http://www.xleitstelle.de/xbau/12');
-
-                // Look for organization name in the XML structure
-                $nameElements = $xpath->query('//xbd:nameBehoerde | //nameBehoerde');
-                if ($nameElements->length > 0) {
-                    $xmlOrgName = $nameElements->item(0)->textContent;
-                    echo "   🏢 Organization name extracted from XML: '{$xmlOrgName}'\n";
-                } else {
-                    echo "   ⚠️ Could not find organization name in XML\n";
-                }
-            } catch (\Exception $e) {
-                echo "   ⚠️ Error parsing XML for org name: {$e->getMessage()}\n";
-            }
+            $this->debugXml($xml);
 
             if (!$isValid && isset($scenarioInfo['expected_error'])) {
                 echo "   Expected error: {$scenarioInfo['expected_error']}\n";
@@ -463,6 +447,27 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         }
 
         usleep(100000); // 100ms delay after all messages
+    }
+
+    private function debugXml($xml): void {
+        // Debug: Extract and show the organization name that will be used for lookup
+        try {
+            $xmlDoc = new \DOMDocument();
+            $xmlDoc->loadXML($xml);
+            $xpath = new \DOMXPath($xmlDoc);
+            $xpath->registerNamespace('xbd', 'http://www.xleitstelle.de/xbau/12');
+
+            // Look for organization name in the XML structure
+            $nameElements = $xpath->query('//xbd:nameBehoerde | //nameBehoerde');
+            if ($nameElements->length > 0) {
+                $xmlOrgName = $nameElements->item(0)->textContent;
+                echo "   🏢 Organization name extracted from XML: '{$xmlOrgName}'\n";
+            } else {
+                echo "   ⚠️ Could not find organization name in XML\n";
+            }
+        } catch (\Exception $e) {
+            echo "   ⚠️ Error parsing XML for org name: {$e->getMessage()}\n";
+        }
     }
 
     /**
