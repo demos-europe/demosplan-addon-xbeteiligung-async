@@ -389,10 +389,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             echo "   Description: {$scenarioInfo['description']}\n";
 
             // Get full scenario data to access all fields including org_name
-            $reflection = new ReflectionClass($this->xmlFactory);
-            $getScenarioDataMethod = $reflection->getMethod('getScenarioData');
-            $getScenarioDataMethod->setAccessible(true);
-            $fullScenarioData = $getScenarioDataMethod->invoke($this->xmlFactory, $scenarioName, $isValid);
+            $fullScenarioData = $this->getFullScenario($scenarioName, $isValid);
 
             // Debug: Show organization name in scenario and verify it matches created org
             $this->debugOrga($fullScenarioData, $xml);
@@ -414,6 +411,13 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         }
 
         usleep(100000); // 100ms delay after all messages
+    }
+
+    private function getFullScenario($scenarioName, $isValid) {
+        $reflection = new ReflectionClass($this->xmlFactory);
+        $getScenarioDataMethod = $reflection->getMethod('getScenarioData');
+        $getScenarioDataMethod->setAccessible(true);
+        return $getScenarioDataMethod->invoke($this->xmlFactory, $scenarioName, $isValid);
     }
 
     private function debugFirstChar($xml) {
