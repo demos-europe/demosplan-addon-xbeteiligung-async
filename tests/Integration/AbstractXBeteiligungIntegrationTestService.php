@@ -9,6 +9,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSub
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
+use demosplan\DemosPlanCoreBundle\Logic\User\OrgaService;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonIntegrationTestInterface;
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonTestResult;
@@ -902,7 +903,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         echo "💾 Persisted all test entities to database\n";
 
         // Debug: Verify organization can be found by name
-        $orgaService = $container->get('demosplan\DemosPlanCoreBundle\Logic\User\OrgaService');
+        $orgaService = $container->get(OrgaService::class);
         $foundOrgas = $orgaService->getOrgaByFields(['name' => $this->testOrganization->getName(), 'deleted' => false]);
         echo "🔍 Debug: Organization '{$this->testOrganization->getName()}' findable by service: " . count($foundOrgas) . " found\n";
     }
