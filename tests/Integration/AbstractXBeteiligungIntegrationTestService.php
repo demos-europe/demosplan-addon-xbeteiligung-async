@@ -862,9 +862,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
         // Flush and COMMIT to ensure entities are visible to all database connections
         $this->commitTestEntities($container);
-
-        // Debug: Verify organizations can be found by name
-        $this->debugOrganizationLookup($container, $entityRequirements);
     }
 
     /**
@@ -973,18 +970,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
     }
 
-    /**
-     * Debug organization lookup to verify entities are accessible.
-     */
-    private function debugOrganizationLookup(ContainerInterface $container, array $entityRequirements): void
-    {
-        $orgaService = $container->get(OrgaService::class);
-
-        foreach (array_keys($entityRequirements['organizations']) as $orgName) {
-            $foundOrgas = $orgaService->getOrgaByFields(['name' => $orgName, 'deleted' => false]);
-            echo "🔍 Debug: Organization '{$orgName}' findable by service: " . count($foundOrgas) . " found\n";
-        }
-    }
 
     /**
      * Get organization created for a specific scenario by its organization name.
