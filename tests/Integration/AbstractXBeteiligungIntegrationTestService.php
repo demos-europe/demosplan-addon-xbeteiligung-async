@@ -394,32 +394,16 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             $getScenarioDataMethod->setAccessible(true);
             $fullScenarioData = $getScenarioDataMethod->invoke($this->xmlFactory, $scenarioName, $isValid);
 
+            // Debug: Show organization name in scenario and verify it matches created org
             $this->debugOrga($fullScenarioData, $xml);
-
-            //fdsfs
 
             // Debug: Show first 500 chars of XML to check content
             echo "   📄 XML preview: " . substr($xml, 0, 500) . "...\n";
 
             // Debug: Show the full section with organization name to understand structure
-            $lines = explode("\n", $xml);
-            $orgLines = [];
-            foreach ($lines as $i => $line) {
-                if (strpos($line, 'TestOrg XBeteiligung') !== false) {
-                    // Show 3 lines before and after the org name
-                    for ($j = max(0, $i-3); $j <= min(count($lines)-1, $i+3); $j++) {
-                        $orgLines[] = $lines[$j];
-                    }
-                    break;
-                }
-            }
-            if (!empty($orgLines)) {
-                echo "   📋 XML structure around organization name:\n";
-                foreach ($orgLines as $line) {
-                    echo "      " . trim($line) . "\n";
-                }
-            }
+            $this->debugFullOrgaSecion($xml);
 
+            // Debug: Extract and show the organization name that will be used for lookup
             $this->debugXml($xml);
 
             if (!$isValid && isset($scenarioInfo['expected_error'])) {
@@ -432,8 +416,27 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         usleep(100000); // 100ms delay after all messages
     }
 
+    private function debugFullOrgaSecion($xml) {
+        $lines = explode("\n", $xml);
+        $orgLines = [];
+        foreach ($lines as $i => $line) {
+            if (strpos($line, 'TestOrg XBeteiligung') !== false) {
+                // Show 3 lines before and after the org name
+                for ($j = max(0, $i-3); $j <= min(count($lines)-1, $i+3); $j++) {
+                    $orgLines[] = $lines[$j];
+                }
+                break;
+            }
+        }
+        if (!empty($orgLines)) {
+            echo "   📋 XML structure around organization name:\n";
+            foreach ($orgLines as $line) {
+                echo "      " . trim($line) . "\n";
+            }
+        }
+    }
+
     private function debugOrga( $fullScenarioData, $xml): void {
-        // Debug: Show organization name in scenario and verify it matches created org
         if (isset($fullScenarioData['org_name'])) {
             echo "   🏢 Scenario org name: '{$fullScenarioData['org_name']}'\n";
             echo "   🏢 Created org name: '{$this->testOrganization->getName()}'\n";
@@ -456,7 +459,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     }
 
     private function debugXml($xml): void {
-        // Debug: Extract and show the organization name that will be used for lookup
         try {
             $xmlDoc = new \DOMDocument();
             $xmlDoc->loadXML($xml);
