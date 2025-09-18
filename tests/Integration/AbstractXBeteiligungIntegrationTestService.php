@@ -9,6 +9,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSub
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use demosplan\DemosPlanCoreBundle\Logic\User\OrgaService;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonIntegrationTestInterface;
@@ -143,7 +144,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
             foreach ($scenarios as [$scenarioName, $isValid]) {
                 $xml = $this->xmlFactory->createXML($scenarioName, $isValid);
-                $messageData = new \DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData(
+                $messageData = new IncomingMessageData(
                     $xml,
                     'bau.cockpit.xyz.00.01.kommunal.Initiieren.0401'
                 );
