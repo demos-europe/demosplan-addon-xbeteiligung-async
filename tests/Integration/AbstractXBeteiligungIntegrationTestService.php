@@ -1070,37 +1070,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     }
 
     /**
-     * Get first planner user for a specific scenario.
-     */
-    protected function getPlannerUserForScenario(string $scenarioName, bool $isValid = true): ?UserInterface
-    {
-        $users = $this->getUsersForScenario($scenarioName, $isValid);
-        return !empty($users) ? $users[0] : null;
-    }
-
-    /**
-     * Debug method: List all created entities for troubleshooting.
-     */
-    protected function debugCreatedEntities(): void
-    {
-        echo "🔍 DEBUG: All created entities:\n";
-        echo "   Customer: " . ($this->testCustomer ? $this->testCustomer->getName() : 'NONE') . "\n";
-
-        echo "   Organizations (" . count($this->createdOrganizations) . "):\n";
-        foreach ($this->createdOrganizations as $orgName => $org) {
-            echo "     - '{$orgName}' (ID: {$org->getId()})\n";
-        }
-
-        echo "   Users by organization:\n";
-        foreach ($this->createdUsers as $orgName => $users) {
-            echo "     - '{$orgName}': " . count($users) . " users\n";
-            foreach ($users as $i => $user) {
-                echo "       [{$i}] {$user->getLogin()} (ID: {$user->getId()})\n";
-            }
-        }
-    }
-
-    /**
      * Clean up test entities created for the integration test.
      */
     protected function cleanupTestEntities(ContainerInterface $container): void
