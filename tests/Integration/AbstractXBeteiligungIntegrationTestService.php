@@ -105,8 +105,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
     public function runIntegrationTest(ContainerInterface $container): AddonTestResult
     {
-        echo "🔧 INTEGRATION_DEBUG: Starting runIntegrationTest with fixes...\n";
-
         // Configure the RabbitMQ transport to use the same connection as our test
         $this->configureRabbitMQTransport($container);
 
@@ -128,17 +126,9 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
             // Get EntityManager for transaction
             $entityManager = $container->get(EntityManagerInterface::class);
-            echo "🔧 INTEGRATION_DEBUG: Got EntityManager for transaction\n";
 
             // Start database transaction for the entire process
             $entityManager->getConnection()->beginTransaction();
-            echo "🔄 Started database transaction\n";
-
-            echo "🔧 INTEGRATION_DEBUG: About to use direct message processing...\n";
-
-            // ALTERNATIVE: Use direct message processing to avoid service isolation issues
-            // This still tests the core XBeteiligung logic but stays in same service context
-            echo "🔧 INTEGRATION_DEBUG: Using direct message processing to avoid service isolation...\n";
 
             $messageProcessor = $container->get('DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor');
             $scenarios = $this->getTestScenarios();
@@ -158,14 +148,9 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
                 try {
                     $result = $messageProcessor->processIncomingMessage($messageData);
-                    echo "🔧 INTEGRATION_DEBUG: Direct processing result: " . (is_object($result) ? get_class($result) : gettype($result)) . "\n";
-
-                    if ($result && method_exists($result, 'getProcedureId')) {
-                        echo "🔧 INTEGRATION_DEBUG: Procedure ID from result: " . ($result->getProcedureId() ?? 'null') . "\n";
-                    }
-                } catch (\Exception $e) {
-                    echo "🚨 INTEGRATION_DEBUG: Exception during direct processing: {$e->getMessage()}\n";
-                    echo "🚨 INTEGRATION_DEBUG: Exception type: " . get_class($e) . "\n";
+                    $this->debugProcessMessage($result);
+                } catch (Exception $e) {
+                    $this->debugProcessMessageException($e);
                 }
             }
 
@@ -285,6 +270,20 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
         // Let concrete implementation validate the specific results with created procedures
         return $this->validateTestResult($createdProcedures, $auditId);
+    }
+
+    private function debugProcessMessage($result) {
+        echo "🔧 INTEGRATION_DEBUG: Direct processing result: " . (is_object($result) ? get_class($result) : gettype($result)) . "\n";
+
+        if ($result && method_exists($result, 'getProcedureId')) {
+            echo "🔧 INTEGRATION_DEBUG: Procedure ID from result: " . ($result->getProcedureId() ?? 'null') . "\n";
+        }
+
+    }
+
+    private function debugProcessMessageException($e) {
+        echo "🚨 INTEGRATION_DEBUG: Exception during direct processing: {$e->getMessage()}\n";
+        echo "🚨 INTEGRATION_DEBUG: Exception type: " . get_class($e) . "\n";
     }
 
     public function cleanupTestData(ContainerInterface $container): void
