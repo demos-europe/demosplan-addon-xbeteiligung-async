@@ -11,6 +11,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTranspor
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use demosplan\DemosPlanCoreBundle\Logic\User\OrgaService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration\IntegrationTestAssertions;
+use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration\IntegrationAssertionException;
 use Exception;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonIntegrationTestInterface;
@@ -41,6 +43,14 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Contains all the common logic for setting up RabbitMQ connections,
  * running the actual service chain, and database interactions.
  *
+ * VALIDATION MODES:
+ * - Error Collection Mode (default): Collects all validation errors and reports them together
+ * - Assertion Mode: Fails immediately on first validation error (fail fast)
+ *
+ * To switch modes in concrete test classes:
+ * - Call $this->enableAssertionMode() in setupTestData() for assertion mode
+ * - Call $this->enableErrorCollectionMode() for error collection mode (or do nothing - it's default)
+ *
  * Concrete implementations must define:
  * - Which test scenarios to run
  * - How to validate the results
@@ -64,6 +74,12 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
     /** @var array<string, UserInterface[]> Map of organization name to array of created users */
     protected array $createdUsers = [];
+
+    /** Toggle between assertion mode (fail fast) and error collection mode (collect all errors) */
+    protected bool $useAssertions = false;
+
+    /** Assertion service for fail-fast validation mode */
+    protected ?IntegrationTestAssertions $assertions = null;
 
     public function getAddonName(): string
     {
@@ -92,8 +108,40 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     abstract protected function validateTestResult(array $createdProcedures, ?string $auditId): AddonTestResult;
 
+    /**
+     * Enable assertion-based validation mode (fail fast on first error).
+     * Uncomment this call in concrete test classes to use assertion mode.
+     */
+    protected function enableAssertionMode(): void
+    {
+        // Manually require the assertions class (integration tests don't use autoloader)
+        $assertionsFile = __DIR__ . '/IntegrationTestAssertions.php';
+        if (!class_exists('DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration\IntegrationTestAssertions')) {
+            if (!file_exists($assertionsFile)) {
+                throw new RuntimeException("IntegrationTestAssertions file not found: {$assertionsFile}");
+            }
+            require_once $assertionsFile;
+        }
+
+        $this->useAssertions = true;
+        $this->assertions = new IntegrationTestAssertions();
+        echo "🔄 Enabled assertion mode: Tests will fail fast on first validation error\n";
+    }
+
+    /**
+     * Enable error collection mode (default - collect all validation errors).
+     * This is the default mode, no need to call explicitly.
+     */
+    protected function enableErrorCollectionMode(): void
+    {
+        $this->useAssertions = false;
+        $this->assertions = null;
+        echo "🔄 Enabled error collection mode: Tests will collect all validation errors\n";
+    }
+
     public function setupTestData(ContainerInterface $container): void
     {
+        //$this->enableAssertionMode(); // Uncomment to enable assertion mode (fail fast)
         $this->loadXmlFactory();
         $this->createTestEntities($container);
         $this->setupRabbitMQConnection();
@@ -855,35 +903,76 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             $scenarioData = $this->getFullScenario($scenarioName, $isValid);
             $errors = [];
 
-            echo "🔍 DEBUG: Validating procedure '{$procedure->getName()}' against scenario '{$scenarioName}'\n";
+            echo "🔍 DEBUG: Validating procedure '{$procedure->getName()}' against scenario '{$scenarioName}'" .
+                 ($this->useAssertions ? " (ASSERTION MODE)" : " (ERROR COLLECTION MODE)") . "\n";
 
             // Validate name
-            if (isset($scenarioData['plan_name']) && $procedure->getName() !== $scenarioData['plan_name']) {
-                $errors[] = "Expected name '{$scenarioData['plan_name']}', got '{$procedure->getName()}'";
-            } else {
-                echo "✅ Procedure name matches: '{$procedure->getName()}'\n";
+            if (isset($scenarioData['plan_name'])) {
+                $expected = $scenarioData['plan_name'];
+                $actual = $procedure->getName();
+
+                if ($this->useAssertions) {
+                    // ASSERTION MODE: Fail immediately
+                    $this->assertions->assertEquals($expected, $actual, "Expected procedure name '{$expected}', got '{$actual}' for scenario '{$scenarioName}'");
+                    echo "✅ Procedure name assertion passed: '{$actual}'\n";
+                } else {
+                    // ERROR COLLECTION MODE: Current behavior
+                    if ($expected !== $actual) {
+                        $errors[] = "Expected name '{$expected}', got '{$actual}'";
+                    } else {
+                        echo "✅ Procedure name matches: '{$actual}'\n";
+                    }
+                }
             }
 
             // Validate organization using the dynamically created organization
             $expectedOrg = $this->getOrganizationForScenario($scenarioName, $isValid);
             if ($expectedOrg) {
-                if ($procedure->getOrga()->getId() !== $expectedOrg->getId()) {
-                    $errors[] = "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrg->getId()}), got '{$procedure->getOrga()->getName()}' (ID: {$procedure->getOrga()->getId()})";
+                $expectedOrgId = $expectedOrg->getId();
+                $actualOrgId = $procedure->getOrga()->getId();
+
+                if ($this->useAssertions) {
+                    // ASSERTION MODE: Fail immediately
+                    $this->assertions->assertEquals($expectedOrgId, $actualOrgId,
+                        "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrgId}), got '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId}) for scenario '{$scenarioName}'");
+                    echo "✅ Procedure organization assertion passed: '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})\n";
                 } else {
-                    echo "✅ Procedure organization matches: '{$procedure->getOrga()->getName()}' (ID: {$procedure->getOrga()->getId()})\n";
+                    // ERROR COLLECTION MODE: Current behavior
+                    if ($expectedOrgId !== $actualOrgId) {
+                        $errors[] = "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrgId}), got '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})";
+                    } else {
+                        echo "✅ Procedure organization matches: '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})\n";
+                    }
                 }
             }
 
             // Validate description (using arbeitstitel as fallback)
             $expectedDescription = $scenarioData['beschreibung_planungsanlass'] ?? $scenarioData['arbeitstitel'] ?? null;
-            if ($expectedDescription && method_exists($procedure, 'getDescription') && $procedure->getDescription() !== $expectedDescription) {
-                $errors[] = "Expected description '{$expectedDescription}', got '{$procedure->getDescription()}'";
+            if ($expectedDescription && method_exists($procedure, 'getDescription')) {
+                $actualDescription = $procedure->getDescription();
+
+                if ($this->useAssertions) {
+                    // ASSERTION MODE: Fail immediately
+                    $this->assertions->assertEquals($expectedDescription, $actualDescription,
+                        "Expected description '{$expectedDescription}', got '{$actualDescription}' for scenario '{$scenarioName}'");
+                    echo "✅ Procedure description assertion passed\n";
+                } else {
+                    // ERROR COLLECTION MODE: Current behavior
+                    if ($actualDescription !== $expectedDescription) {
+                        $errors[] = "Expected description '{$expectedDescription}', got '{$actualDescription}'";
+                    }
+                }
             }
 
-            if (empty($errors)) {
-                echo "✅ All validations passed for scenario '{$scenarioName}'\n";
+            // Final status messages
+            if ($this->useAssertions) {
+                echo "✅ All assertions passed for scenario '{$scenarioName}'\n";
             } else {
-                echo "❌ Validation errors for scenario '{$scenarioName}': " . implode('; ', $errors) . "\n";
+                if (empty($errors)) {
+                    echo "✅ All validations passed for scenario '{$scenarioName}'\n";
+                } else {
+                    echo "❌ Validation errors for scenario '{$scenarioName}': " . implode('; ', $errors) . "\n";
+                }
             }
 
             return [
@@ -892,8 +981,15 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                 'procedure' => $procedure,
                 'scenario' => $scenarioName
             ];
+        } catch (IntegrationAssertionException $e) {
+            // Assertion failed - this is expected in assertion mode
+            echo "❌ Assertion failed for scenario '{$scenarioName}': {$e->getMessage()}\n";
+            throw $e; // Re-throw to fail the test
         } catch (\Exception $e) {
             echo "⚠️ Exception during validation for scenario '{$scenarioName}': {$e->getMessage()}\n";
+            if ($this->useAssertions) {
+                throw $e; // Re-throw in assertion mode
+            }
             return [
                 'success' => false,
                 'errors' => ["Could not validate against scenario: " . $e->getMessage()],

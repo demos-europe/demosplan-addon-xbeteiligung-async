@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
 
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonTestResult;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Integration test for XBeteiligung valid scenarios.
@@ -21,6 +22,19 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
     public function getTestName(): string
     {
         return 'Real Service Chain with Valid Scenarios - Procedure Creation';
+    }
+
+    /**
+     * Example of how to enable assertion mode.
+     * Uncomment the line below to switch to assertion mode (fail fast).
+     */
+    public function setupTestData(ContainerInterface $container): void
+    {
+        // Toggle modes by uncommenting one of these lines:
+        $this->enableAssertionMode();      // Uncomment for assertion mode (fail fast)
+        // $this->enableErrorCollectionMode(); // Uncomment to explicitly set error collection mode
+
+        parent::setupTestData($container);
     }
 
     /**
