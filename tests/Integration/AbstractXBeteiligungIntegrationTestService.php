@@ -78,8 +78,8 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     /** Toggle between assertion mode (fail fast) and error collection mode (collect all errors) */
     protected bool $useAssertions = false;
 
-    /** Assertion service for fail-fast validation mode */
-    protected ?IntegrationTestAssertions $assertions = null;
+    /** PHPUnit test case for real assertions (when available) */
+    protected ?object $testCase = null;
 
     public function getAddonName(): string
     {
@@ -114,18 +114,8 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function enableAssertionMode(): void
     {
-        // Manually require the assertions class (integration tests don't use autoloader)
-        $assertionsFile = __DIR__ . '/IntegrationTestAssertions.php';
-        if (!class_exists('DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration\IntegrationTestAssertions')) {
-            if (!file_exists($assertionsFile)) {
-                throw new RuntimeException("IntegrationTestAssertions file not found: {$assertionsFile}");
-            }
-            require_once $assertionsFile;
-        }
-
         $this->useAssertions = true;
-        $this->assertions = new IntegrationTestAssertions();
-        echo "🔄 Enabled assertion mode: Tests will fail fast on first validation error\n";
+        echo "🔄 Enabled assertion mode: Tests will fail fast on first validation error using PHPUnit assertions\n";
     }
 
     /**
@@ -135,13 +125,12 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     protected function enableErrorCollectionMode(): void
     {
         $this->useAssertions = false;
-        $this->assertions = null;
         echo "🔄 Enabled error collection mode: Tests will collect all validation errors\n";
     }
 
-    public function setupTestData(ContainerInterface $container): void
+    public function setupTestData(ContainerInterface $container, ?object $testCase = null): void
     {
-        //$this->enableAssertionMode(); // Uncomment to enable assertion mode (fail fast)
+        $this->testCase = $testCase;
         $this->loadXmlFactory();
         $this->createTestEntities($container);
         $this->setupRabbitMQConnection();
@@ -804,42 +793,42 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function validateProcedureAgainstScenario(ProcedureInterface $procedure, string $scenarioName, bool $isValid): array
     {
-
-        // Get full scenario data to access all fields including org_name
         $scenarioData = $this->getFullScenario($scenarioName, $isValid);
-        $errors = [];
 
-        // Validate name
-        $expected = $scenarioData['plan_name'];
-        $actual = $procedure->getName();
-        $this->assertions->assertEquals($expected, $actual, "Expected procedure name '{$expected}', got '{$actual}' for scenario '{$scenarioName}'");
-        echo "✅ Procedure name assertion passed: '{$actual}'\n";
+        // USE REAL PHPUNIT ASSERTIONS! ✅
+        $this->testCase->assertEquals(
+            $scenarioData['plan_name'],
+            $procedure->getName(),
+            "Expected procedure name '{$scenarioData['plan_name']}', got '{$procedure->getName()}' for scenario '{$scenarioName}'"
+        );
+        echo "✅ Procedure name PHPUnit assertion passed: '{$procedure->getName()}'\n";
 
-        // Validate organization using the dynamically created organization
-        $expectedOrg = $this->getOrganizationForScenario($scenarioName, $isValid);
-        $expectedOrgId = $expectedOrg->getId();
-        $actualOrgId = $procedure->getOrga()->getId();
+        $this->testCase->assertEquals(
+            $scenarioData['beschreibung_planungsanlass'],
+            $procedure->getDesc(),
+            "Expected procedure description to match scenario '{$scenarioName}'"
+        );
+        echo "✅ Procedure description PHPUnit assertion passed\n";
 
-        $this->assertions->assertEquals($expectedOrgId, $actualOrgId,
-            "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrgId}), got '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId}) for scenario '{$scenarioName}'");
-        echo "✅ Procedure organization assertion passed: '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})\n";
+        $this->testCase->assertEquals(
+            $scenarioData['org_name'],
+            $procedure->getOrga()->getName(),
+            "Expected organization name '{$scenarioData['org_name']}' for scenario '{$scenarioName}'"
+        );
+        echo "✅ Procedure organization PHPUnit assertion passed: '{$procedure->getOrga()->getName()}'\n";
 
-        // Validate description (using arbeitstitel as fallback)
-        $expectedDescription = $scenarioData['beschreibung_planungsanlass'] ?? $scenarioData['arbeitstitel'] ?? null;
-        if ($expectedDescription && method_exists($procedure, 'getDescription')) {
-            $actualDescription = $procedure->getDescription();
-
-            $this->assertions->assertEquals($expectedDescription, $actualDescription,
-                "Expected description '{$expectedDescription}', got '{$actualDescription}' for scenario '{$scenarioName}'");
-            echo "✅ Procedure description assertion passed\n";
-        }
+        $this->testCase->assertNotNull($procedure->getSettings()->getTerritory(), "Territory should not be null");
+        $this->testCase->assertNotNull($procedure->getProcedureType(), "Procedure type should not be null");
+        $this->testCase->assertNotNull($procedure->getCustomer(), "Customer should not be null");
+        echo "✅ All required fields PHPUnit assertions passed\n";
 
         return [
-            'success' => empty($errors),
-            'errors' => $errors,
+            'success' => true,
             'procedure' => $procedure,
-            'scenario' => $scenarioName
+            'scenario' => $scenarioName,
+            'errors' => []
         ];
+
     }
 
     /**

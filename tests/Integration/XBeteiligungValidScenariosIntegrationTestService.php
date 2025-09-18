@@ -28,13 +28,13 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
      * Example of how to enable assertion mode.
      * Uncomment the line below to switch to assertion mode (fail fast).
      */
-    public function setupTestData(ContainerInterface $container): void
+    public function setupTestData(ContainerInterface $container, ?object $testCase = null): void
     {
         // Toggle modes by uncommenting one of these lines:
         $this->enableAssertionMode();      // Uncomment for assertion mode (fail fast)
         // $this->enableErrorCollectionMode(); // Uncomment to explicitly set error collection mode
 
-        parent::setupTestData($container);
+        parent::setupTestData($container, $testCase);
     }
 
     /**
