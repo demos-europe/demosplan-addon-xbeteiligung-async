@@ -64,6 +64,12 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     /** @var UserInterface|null Test planner user created by factory */
     protected ?UserInterface $testPlannerUser = null;
 
+    /** @var array<string, OrgaInterface> Map of organization name to created organization entities */
+    protected array $createdOrganizations = [];
+
+    /** @var array<string, UserInterface[]> Map of organization name to array of created users */
+    protected array $createdUsers = [];
+
     public function getAddonName(): string
     {
         return 'XBeteiligung';
@@ -816,22 +822,39 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     protected function validateProcedureAgainstScenario(ProcedureInterface $procedure, string $scenarioName, bool $isValid): array
     {
         try {
-            $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
+            // Get full scenario data to access all fields including org_name
+            $scenarioData = $this->getFullScenario($scenarioName, $isValid);
             $errors = [];
 
+            echo "🔍 DEBUG: Validating procedure '{$procedure->getName()}' against scenario '{$scenarioName}'\n";
+
             // Validate name
-            if (isset($scenarioInfo['plan_name']) && $procedure->getName() !== $scenarioInfo['plan_name']) {
-                $errors[] = "Expected name '{$scenarioInfo['plan_name']}', got '{$procedure->getName()}'";
+            if (isset($scenarioData['plan_name']) && $procedure->getName() !== $scenarioData['plan_name']) {
+                $errors[] = "Expected name '{$scenarioData['plan_name']}', got '{$procedure->getName()}'";
+            } else {
+                echo "✅ Procedure name matches: '{$procedure->getName()}'\n";
             }
 
-            // Validate organization
-            if (isset($scenarioInfo['org_name']) && $procedure->getOrga()->getName() !== $scenarioInfo['org_name']) {
-                $errors[] = "Expected org '{$scenarioInfo['org_name']}', got '{$procedure->getOrga()->getName()}'";
+            // Validate organization using the dynamically created organization
+            $expectedOrg = $this->getOrganizationForScenario($scenarioName, $isValid);
+            if ($expectedOrg) {
+                if ($procedure->getOrga()->getId() !== $expectedOrg->getId()) {
+                    $errors[] = "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrg->getId()}), got '{$procedure->getOrga()->getName()}' (ID: {$procedure->getOrga()->getId()})";
+                } else {
+                    echo "✅ Procedure organization matches: '{$procedure->getOrga()->getName()}' (ID: {$procedure->getOrga()->getId()})\n";
+                }
             }
 
-            // Validate description
-            if (isset($scenarioInfo['beschreibung_planungsanlass']) && $procedure->getDescription() !== $scenarioInfo['beschreibung_planungsanlass']) {
-                $errors[] = "Expected description '{$scenarioInfo['beschreibung_planungsanlass']}', got '{$procedure->getDescription()}'";
+            // Validate description (using arbeitstitel as fallback)
+            $expectedDescription = $scenarioData['beschreibung_planungsanlass'] ?? $scenarioData['arbeitstitel'] ?? null;
+            if ($expectedDescription && method_exists($procedure, 'getDescription') && $procedure->getDescription() !== $expectedDescription) {
+                $errors[] = "Expected description '{$expectedDescription}', got '{$procedure->getDescription()}'";
+            }
+
+            if (empty($errors)) {
+                echo "✅ All validations passed for scenario '{$scenarioName}'\n";
+            } else {
+                echo "❌ Validation errors for scenario '{$scenarioName}': " . implode('; ', $errors) . "\n";
             }
 
             return [
@@ -841,6 +864,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                 'scenario' => $scenarioName
             ];
         } catch (\Exception $e) {
+            echo "⚠️ Exception during validation for scenario '{$scenarioName}': {$e->getMessage()}\n";
             return [
                 'success' => false,
                 'errors' => ["Could not validate against scenario: " . $e->getMessage()],
@@ -856,7 +880,11 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function createTestEntities(ContainerInterface $container): void
     {
-        echo "🏭 Creating test entities using factories...\n";
+        echo "🏭 Creating test entities dynamically based on scenario requirements...\n";
+
+        // Analyze all scenarios to extract entity requirements
+        $entityRequirements = $this->analyzeScenarioRequirements();
+        echo "📊 Found {$entityRequirements['organization_count']} unique organizations across " . count($entityRequirements['scenarios']) . " scenarios\n";
 
         // Create required procedure type first (must match config: addon_xbeteiligung_async_procedure_type_name)
         $testProcedureType = ProcedureTypeFactory::createOne([
@@ -870,45 +898,119 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             'subdomain' => 'hh',
             'name' => 'Test Hamburg Customer for XBeteiligung',
         ])->_real();
-
         echo "✅ Created test customer: {$this->testCustomer->getName()} (subdomain: {$this->testCustomer->getSubdomain()})\n";
 
-        // Create test organization for procedure creation
-        $this->testOrganization = OrgaFactory::createOne([
-            'name' => 'TestOrg XBeteiligung',
-            'deleted' => false,
-            'showlist' => true,
-            'showname' => true,
-        ])->_real();
+        // Create organizations and users dynamically based on scenario requirements
+        $this->createDynamicOrganizationsAndUsers($container, $entityRequirements);
 
-        echo "✅ Created test organization: {$this->testOrganization->getName()}\n";
+        // Set primary entities for backward compatibility (use first created organization)
+        $firstOrgName = array_keys($entityRequirements['organizations'])[0];
+        $this->testOrganization = $this->createdOrganizations[$firstOrgName];
+        $this->testPlannerUser = $this->createdUsers[$firstOrgName][0]; // First user in first org
 
-        // Create test planner user in the organization (required for procedure creation)
-        $this->testPlannerUser = UserFactory::createOne([
-            'login' => 'xbet_test_planner_' . uniqid('', true),
-            'orga' => $this->testOrganization,
-            'deleted' => false,
-            'firstname' => 'Test',
-            'lastname' => 'Planner',
-            'email' => 'test.planner.' . uniqid('', true) . '@xbeteiligung.test',
-        ])->_real();
-
-        echo "✅ Created test planner user: {$this->testPlannerUser->getLogin()} in org {$this->testOrganization->getName()}\n";
-
-        // Ensure bidirectional user-organization relationship (user has orga, but orga needs user in collection)
-        $this->testOrganization->addUser($this->testPlannerUser);
-        echo "✅ Added user to organization's user collection\n";
-
-        // Assign planner role to the user (fix: set current customer first for proper role persistence)
-        $this->testPlannerUser->setCurrentCustomer($this->testCustomer);
-
-        $roleHandler = $container->get(RoleHandler::class);
-        $plannerRole = $roleHandler->getUserRolesByCodes([RoleInterface::PRIVATE_PLANNING_AGENCY])[0];
-        $this->testPlannerUser->addDplanrole($plannerRole, $this->testCustomer);
-
-        echo "✅ Assigned planner role to user: {$plannerRole->getCode()}\n";
+        echo "✅ Set primary test entities: org='{$this->testOrganization->getName()}', user='{$this->testPlannerUser->getLogin()}'\n";
 
         // Flush and COMMIT to ensure entities are visible to all database connections
+        $this->commitTestEntities($container);
+
+        // Debug: Verify organizations can be found by name
+        $this->debugOrganizationLookup($container, $entityRequirements);
+    }
+
+    /**
+     * Analyze all test scenarios to extract entity requirements.
+     */
+    private function analyzeScenarioRequirements(): array
+    {
+        $scenarios = $this->getTestScenarios();
+        $organizations = [];
+        $scenarioData = [];
+
+        foreach ($scenarios as [$scenarioName, $isValid]) {
+            try {
+                $scenarioInfo = $this->getFullScenario($scenarioName, $isValid);
+                $orgName = $scenarioInfo['org_name'] ?? null;
+
+                if ($orgName) {
+                    $organizations[$orgName] = true;
+                    $scenarioData[] = [
+                        'scenario' => $scenarioName,
+                        'valid' => $isValid,
+                        'org_name' => $orgName,
+                        'plan_name' => $scenarioInfo['plan_name'] ?? 'Unknown Plan'
+                    ];
+                    echo "🔍 Scenario '{$scenarioName}' requires organization: '{$orgName}'\n";
+                } else {
+                    echo "⚠️ Scenario '{$scenarioName}' missing org_name, skipping\n";
+                }
+            } catch (\Exception $e) {
+                echo "❌ Failed to analyze scenario '{$scenarioName}': {$e->getMessage()}\n";
+            }
+        }
+
+        return [
+            'organizations' => $organizations,
+            'scenarios' => $scenarioData,
+            'organization_count' => count($organizations)
+        ];
+    }
+
+    /**
+     * Create organizations and users dynamically based on requirements.
+     */
+    private function createDynamicOrganizationsAndUsers(ContainerInterface $container, array $entityRequirements): void
+    {
+        $roleHandler = $container->get(RoleHandler::class);
+        $plannerRole = $roleHandler->getUserRolesByCodes([RoleInterface::PRIVATE_PLANNING_AGENCY])[0];
+
+        foreach (array_keys($entityRequirements['organizations']) as $orgName) {
+            echo "🏢 Creating organization: '{$orgName}'\n";
+
+            // Create organization
+            $organization = OrgaFactory::createOne([
+                'name' => $orgName,
+                'deleted' => false,
+                'showlist' => true,
+                'showname' => true,
+            ])->_real();
+
+            echo "✅ Created organization: {$organization->getName()}\n";
+
+            // Create planner user for this organization
+            $plannerUser = UserFactory::createOne([
+                'login' => 'xbet_planner_' . strtolower(str_replace([' ', 'ä', 'ö', 'ü'], ['_', 'ae', 'oe', 'ue'], $orgName)) . '_' . uniqid('', true),
+                'orga' => $organization,
+                'deleted' => false,
+                'firstname' => 'Test',
+                'lastname' => 'Planner',
+                'email' => 'test.planner.' . uniqid('', true) . '@xbeteiligung.test',
+            ])->_real();
+
+            echo "✅ Created planner user: {$plannerUser->getLogin()} for org '{$orgName}'\n";
+
+            // Ensure bidirectional relationship
+            $organization->addUser($plannerUser);
+
+            // Assign planner role (fix: set current customer first)
+            $plannerUser->setCurrentCustomer($this->testCustomer);
+            $plannerUser->addDplanrole($plannerRole, $this->testCustomer);
+
+            echo "✅ Assigned planner role to user in '{$orgName}'\n";
+
+            // Store created entities for lookup
+            $this->createdOrganizations[$orgName] = $organization;
+            if (!isset($this->createdUsers[$orgName])) {
+                $this->createdUsers[$orgName] = [];
+            }
+            $this->createdUsers[$orgName][] = $plannerUser;
+        }
+    }
+
+    /**
+     * Commit test entities and ensure database visibility.
+     */
+    private function commitTestEntities(ContainerInterface $container): void
+    {
         $entityManager = $container->get(EntityManagerInterface::class);
         $entityManager->flush();
 
@@ -924,11 +1026,102 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         }
 
         echo "💾 Persisted all test entities to database\n";
+    }
 
-        // Debug: Verify organization can be found by name
+    /**
+     * Debug organization lookup to verify entities are accessible.
+     */
+    private function debugOrganizationLookup(ContainerInterface $container, array $entityRequirements): void
+    {
         $orgaService = $container->get(OrgaService::class);
-        $foundOrgas = $orgaService->getOrgaByFields(['name' => $this->testOrganization->getName(), 'deleted' => false]);
-        echo "🔍 Debug: Organization '{$this->testOrganization->getName()}' findable by service: " . count($foundOrgas) . " found\n";
+
+        foreach (array_keys($entityRequirements['organizations']) as $orgName) {
+            $foundOrgas = $orgaService->getOrgaByFields(['name' => $orgName, 'deleted' => false]);
+            echo "🔍 Debug: Organization '{$orgName}' findable by service: " . count($foundOrgas) . " found\n";
+        }
+    }
+
+    /**
+     * Get organization created for a specific scenario by its organization name.
+     */
+    protected function getOrganizationForScenario(string $scenarioName, bool $isValid = true): ?OrgaInterface
+    {
+        try {
+            $scenarioInfo = $this->getFullScenario($scenarioName, $isValid);
+            $orgName = $scenarioInfo['org_name'] ?? null;
+
+            if (!$orgName) {
+                echo "⚠️ Scenario '{$scenarioName}' has no org_name defined\n";
+                return null;
+            }
+
+            if (isset($this->createdOrganizations[$orgName])) {
+                return $this->createdOrganizations[$orgName];
+            }
+
+            echo "⚠️ Organization '{$orgName}' not found in created entities for scenario '{$scenarioName}'\n";
+            return null;
+        } catch (\Exception $e) {
+            echo "⚠️ Failed to get organization for scenario '{$scenarioName}': {$e->getMessage()}\n";
+            return null;
+        }
+    }
+
+    /**
+     * Get users created for a specific scenario by its organization name.
+     */
+    protected function getUsersForScenario(string $scenarioName, bool $isValid = true): array
+    {
+        try {
+            $scenarioInfo = $this->getFullScenario($scenarioName, $isValid);
+            $orgName = $scenarioInfo['org_name'] ?? null;
+
+            if (!$orgName) {
+                echo "⚠️ Scenario '{$scenarioName}' has no org_name defined\n";
+                return [];
+            }
+
+            if (isset($this->createdUsers[$orgName])) {
+                return $this->createdUsers[$orgName];
+            }
+
+            echo "⚠️ Users for organization '{$orgName}' not found in created entities for scenario '{$scenarioName}'\n";
+            return [];
+        } catch (\Exception $e) {
+            echo "⚠️ Failed to get users for scenario '{$scenarioName}': {$e->getMessage()}\n";
+            return [];
+        }
+    }
+
+    /**
+     * Get first planner user for a specific scenario.
+     */
+    protected function getPlannerUserForScenario(string $scenarioName, bool $isValid = true): ?UserInterface
+    {
+        $users = $this->getUsersForScenario($scenarioName, $isValid);
+        return !empty($users) ? $users[0] : null;
+    }
+
+    /**
+     * Debug method: List all created entities for troubleshooting.
+     */
+    protected function debugCreatedEntities(): void
+    {
+        echo "🔍 DEBUG: All created entities:\n";
+        echo "   Customer: " . ($this->testCustomer ? $this->testCustomer->getName() : 'NONE') . "\n";
+
+        echo "   Organizations (" . count($this->createdOrganizations) . "):\n";
+        foreach ($this->createdOrganizations as $orgName => $org) {
+            echo "     - '{$orgName}' (ID: {$org->getId()})\n";
+        }
+
+        echo "   Users by organization:\n";
+        foreach ($this->createdUsers as $orgName => $users) {
+            echo "     - '{$orgName}': " . count($users) . " users\n";
+            foreach ($users as $i => $user) {
+                echo "       [{$i}] {$user->getLogin()} (ID: {$user->getId()})\n";
+            }
+        }
     }
 
     /**
@@ -936,84 +1129,29 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function cleanupTestEntities(ContainerInterface $container): void
     {
-        echo "🗑️ Cleaning up test entities...\n";
+        echo "🗑️ Cleaning up dynamically created test entities...\n";
 
         try {
             $entityManager = $container->get(EntityManagerInterface::class);
 
             if (!$entityManager->isOpen()) {
                 echo "⚠️ EntityManager was closed during test execution\n";
-                echo "   Attempting cleanup with IDs only...\n";
-
-                // If we have entity references, we can at least report what should be cleaned up
-                if ($this->testPlannerUser) {
-                    echo "🗑️ Test planner user should be cleaned: {$this->testPlannerUser->getLogin()} (ID: {$this->testPlannerUser->getId()})\n";
-                }
-                if ($this->testOrganization) {
-                    echo "🗑️ Test organization should be cleaned: {$this->testOrganization->getName()} (ID: {$this->testOrganization->getId()})\n";
-                }
-                if ($this->testCustomer) {
-                    echo "🗑️ Test customer should be cleaned: {$this->testCustomer->getName()} (ID: {$this->testCustomer->getId()})\n";
-                }
-
+                $this->reportEntitiesForCleanup();
                 echo "⚠️ EntityManager closed - entities may persist in database\n";
                 return;
             }
 
-            // EntityManager is open, proceed with normal cleanup
+            // EntityManager is open, proceed with cleanup
             $entitiesRemoved = 0;
 
-            if ($this->testPlannerUser) {
-                try {
-                    if ($entityManager->contains($this->testPlannerUser)) {
-                        $entityManager->remove($this->testPlannerUser);
-                    } else {
-                        // Entity might be detached, try to find and remove by ID
-                        $managedUser = $entityManager->find(get_class($this->testPlannerUser), $this->testPlannerUser->getId());
-                        if ($managedUser) {
-                            $entityManager->remove($managedUser);
-                        }
-                    }
-                    echo "🗑️ Removed test planner user: {$this->testPlannerUser->getLogin()}\n";
-                    $entitiesRemoved++;
-                } catch (\Exception $e) {
-                    echo "⚠️ Could not remove test planner user: {$e->getMessage()}\n";
-                }
-            }
+            // Clean up dynamically created users (must be done before organizations)
+            $entitiesRemoved += $this->cleanupDynamicUsers($entityManager);
 
-            if ($this->testOrganization) {
-                try {
-                    if ($entityManager->contains($this->testOrganization)) {
-                        $entityManager->remove($this->testOrganization);
-                    } else {
-                        $managedOrga = $entityManager->find(get_class($this->testOrganization), $this->testOrganization->getId());
-                        if ($managedOrga) {
-                            $entityManager->remove($managedOrga);
-                        }
-                    }
-                    echo "🗑️ Removed test organization: {$this->testOrganization->getName()}\n";
-                    $entitiesRemoved++;
-                } catch (\Exception $e) {
-                    echo "⚠️ Could not remove test organization: {$e->getMessage()}\n";
-                }
-            }
+            // Clean up dynamically created organizations
+            $entitiesRemoved += $this->cleanupDynamicOrganizations($entityManager);
 
-            if ($this->testCustomer) {
-                try {
-                    if ($entityManager->contains($this->testCustomer)) {
-                        $entityManager->remove($this->testCustomer);
-                    } else {
-                        $managedCustomer = $entityManager->find(get_class($this->testCustomer), $this->testCustomer->getId());
-                        if ($managedCustomer) {
-                            $entityManager->remove($managedCustomer);
-                        }
-                    }
-                    echo "🗑️ Removed test customer: {$this->testCustomer->getName()}\n";
-                    $entitiesRemoved++;
-                } catch (\Exception $e) {
-                    echo "⚠️ Could not remove test customer: {$e->getMessage()}\n";
-                }
-            }
+            // Clean up customer (if any)
+            $entitiesRemoved += $this->cleanupTestCustomer($entityManager);
 
             if ($entitiesRemoved > 0 && $entityManager->isOpen()) {
                 $entityManager->flush();
@@ -1029,9 +1167,121 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             // Don't fail the test due to cleanup issues
         }
 
-        // Reset references
+        // Reset all references
+        $this->resetEntityReferences();
+    }
+
+    /**
+     * Report entities that should be cleaned up when EntityManager is closed.
+     */
+    private function reportEntitiesForCleanup(): void
+    {
+        echo "   Attempting cleanup with IDs only...\n";
+
+        // Report dynamically created users
+        foreach ($this->createdUsers as $orgName => $users) {
+            foreach ($users as $user) {
+                echo "🗑️ User should be cleaned: {$user->getLogin()} (ID: {$user->getId()}) in org '{$orgName}'\n";
+            }
+        }
+
+        // Report dynamically created organizations
+        foreach ($this->createdOrganizations as $orgName => $org) {
+            echo "🗑️ Organization should be cleaned: {$org->getName()} (ID: {$org->getId()})\n";
+        }
+
+        // Report customer
+        if ($this->testCustomer) {
+            echo "🗑️ Test customer should be cleaned: {$this->testCustomer->getName()} (ID: {$this->testCustomer->getId()})\n";
+        }
+    }
+
+    /**
+     * Clean up all dynamically created users.
+     */
+    private function cleanupDynamicUsers($entityManager): int
+    {
+        $removed = 0;
+
+        foreach ($this->createdUsers as $orgName => $users) {
+            echo "🗑️ Cleaning users from organization: {$orgName}\n";
+
+            foreach ($users as $user) {
+                try {
+                    $this->removeEntitySafely($entityManager, $user, "user {$user->getLogin()}");
+                    $removed++;
+                } catch (\Exception $e) {
+                    echo "⚠️ Could not remove user {$user->getLogin()}: {$e->getMessage()}\n";
+                }
+            }
+        }
+
+        return $removed;
+    }
+
+    /**
+     * Clean up all dynamically created organizations.
+     */
+    private function cleanupDynamicOrganizations($entityManager): int
+    {
+        $removed = 0;
+
+        foreach ($this->createdOrganizations as $orgName => $org) {
+            try {
+                $this->removeEntitySafely($entityManager, $org, "organization {$org->getName()}");
+                $removed++;
+            } catch (\Exception $e) {
+                echo "⚠️ Could not remove organization {$org->getName()}: {$e->getMessage()}\n";
+            }
+        }
+
+        return $removed;
+    }
+
+    /**
+     * Clean up the test customer.
+     */
+    private function cleanupTestCustomer($entityManager): int
+    {
+        if (!$this->testCustomer) {
+            return 0;
+        }
+
+        try {
+            $this->removeEntitySafely($entityManager, $this->testCustomer, "customer {$this->testCustomer->getName()}");
+            return 1;
+        } catch (\Exception $e) {
+            echo "⚠️ Could not remove test customer: {$e->getMessage()}\n";
+            return 0;
+        }
+    }
+
+    /**
+     * Safely remove an entity, handling both managed and detached states.
+     */
+    private function removeEntitySafely($entityManager, $entity, string $description): void
+    {
+        if ($entityManager->contains($entity)) {
+            $entityManager->remove($entity);
+        } else {
+            // Entity might be detached, try to find and remove by ID
+            $managedEntity = $entityManager->find(get_class($entity), $entity->getId());
+            if ($managedEntity) {
+                $entityManager->remove($managedEntity);
+            }
+        }
+        echo "🗑️ Removed {$description}\n";
+    }
+
+    /**
+     * Reset all entity references after cleanup.
+     */
+    private function resetEntityReferences(): void
+    {
         $this->testCustomer = null;
         $this->testOrganization = null;
         $this->testPlannerUser = null;
+        $this->createdOrganizations = [];
+        $this->createdUsers = [];
     }
 }

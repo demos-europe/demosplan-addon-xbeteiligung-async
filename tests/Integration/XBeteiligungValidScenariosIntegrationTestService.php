@@ -31,14 +31,12 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
     protected function getTestScenarios(): array
     {
         return [
-            // Use test-specific scenario with existing test organization
+            // Test scenarios with dynamically created organizations
             ['test_minimal', true],
-
-            // Original scenarios are for production-like environments:
-            // ['quickborn_minimal', true],  // Fails: "Stadt Quickborn" org doesn't exist in test DB
-            // ['quickborn_comprehensive', true],
-            // ['buero_flachennutzung', true],
-            // ['quickborn_with_attachments', true],
+            ['quickborn_minimal', true],       // Now works with dynamic entity creation
+            ['quickborn_comprehensive', true], // Now works with dynamic entity creation
+            ['buero_flachennutzung', true],    // Now works with dynamic entity creation
+            ['quickborn_with_attachments', true], // Now works with dynamic entity creation
         ];
     }
 
