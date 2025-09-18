@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Core\Integration;
 
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonIntegrationTestInterface;
+use Exception;
 use Tests\Base\FunctionalTestCase;
 
 class AddonIntegrationTestCase extends FunctionalTestCase
@@ -24,6 +25,7 @@ class AddonIntegrationTestCase extends FunctionalTestCase
 
             // Use Symfony's kernel to get project directory (committed pattern)
             $projectDir = $container->getParameter('kernel.project_dir');
+
             echo "📁 Project directory: {$projectDir}\n";
 
             // Look for addon directories using committed patterns
@@ -155,9 +157,7 @@ class AddonIntegrationTestCase extends FunctionalTestCase
 
         foreach ($addonTests as $addonTest) {
             $testsRun++;
-            echo "\n" . str_repeat("=", 80) . "\n";
-            echo "🧪 Running {$addonTest->getAddonName()} - {$addonTest->getTestName()}\n";
-            echo str_repeat("=", 80) . "\n";
+            echo "**** Running {$addonTest->getAddonName()} - {$addonTest->getTestName()} **** \n ";
 
             try {
                 // Setup test data
@@ -185,14 +185,14 @@ class AddonIntegrationTestCase extends FunctionalTestCase
                     echo "❌ FAILED: {$result->getMessage()}\n";
                     $this->fail($result->getMessage());
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $testsFailed++;
                 echo "💥 EXCEPTION: {$e->getMessage()}\n";
 
                 // Always cleanup on exception
                 try {
                     $addonTest->cleanupTestData($container);
-                } catch (\Exception $cleanupException) {
+                } catch (Exception $cleanupException) {
                     echo "⚠️ CLEANUP ERROR: {$cleanupException->getMessage()}\n";
                 }
 
