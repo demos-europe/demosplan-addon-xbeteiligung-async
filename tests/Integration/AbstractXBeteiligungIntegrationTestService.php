@@ -11,6 +11,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTranspor
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use demosplan\DemosPlanCoreBundle\Logic\User\OrgaService;
+use Exception;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonIntegrationTestInterface;
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonTestResult;
@@ -930,20 +931,17 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             try {
                 $scenarioInfo = $this->getFullScenario($scenarioName, $isValid);
                 $orgName = $scenarioInfo['org_name'] ?? null;
+                $organizations[$orgName] = true;
+                $scenarioData[] = [
+                    'scenario' => $scenarioName,
+                    'valid' => $isValid,
+                    'org_name' => $orgName,
+                    'plan_name' => $scenarioInfo['plan_name'] ?? 'Unknown Plan'
+                ];
 
-                if ($orgName) {
-                    $organizations[$orgName] = true;
-                    $scenarioData[] = [
-                        'scenario' => $scenarioName,
-                        'valid' => $isValid,
-                        'org_name' => $orgName,
-                        'plan_name' => $scenarioInfo['plan_name'] ?? 'Unknown Plan'
-                    ];
-                    echo "🔍 Scenario '{$scenarioName}' requires organization: '{$orgName}'\n";
-                } else {
-                    echo "⚠️ Scenario '{$scenarioName}' missing org_name, skipping\n";
-                }
-            } catch (\Exception $e) {
+                echo "🔍 Scenario '{$scenarioName}' requires organization: '{$orgName}'\n";
+
+            } catch (Exception $e) {
                 echo "❌ Failed to analyze scenario '{$scenarioName}': {$e->getMessage()}\n";
             }
         }
