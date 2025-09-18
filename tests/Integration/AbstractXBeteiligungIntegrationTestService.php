@@ -804,63 +804,47 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function validateProcedureAgainstScenario(ProcedureInterface $procedure, string $scenarioName, bool $isValid): array
     {
-        try {
-            // Get full scenario data to access all fields including org_name
-            $scenarioData = $this->getFullScenario($scenarioName, $isValid);
-            $errors = [];
 
-            // Validate name
-            if (isset($scenarioData['plan_name'])) {
-                $expected = $scenarioData['plan_name'];
-                $actual = $procedure->getName();
+        // Get full scenario data to access all fields including org_name
+        $scenarioData = $this->getFullScenario($scenarioName, $isValid);
+        $errors = [];
 
-                $this->assertions->assertEquals($expected, $actual, "Expected procedure name '{$expected}', got '{$actual}' for scenario '{$scenarioName}'");
-                echo "✅ Procedure name assertion passed: '{$actual}'\n";
-            }
+        // Validate name
+        if (isset($scenarioData['plan_name'])) {
+            $expected = $scenarioData['plan_name'];
+            $actual = $procedure->getName();
 
-            // Validate organization using the dynamically created organization
-            $expectedOrg = $this->getOrganizationForScenario($scenarioName, $isValid);
-            if ($expectedOrg) {
-                $expectedOrgId = $expectedOrg->getId();
-                $actualOrgId = $procedure->getOrga()->getId();
-
-                $this->assertions->assertEquals($expectedOrgId, $actualOrgId,
-                    "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrgId}), got '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId}) for scenario '{$scenarioName}'");
-                echo "✅ Procedure organization assertion passed: '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})\n";
-            }
-
-            // Validate description (using arbeitstitel as fallback)
-            $expectedDescription = $scenarioData['beschreibung_planungsanlass'] ?? $scenarioData['arbeitstitel'] ?? null;
-            if ($expectedDescription && method_exists($procedure, 'getDescription')) {
-                $actualDescription = $procedure->getDescription();
-
-                $this->assertions->assertEquals($expectedDescription, $actualDescription,
-                    "Expected description '{$expectedDescription}', got '{$actualDescription}' for scenario '{$scenarioName}'");
-                echo "✅ Procedure description assertion passed\n";
-            }
-
-            return [
-                'success' => empty($errors),
-                'errors' => $errors,
-                'procedure' => $procedure,
-                'scenario' => $scenarioName
-            ];
-        } catch (IntegrationAssertionException $e) {
-            // Assertion failed - this is expected in assertion mode
-            echo "❌ Assertion failed for scenario '{$scenarioName}': {$e->getMessage()}\n";
-            throw $e; // Re-throw to fail the test
-        } catch (\Exception $e) {
-            echo "⚠️ Exception during validation for scenario '{$scenarioName}': {$e->getMessage()}\n";
-            if ($this->useAssertions) {
-                throw $e; // Re-throw in assertion mode
-            }
-            return [
-                'success' => false,
-                'errors' => ["Could not validate against scenario: " . $e->getMessage()],
-                'procedure' => $procedure,
-                'scenario' => $scenarioName
-            ];
+            $this->assertions->assertEquals($expected, $actual, "Expected procedure name '{$expected}', got '{$actual}' for scenario '{$scenarioName}'");
+            echo "✅ Procedure name assertion passed: '{$actual}'\n";
         }
+
+        // Validate organization using the dynamically created organization
+        $expectedOrg = $this->getOrganizationForScenario($scenarioName, $isValid);
+        if ($expectedOrg) {
+            $expectedOrgId = $expectedOrg->getId();
+            $actualOrgId = $procedure->getOrga()->getId();
+
+            $this->assertions->assertEquals($expectedOrgId, $actualOrgId,
+                "Expected org '{$expectedOrg->getName()}' (ID: {$expectedOrgId}), got '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId}) for scenario '{$scenarioName}'");
+            echo "✅ Procedure organization assertion passed: '{$procedure->getOrga()->getName()}' (ID: {$actualOrgId})\n";
+        }
+
+        // Validate description (using arbeitstitel as fallback)
+        $expectedDescription = $scenarioData['beschreibung_planungsanlass'] ?? $scenarioData['arbeitstitel'] ?? null;
+        if ($expectedDescription && method_exists($procedure, 'getDescription')) {
+            $actualDescription = $procedure->getDescription();
+
+            $this->assertions->assertEquals($expectedDescription, $actualDescription,
+                "Expected description '{$expectedDescription}', got '{$actualDescription}' for scenario '{$scenarioName}'");
+            echo "✅ Procedure description assertion passed\n";
+        }
+
+        return [
+            'success' => empty($errors),
+            'errors' => $errors,
+            'procedure' => $procedure,
+            'scenario' => $scenarioName
+        ];
     }
 
     /**
@@ -995,7 +979,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
         // CRITICAL: Commit the transaction so XBeteiligung processing can see the test entities
         $connection = $entityManager->getConnection();
-        echo "🔍 DEBUG: Transaction active: " . ($connection->isTransactionActive() ? 'YES' : 'NO') . "\n";
 
         if ($connection->isTransactionActive()) {
             $connection->commit();
@@ -1004,7 +987,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             echo "⚠️ No active transaction to commit - entities should already be visible\n";
         }
 
-        echo "💾 Persisted all test entities to database\n";
     }
 
     /**
