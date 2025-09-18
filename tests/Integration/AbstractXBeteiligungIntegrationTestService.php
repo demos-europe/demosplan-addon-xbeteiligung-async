@@ -861,12 +861,12 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
         // Create test planner user in the organization (required for procedure creation)
         $this->testPlannerUser = UserFactory::createOne([
-            'login' => 'xbet_test_planner_' . uniqid(),
+            'login' => 'xbet_test_planner_' . uniqid('', true),
             'orga' => $this->testOrganization,
             'deleted' => false,
             'firstname' => 'Test',
             'lastname' => 'Planner',
-            'email' => 'test.planner.' . uniqid() . '@xbeteiligung.test',
+            'email' => 'test.planner.' . uniqid('', true) . '@xbeteiligung.test',
         ])->_real();
 
         echo "✅ Created test planner user: {$this->testPlannerUser->getLogin()} in org {$this->testOrganization->getName()}\n";
