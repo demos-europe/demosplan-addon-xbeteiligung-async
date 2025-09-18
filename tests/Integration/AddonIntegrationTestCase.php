@@ -171,12 +171,8 @@ class AddonIntegrationTestCase extends FunctionalTestCase
 
                 if ($result->isSuccess()) {
                     $testsPassed++;
-                    echo "✅ SUCCESS: {$result->getMessage()}\n";
 
-                    // Display result details
-                    foreach ($result->getDetails() as $key => $value) {
-                        echo "   {$key}: {$value}\n";
-                    }
+                    $this->debugSuccessTestResult($result);
 
                     // Assert success
                     $this->assertTrue($result->isSuccess(), $result->getMessage());
@@ -200,6 +196,23 @@ class AddonIntegrationTestCase extends FunctionalTestCase
             }
         }
 
+        $this->debugTestSummary($testsRun, $testsPassed, $testsFailed);
+
+        // Final assertion
+        $this->assertEquals(0, $testsFailed, "Some addon integration tests failed");
+        $this->assertGreaterThan(0, $testsRun, "No addon integration tests were discovered");
+    }
+
+    private function debugSuccessTestResult($result){
+        echo "✅ SUCCESS: {$result->getMessage()}\n";
+
+        // Display result details
+        foreach ($result->getDetails() as $key => $value) {
+            echo "   {$key}: {$value}\n";
+        }
+    }
+
+    private function debugTestSummary($testsRun, $testsPassed, $testsFailed) {
         echo "\n" . str_repeat("=", 80) . "\n";
         echo "📊 ADDON INTEGRATION TEST SUMMARY\n";
         echo str_repeat("=", 80) . "\n";
@@ -208,9 +221,6 @@ class AddonIntegrationTestCase extends FunctionalTestCase
         echo "Tests Failed: {$testsFailed}\n";
         echo str_repeat("=", 80) . "\n";
 
-        // Final assertion
-        $this->assertEquals(0, $testsFailed, "Some addon integration tests failed");
-        $this->assertGreaterThan(0, $testsRun, "No addon integration tests were discovered");
     }
 
     /**
