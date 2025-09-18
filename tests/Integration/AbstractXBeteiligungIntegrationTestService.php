@@ -59,12 +59,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     /** @var CustomerInterface|null Test customer created by factory */
     protected ?CustomerInterface $testCustomer = null;
 
-    /** @var OrgaInterface|null Test organization created by factory */
-    protected ?OrgaInterface $testOrganization = null;
-
-    /** @var UserInterface|null Test planner user created by factory */
-    protected ?UserInterface $testPlannerUser = null;
-
     /** @var array<string, OrgaInterface> Map of organization name to created organization entities */
     protected array $createdOrganizations = [];
 
@@ -268,15 +262,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         echo "📊 Final relevant procedures: " . count($finalProcedures) . "\n";
         echo "✨ Procedures created by REAL services: {$proceduresCreated}\n";
 
-        // Debug: Check all procedures in the test organization to see if any were created
-        if ($this->testOrganization) {
-            $allOrgProcedures = $procedureRepository->findBy(['orga' => $this->testOrganization]);
-            echo "🔍 Debug: All procedures in test org '{$this->testOrganization->getName()}': " . count($allOrgProcedures) . "\n";
-            foreach ($allOrgProcedures as $proc) {
-                echo "   - ID: {$proc->getId()}, Name: {$proc->getName()}, Created: {$proc->getCreatedDate()->format('Y-m-d H:i:s')}\n";
-            }
-        }
-
         if (!empty($createdProcedures)) {
             echo "📋 Created procedures:\n";
             foreach ($createdProcedures as $procedure) {
@@ -408,13 +393,13 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         $fullScenarioData = $this->getFullScenario($scenarioName, $isValid);
 
         // Debug: Show organization name in scenario and verify it matches created org
-        $this->debugOrga($fullScenarioData, $xml);
+        //$this->debugOrga($fullScenarioData, $xml);
 
         // Debug: Show first 500 chars of XML to check content
         $this->debugFirstChar($xml);
 
         // Debug: Show the full section with organization name to understand structure
-        $this->debugFullOrgaSecion($xml);
+        //$this->debugFullOrgaSecion($xml);
 
         // Debug: Extract and show the organization name that will be used for lookup
         $this->debugXml($xml);
@@ -904,13 +889,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         // Create organizations and users dynamically based on scenario requirements
         $this->createDynamicOrganizationsAndUsers($container, $entityRequirements);
 
-        // Set primary entities for backward compatibility (use first created organization)
-        $firstOrgName = array_keys($entityRequirements['organizations'])[0];
-        $this->testOrganization = $this->createdOrganizations[$firstOrgName];
-        $this->testPlannerUser = $this->createdUsers[$firstOrgName][0]; // First user in first org
-
-        echo "✅ Set primary test entities: org='{$this->testOrganization->getName()}', user='{$this->testPlannerUser->getLogin()}'\n";
-
         // Flush and COMMIT to ensure entities are visible to all database connections
         $this->commitTestEntities($container);
 
@@ -1277,8 +1255,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     private function resetEntityReferences(): void
     {
         $this->testCustomer = null;
-        $this->testOrganization = null;
-        $this->testPlannerUser = null;
         $this->createdOrganizations = [];
         $this->createdUsers = [];
     }
