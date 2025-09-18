@@ -318,8 +318,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         $factoryClassName = 'DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory';
 
         if (!class_exists($factoryClassName)) {
-            throw new RuntimeException("Factory class not found via
-  autoloader: {$factoryClassName}");
+            throw new RuntimeException("Factory class not found via autoloader: {$factoryClassName}");
         }
 
         $commonHelpers = new CommonHelpers(new NullLogger());
@@ -839,14 +838,14 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         $testProcedureType = ProcedureTypeFactory::createOne([
             'name' => 'test-procedure-type',
             'description' => 'Test procedure type for XBeteiligung integration tests',
-        ])->object();
+        ])->_real();
         echo "✅ Created procedure type: {$testProcedureType->getName()}\n";
 
         // Create test customer with subdomain 'hh' (required for routing key mapping)
         $this->testCustomer = CustomerFactory::createOne([
             'subdomain' => 'hh',
             'name' => 'Test Hamburg Customer for XBeteiligung',
-        ])->object();
+        ])->_real();
 
         echo "✅ Created test customer: {$this->testCustomer->getName()} (subdomain: {$this->testCustomer->getSubdomain()})\n";
 
@@ -856,7 +855,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             'deleted' => false,
             'showlist' => true,
             'showname' => true,
-        ])->object();
+        ])->_real();
 
         echo "✅ Created test organization: {$this->testOrganization->getName()}\n";
 
@@ -868,7 +867,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             'firstname' => 'Test',
             'lastname' => 'Planner',
             'email' => 'test.planner.' . uniqid() . '@xbeteiligung.test',
-        ])->object();
+        ])->_real();
 
         echo "✅ Created test planner user: {$this->testPlannerUser->getLogin()} in org {$this->testOrganization->getName()}\n";
 
