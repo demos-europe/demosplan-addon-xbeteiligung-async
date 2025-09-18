@@ -202,7 +202,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                 }
             }
 
-            echo "✅ Event subscriber processing completed\n";
 
             // Check if messages were processed from the queue
             $messageCountAfterEvent = $this->channel->queue_declare($this->queueName, true, true, false, false)[1];
@@ -467,37 +466,10 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             echo "📤 Publishing test scenario: {$scenarioName} (valid: " . ($isValid ? 'YES' : 'NO') . ")\n";
 
             $xml = $this->xmlFactory->createXML($scenarioName, $isValid);
-
-            $this->debugPublishingMessage($xml, $scenarioName, $isValid);
-
             $this->publishMessage($xml, $scenarioName);
         }
 
         usleep(100000); // 100ms delay after all messages
-    }
-    private function debugPublishingMessage($xml, $scenarioName, $isValid) {
-        // Get scenario info for debugging
-        $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
-        echo "   Description: {$scenarioInfo['description']}\n";
-
-        // Get full scenario data to access all fields including org_name
-        $fullScenarioData = $this->getFullScenario($scenarioName, $isValid);
-
-        // Debug: Show organization name in scenario and verify it matches created org
-        //$this->debugOrga($fullScenarioData, $xml);
-
-        // Debug: Show first 500 chars of XML to check content
-        $this->debugFirstChar($xml);
-
-        // Debug: Show the full section with organization name to understand structure
-        //$this->debugFullOrgaSecion($xml);
-
-        // Debug: Extract and show the organization name that will be used for lookup
-        $this->debugXml($xml);
-
-        if (!$isValid && isset($scenarioInfo['expected_error'])) {
-            echo "   Expected error: {$scenarioInfo['expected_error']}\n";
-        }
     }
 
     private function getFullScenario($scenarioName, $isValid) {
@@ -505,72 +477,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         $getScenarioDataMethod = $reflection->getMethod('getScenarioData');
         $getScenarioDataMethod->setAccessible(true);
         return $getScenarioDataMethod->invoke($this->xmlFactory, $scenarioName, $isValid);
-    }
-
-    private function debugFirstChar($xml) {
-        echo "   📄 XML preview: " . substr($xml, 0, 500) . "...\n";
-    }
-
-    private function debugFullOrgaSecion($xml) {
-        $lines = explode("\n", $xml);
-        $orgLines = [];
-        foreach ($lines as $i => $line) {
-            if (strpos($line, 'TestOrg XBeteiligung') !== false) {
-                // Show 3 lines before and after the org name
-                for ($j = max(0, $i-3); $j <= min(count($lines)-1, $i+3); $j++) {
-                    $orgLines[] = $lines[$j];
-                }
-                break;
-            }
-        }
-        if (!empty($orgLines)) {
-            echo "   📋 XML structure around organization name:\n";
-            foreach ($orgLines as $line) {
-                echo "      " . trim($line) . "\n";
-            }
-        }
-    }
-
-    private function debugOrga( $fullScenarioData, $xml): void {
-        if (isset($fullScenarioData['org_name'])) {
-            echo "   🏢 Scenario org name: '{$fullScenarioData['org_name']}'\n";
-            echo "   🏢 Created org name: '{$this->testOrganization->getName()}'\n";
-            echo "   🔍 Names match: " . ($fullScenarioData['org_name'] === $this->testOrganization->getName() ? 'YES' : 'NO') . "\n";
-
-            // Debug: Check if ORG_NAME is in the generated XML
-            if (strpos($xml, 'TestOrg XBeteiligung') !== false) {
-                echo "   ✅ Organization name found in generated XML\n";
-            } else {
-                echo "   ❌ Organization name NOT found in generated XML\n";
-                // Look for ORG_NAME placeholder not being replaced
-                if (strpos($xml, '{{ORG_NAME}}') !== false) {
-                    echo "   ⚠️ Unreplaced {{ORG_NAME}} placeholder found in XML\n";
-                }
-            }
-        } else {
-            echo "   ⚠️ No org_name in full scenario data\n";
-            echo "   📋 Available fields: " . implode(', ', array_keys($fullScenarioData)) . "\n";
-        }
-    }
-
-    private function debugXml($xml): void {
-        try {
-            $xmlDoc = new \DOMDocument();
-            $xmlDoc->loadXML($xml);
-            $xpath = new \DOMXPath($xmlDoc);
-            $xpath->registerNamespace('xbd', 'http://www.xleitstelle.de/xbau/12');
-
-            // Look for organization name in the XML structure
-            $nameElements = $xpath->query('//xbd:nameBehoerde | //nameBehoerde');
-            if ($nameElements->length > 0) {
-                $xmlOrgName = $nameElements->item(0)->textContent;
-                echo "   🏢 Organization name extracted from XML: '{$xmlOrgName}'\n";
-            } else {
-                echo "   ⚠️ Could not find organization name in XML\n";
-            }
-        } catch (\Exception $e) {
-            echo "   ⚠️ Error parsing XML for org name: {$e->getMessage()}\n";
-        }
     }
 
     /**
