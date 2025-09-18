@@ -398,7 +398,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             $this->debugOrga($fullScenarioData, $xml);
 
             // Debug: Show first 500 chars of XML to check content
-            echo "   📄 XML preview: " . substr($xml, 0, 500) . "...\n";
+            $this->debugFirstChar($xml);
 
             // Debug: Show the full section with organization name to understand structure
             $this->debugFullOrgaSecion($xml);
@@ -414,6 +414,10 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         }
 
         usleep(100000); // 100ms delay after all messages
+    }
+
+    private function debugFirstChar($xml) {
+        echo "   📄 XML preview: " . substr($xml, 0, 500) . "...\n";
     }
 
     private function debugFullOrgaSecion($xml) {
