@@ -217,6 +217,7 @@ class XmlDataExtractorService
     {
         $planId = $participation->getPlanID();
         if (null !== $planId) {
+            $planId = str_replace(XBeteiligungService::STATEMENT_ID_PREFIX, '', $planId);
             $procedureData->setPlanId($planId);
         }
 

@@ -65,7 +65,7 @@ class XBeteiligungConfiguration
             $params->get('addon_xbeteiligung_async_rabbitmq_communication_delay'),
             $params->get('addon_xbeteiligung_async_procedure_message_type'),
             $params->get('addon_xbeteiligung_async_enable_audit'),
-            'bau.beteiligung',
+            'pfv.beteiligung',
             'bdp',
             'bap',
             $params->get('addon_xbeteiligung_async_max_messages_per_cycle'),
