@@ -25,9 +25,9 @@ class AnlageValueObject
     private ?DateTime $datum;
     private ?string $anlageart;
     private ?string $mimeType;
-    private ?string $dokumentId;
-    private ?string $dateiname;
-    private ?string $url;
+    private ?string $dokumentId = null;
+    private ?string $dateiname = null;
+    private ?string $url = null;
     private ?string $dokument;
     private bool $isAnhang = false;
     private bool $isVerlinkung = false;
