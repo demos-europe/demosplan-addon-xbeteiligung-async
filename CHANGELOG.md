@@ -27,6 +27,8 @@
 - Add AnlagenExtractor mock support to test factory
 - Resolve PHPUnit test failures with proper dependency injection
 
+- improve rest api documentation
+
 ## v0.33 (2025-09-12)
 - fix token length check
 - improve logging
