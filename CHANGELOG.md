@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.34 (2025-09-23)
 **Planfeststellung Message Support (DPLAN-16438)**
 - Add support for Planfeststellung 0201 message creation in XBeteiligungEventSubscriber
 - Enable automatic 201 message generation for new procedures when `feature_procedure_message_pln_create` permission is enabled
