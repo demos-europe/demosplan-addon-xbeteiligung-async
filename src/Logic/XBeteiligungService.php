@@ -15,6 +15,10 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType\BeteiligungPlanfeststellungOeffentlichkeitArtAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType\BeteiligungPlanfeststellungTOEBArtAnonymousPHPType;
 use demosplan\DemosPlanCoreBundle\Logic\Procedure\MasterTemplateService;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure\ProcedureDataValueObject;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
@@ -40,9 +44,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XmlDataExtractorService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
 use demosplan\DemosPlanCoreBundle\Repository\OrgaRepository;
@@ -69,7 +71,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoe
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302\RaumordnungAktualisieren0302AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202\PlanfeststellungAktualisieren0202AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt202;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201\PlanfeststellungInitiieren0201AnonymousPHPType\NachrichteninhaltAnonymousPHPType  as Nachrichteninhalt201;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301\RaumordnungInitiieren0301AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt301;
@@ -80,7 +81,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
-use JMS\Serializer\Serializer;
 use proj4php\Point;
 use proj4php\Proj;
 use proj4php\Proj4php;
@@ -160,7 +160,7 @@ class XBeteiligungService
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
 
     /** Statement ID prefix that needs to be removed for database storage */
-    private const STATEMENT_ID_PREFIX = 'ID_';
+    public const STATEMENT_ID_PREFIX = 'ID_';
     public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.0401';
     public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Aktualisieren.0402';
     public const DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Loeschen.0409';
@@ -206,7 +206,7 @@ class XBeteiligungService
         private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
         private readonly ServiceStorage                         $serviceStorage,
         private readonly XBeteiligungAuditService               $auditService,
-        private readonly XmlDataExtractorService                $xmlDataExtractorService,
+        private readonly ProcedureDataExtractor                $xmlDataExtractorService,
         private readonly MasterTemplateService                  $masterTemplateService,
         private readonly ProcedureTypeServiceInterface          $procedureTypeService,
 
@@ -547,8 +547,8 @@ class XBeteiligungService
             $this->getPublicProcedurePhaseCodeType($procedure)
         );
         $participationType->setGeltungsbereich($procedure->getSettings()->getTerritory());
-        $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure));
-        $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure));
+        $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure, $participationType));
+        $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure, $participationType));
 
         return $participationType;
     }
@@ -593,34 +593,18 @@ class XBeteiligungService
         BeteiligungPlanfeststellungType $participationType,
         ProcedureInterface $procedure
     ): BeteiligungPlanfeststellungType {
-        $participationType->setPlanart($this->createNewCodePlanartPlanfeststellungType()); // optional
-        $participationType->setVerfahrensschritt(
+        $participationType->setPlanartPlanfeststellung($this->createNewCodePlanartPlanfeststellungType()); // optional
+        $participationType->setVerfahrensschrittPlanfeststellung(
             $this->createCodeTypePlanfeststellung(
                 'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung',
                 $procedure->getPublicParticipationPhase()
             )
         );
-        // ***********currently for 0201 and 0201 required fields*******************************************************
-        // deprecated: With next standard update this setters could be removed.
-        $participationType->setZeitraum(
-            $this->createTimeSpanOfProcedurePhase($procedure->getPublicParticipationPhaseObject())
-        );
-        $participationType->setAktuelleMitteilung($this->getPublicNewsList($procedure));
-        $participationType->setBekanntmachung(
-            DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
-        );
-        // Ensure durchgang is at least 1 as required by XSD schema (xs:positiveInteger)
-        $iteration = $procedure->getPublicParticipationPhaseObject()->getIteration();
-        $participationType->setDurchgang($iteration);
-        $participationType->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
 
         // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
         $participationType->setGeltungsbereich('');
-        // *************************************************************************************************************
-        // *** With the next standard update something like this should be available. **********************************
-        //$participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure));
-        //$participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure));
-        // *************************************************************************************************************
+        $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure, $participationType));
+        $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure, $participationType));
 
         return $participationType;
     }
@@ -658,54 +642,129 @@ class XBeteiligungService
         return $planType;
     }
 
-    private function generateInstitutionParticipationType(ProcedureInterface $procedure): BeteiligungKommunalTOEBType
-    {
-        $institutionParticipationType = new BeteiligungKommunalTOEBType();
+    private function generateInstitutionParticipationType(
+        ProcedureInterface $procedure,
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType $participationType
+    ): BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType {
+        $institutionParticipationType = $this->getSpecificParticipationToebType($participationType);
 
         // we as demos think this id is useless - did not win the discussion as it seems :(
-        $institutionParticipationType->setBeteiligungsID($this->commonHelpers->uuid());
+        $institutionParticipationType?->setBeteiligungsID($this->commonHelpers->uuid());
         // this MetadatenAnlageType should support a base64 container to dump files into, but it does not - S.C. is informed
         //$publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
-        $institutionParticipationType->setZeitraum($this->createTimeSpanOfProcedurePhase($procedure->getPhaseObject()));
-        $institutionParticipationType->setBekanntmachung(
+        $institutionParticipationType?->setZeitraum($this->createTimeSpanOfProcedurePhase($procedure->getPhaseObject()));
+        $institutionParticipationType?->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
         // Ensure durchgang is at least 1 as required by XSD schema (xs:positiveInteger)
         $iteration = $procedure->getPhaseObject()->getIteration();
-        $institutionParticipationType->setDurchgang($iteration);
-        $bkTOEBaaType = new BeteiligungKommunalTOEBArtAnonymousPHPType();
-        $bkTOEBaaType->setBeteiligungKommunalFormalTOEB($this->getInstitutionProcedurePhaseCodeType($procedure));
-        $institutionParticipationType->setBeteiligungKommunalTOEBArt($bkTOEBaaType);
+        $institutionParticipationType?->setDurchgang($iteration);
+        if (null !== $institutionParticipationType) {
+            $this->setSpecificParticipationToebArtType($procedure, $institutionParticipationType);
+        }
         // optional - we want to use it
         $institutionParticipationType->setAktuelleMitteilung($this->getInstitutionNewsList($procedure));
 
         return $institutionParticipationType;
     }
 
-    private function generatePublicParticipationType(ProcedureInterface $procedure): BeteiligungKommunalOeffentlichkeitType
+    private function generatePublicParticipationType(
+        ProcedureInterface $procedure,
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType $participationType
+    ): BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType
     {
-        $publicParticipationType = new BeteiligungKommunalOeffentlichkeitType();
+        $publicParticipationType = $this->getSpecificParticipationOeffentlichkeitType($participationType);
+
         // we as demos think this id is useless - did not win the discussion as it seems :(
-        $publicParticipationType->setBeteiligungsID($this->commonHelpers->uuid());
-        $publicParticipationType->setZeitraum(
+        $publicParticipationType?->setBeteiligungsID($this->commonHelpers->uuid());
+        $publicParticipationType?->setZeitraum(
             $this->createTimeSpanOfProcedurePhase($procedure->getPublicParticipationPhaseObject())
         );
-        $publicParticipationType->setBekanntmachung(
+        $publicParticipationType?->setBekanntmachung(
             DateTime::createFromInterface($procedure->getStartDate())->sub(new DateInterval('P7D'))
         ); // required - we dont want it
         // Ensure durchgang is at least 1 as required by XSD schema (xs:positiveInteger)
         $iteration = $procedure->getPublicParticipationPhaseObject()->getIteration();
-        $publicParticipationType->setDurchgang($iteration);
-        $bkoeaaType = new BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType();
-        $bkoeaaType->setBeteiligungKommunalFormalOeffentlichkeit(
-            $this->getPublicProcedurePhaseCodeType($procedure)
-        );
-        $publicParticipationType->setBeteiligungKommunalOeffentlichkeitArt($bkoeaaType);
-        $publicParticipationType->setAktuelleMitteilung($this->getPublicNewsList($procedure));
-        $publicParticipationType->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
-
+        $publicParticipationType?->setDurchgang($iteration);
+        if (null !== $publicParticipationType) {
+            $this->setSpecificParticipationOeffentlichkeitArtType($procedure, $publicParticipationType);
+        }
+        $publicParticipationType?->setAktuelleMitteilung($this->getPublicNewsList($procedure));
+        $publicParticipationType?->setAnlagen($this->planningDocumentsLinkCreator->getPlanningDocuments($procedure));
 
         return $publicParticipationType;
+    }
+
+    private function getSpecificParticipationOeffentlichkeitType(
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType $participationType
+    ): null|BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType {
+        $participationOeffentlichkeitType = null;
+        if ($participationType instanceof BeteiligungKommunalType) {
+            $participationOeffentlichkeitType = new BeteiligungKommunalOeffentlichkeitType();
+        }
+        if ($participationType instanceof BeteiligungPlanfeststellungType) {
+            $participationOeffentlichkeitType = new BeteiligungPlanfeststellungOeffentlichkeitType();
+        }
+
+        return $participationOeffentlichkeitType;
+    }
+
+    private function getSpecificParticipationToebType(
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType $participationType
+    ): null|BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType {
+        $participationToebType = null;
+        if ($participationType instanceof BeteiligungKommunalType) {
+            $participationToebType = new BeteiligungKommunalTOEBType();
+        }
+        if ($participationType instanceof BeteiligungPlanfeststellungType) {
+            $participationToebType = new BeteiligungPlanfeststellungTOEBType();
+        }
+
+        return $participationToebType;
+    }
+
+    private function setSpecificParticipationOeffentlichkeitArtType(
+        ProcedureInterface $procedure,
+        BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType $participationType
+    ): void {
+        if ($participationType instanceof BeteiligungKommunalOeffentlichkeitType) {
+            $participationOeffentlichkeitArtType = new BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType();
+            $participationOeffentlichkeitArtType->setBeteiligungKommunalFormalOeffentlichkeit(
+                $this->getPublicProcedurePhaseCodeType($procedure)
+            );
+            $participationType->setBeteiligungKommunalOeffentlichkeitArt($participationOeffentlichkeitArtType);
+        }
+        if ($participationType instanceof BeteiligungPlanfeststellungOeffentlichkeitType) {
+            $participationOeffentlichkeitArtType = new BeteiligungPlanfeststellungOeffentlichkeitArtAnonymousPHPType();
+            $participationOeffentlichkeitArtType->setBeteiligungPlanfeststellungFormalOeffentlichkeit(
+                $this->createCodeTypePlanfeststellung(
+                    'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung',
+                    $procedure->getPublicParticipationPhase())
+            );
+            $participationType->setBeteiligungPlanfeststellungOeffentlichkeitArt($participationOeffentlichkeitArtType);
+        }
+    }
+
+    private function setSpecificParticipationToebArtType(
+        ProcedureInterface $procedure,
+        BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType $participationType
+    ): void {
+        if ($participationType instanceof BeteiligungKommunalTOEBType) {
+            $participationOeffentlichkeitArtType = new BeteiligungKommunalTOEBArtAnonymousPHPType();
+            $participationOeffentlichkeitArtType->setBeteiligungKommunalFormalTOEB(
+                $this->getPublicProcedurePhaseCodeType($procedure)
+            );
+            $participationType->setBeteiligungKommunalTOEBArt($participationOeffentlichkeitArtType);
+        }
+        if ($participationType instanceof BeteiligungPlanfeststellungTOEBType) {
+            $participationOeffentlichkeitArtType = new BeteiligungPlanfeststellungTOEBArtAnonymousPHPType();
+            $participationOeffentlichkeitArtType->setBeteiligungPlanfeststellungFormalTOEB(
+                $this->createCodeTypePlanfeststellung(
+                    'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung',
+                    $procedure->getPhase())
+            );
+            $participationType->setBeteiligungPlanfeststellungTOEBArt($participationOeffentlichkeitArtType);
+        }
     }
 
     /**
@@ -1136,81 +1195,18 @@ class XBeteiligungService
             $planfeststellungInitiieren201 = $this->incomingMessageParser->getXmlObject($messageXml, '0201');
 
             if ($auditEnabled) {
-                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier);
+                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier, $routingKey);
             }
 
             try {
-                $procedureData = $this->xmlDataExtractorService->extractFromG2GMessage($planfeststellungInitiieren201);
-
-                $this->logger->info('Extracted procedure data from planfeststellung message', [
-                    'processId' => $procedureData->getProcessId(),
-                    'planId' => $procedureData->getPlanId(),
-                    'planName' => $procedureData->getPlanName()
-                ]);
-
-                try {
-                    $contactOrganization = $procedureData->getContactOrganization();
-                    if (null !== $contactOrganization) {
-                        $this->validateOrganization($contactOrganization);
-                    }
-                } catch (\Error $e) {
-                    $this->logger->debug('No contact organization found in XML data for validation', [
-                        'error' => $e->getMessage()
-                    ]);
-                }
-
-                try {
-                    $procedure = $this->createProcedureFromXmlData($procedureData);
-                    $this->logger->info('Successfully created procedure from XBeteiligung XML', [
-                        'procedureId' => $procedure->getId(),
-                        'procedureName' => $procedure->getName(),
-                        'planId' => $procedureData->getPlanId()
-                    ]);
-                } catch (ContentMandatoryFieldsException $e) {
-                    $this->logger->error('Failed to create procedure: missing mandatory fields', [
-                        'error' => $e->getMessage(),
-                        'planId' => $procedureData->getPlanId()
-                    ]);
-                    throw $e;
-                } catch (\Exception $e) {
-                    $this->logger->error('Failed to create procedure from XBeteiligung XML', [
-                        'error' => $e->getMessage(),
-                        'planId' => $procedureData->getPlanId(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                    throw $e;
-                }
-
-                try {
-                    $this->logger->debug('ProcedureDataValueObject extracted successfully', [
-                        'processId' => $procedureData->getProcessId(),
-                        'planId' => $procedureData->getPlanId(),
-                        'planName' => $procedureData->getPlanName(),
-                        'planType' => $procedureData->getPlanType(),
-                        'contactOrganization' => $procedureData->getContactOrganization(),
-                        'startDate' => $procedureData->getStartDate()?->format('Y-m-d H:i:s'),
-                        'endDate' => $procedureData->getEndDate()?->format('Y-m-d H:i:s'),
-                    ]);
-                } catch (\Throwable $e) {
-                    $this->logger->error('Error logging debug message', [
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                }
-
-                $this->markAuditRecordAsProcessed($auditRecord, $procedureData->getPlanId());
-
-                $response = new ResponseValue();
-                $response->setProcedureId($procedureData->getPlanId());
-                $response->setMessageStringIdentifier($messageStringIdentifier);
-                $response->setMessageXml($messageXml);
+                $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage(
+                    $planfeststellungInitiieren201,
+                    $routingKey
+                );
+                $this->markAuditRecordAsProcessed($auditRecord, $response->getProcedureId());
 
                 return $response;
             } catch (Exception $e) {
-                $this->logger->error('Failed to process planfeststellung message', [
-                    'error' => $e->getMessage(),
-                    'messageType' => $messageStringIdentifier
-                ]);
                 $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
                 throw $e;
             }
@@ -1282,66 +1278,6 @@ class XBeteiligungService
 
             // Statement acknowledgments don't require a response - return null
             return null;
-        }
-
-        if (self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageStringIdentifier) {
-            if ($auditEnabled) {
-                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier, $routingKey);
-            }
-
-            try {
-                /** @var PlanfeststellungInitiieren0201 $planfeststellungInitiieren201 */
-                $planfeststellungInitiieren201 = $this->incomingMessageParser->getXmlObject($messageXml, '201');
-            } catch (Exception $parseException) {
-                $this->logger->error('Failed to parse planfeststellung XML message', [
-                    'messageType' => $messageStringIdentifier,
-                    'error' => $parseException->getMessage(),
-                    'xmlContent' => $messageXml
-                ]);
-
-                $this->markAuditRecordAsFailed($auditRecord, 'XML parsing failed: ' . $parseException->getMessage());
-
-                throw new InvalidArgumentException(
-                    'Failed to parse XML message: ' . $parseException->getMessage(),
-                    0,
-                    $parseException
-                );
-            }
-
-            try {
-                $procedureDataObject = $this->xmlDataExtractorService->extractFromG2GMessage($planfeststellungInitiieren201);
-
-                try {
-                    $contactOrganization = $procedureDataObject->getContactOrganization();
-                    if (null !== $contactOrganization) {
-                        $this->validateOrganization($contactOrganization);
-                    }
-                } catch (Exception $validationException) {
-                    $this->logger->warning('Validation failed during procedure creation', [
-                        'error' => $validationException->getMessage()
-                    ]);
-                }
-
-                $procedure = $this->createProcedureFromXmlData($procedureDataObject);
-
-                $this->logger->info('Created procedure from PlanfeststellungInitiieren0201 message', [
-                    'messageType' => $messageStringIdentifier,
-                    'procedureId' => $procedure->getId(),
-                    'planId' => $messageContent?->getBeteiligung()?->getPlanID(),
-                    'planName' => $messageContent?->getBeteiligung()?->getPlanname(),
-                ]);
-
-                $response = new ResponseValue();
-                $response->setProcedureId($procedure->getId());
-                $response->setSuccess(true);
-
-                $this->markAuditRecordAsProcessed($auditRecord, $procedure->getId());
-
-                return $response;
-            } catch (Exception $e) {
-                $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
-                throw $e;
-            }
         }
 
         throw new InvalidArgumentException('Unsupported message type: ' . $messageStringIdentifier);

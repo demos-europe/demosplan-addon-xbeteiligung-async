@@ -24,8 +24,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\FormatException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure\ProcedureDataValueObject;
 use Doctrine\DBAL\ConnectionException;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -33,7 +34,6 @@ use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\AgsCodeNotFoundException;
-use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingKeyParser;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Webmozart\Assert\Assert;
 use function count;
@@ -52,14 +52,16 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * Creates a procedure from an incoming XBeteiligung message.
      * If everything goes well returns a Beteiligung2PlanungBeteiligungNeuOK0411 success Object
      * If there is any error during the process it will return a Beteiligung2PlanungBeteiligungNeuNOK0421 Object.
+     *
+     * @throws Exception
      */
     public function createNewProcedureFromXBeteiligungMessageOrErrorMessage(
-        KommunalInitiieren0401 $xmlObject401,
+        KommunalInitiieren0401|PlanfeststellungInitiieren0201 $xmlObject,
         ?string $incomingRoutingKey = null
     ): ResponseValue
     {
         try {
-            return $this->createNewKommunalProcedureFromXBeteiligungMessageWithResponse($xmlObject401, $incomingRoutingKey);
+            return $this->createNewKommunalProcedureFromXBeteiligungMessageWithResponse($xmlObject, $incomingRoutingKey);
         } catch (AddonUserNotFoundException $exception) {
             $userLogin = $exception->getUserLogin();
             $message = str_replace('%1$s', $userLogin, XBeteiligungService::MISSING_USER_ERROR_DESCRIPTION);
@@ -126,7 +128,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             )];
         }
 
-        return $this->kommunaleMessageFactory->buildProcedureCreatedErrorResponse421($errorTypes, $xmlObject401);
+        return $this->kommunaleMessageFactory->buildProcedureCreatedErrorResponse421($errorTypes, $xmlObject);
     }
 
     /**
@@ -134,12 +136,12 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * @throws Exception
      */
     public function createNewKommunalProcedureFromXBeteiligungMessageWithResponse(
-        KommunalInitiieren0401 $xmlObject401,
+        KommunalInitiieren0401|PlanfeststellungInitiieren0201 $xmlObject,
         ?string $incomingRoutingKey = null
     ): ResponseValue
     {
-        $procedure = $this->createNewKommunalProcedureFromXBeteiligungMessage($xmlObject401, $incomingRoutingKey);
-        $response = $this->kommunaleMessageFactory->buildProcedureCreatedResponse411($procedure, $xmlObject401);
+        $procedure = $this->createNewKommunalProcedureFromXBeteiligungMessage($xmlObject, $incomingRoutingKey);
+        $response = $this->kommunaleMessageFactory->buildProcedureCreatedResponse411($procedure, $xmlObject);
         $response->setProcedureId($procedure->getId());
 
         return $response;
@@ -153,25 +155,18 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * @throws Exception
      */
     public function createNewKommunalProcedureFromXBeteiligungMessage(
-        KommunalInitiieren0401 $xmlObject401,
+        KommunalInitiieren0401|PlanfeststellungInitiieren0201 $xmlObject,
         ?string $incomingRoutingKey = null
     ): ProcedureInterface
     {
-        $messageContent = $xmlObject401->getNachrichteninhalt()?->getBeteiligung();
-        if(null === $messageContent) {
-            $this->logger->error(
-                'Message content is missing',
-                ['xmlObject401' => var_export($xmlObject401, true)]
-            );
-            throw new FormatException('Message content is missing');
-        }
-
         // Get mapped customer before transaction
         $customer = $this->getCustomerFromRoutingKey($incomingRoutingKey);
 
         $result = $this->transactionService->executeAndFlushInTransaction(
-            function () use ($messageContent, $customer) {
-                $procedure = $this->createProcedureEntity($messageContent);
+            function () use ($xmlObject, $customer) {
+
+                $procedureDataValueObject = $this->procedureDataExtractor->extract($xmlObject);
+                $procedure = $this->createProcedureEntity($procedureDataValueObject);
                 $procedure->setCustomer($customer);
 
                 $this->logger->info('Set procedure customer based on AGS mapping for 401 message', [
@@ -180,15 +175,10 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                     'messageType' => '401'
                 ]);
 
-                $procedureData =  $this->procedurePhaseExtractor->extract($messageContent);
-                $this->setProcedurePhase($procedure, $procedureData);
-
-                $anlagenData = $this->anlagenExtractor->extract($messageContent);
-
-                $mapData = $this->xbeteiligungMapService->setMapData($messageContent->getGeltungsbereich());
-                $procedure->getSettings()->setTerritory($mapData->getTerritory());
-                $procedure->getSettings()->setBoundingBox($mapData->getBbox());
-                $procedure->getSettings()->setMapExtent($mapData->getMapExtent());
+                $this->setProcedurePhase($procedure, $procedureDataValueObject->getProcedurePhaseData());
+                $procedure->getSettings()->setTerritory($procedureDataValueObject->getMapData()->getTerritory());
+                $procedure->getSettings()->setBoundingBox($procedureDataValueObject->getMapData()->getBbox());
+                $procedure->getSettings()->setMapExtent($procedureDataValueObject->getMapData()->getMapExtent());
                 return $procedure;
             }
         );
@@ -202,11 +192,11 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * @throws AddonOrgaNotFoundException
      */
     private function createProcedureEntity(
-        BeteiligungKommunalType $messageContent,
+        ProcedureDataValueObject $procedureDataValueObject,
     ): ProcedureInterface {
         // get user from message should be set, because of that userId here is not correct
         try {
-            $orgaName = $messageContent->getAkteurVorhaben()?->getVeranlasser()?->getName()?->getName() ?? '';
+            $orgaName = $procedureDataValueObject->getContactOrganization() ?? '';
             $orgaList = $this->orgaService->getOrgaByFields(['name' => $orgaName, 'deleted' => false]);
             if (0 === count($orgaList)) {
                 $errorMessage = sprintf(
@@ -255,7 +245,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             );
         }
 
-        $data = $this->createProcedureArrayFormatFromBeteiligungType($messageContent, $orga);
+        $data = $this->createProcedureArrayFormatFromBeteiligungType($procedureDataValueObject, $orga);
         $procedure = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
         $procedure->setAuthorizedUsers($usersToAllowAccessToProcedure);
         $procedure->setOrga($orga);
@@ -341,13 +331,13 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     }
 
     protected function createProcedureArrayFormatFromBeteiligungType(
-        BeteiligungKommunalType $procedureObject,
+        ProcedureDataValueObject $procedureObject,
         OrgaInterface $orga
     ): array {
         return [
-            'r_name'                                                        => $procedureObject->getPlanname(),
-            'r_desc'                                                        => $procedureObject->getBeschreibungPlanungsanlass(),
-            'r_externalDesc'                                                => $procedureObject->getBeschreibungPlanungsanlass(),
+            'r_name'                                                        => $procedureObject->getPlanName(),
+            'r_desc'                                                        => $procedureObject->getPlanDescription(),
+            'r_externalDesc'                                                => $procedureObject->getPlanDescription(),
             'orgaId'                                                        => $orga->getId(),
             'orgaName'                                                      => $orga->getName(),
             // fixme: currently we dont get an email for Verfahrensträger from cockpit
@@ -356,7 +346,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             'r_master'                                                      => 'false',
             'r_copymaster'                                                  => $this->procedureService->getMasterTemplateId(),
             'r_procedure_type'                                              => $this->getProcedureTypeId(),
-            'xtaPlanId'                                                     => $procedureObject->getPlanID(),
+            'xtaPlanId'                                                     => $procedureObject->getPlanId(),
         ];
     }
 

@@ -17,13 +17,13 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class XBeteiligungConfiguration
 {
+    private const RABBIT_MQ_EXCHANGE = '.beteiligung';
     public function __construct(
         public readonly bool $rabbitMqEnabled,
         public readonly int $requestTimeout,
         public readonly int $communicationDelay,
         public readonly string $procedureMessageType,
         public readonly bool $auditEnabled,
-        public readonly string $rabbitMqExchange,
         public readonly string $xoevAddressPrefixKommunal,
         public readonly string $xoevAddressPrefixCockpit,
         public readonly int $maxMessagesPerCycle,
@@ -65,7 +65,6 @@ class XBeteiligungConfiguration
             $params->get('addon_xbeteiligung_async_rabbitmq_communication_delay'),
             $params->get('addon_xbeteiligung_async_procedure_message_type'),
             $params->get('addon_xbeteiligung_async_enable_audit'),
-            'bau.beteiligung',
             'bdp',
             'bap',
             $params->get('addon_xbeteiligung_async_max_messages_per_cycle'),
@@ -84,6 +83,12 @@ class XBeteiligungConfiguration
                 sprintf('Unknown procedure message type "%s"', $this->procedureMessageType)
             )
         };
+    }
+
+    public function getRabbitMqExchange(): string
+    {
+        $projectPrefix = $this->getProjectTypePrefix();
+        return $projectPrefix . self::RABBIT_MQ_EXCHANGE;
     }
 
     /**

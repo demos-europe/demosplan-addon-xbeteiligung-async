@@ -14,6 +14,8 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure;
 
 use DateTime;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\AnlageValueObject;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\MapData;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
 
 /**
  * Value object to hold procedure data extracted from XML messages.
@@ -50,9 +52,8 @@ class ProcedureDataValueObject
      */
     private array $anlagen = [];
 
-    public function __construct()
-    {
-    }
+    private ?ProcedurePhaseData $procedurePhaseData = null;
+    private ?MapData $mapData = null;
 
     public function getProcessId(): ?string
     {
@@ -310,4 +311,23 @@ class ProcedureDataValueObject
         $this->anlagen = $anlagen;
     }
 
+    public function getProcedurePhaseData(): ?ProcedurePhaseData
+    {
+        return $this->procedurePhaseData;
+    }
+
+    public function setProcedurePhaseData(ProcedurePhaseData $procedurePhaseData): void
+    {
+        $this->procedurePhaseData = $procedurePhaseData;
+    }
+
+    public function getMapData(): ?MapData
+    {
+        return $this->mapData;
+    }
+
+    public function setMapData(?MapData $mapData): void
+    {
+        $this->mapData = $mapData;
+    }
 }
