@@ -206,7 +206,7 @@ class XBeteiligungService
         private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
         private readonly ServiceStorage                         $serviceStorage,
         private readonly XBeteiligungAuditService               $auditService,
-        private readonly XmlDataExtractorService                $xmlDataExtractorService,
+        private readonly ProcedureDataExtractor                $xmlDataExtractorService,
         private readonly MasterTemplateService                  $masterTemplateService,
         private readonly ProcedureTypeServiceInterface          $procedureTypeService,
 

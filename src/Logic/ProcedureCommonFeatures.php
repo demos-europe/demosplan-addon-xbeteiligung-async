@@ -59,7 +59,7 @@ abstract class ProcedureCommonFeatures
         protected readonly XBeteiligungMapService             $xbeteiligungMapService,
         protected readonly XBeteiligungConfiguration          $xbeteiligungConfiguration,
         protected readonly XBeteiligungRoutingKeyParser       $routingKeyParser,
-        protected readonly XmlDataExtractorService            $xmlDataExtractorService,
+        protected readonly ProcedureDataExtractor            $xmlDataExtractorService,
     )
     {
     }

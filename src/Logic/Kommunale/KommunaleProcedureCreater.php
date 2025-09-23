@@ -159,27 +159,13 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         ?string $incomingRoutingKey = null
     ): ProcedureInterface
     {
-        $messageContent = $xmlObject->getNachrichteninhalt()?->getBeteiligung();
-        if(null === $messageContent) {
-            $this->logger->error(
-                'Message content is missing',
-                ['xmlObject401' => var_export($xmlObject, true)]
-            );
-            throw new FormatException('Message content is missing');
-        }
-
         // Get mapped customer before transaction
         $customer = $this->getCustomerFromRoutingKey($incomingRoutingKey);
 
         $result = $this->transactionService->executeAndFlushInTransaction(
-            function () use ($xmlObject, $messageContent, $customer) {
+            function () use ($xmlObject, $customer) {
 
-                $procedureDataValueObject = $this->xmlDataExtractorService->extractFromG2GMessage($xmlObject);
-                $anlagenData = $this->anlagenExtractor->extract($messageContent);
-                $procedureDataValueObject->setAnlagen($anlagenData);
-                $mapData = $this->xbeteiligungMapService->setMapData($messageContent->getGeltungsbereich());
-                $procedureData =  $this->procedurePhaseExtractor->extract($messageContent);
-
+                $procedureDataValueObject = $this->xmlDataExtractorService->extract($xmlObject);
                 $procedure = $this->createProcedureEntity($procedureDataValueObject);
                 $procedure->setCustomer($customer);
 
@@ -189,10 +175,10 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                     'messageType' => '401'
                 ]);
 
-                $this->setProcedurePhase($procedure, $procedureData);
-                $procedure->getSettings()->setTerritory($mapData->getTerritory());
-                $procedure->getSettings()->setBoundingBox($mapData->getBbox());
-                $procedure->getSettings()->setMapExtent($mapData->getMapExtent());
+                $this->setProcedurePhase($procedure, $procedureDataValueObject->getProcedurePhaseData());
+                $procedure->getSettings()->setTerritory($procedureDataValueObject->getMapData()->getTerritory());
+                $procedure->getSettings()->setBoundingBox($procedureDataValueObject->getMapData()->getBbox());
+                $procedure->getSettings()->setMapExtent($procedureDataValueObject->getMapData()->getMapExtent());
                 return $procedure;
             }
         );
@@ -260,7 +246,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         }
 
         $data = $this->createProcedureArrayFormatFromBeteiligungType($procedureDataValueObject, $orga);
-        $this->logger->warning($data['xtaPlanId']);
         $procedure = $this->procedureServiceStorage->administrationNewHandler($data, $userId);
         $procedure->setAuthorizedUsers($usersToAllowAccessToProcedure);
         $procedure->setOrga($orga);
