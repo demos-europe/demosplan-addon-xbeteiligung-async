@@ -27,6 +27,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoe
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschenNOK0429\KommunalLoeschenNOK0429AnonymousPHPType\NachrichteninhaltAnonymousPHPType as KommunalLoeschenNOOKAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschenOK0419;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\NachrichteninhaltTemplateNOKType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiierenNOK0221;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiierenOK0211;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 
@@ -39,13 +42,13 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureCreatedResponse411(
         ProcedureInterface $procedure,
-        KommunalInitiieren0401 $xmlObject401
+        KommunalInitiieren0401|PlanfeststellungInitiieren0201 $xmlObject
     ): ResponseValue
     {
         return $this->buildProcedureCreatedResponse(
             $procedure,
-            $xmlObject401,
-            new KommunalInitiierenOK0411()
+            $xmlObject,
+            $xmlObject instanceof KommunalInitiieren0401 ? new KommunalInitiierenOK0411() : new PlanfeststellungInitiierenOK0211()
         );
     }
 
@@ -83,15 +86,16 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
      *
      * @param array<int, FehlerType> $errorTypes
      *
+     * @throws Exception
      */
     public function buildProcedureCreatedErrorResponse421(
         array $errorTypes,
-        KommunalInitiieren0401 $xmlObject401
+        KommunalInitiieren0401|PlanfeststellungInitiieren0201 $xmlObject
     ): ResponseValue {
         return $this->buildCreateErrorResponse(
             $errorTypes,
-            $xmlObject401,
-            new KommunalInitiierenNOK0421(),
+            $xmlObject,
+            $xmlObject instanceof KommunalInitiieren0401 ? new KommunalInitiierenNOK0421() : new PlanfeststellungInitiierenNOK0221(),
             new NachrichteninhaltTemplateNOKType()
         );
     }

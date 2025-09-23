@@ -23,6 +23,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfigurat
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use Exception;
@@ -133,6 +134,11 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
                 'trace' => $exception->getTraceAsString()
             ]);
             throw $exception;
+        }
+
+        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
+            $xml = $this->xBeteiligungService->createXMLFor201($event->getProcedure());
+            $this->createProcedureMessage($xml, $event->getProcedure(), PlanfeststellungInitiieren0201::class);
         }
     }
 
