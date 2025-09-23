@@ -165,7 +165,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         $result = $this->transactionService->executeAndFlushInTransaction(
             function () use ($xmlObject, $customer) {
 
-                $procedureDataValueObject = $this->xmlDataExtractorService->extract($xmlObject);
+                $procedureDataValueObject = $this->procedureDataExtractor->extract($xmlObject);
                 $procedure = $this->createProcedureEntity($procedureDataValueObject);
                 $procedure->setCustomer($customer);
 
