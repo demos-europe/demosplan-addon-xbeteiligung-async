@@ -1,6 +1,32 @@
 # Changelog
 
 ## UNRELEASED
+**Planfeststellung Message Support (DPLAN-16438)**
+- Add support for Planfeststellung 0201 message creation in XBeteiligungEventSubscriber
+- Enable automatic 201 message generation for new procedures when `feature_procedure_message_pln_create` permission is enabled
+- Extend KommunaleProcedureCreater to handle both Kommunal and Planfeststellung message types with union type support
+- Add PlanfeststellungInitiieren0201 class integration for K3 system communication
+
+**RabbitMQ Exchange Configuration**
+- Refactor exchange configuration from hardcoded parameter to dynamic generation based on project type
+- Add getRabbitMqExchange() method for project-specific exchange naming (bau.beteiligung, rog.beteiligung, pfv.beteiligung)
+- Remove hardcoded 'bau.beteiligung' exchange in favor of configurable project-based exchanges
+
+**XML Namespace Fixes**
+- Fix XML validation failures for Planfeststellung messages by correcting YAML namespace configurations
+- Comment out namespace entries for anlage elements to ensure XSD compliance with form="unqualified" specification
+- Update README documentation with comprehensive namespace configuration guidance
+
+**Attachment Data Extraction Foundation**
+- Add AnlagenExtractor service for extracting attachment metadata from XBeteiligung messages
+- Implement AnlageValueObject for structured attachment data representation
+- Note: This provides the foundation for attachment handling - actual processing implementation pending
+
+**Test Infrastructure**
+- Fix KommunaleProcedureHandlerFactory constructor dependency issues
+- Add AnlagenExtractor mock support to test factory
+- Resolve PHPUnit test failures with proper dependency injection
+
 ## v0.33 (2025-09-12)
 - fix token length check
 - improve logging
