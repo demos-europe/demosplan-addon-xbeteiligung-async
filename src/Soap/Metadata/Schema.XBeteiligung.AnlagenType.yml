@@ -4,13 +4,13 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType:
             expose: true
             access_type: public_method
             serialized_name: anlage
-            xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            xml_element: ~
+#                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             accessor:
                 getter: getAnlage
                 setter: setAnlage
             xml_list:
                 inline: true
                 entry_name: anlage
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+#                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
             type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType>

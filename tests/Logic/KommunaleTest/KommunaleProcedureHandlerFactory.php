@@ -16,6 +16,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfigurat
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureDataExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use InvalidArgumentException;
 
@@ -48,6 +50,9 @@ class KommunaleProcedureHandlerFactory
             procedureTypeName: 'Allgemeine Beteiligung'
         );
 
+        $anlagenExtractor = $this->mockFactory->getAnlagenExtractor();
+        $procedureDataExtractor = new ProcedureDataExtractor($anlagenExtractor, $logger, $phaseExtractor, $mapService);
+
         $commonDependencies = [
             $this->mockFactory->getCurrentUserProviderInterfaceMock(),
             $this->mockFactory->getCustomerServiceInterfaceMock(),
@@ -56,6 +61,7 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
             $phaseExtractor,
+            $anlagenExtractor,
             $this->mockFactory->getProcedureServiceInterface(),
             $this->mockFactory->getProcedureServiceStorage(),
             $this->mockFactory->getProcedureTypeService(),
@@ -68,7 +74,8 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getXBeteiligungCustomerMappingServiceMock(),
             $mapService,
             $configuration,
-            $this->mockFactory->getXBeteiligungRoutingKeyParserMock()
+            $this->mockFactory->getXBeteiligungRoutingKeyParserMock(),
+            $procedureDataExtractor
         ];
 
         switch ($handlerType) {
