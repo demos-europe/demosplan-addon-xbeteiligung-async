@@ -34,7 +34,6 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
             300,            // communicationDelay
             'Kommunal',     // procedureMessageType
             true,           // auditEnabled
-            'test.exchange', // rabbitMqExchange
             'bdp',          // xoevAddressPrefixKommunal
             'bap',          // xoevAddressPrefixCockpit
             10,             // maxMessagesPerCycle
@@ -172,7 +171,6 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
             300,            // communicationDelay
             'Raumordnung',  // procedureMessageType (gives 'rog' prefix)
             true,           // auditEnabled
-            'test.exchange', // rabbitMqExchange
             'custom_kommunal', // xoevAddressPrefixKommunal
             'custom_cockpit', // xoevAddressPrefixCockpit
             10,             // maxMessagesPerCycle

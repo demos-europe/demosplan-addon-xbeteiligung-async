@@ -33,7 +33,7 @@ class KommunaleProcedureHandlerFactory
         $logger = $this->mockFactory->getLoggerInterfaceMock();
         $phaseExtractor = new ProcedurePhaseExtractor($logger);
         $mapService = new XBeteiligungMapService($logger);
-        
+
         // Create real configuration with test values
         $configuration = new XBeteiligungConfiguration(
             rabbitMqEnabled: false,
@@ -41,7 +41,6 @@ class KommunaleProcedureHandlerFactory
             communicationDelay: 300,
             procedureMessageType: 'Kommunal',
             auditEnabled: true,
-            rabbitMqExchange: 'init.cockpit',
             xoevAddressPrefixKommunal: 'bdp',
             xoevAddressPrefixCockpit: 'bap',
             maxMessagesPerCycle: 10,
