@@ -206,6 +206,7 @@ abstract class XBeteiligungServiceTest extends TestCase
             '',
             $messageClass,
         );
+
         self::assertTrue($isValid);
     }
 

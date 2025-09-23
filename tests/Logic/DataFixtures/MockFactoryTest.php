@@ -33,6 +33,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
@@ -310,5 +311,10 @@ class MockFactoryTest
             'receiver' => '020100000099'  // Valid Schleswig-Holstein AGS code (Stage)
         ]);
         return $mock;
+    }
+
+    public function getAnlagenExtractor(): AnlagenExtractor|MockObject
+    {
+        return $this->testCase->createMockObject(AnlagenExtractor::class);
     }
 }

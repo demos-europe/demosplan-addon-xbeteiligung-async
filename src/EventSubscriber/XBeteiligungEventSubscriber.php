@@ -23,6 +23,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfigurat
 use DemosEurope\DemosplanAddon\XBeteiligung\Debugger\XBeteiligungDebugger;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use Exception;
@@ -96,7 +97,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 
                 return;
             }
-            
+
             $this->rabbitMQMessageBroker->handleStatementCreatedEvent($event);
         } catch (Exception $exception) {
             $this->cockpitLogger->error('XBeteiligung: Error in handleStatementCreatedEvent', [
@@ -123,6 +124,11 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
             if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
                 $xml = $this->xBeteiligungService->createXMLFor301($event->getProcedure());
                 $this->createProcedureMessage($xml, $event->getProcedure(), RaumordnungInitiieren0301::class);
+            }
+
+            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
+                $xml = $this->xBeteiligungService->createXMLFor201($event->getProcedure());
+                $this->createProcedureMessage($xml, $event->getProcedure(), PlanfeststellungInitiieren0201::class);
             }
         } catch (Exception $exception) {
             $this->cockpitLogger->error('XBeteiligung: Error in newProcedureCreated event handler', [

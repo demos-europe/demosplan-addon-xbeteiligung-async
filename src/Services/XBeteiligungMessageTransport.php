@@ -65,6 +65,6 @@ class XBeteiligungMessageTransport
      */
     public function publishDirectMessage(string $xmlString, string $routingKey): bool
     {
-        return $this->createDirectPublisher()->publish($xmlString, $this->config->rabbitMqExchange, $routingKey);
+        return $this->createDirectPublisher()->publish($xmlString, $this->config->getRabbitMqExchange(), $routingKey);
     }
 }

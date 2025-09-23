@@ -16,6 +16,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfigurat
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureDataExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use InvalidArgumentException;
 
@@ -33,7 +35,7 @@ class KommunaleProcedureHandlerFactory
         $logger = $this->mockFactory->getLoggerInterfaceMock();
         $phaseExtractor = new ProcedurePhaseExtractor($logger);
         $mapService = new XBeteiligungMapService($logger);
-        
+
         // Create real configuration with test values
         $configuration = new XBeteiligungConfiguration(
             rabbitMqEnabled: false,
@@ -41,13 +43,15 @@ class KommunaleProcedureHandlerFactory
             communicationDelay: 300,
             procedureMessageType: 'Kommunal',
             auditEnabled: true,
-            rabbitMqExchange: 'init.cockpit',
             xoevAddressPrefixKommunal: 'bdp',
             xoevAddressPrefixCockpit: 'bap',
             maxMessagesPerCycle: 10,
             consumerTimeout: 5,
             procedureTypeName: 'Allgemeine Beteiligung'
         );
+
+        $anlagenExtractor = $this->mockFactory->getAnlagenExtractor();
+        $procedureDataExtractor = new ProcedureDataExtractor($anlagenExtractor, $logger, $phaseExtractor, $mapService);
 
         $commonDependencies = [
             $this->mockFactory->getCurrentUserProviderInterfaceMock(),
@@ -57,6 +61,7 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
             $phaseExtractor,
+            $anlagenExtractor,
             $this->mockFactory->getProcedureServiceInterface(),
             $this->mockFactory->getProcedureServiceStorage(),
             $this->mockFactory->getProcedureTypeService(),
@@ -69,7 +74,8 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getXBeteiligungCustomerMappingServiceMock(),
             $mapService,
             $configuration,
-            $this->mockFactory->getXBeteiligungRoutingKeyParserMock()
+            $this->mockFactory->getXBeteiligungRoutingKeyParserMock(),
+            $procedureDataExtractor
         ];
 
         switch ($handlerType) {

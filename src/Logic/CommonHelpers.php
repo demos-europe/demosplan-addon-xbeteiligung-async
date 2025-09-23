@@ -321,6 +321,8 @@ class CommonHelpers
 
     /**
      * Validates a message against a given xsd file located in plugin xsd folder.
+     *
+     * @see ../../docs/XML_VALIDATION_DEBUG.md
      */
     public function isValidMessage(
         string $message,
@@ -332,13 +334,20 @@ class CommonHelpers
         if ('' === $path) {
             $path = AddonPath::getRootPath('Resources/xsd/');
         }
+
         $xsdFile = $this->resolveXsdFilePath($messageClass);
         $fullPath = $path . $xsdFile;
+        if (!file_exists($fullPath)) {
+            return false;
+        }
+
         $document = new DOMDocument();
         // Suppress errors and allow internal error handling
         libxml_use_internal_errors(true);
+
         if (!$document->loadXML($message)) {
             $errors = libxml_get_errors();
+
             $this->logger->error('Failed to load XML, probably invalid',
                 [
                     'message' => $message,
@@ -348,9 +357,11 @@ class CommonHelpers
 
             return false;
         }
+
         $isValid = $document->schemaValidate($fullPath);
         if (!$isValid) {
             $errors = libxml_get_errors();
+
             foreach ($errors as $error) {
                 $this->logger->warning('Invalid XML message', [$error]);
                 if ($verboseDebug) {
@@ -361,6 +372,7 @@ class CommonHelpers
 
             return false;
         }
+
         return true;
     }
 

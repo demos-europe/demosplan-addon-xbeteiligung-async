@@ -62,6 +62,10 @@ class XBeteiligungIncomingMessageParser
             'class' => PlanfeststellungInitiieren0201::class,
             'identifier' => XBeteiligungService::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
         ],
+        '0201' => [
+            'class' => PlanfeststellungInitiieren0201::class,
+            'identifier' => XBeteiligungService::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
+        ],
         '202' => [
             'class' => PlanfeststellungAktualisieren0202::class,
             'identifier' => XBeteiligungService::UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER

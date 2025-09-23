@@ -16,6 +16,9 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
 use Psr\Log\LoggerInterface;
 
@@ -26,12 +29,12 @@ class ProcedurePhaseExtractor
     }
 
     public function extract(
-        BeteiligungKommunalType $beteiligungKommunal
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType $beteiligungType
     ): ProcedurePhaseData {
-        $verfahrensschrittKommunal = $beteiligungKommunal->getVerfahrensschrittKommunal();
-        $codeVerfahrensschrittKommunal = $verfahrensschrittKommunal?->getCode();
+        $verfahrensschrittType = $this->getSpecificVerfahrensschrittType($beteiligungType);
+        $codeVerfahrensschrittType = $verfahrensschrittType?->getCode();
 
-        $beteiligungOeffentlichkeit = $beteiligungKommunal->getBeteiligungOeffentlichkeit();
+        $beteiligungOeffentlichkeit = $beteiligungType->getBeteiligungOeffentlichkeit();
         $durchgangOeffentlichkeit = $beteiligungOeffentlichkeit?->getDurchgang() ?? 1;
         $zeitraumOeffentlichkeit = $beteiligungOeffentlichkeit?->getZeitraum();
         $beginnOeffentlichkeit = $zeitraumOeffentlichkeit?->getBeginn();
@@ -42,8 +45,8 @@ class ProcedurePhaseExtractor
             ?->getBeteiligungKommunalFormalOeffentlichkeit();
         $codeBeteiligungOeffentlichkeit = $beteiligungKommunalFormalOeffentlichkeit?->getCode();
 
-        $beteiligungKommunalTOEB = $beteiligungKommunal->getBeteiligungTOEB();
-        $durchgangTOEB = $beteiligungKommunalTOEB?->getDurchgang() ?? 1;;
+        $beteiligungKommunalTOEB = $beteiligungType->getBeteiligungTOEB();
+        $durchgangTOEB = $beteiligungKommunalTOEB?->getDurchgang() ?? 1;
         $zeitraumTOEB = $beteiligungKommunalTOEB?->getZeitraum();
         $beginnTOEB = $zeitraumTOEB?->getBeginn();
         $endeTOEB = $zeitraumTOEB?->getEnde();
@@ -52,22 +55,22 @@ class ProcedurePhaseExtractor
         $codeBeteiligungTOEB = $beteiligungKommunalTOEBFormal?->getCode();
 
 
-        $publicParticipationPhase = null !== $codeVerfahrensschrittKommunal
-            ? PublicParticipationPhase::fromCode($codeVerfahrensschrittKommunal)
+        $publicParticipationPhase = null !== $codeVerfahrensschrittType
+            ? PublicParticipationPhase::fromCode($codeVerfahrensschrittType)
             : null;
         $publicParticipationPhase = null !== $codeBeteiligungOeffentlichkeit
             ? PublicParticipationPhase::fromCode($codeBeteiligungOeffentlichkeit)
             : $publicParticipationPhase;
 
-        $institutionParticipationPhase = null !== $codeVerfahrensschrittKommunal
-            ? InstitutionParticipationPhase::fromCode($codeVerfahrensschrittKommunal)
+        $institutionParticipationPhase = null !== $codeVerfahrensschrittType
+            ? InstitutionParticipationPhase::fromCode($codeVerfahrensschrittType)
             : null;
         $institutionParticipationPhase = null !== $codeBeteiligungTOEB
             ? InstitutionParticipationPhase::fromCode($codeBeteiligungTOEB)
             : $institutionParticipationPhase;
 
         $this->logWarningsForMissingCodes(
-            $codeVerfahrensschrittKommunal,
+            $codeVerfahrensschrittType,
             $codeBeteiligungOeffentlichkeit,
             $codeBeteiligungTOEB
         );
@@ -82,6 +85,21 @@ class ProcedurePhaseExtractor
             $durchgangOeffentlichkeit,
             $durchgangTOEB
         );
+    }
+
+    private function getSpecificVerfahrensschrittType(
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType $beteiligungType
+    ): null| CodeVerfahrensschrittKommunalType|CodeVerfahrensschrittPlanfeststellungType {
+        $verfahrensschrittType = null;
+        if ($beteiligungType instanceof BeteiligungKommunalType) {
+            $verfahrensschrittType = $beteiligungType->getVerfahrensschrittKommunal();
+        }
+        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
+            $verfahrensschrittType = $beteiligungType->getVerfahrensschrittPlanfeststellung();
+        }
+
+
+        return $verfahrensschrittType;
     }
 
     private function logWarningsForMissingCodes(
