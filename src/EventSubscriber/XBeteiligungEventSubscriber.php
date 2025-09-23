@@ -97,7 +97,7 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
 
                 return;
             }
-            
+
             $this->rabbitMQMessageBroker->handleStatementCreatedEvent($event);
         } catch (Exception $exception) {
             $this->cockpitLogger->error('XBeteiligung: Error in handleStatementCreatedEvent', [
@@ -125,6 +125,11 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
                 $xml = $this->xBeteiligungService->createXMLFor301($event->getProcedure());
                 $this->createProcedureMessage($xml, $event->getProcedure(), RaumordnungInitiieren0301::class);
             }
+
+            if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
+                $xml = $this->xBeteiligungService->createXMLFor201($event->getProcedure());
+                $this->createProcedureMessage($xml, $event->getProcedure(), PlanfeststellungInitiieren0201::class);
+            }
         } catch (Exception $exception) {
             $this->cockpitLogger->error('XBeteiligung: Error in newProcedureCreated event handler', [
                 'procedureId' => $event->getProcedure()->getId(),
@@ -134,11 +139,6 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
                 'trace' => $exception->getTraceAsString()
             ]);
             throw $exception;
-        }
-
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
-            $xml = $this->xBeteiligungService->createXMLFor201($event->getProcedure());
-            $this->createProcedureMessage($xml, $event->getProcedure(), PlanfeststellungInitiieren0201::class);
         }
     }
 
