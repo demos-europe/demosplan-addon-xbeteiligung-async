@@ -178,4 +178,10 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
             $proceduresCreated
         );
     }
+
+
+    protected function validateCreatedProcedure($createdProcedure, ?string $auditId): AddonTestResult
+    {
+        // TODO: Implement validateCreatedProcedure() method.
+    }
 }

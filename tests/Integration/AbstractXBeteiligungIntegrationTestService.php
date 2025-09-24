@@ -105,6 +105,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      * @return AddonTestResult The test result
      */
     abstract protected function validateTestResult(array $createdProcedures, ?string $auditId): AddonTestResult;
+    abstract protected function validateCreatedProcedure($createdProcedure, ?string $auditId): AddonTestResult;
 
     /**
      * Enable assertion-based validation mode (fail fast on first error).
@@ -168,13 +169,17 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
                 echo "🔧 INTEGRATION_DEBUG: Processing scenario '{$scenarioName}' directly...\n";
 
+
                 // Check EntityManager status before processing
                 $currentEM = $container->get(EntityManagerInterface::class);
                 echo "🔧 INTEGRATION_DEBUG: EntityManager open before processing: " . ($currentEM->isOpen() ? 'YES' : 'NO') . "\n";
 
                 try {
                     $result = $messageProcessor->processIncomingMessage($messageData);
-                    $this->debugProcessMessage($result);
+
+                    // validate that procedure was created
+                    $this->validateProcedureAgainstScenarioAfterCreation($scenarioName, $isValid);
+
                 } catch (Exception $e) {
                     $this->debugProcessMessageException($e);
                 }
@@ -752,6 +757,47 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function validateProcedureAgainstScenario(ProcedureInterface $procedure, string $scenarioName, bool $isValid): array
     {
+        $scenarioData = $this->getFullScenario($scenarioName, $isValid);
+
+        // USE REAL PHPUNIT ASSERTIONS! ✅
+        $this->testCase->assertEquals(
+            $scenarioData['plan_name'],
+            $procedure->getName(),
+            "Expected procedure name '{$scenarioData['plan_name']}', got '{$procedure->getName()}' for scenario '{$scenarioName}'"
+        );
+        echo "✅ Procedure name PHPUnit assertion passed: '{$procedure->getName()}'\n";
+
+        $this->testCase->assertEquals(
+            $scenarioData['beschreibung_planungsanlass'],
+            $procedure->getDesc(),
+            "Expected procedure description to match scenario '{$scenarioName}'"
+        );
+        echo "✅ Procedure description PHPUnit assertion passed\n";
+
+        $this->testCase->assertEquals(
+            $scenarioData['org_name'],
+            $procedure->getOrga()->getName(),
+            "Expected organization name '{$scenarioData['org_name']}' for scenario '{$scenarioName}'"
+        );
+        echo "✅ Procedure organization PHPUnit assertion passed: '{$procedure->getOrga()->getName()}'\n";
+
+        $this->testCase->assertNotNull($procedure->getSettings()->getTerritory(), "Territory should not be null");
+        $this->testCase->assertNotNull($procedure->getProcedureType(), "Procedure type should not be null");
+        $this->testCase->assertNotNull($procedure->getCustomer(), "Customer should not be null");
+        echo "✅ All required fields PHPUnit assertions passed\n";
+
+        return [
+            'success' => true,
+            'procedure' => $procedure,
+            'scenario' => $scenarioName,
+            'errors' => []
+        ];
+
+    }
+
+    protected function validateProcedureAgainstScenarioAfterCreation(string $scenarioName, bool $isValid): array
+    {
+        $procedure = ProcedureFactory::last()->_real();
         $scenarioData = $this->getFullScenario($scenarioName, $isValid);
 
         // USE REAL PHPUNIT ASSERTIONS! ✅
