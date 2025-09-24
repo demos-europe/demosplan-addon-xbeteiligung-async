@@ -226,8 +226,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                 $entityManager->getConnection()->rollBack();
             }
 
-            $this->debugDatabaseException($entityManager, $e);
-
             return new AddonTestResult(
                 false,
                 "Exception during event processing: " . $e->getMessage(),
@@ -256,39 +254,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     private function debugProcessMessageException($e) {
         echo "🚨 INTEGRATION_DEBUG: Exception during direct processing: {$e->getMessage()}\n";
         echo "🚨 INTEGRATION_DEBUG: Exception type: " . get_class($e) . "\n";
-    }
-
-    private function debugAuditDetails($auditId, $entityManager) {
-        echo "✅ Found audit entry from event processing: {$auditId}\n";
-
-        // Check for error details in audit entry that might explain why procedure creation failed
-        $auditDetails = $this->getAuditEntryDetails($entityManager, $auditId);
-        if ($auditDetails) {
-            if (isset($auditDetails['error_details']) && !empty($auditDetails['error_details'])) {
-                echo "❌ Audit entry contains error details: {$auditDetails['error_details']}\n";
-            }
-            if (isset($auditDetails['status']) && $auditDetails['status'] !== 'processed') {
-                echo "⚠️ Audit entry status: {$auditDetails['status']}\n";
-            }
-            if (empty($auditDetails['procedure_id'])) {
-                echo "⚠️ No procedure_id in audit entry - procedure creation likely failed\n";
-            } else {
-                echo "✅ Audit entry has procedure_id: {$auditDetails['procedure_id']}\n";
-            }
-        }
-    }
-
-    private function debugDatabaseException($entityManager, $e) {
-        echo "💥 Exception during message processing: {$e->getMessage()}\n";
-        echo "   File: {$e->getFile()}:{$e->getLine()}\n";
-        echo "   EntityManager open: " . ($entityManager->isOpen() ? 'YES' : 'NO') . "\n";
-
-        // Show the full stack trace for debugging
-        echo "🔍 Stack trace:\n";
-        $stackLines = explode("\n", $e->getTraceAsString());
-        foreach (array_slice($stackLines, 0, 10) as $line) {
-            echo "   {$line}\n";
-        }
     }
 
     public function cleanupTestData(ContainerInterface $container): void
