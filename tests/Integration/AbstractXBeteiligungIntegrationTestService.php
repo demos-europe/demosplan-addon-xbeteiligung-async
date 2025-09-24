@@ -9,6 +9,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
+use demosplan\DemosPlanCoreBundle\DataGenerator\Factory\Procedure\ProcedureFactory;
 use Exception;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonIntegrationTestInterface;
@@ -32,6 +33,7 @@ use Psr\Log\NullLogger;
 use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Zenstruck\Foundry\Persistence\Proxy;
 
 /**
  * Abstract base class for XBeteiligung integration tests.
@@ -133,7 +135,8 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
         // Capture procedures before processing using repository approach
         $procedureRepository = $container->get(ProcedureRepository::class);
-        $initialProcedures = $this->captureRelevantProcedures($procedureRepository);
+        $initialProcedures  = ProcedureFactory::findBy(['deleted' => false]);
+        //$initialProcedures = $this->captureRelevantProcedures($procedureRepository);
         $initialCount = count($initialProcedures);
         echo "📊 Initial relevant procedures: {$initialCount}\n";
 
@@ -234,7 +237,8 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         }
 
         // Capture procedures after processing and find newly created ones
-        $finalProcedures = $this->captureRelevantProcedures($procedureRepository);
+        $finalProcedures  = ProcedureFactory::findBy(['deleted' => false]);
+        //$finalProcedures = $this->captureRelevantProcedures($procedureRepository);
         $createdProcedures = $this->findNewlyCreatedProcedures($initialProcedures, $finalProcedures);
         $proceduresCreated = count($createdProcedures);
 
@@ -307,7 +311,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
     private function debugProcedureDetails($finalProcedures, $proceduresCreated, $createdProcedures) {
         echo "📊 Final relevant procedures: " . count($finalProcedures) . "\n";
-        echo "✨ Procedures created by REAL services: {$proceduresCreated}\n";
 
         if (!empty($createdProcedures)) {
             echo "📋 Created procedures:\n";
@@ -724,15 +727,16 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     protected function findNewlyCreatedProcedures(array $initialProcedures, array $finalProcedures): array
     {
         // Create map of initial procedure IDs for fast lookup
-        $initialIds = array_map(function(ProcedureInterface $p) {
-            return $p->getId();
+
+        $initialIds = array_map(function(Proxy $p) {
+            return $p->_real()->getId();
         }, $initialProcedures);
 
         $initialIdSet = array_flip($initialIds);
 
         // Find procedures in final set that weren't in initial set
-        $newProcedures = array_filter($finalProcedures, function(ProcedureInterface $p) use ($initialIdSet) {
-            return !isset($initialIdSet[$p->getId()]);
+        $newProcedures = array_filter($finalProcedures, function(Proxy $p) use ($initialIdSet) {
+            return !isset($initialIdSet[$p->_real()->getId()]);
         });
 
         return array_values($newProcedures); // Re-index array
@@ -796,21 +800,21 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
         // Analyze all scenarios to extract entity requirements
         $entityRequirements = $this->analyzeScenarioRequirements();
-        echo "📊 Found {$entityRequirements['organization_count']} unique organizations across " . count($entityRequirements['scenarios']) . " scenarios\n";
+        //echo "📊 Found {$entityRequirements['organization_count']} unique organizations across " . count($entityRequirements['scenarios']) . " scenarios\n";
 
         // Create required procedure type first (must match config: addon_xbeteiligung_async_procedure_type_name)
         $testProcedureType = ProcedureTypeFactory::createOne([
             'name' => 'test-procedure-type',
             'description' => 'Test procedure type for XBeteiligung integration tests',
         ])->_real();
-        echo "✅ Created procedure type: {$testProcedureType->getName()}\n";
+        //echo "✅ Created procedure type: {$testProcedureType->getName()}\n";
 
         // Create test customer with subdomain 'hh' (required for routing key mapping)
         $this->testCustomer = CustomerFactory::createOne([
             'subdomain' => 'hh',
             'name' => 'Test Hamburg Customer for XBeteiligung',
         ])->_real();
-        echo "✅ Created test customer: {$this->testCustomer->getName()} (subdomain: {$this->testCustomer->getSubdomain()})\n";
+        //echo "✅ Created test customer: {$this->testCustomer->getName()} (subdomain: {$this->testCustomer->getSubdomain()})\n";
 
         // Create organizations and users dynamically based on scenario requirements
         $this->createDynamicOrganizationsAndUsers($container, $entityRequirements);
@@ -840,7 +844,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                     'plan_name' => $scenarioInfo['plan_name'] ?? 'Unknown Plan'
                 ];
 
-                echo "🔍 Scenario '{$scenarioName}' requires organization: '{$orgName}'\n";
+                //echo "🔍 Scenario '{$scenarioName}' requires organization: '{$orgName}'\n";
 
             } catch (Exception $e) {
                 echo "❌ Failed to analyze scenario '{$scenarioName}': {$e->getMessage()}\n";

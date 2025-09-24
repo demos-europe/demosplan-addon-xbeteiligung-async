@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
 
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonTestResult;
+use Exception;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -65,6 +66,8 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
      */
     protected function validateTestResult(array $createdProcedures, ?string $auditId): AddonTestResult
     {
+
+
         $proceduresCreated = count($createdProcedures);
 
         // For valid scenarios, we EXPECT procedures to be created
@@ -84,11 +87,6 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
             );
         }
 
-        // Debug: Show all created procedures
-        echo "🔍 DEBUG: Created procedures:\n";
-        foreach ($createdProcedures as $i => $procedure) {
-            echo "   [$i] Name: '{$procedure->getName()}', Org: '{$procedure->getOrga()->getName()}'\n";
-        }
 
         // Validate each created procedure against scenario expectations
         $scenarios = $this->getTestScenarios();
@@ -98,35 +96,19 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
         foreach ($scenarios as [$scenarioName, $isValid]) {
             // Find procedures that should match this scenario
             echo "🔍 DEBUG: Looking for scenario '{$scenarioName}' procedures...\n";
+            $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
+            $expectedName = $scenarioInfo['plan_name'];
+            foreach ($createdProcedures as $procedure) {
+                if ($procedure->getName() === $expectedName) {
+                    echo "✅ Found expected procedure: {$procedure->getName()}\n";
 
-            $matchingProcedures = array_filter($createdProcedures, function($procedure) use ($scenarioName, $isValid) {
-                try {
                     $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
                     $expectedName = $scenarioInfo['plan_name'] ?? 'NOT_SET';
-                    $actualName = $procedure->getName();
-
-                    echo "🔍 DEBUG: Comparing procedure '{$actualName}' vs expected '{$expectedName}'\n";
-
-                    return isset($scenarioInfo['plan_name']) && $procedure->getName() === $scenarioInfo['plan_name'];
-                } catch (\Exception $e) {
-                    echo "🚨 DEBUG: Exception in scenario matching: {$e->getMessage()}\n";
-                    return false;
-                }
-            });
-
-            if (empty($matchingProcedures)) {
-                $validationErrors[] = "No procedure found for scenario '{$scenarioName}'";
-                continue;
-            }
-
-            foreach ($matchingProcedures as $procedure) {
-                $validationResult = $this->validateProcedureAgainstScenario($procedure, $scenarioName, $isValid);
-                $validationResults[] = $validationResult;
-
-                if (!$validationResult['success']) {
-                    $validationErrors = array_merge($validationErrors, $validationResult['errors']);
+                    $validationResult = $this->validateProcedureAgainstScenario($procedure->_real(), $scenarioName, $isValid);
+                    $validationResults[] = $validationResult;
                 }
             }
+
         }
 
         // If we have validation errors, return failure with details
