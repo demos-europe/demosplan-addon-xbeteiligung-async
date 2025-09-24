@@ -7,6 +7,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
+use DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use demosplan\DemosPlanCoreBundle\DataGenerator\Factory\Procedure\ProcedureFactory;
@@ -288,7 +289,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         }
 
         $commonHelpers = new CommonHelpers(new NullLogger());
-        $this->xmlFactory = new \DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory(
+        $this->xmlFactory = new XBeteiligung401TestFactory(
             $this->getAddonRootPath(),
             $commonHelpers
         );
