@@ -175,9 +175,22 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
                 try {
                     $result = $messageProcessor->processIncomingMessage($messageData);
-
                     // validate that procedure was created
+
+                    $finalProceduresNEW  = ProcedureFactory::findBy(['deleted' => false]);
+
+                    $initialCount = count($finalProceduresNEW);
+
+                    echo "💾 Final procedure COUNT {$initialCount}\n";
                     $this->validateProcedureAgainstScenarioAfterCreation($scenarioName, $isValid);
+
+                    // todo (test audit entry)
+                    //echo "🔍 Searching for audit entries created during event processing...\n";
+                    //$auditId = $this->findLatestAuditEntry($entityManager);
+
+                    /*if ($auditId) {
+                        $this->debugAuditDetails($auditId, $entityManager);
+                    }*/
 
                 } catch (Exception $e) {
                     $this->debugProcessMessageException($e);
@@ -188,14 +201,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             // Check if messages were processed from the queue
             $messageCountAfterEvent = $this->channel->queue_declare($this->queueName, true, true, false, false)[1];
             echo "📊 Messages in queue after event processing: {$messageCountAfterEvent}\n";
-
-            // Look for audit entries created during event processing
-            echo "🔍 Searching for audit entries created during event processing...\n";
-            $auditId = $this->findLatestAuditEntry($entityManager);
-
-            if ($auditId) {
-                $this->debugAuditDetails($auditId, $entityManager);
-            }
 
             // Commit transaction
             // Check if EntityManager is still open (XBeteiligung processing might have closed it)
@@ -355,14 +360,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
             $commonHelpers
         );
     }
-
-    private function getAddonRootPath(): string
-    {
-        // Use reflection to get the current class directory and go up to addon root
-      $reflectionClass = new \ReflectionClass($this);
-      return dirname($reflectionClass->getFileName(), 3); // Go up 3 levels:Integration -> tests -> addon-root
-  }
-
 
 
     /**
@@ -641,48 +638,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         }
     }
 
-    /**
-     * Capture procedures that might be relevant to our test scenarios.
-     * This includes procedures created recently or with names matching our test scenarios.
-     *
-     * @param ProcedureRepository $repository
-     * @return ProcedureInterface[]
-     */
-    protected function captureRelevantProcedures(ProcedureRepository $repository): array
-    {
-        // Get all procedures created in the last minute to catch test-created procedures
-        $recentThreshold = new \DateTime('-1 minute');
-
-        // Use query builder for more flexible querying
-        $qb = $repository->createQueryBuilder('p')
-            ->leftJoin('p.orga', 'o')
-            ->where('p.createdDate >= :threshold')
-            ->setParameter('threshold', $recentThreshold)
-            ->orderBy('p.createdDate', 'DESC');
-
-        // Also look for procedures with names matching our test scenarios
-        $scenarios = $this->getTestScenarios();
-        $testNames = [];
-
-        foreach ($scenarios as [$scenarioName, $isValid]) {
-            try {
-                $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
-                if (isset($scenarioInfo['plan_name'])) {
-                    $testNames[] = $scenarioInfo['plan_name'];
-                }
-            } catch (\Exception $e) {
-                // Skip if scenario info not available
-                continue;
-            }
-        }
-
-        if (!empty($testNames)) {
-            $qb->orWhere('p.name IN (:testNames)')
-               ->setParameter('testNames', $testNames);
-        }
-
-        return $qb->getQuery()->getResult();
-    }
 
     /**
      * Find procedures that were created between the initial and final snapshots.
@@ -759,7 +714,8 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
     protected function validateProcedureAgainstScenarioAfterCreation(string $scenarioName, bool $isValid): array
     {
-        $procedure = ProcedureFactory::last()->_real();
+        echo "Asserting procedure details with Scenario : '{$scenarioName}'\n";
+        $procedure = ProcedureFactory::last('createdDate')->_real();
         $scenarioData = $this->getFullScenario($scenarioName, $isValid);
 
         // USE REAL PHPUNIT ASSERTIONS! ✅
