@@ -277,53 +277,32 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function loadXmlFactory(): void
     {
-        /*$factoryClassName = self::FACTORY_CLASS_NAME;
+        $factoryFile = $this->getAddonRootPath() . '/tests/DataFactory/XBeteiligung401TestFactory.php';
 
-        if (!class_exists($factoryClassName)) {
-            throw new RuntimeException("Factory class not found via autoloader: {$factoryClassName}");
-        }
-
-        $commonHelpers = new CommonHelpers(new NullLogger());
-        $this->xmlFactory = new $factoryClassName(
-            $this->getAddonRootPath(),
-            $commonHelpers
-        );*/
-
-
-        // Manually require the factory file (following the same pattern as this integration test loading)
-        $factoryFile = __DIR__ .
-            '/../DataFactory/XBeteiligung401TestFactory.php';
-
-        if (!class_exists('DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory')) {
-            if (!file_exists($factoryFile)) {
-                throw new RuntimeException("Factory file not found:
-  {$factoryFile}");
-            }
-
-            echo "📁 Manually requiring XBeteiligung401TestFactory\n";
+        if (!class_exists(self::FACTORY_CLASS_NAME) && file_exists($factoryFile)) {
             require_once $factoryFile;
-
-            if (!class_exists('DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory')) {
-                echo "❌ Available classes after require:\n";
-                $classes = get_declared_classes();
-                foreach ($classes as $class) {
-                    if (strpos($class, 'XBeteiligung') !== false) {
-                        echo "  - {$class}\n";
-                    }
-                }
-                throw new RuntimeException("Factory class not available after requiring file");
-            }
-            echo "✅ Factory class loaded successfully\n";
         }
 
+        if (!class_exists(self::FACTORY_CLASS_NAME)) {
+            throw new RuntimeException("Factory class not available: " . self::FACTORY_CLASS_NAME);
+        }
 
-        // Initialize XML factory for dynamic test data generation
         $commonHelpers = new CommonHelpers(new NullLogger());
         $this->xmlFactory = new \DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory(
-            __DIR__ . '/../..',  // Point to the addon root directory
+            $this->getAddonRootPath(),
             $commonHelpers
         );
     }
+
+    private function getAddonRootPath(): string
+    {
+        // Use reflection to get the current class directory and go up to addon root
+        $reflectionClass = new \ReflectionClass($this);
+        return dirname($reflectionClass->getFileName(), 3); // Go up 3 levels:Integration -> tests -> addon-root
+    }
+
+
+
 
 
     /**
