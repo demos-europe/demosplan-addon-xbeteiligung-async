@@ -95,7 +95,7 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
 
         foreach ($scenarios as [$scenarioName, $isValid]) {
             // Find procedures that should match this scenario
-            echo "🔍 DEBUG: Looking for scenario '{$scenarioName}' procedures...\n";
+            echo "🔍 Looking for scenario '{$scenarioName}' procedures...\n";
             $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
             $expectedName = $scenarioInfo['plan_name'];
             foreach ($createdProcedures as $procedure) {

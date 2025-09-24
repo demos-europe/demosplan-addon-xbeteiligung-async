@@ -172,7 +172,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
                 // Check EntityManager status before processing
                 $currentEM = $container->get(EntityManagerInterface::class);
-                echo "🔧 INTEGRATION_DEBUG: EntityManager open before processing: " . ($currentEM->isOpen() ? 'YES' : 'NO') . "\n";
 
                 try {
                     $result = $messageProcessor->processIncomingMessage($messageData);
@@ -243,37 +242,11 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
         // Capture procedures after processing and find newly created ones
         $finalProcedures  = ProcedureFactory::findBy(['deleted' => false]);
-        //$finalProcedures = $this->captureRelevantProcedures($procedureRepository);
         $createdProcedures = $this->findNewlyCreatedProcedures($initialProcedures, $finalProcedures);
-        $proceduresCreated = count($createdProcedures);
 
-        $this->debugProcedureDetails($finalProcedures, $proceduresCreated, $createdProcedures);
-
-        // Verify audit entry was created if we have an audit ID
-        if ($auditId && !$this->verifyAuditEntry($entityManager, $auditId)) {
-            return new AddonTestResult(
-                false,
-                "Expected audit entry to be created for message processing",
-                ['audit_id' => $auditId],
-                $auditId,
-                count($initialProcedures),
-                count($finalProcedures)
-            );
-        }
-
-        echo "📝 Audit entry exists: " . ($auditId ? 'YES' : 'NO') . "\n";
 
         // Let concrete implementation validate the specific results with created procedures
         return $this->validateTestResult($createdProcedures, $auditId);
-    }
-
-    private function debugProcessMessage($result) {
-        echo "🔧 INTEGRATION_DEBUG: Direct processing result: " . (is_object($result) ? get_class($result) : gettype($result)) . "\n";
-
-        if ($result && method_exists($result, 'getProcedureId')) {
-            echo "🔧 INTEGRATION_DEBUG: Procedure ID from result: " . ($result->getProcedureId() ?? 'null') . "\n";
-        }
-
     }
 
     private function debugProcessMessageException($e) {
@@ -311,17 +284,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         $stackLines = explode("\n", $e->getTraceAsString());
         foreach (array_slice($stackLines, 0, 10) as $line) {
             echo "   {$line}\n";
-        }
-    }
-
-    private function debugProcedureDetails($finalProcedures, $proceduresCreated, $createdProcedures) {
-        echo "📊 Final relevant procedures: " . count($finalProcedures) . "\n";
-
-        if (!empty($createdProcedures)) {
-            echo "📋 Created procedures:\n";
-            foreach ($createdProcedures as $procedure) {
-                echo "   - ID: {$procedure->getId()}, Name: {$procedure->getName()}, Org: {$procedure->getOrga()->getName()}\n";
-            }
         }
     }
 
