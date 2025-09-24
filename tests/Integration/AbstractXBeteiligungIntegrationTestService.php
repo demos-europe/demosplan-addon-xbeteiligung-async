@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
 
-use DemosEurope\DemosplanAddon\Contracts\Events\AddonMaintenanceEventInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber\XBeteiligungEventSubscriber;
+
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
-use demosplan\DemosPlanCoreBundle\Logic\User\OrgaService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration\IntegrationTestAssertions;
-use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration\IntegrationAssertionException;
 use Exception;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use demosplan\DemosPlanCoreBundle\Tests\Integration\AddonIntegrationTestInterface;
@@ -116,16 +112,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
     {
         $this->useAssertions = true;
         echo "🔄 Enabled assertion mode: Tests will fail fast on first validation error using PHPUnit assertions\n";
-    }
-
-    /**
-     * Enable error collection mode (default - collect all validation errors).
-     * This is the default mode, no need to call explicitly.
-     */
-    protected function enableErrorCollectionMode(): void
-    {
-        $this->useAssertions = false;
-        echo "🔄 Enabled error collection mode: Tests will collect all validation errors\n";
     }
 
     public function setupTestData(ContainerInterface $container, ?object $testCase = null): void
@@ -539,37 +525,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         $messageBroker->setClient($rpcClient);
 
         echo "✅ RabbitMQ transport configured with test connection\n";
-    }
-
-    /**
-     * Get the current count of procedures in the database.
-     */
-    protected function getProcedureCount(EntityManagerInterface $entityManager): int
-    {
-        try {
-            $connection = $entityManager->getConnection();
-            $result = $connection->executeQuery('SELECT COUNT(*) as count FROM _procedure')->fetchAssociative();
-
-            // Debug: Show recent procedures and check for very recent ones
-            echo "🔍 Debug: Recent procedures in database:\n";
-            $recent = $connection->executeQuery(
-                'SELECT _p_id, _p_name, _o_name, _p_created_date FROM _procedure ORDER BY _p_created_date DESC LIMIT 5'
-            )->fetchAllAssociative();
-
-            $veryRecent = $connection->executeQuery(
-                "SELECT _p_id, _p_name, _o_name, _p_created_date FROM _procedure WHERE _p_created_date >= datetime('now', '-10 seconds')"
-            )->fetchAllAssociative();
-            echo "🕒 Procedures created in last 10 seconds: " . count($veryRecent) . "\n";
-
-            foreach ($recent as $proc) {
-                echo "   ID: {$proc['_p_id']}, Name: {$proc['_p_name']}, Org: {$proc['_o_name']}, Created: {$proc['_p_created_date']}\n";
-            }
-
-            return (int) ($result['count'] ?? 0);
-        } catch (\Exception $e) {
-            echo "⚠️ Error getting procedure count: " . $e->getMessage() . "\n";
-            return 0;
-        }
     }
 
     /**
