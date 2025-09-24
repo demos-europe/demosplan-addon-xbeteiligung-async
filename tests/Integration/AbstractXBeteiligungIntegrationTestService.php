@@ -135,21 +135,18 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
         $this->configureRabbitMQTransport($container);
 
         // Capture procedures before processing using repository approach
-        $procedureRepository = $container->get(ProcedureRepository::class);
         $initialProcedures  = ProcedureFactory::findBy(['deleted' => false]);
-        //$initialProcedures = $this->captureRelevantProcedures($procedureRepository);
         $initialCount = count($initialProcedures);
-        echo "📊 Initial relevant procedures: {$initialCount}\n";
+        echo "PRE-STATUS: Procedures count: {$initialCount}\n";
 
         // Check queue and process messages
         $messageCount = $this->channel->queue_declare($this->queueName, true, true, false, false)[1];
-        echo "📊 Messages in queue before processing: {$messageCount}\n";
+        echo "PRE-STATUS: Messages in queue before processing: {$messageCount}\n";
 
         // Initialize variables
         $auditId = null;
 
         try {
-            echo "🔧 INTEGRATION_DEBUG: About to start database transaction...\n";
 
             // Get EntityManager for transaction
             $entityManager = $container->get(EntityManagerInterface::class);
@@ -167,7 +164,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                     'bau.cockpit.xyz.00.01.kommunal.Initiieren.0401'
                 );
 
-                echo "🔧 INTEGRATION_DEBUG: Processing scenario '{$scenarioName}' directly...\n";
+                echo "SCENARIO UPDATE: Processing scenario '{$scenarioName}' directly...\n";
 
 
                 // Check EntityManager status before processing
@@ -181,7 +178,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
                     $initialCount = count($finalProceduresNEW);
 
-                    echo "💾 Final procedure COUNT {$initialCount}\n";
+                    echo "POST-STATUS: Procedures count:{$initialCount}\n";
                     $this->validateProcedureAgainstScenarioAfterCreation($scenarioName, $isValid);
 
                     // todo (test audit entry)
@@ -200,7 +197,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
             // Check if messages were processed from the queue
             $messageCountAfterEvent = $this->channel->queue_declare($this->queueName, true, true, false, false)[1];
-            echo "📊 Messages in queue after event processing: {$messageCountAfterEvent}\n";
+            echo "POST-STATUS: Messages in queue after event processing: {$messageCountAfterEvent}\n";
 
             // Commit transaction
             // Check if EntityManager is still open (XBeteiligung processing might have closed it)
@@ -278,6 +275,8 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function loadXmlFactory(): void
     {
+        echo "SETUP:oad the XML factory for dynamic test data generation...\n";
+
         $factoryFile = $this->getAddonRootPath() . '/tests/DataFactory/XBeteiligung401TestFactory.php';
 
         if (!class_exists(self::FACTORY_CLASS_NAME) && file_exists($factoryFile)) {
@@ -311,6 +310,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function setupRabbitMQConnection(): void
     {
+        echo "SETUP: RabbitMQ connection...\n";
         $this->connection = new AMQPStreamConnection(
             '172.22.255.5', // RabbitMQ host from docker-compose
             5672,
@@ -325,6 +325,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function setupRabbitMQTopology(): void
     {
+        echo "SETUP: RabbitMQ topology (exchanges, queues, bindings)...\n";
         $this->channel->exchange_declare($this->exchangeName, 'topic', false, true, false);
         $this->channel->queue_declare($this->queueName, false, true, false, false, false, [
             'x-queue-type' => ['S', 'quorum']
@@ -658,9 +659,13 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
 
     protected function validateProcedureAgainstScenarioAfterCreation(string $scenarioName, bool $isValid): array
     {
-        echo "Asserting procedure details with Scenario : '{$scenarioName}'\n";
-        $procedure = ProcedureFactory::last('createdDate')->_real();
+        echo "SCENARIO UPDATE: Asserting procedure details with Scenario : '{$scenarioName}'\n";
+
+
         $scenarioData = $this->getFullScenario($scenarioName, $isValid);
+
+        $procedure = ProcedureFactory::findBy(['name' => $scenarioData['plan_name']])[0]?->_real();
+
 
         // USE REAL PHPUNIT ASSERTIONS! ✅
         $this->testCase->assertEquals(
@@ -704,25 +709,22 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      */
     protected function createTestEntities(ContainerInterface $container): void
     {
-        echo "🏭 Creating test entities dynamically based on scenario requirements...\n";
+        echo "SETUP: Creating test entities dynamically based on scenario requirements...\n";
 
         // Analyze all scenarios to extract entity requirements
         $entityRequirements = $this->analyzeScenarioRequirements();
-        //echo "📊 Found {$entityRequirements['organization_count']} unique organizations across " . count($entityRequirements['scenarios']) . " scenarios\n";
 
         // Create required procedure type first (must match config: addon_xbeteiligung_async_procedure_type_name)
         $testProcedureType = ProcedureTypeFactory::createOne([
             'name' => 'test-procedure-type',
             'description' => 'Test procedure type for XBeteiligung integration tests',
         ])->_real();
-        //echo "✅ Created procedure type: {$testProcedureType->getName()}\n";
 
         // Create test customer with subdomain 'hh' (required for routing key mapping)
         $this->testCustomer = CustomerFactory::createOne([
             'subdomain' => 'hh',
             'name' => 'Test Hamburg Customer for XBeteiligung',
         ])->_real();
-        //echo "✅ Created test customer: {$this->testCustomer->getName()} (subdomain: {$this->testCustomer->getSubdomain()})\n";
 
         // Create organizations and users dynamically based on scenario requirements
         $this->createDynamicOrganizationsAndUsers($container, $entityRequirements);
@@ -751,8 +753,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                     'org_name' => $orgName,
                     'plan_name' => $scenarioInfo['plan_name'] ?? 'Unknown Plan'
                 ];
-
-                //echo "🔍 Scenario '{$scenarioName}' requires organization: '{$orgName}'\n";
 
             } catch (Exception $e) {
                 echo "❌ Failed to analyze scenario '{$scenarioName}': {$e->getMessage()}\n";
