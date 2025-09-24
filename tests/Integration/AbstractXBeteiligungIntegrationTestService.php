@@ -105,7 +105,6 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
      * @return AddonTestResult The test result
      */
     abstract protected function validateTestResult(array $createdProcedures, ?string $auditId): AddonTestResult;
-    abstract protected function validateCreatedProcedure($createdProcedure, ?string $auditId): AddonTestResult;
 
     /**
      * Enable assertion-based validation mode (fail fast on first error).
@@ -215,7 +214,7 @@ abstract class AbstractXBeteiligungIntegrationTestService implements AddonIntegr
                     try {
                         $entityManager->getConnection()->rollBack();
                         echo "🔄 Rolled back database transaction\n";
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         echo "⚠️ Could not rollback transaction: {$e->getMessage()}\n";
                     }
                 }

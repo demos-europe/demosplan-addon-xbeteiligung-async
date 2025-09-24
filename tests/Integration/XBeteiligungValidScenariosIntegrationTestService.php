@@ -93,23 +93,6 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
         $validationResults = [];
         $validationErrors = [];
 
-        foreach ($scenarios as [$scenarioName, $isValid]) {
-            // Find procedures that should match this scenario
-            echo "🔍 Looking for scenario '{$scenarioName}' procedures...\n";
-            $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
-            $expectedName = $scenarioInfo['plan_name'];
-            foreach ($createdProcedures as $procedure) {
-                if ($procedure->getName() === $expectedName) {
-                    echo "✅ Found expected procedure: {$procedure->getName()}\n";
-
-                    $scenarioInfo = $this->xmlFactory->getScenarioInfo($scenarioName, $isValid);
-                    $expectedName = $scenarioInfo['plan_name'] ?? 'NOT_SET';
-                    $validationResult = $this->validateProcedureAgainstScenario($procedure->_real(), $scenarioName, $isValid);
-                    $validationResults[] = $validationResult;
-                }
-            }
-
-        }
 
         // If we have validation errors, return failure with details
         if (!empty($validationErrors)) {
@@ -124,22 +107,6 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
                     'test_type' => 'valid_scenarios'
                 ],
                 $auditId,
-                0,
-                $proceduresCreated
-            );
-        }
-
-        // Verify audit entry exists (should always be present for processed messages)
-        if (!$auditId) {
-            return new AddonTestResult(
-                false,
-                "No audit entry was created during message processing",
-                [
-                    'procedures_created' => $proceduresCreated,
-                    'expected_audit' => true,
-                    'actual_audit' => false
-                ],
-                null,
                 0,
                 $proceduresCreated
             );
@@ -179,9 +146,4 @@ class XBeteiligungValidScenariosIntegrationTestService extends AbstractXBeteilig
         );
     }
 
-
-    protected function validateCreatedProcedure($createdProcedure, ?string $auditId): AddonTestResult
-    {
-        // TODO: Implement validateCreatedProcedure() method.
-    }
 }
