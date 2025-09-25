@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.35 (2025-09-25)
 - fix rabbitMQ message send error for unbound procedures
 
 ## v0.34 (2025-09-23)
