@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- fix rabbitMQ message send error for unbound procedures
+
 ## v0.34 (2025-09-23)
 **Planfeststellung Message Support (DPLAN-16438)**
 - Add support for Planfeststellung 0201 message creation in XBeteiligungEventSubscriber
