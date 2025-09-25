@@ -113,6 +113,14 @@ class RabbitMQMessageBroker
         $originalAuditRecord = $this->auditService->findOriginalIncoming401Message($statementCreated->getProcedureId());
         $incomingRoutingKey = $originalAuditRecord?->getRoutingKey();
 
+        if (null === $incomingRoutingKey) {
+            $this->logger->warning('No original incoming routing key found for procedure', [
+                'procedureId' => $statementCreated->getProcedureId()
+            ]);
+
+            return $event;
+        }
+
         $this->sendResponseToRabbitMq(
             $xmlString,
             CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[AllgemeinStellungnahmeNeuabgegeben0701::class]['name'],
