@@ -96,7 +96,29 @@ class CoordinateTransformationTest extends TestCase
 
         $resultingMapData = $this->sut->setMapData($initialGeoJson);
 
-        self::assertSame($resultingGeoJson, $resultingMapData->getTerritory());
+        // The service now returns a FeatureCollection, so we need to parse it and verify the structure
+        $territoryJson = $resultingMapData->getTerritory();
+        $territory = json_decode($territoryJson, true);
+
+        // Verify it's a FeatureCollection with 2 features
+        self::assertSame('FeatureCollection', $territory['type']);
+        self::assertCount(2, $territory['features']);
+
+        // First feature should be the original WGS84 polygon
+        $originalFeature = $territory['features'][0];
+        self::assertSame('Feature', $originalFeature['type']);
+        self::assertSame('Polygon', $originalFeature['geometry']['type']);
+
+        // Second feature should be the transformed Web Mercator polygon
+        $transformedFeature = $territory['features'][1];
+        self::assertSame('Feature', $transformedFeature['type']);
+        self::assertSame('Polygon', $transformedFeature['geometry']['type']);
+
+        // Extract the transformed coordinates and verify they match expected values
+        $expectedTransformed = json_decode($resultingGeoJson, true);
+
+        // Compare the transformed coordinates from the second feature
+        self::assertSame($expectedTransformed['coordinates'], $transformedFeature['geometry']['coordinates']);
         $resultingBBox = explode(',', $resultingMapData->getBbox());
         self::assertSame(count($resultingBBox), count($boundingBox));
         $resultingMapExtent = explode(',', $resultingMapData->getMapExtent());
