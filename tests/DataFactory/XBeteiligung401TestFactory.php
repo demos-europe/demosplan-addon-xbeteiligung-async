@@ -20,7 +20,7 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Factory for generating dynamic XBeteiligung 401 test XML messages.
- * 
+ *
  * This class provides a dynamic approach to XML test generation by:
  * - Loading XML templates with placeholders
  * - Reading test scenario configurations from YAML
@@ -35,7 +35,7 @@ class XBeteiligung401TestFactory
     private const GEOJSON_DIR = 'geojson';
     private const VALID_SCENARIOS_DIR = 'scenarios/valid';
     private const INVALID_SCENARIOS_DIR = 'scenarios/invalid';
-    
+
     private string $templateContent;
     private array $scenariosConfig;
     private array $defaults;
@@ -60,7 +60,7 @@ class XBeteiligung401TestFactory
     {
         $scenarioData = $this->getScenarioData($scenarioName, $isValid);
         $parameters = $this->buildParameters($scenarioData);
-        
+
         return $this->processTemplate($parameters);
     }
 
@@ -87,13 +87,15 @@ class XBeteiligung401TestFactory
     public function getScenarioInfo(string $scenarioName, bool $isValid = true): array
     {
         $scenario = $this->getScenarioData($scenarioName, $isValid);
-        
+
         return [
             'name' => $scenarioName,
             'description' => $scenario['description'] ?? 'No description available',
             'expected_error' => $scenario['expected_error'] ?? null,
             'expected_error_type' => $scenario['expected_error_type'] ?? null,
-            'is_valid' => $isValid
+            'is_valid' => $isValid,
+            // Include the plan_name for validation matching
+            'plan_name' => $scenario['plan_name'] ?? null,
         ];
     }
 
@@ -105,7 +107,7 @@ class XBeteiligung401TestFactory
      */
     public function createAllXML(bool $isValid = true): array
     {
-        $scenarios = $isValid 
+        $scenarios = $isValid
             ? $this->scenariosConfig['valid_scenarios'] ?? []
             : $this->scenariosConfig['invalid_scenarios'] ?? [];
 
@@ -123,13 +125,13 @@ class XBeteiligung401TestFactory
     private function loadTemplate(): void
     {
         $templatePath = $this->addonRootPath . '/' . self::TEMPLATE_FILE;
-        
+
         if (!file_exists($templatePath)) {
             throw new RuntimeException("Template file not found: {$templatePath}");
         }
 
         $this->templateContent = file_get_contents($templatePath);
-        
+
         if (false === $this->templateContent) {
             throw new RuntimeException("Failed to read template file: {$templatePath}");
         }
@@ -141,14 +143,14 @@ class XBeteiligung401TestFactory
     private function loadScenarios(): void
     {
         $baseDir = $this->addonRootPath . '/' . self::SCENARIOS_BASE_DIR;
-        
+
         if (!is_dir($baseDir)) {
             throw new RuntimeException("Scenarios base directory not found: {$baseDir}");
         }
 
         // Load defaults
         $this->loadDefaults($baseDir);
-        
+
         // Load individual scenario files
         $this->scenariosConfig = [
             'valid_scenarios' => $this->loadScenariosFromDirectory($baseDir . '/' . self::VALID_SCENARIOS_DIR),
@@ -162,13 +164,13 @@ class XBeteiligung401TestFactory
     private function loadDefaults(string $baseDir): void
     {
         $defaultsPath = $baseDir . '/' . self::DEFAULTS_FILE;
-        
+
         if (!file_exists($defaultsPath)) {
             throw new RuntimeException("Defaults file not found: {$defaultsPath}");
         }
 
         $this->defaults = Yaml::parseFile($defaultsPath);
-        
+
         // Load GeoJSON for defaults if referenced
         $this->defaults = $this->loadGeoJsonForScenario($this->defaults, $baseDir);
     }
@@ -184,14 +186,14 @@ class XBeteiligung401TestFactory
 
         $scenarios = [];
         $files = glob($directory . '/*.yml');
-        
+
         foreach ($files as $file) {
             $scenarioName = pathinfo($file, PATHINFO_FILENAME);
             $scenarioData = Yaml::parseFile($file);
-            
+
             // Load GeoJSON if referenced
             $scenarioData = $this->loadGeoJsonForScenario($scenarioData, dirname($directory, 2));
-            
+
             $scenarios[$scenarioName] = $scenarioData;
         }
 
@@ -205,7 +207,7 @@ class XBeteiligung401TestFactory
     {
         if (isset($scenarioData['geltungsbereich_geojson_file'])) {
             $geoJsonPath = $baseDir . '/' . $scenarioData['geltungsbereich_geojson_file'];
-            
+
             if (file_exists($geoJsonPath)) {
                 $geoJsonContent = file_get_contents($geoJsonPath);
                 if ($geoJsonContent !== false) {
@@ -226,7 +228,7 @@ class XBeteiligung401TestFactory
     {
         $scenarioKey = $isValid ? 'valid_scenarios' : 'invalid_scenarios';
         $scenarios = $this->scenariosConfig[$scenarioKey] ?? [];
-        
+
         if (!isset($scenarios[$scenarioName])) {
             $type = $isValid ? 'valid' : 'invalid';
             throw new InvalidArgumentException("Scenario '{$scenarioName}' not found in {$type} scenarios");
@@ -242,13 +244,13 @@ class XBeteiligung401TestFactory
     {
         // Start with defaults
         $parameters = $this->defaults;
-        
+
         // Merge scenario-specific data
         $parameters = array_merge($parameters, $scenarioData);
-        
+
         // Generate dynamic values
         $parameters = $this->addDynamicParameters($parameters);
-        
+
         // Convert to template placeholder format
         return $this->convertToPlaceholders($parameters);
     }
@@ -262,9 +264,9 @@ class XBeteiligung401TestFactory
         $parameters['nachrichten_uuid'] = $parameters['nachrichten_uuid'] ?? $this->commonHelpers->uuid();
         $parameters['vorgangs_id'] = $parameters['vorgangs_id'] ?? 'ID_' . $this->commonHelpers->uuid();
         $parameters['plan_id'] = $parameters['plan_id'] ?? 'ID_' . $this->commonHelpers->uuid();
-        
+
         // Generate timestamp if not provided
-        $parameters['erstellungszeitpunkt'] = $parameters['erstellungszeitpunkt'] ?? 
+        $parameters['erstellungszeitpunkt'] = $parameters['erstellungszeitpunkt'] ??
             (new DateTime())->format('Y-m-d\TH:i:s.v\Z');
 
         return $parameters;
@@ -276,7 +278,7 @@ class XBeteiligung401TestFactory
     private function convertToPlaceholders(array $parameters): array
     {
         $placeholders = [];
-        
+
         foreach ($parameters as $key => $value) {
             // Convert snake_case to UPPER_CASE for template placeholders
             $placeholderKey = strtoupper($key);
@@ -292,13 +294,13 @@ class XBeteiligung401TestFactory
     private function processTemplate(array $parameters): string
     {
         $xml = $this->templateContent;
-        
+
         // Handle conditional sections first
         $xml = $this->processConditionalSections($xml, $parameters);
-        
+
         // Replace simple placeholders
         $xml = $this->replacePlaceholders($xml, $parameters);
-        
+
         return $xml;
     }
 
@@ -344,9 +346,9 @@ class XBeteiligung401TestFactory
     {
         $startTag = "{{#$sectionName}}";
         $endTag = "{{/$sectionName}}";
-        
+
         $pattern = '/\s*' . preg_quote($startTag, '/') . '(.*?)' . preg_quote($endTag, '/') . '\s*/s';
-        
+
         if ($include) {
             // Keep content, remove conditional tags
             $xml = preg_replace($pattern, '$1', $xml);
