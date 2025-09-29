@@ -23,6 +23,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahr
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\StellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\VerfasserType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
@@ -85,29 +86,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $status->setCode($this->statusDerStellungnahme($statementCreated->getStatus()));
         $statement->setStatus($status);
         // set Verfasser --> user data
-        $verfasser = new VerfasserType();
-        if ($this->getTypeOfPerson($statementCreated) === true) {
-            $verfasser->setPrivatperson(true);
-        }
-
-        $natuerlichePerson = new NameNatuerlichePersonType();
-        //$natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
-        $fname = new AllgemeinerNameType();
-        $lname = new AllgemeinerNameType();
-        $fname->setName($statementCreated->getMeta()->getAuthorName());
-        $lname->setName($statementCreated->getMeta()->getAuthorName());
-        $natuerlichePerson->setFamilienname($lname);
-        $natuerlichePerson->setVorname($fname);
-        //$natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
-        $verfasser->setName($natuerlichePerson);
-        $statement->setVerfasser($verfasser);
-
-        //$natuerlichePerson = new NameNatuerlichePersonType();
-        //$natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
-        $name = new AllgemeinerNameType();
-        $name->setName($statementCreated->getMeta()->getAuthorName());
-        //$natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
-        $verfasser->setName($natuerlichePerson);
+        $verfasser = $this->buildVerfasser($statementCreated, $statement);
         $statement->setVerfasser($verfasser);
 
         // set title
@@ -328,5 +307,41 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         }
 
         return $result;
+    }
+
+    private function buildVerfasser($statementCreated, $statement): VerfasserType {
+        $verfasser = new VerfasserType();
+
+        if (true === $this->getTypeOfPerson($statementCreated)) {
+            $verfasser->setPrivatperson(true);
+        } else {
+            $organisation = new OrganisationType();
+            $organisation->setName($statementCreated->getMeta()->getOrgaName());
+            $verfasser->setOrganisation($organisation);
+        }
+
+
+        $natuerlichePerson = new NameNatuerlichePersonType();
+        //$natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
+        $fname = new AllgemeinerNameType();
+        $lname = new AllgemeinerNameType();
+        $fname->setName($statementCreated->getMeta()->getAuthorName());
+        $lname->setName($statementCreated->getMeta()->getAuthorName());
+        $natuerlichePerson->setFamilienname($lname);
+        $natuerlichePerson->setVorname($fname);
+        //$natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
+        $verfasser->setName($natuerlichePerson);
+        $statement->setVerfasser($verfasser);
+
+        //$anschrift = new AnschriftType();
+        //$anschrift->setOrt($statementCreated->getMeta()->)
+
+        //$natuerlichePerson = new NameNatuerlichePersonType();
+        //$natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
+        $name = new AllgemeinerNameType();
+        $name->setName($statementCreated->getMeta()->getAuthorName());
+        //$natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
+        $verfasser->setName($natuerlichePerson);
+        return $verfasser;
     }
 }
