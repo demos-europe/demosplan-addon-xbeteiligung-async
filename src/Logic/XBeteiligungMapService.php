@@ -30,7 +30,7 @@ class XBeteiligungMapService
     /**
      * @throws JsonException
      */
-    public function setMapData(?string $geltungsbereich): ?MapData
+    public function setMapData(?string $geltungsbereich, ?string $flaechenabgrezungsUrl): ?MapData
     {
         if (null === $geltungsbereich) {
             $this->logger->warning(
@@ -122,7 +122,7 @@ class XBeteiligungMapService
         $bbox = $mapExtent;
         $mapExtent = $tempBoundingBox;
 
-        return new MapData($transformedGeoJson, $bbox, $mapExtent);
+        return new MapData($transformedGeoJson, $bbox, $mapExtent, $flaechenabgrezungsUrl);
     }
 
     private function calculateMapExtent(String $boundingBox): String
