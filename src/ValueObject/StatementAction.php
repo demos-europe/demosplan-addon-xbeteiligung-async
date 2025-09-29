@@ -11,6 +11,9 @@ use Doctrine\Common\Collections\Collection;
 
 class StatementAction extends ValueObject
 {
+    protected const AUTHOR_ANONYMOUS = 'anonym';
+    protected const AUTHOR_NAMED = 'namentlich';
+
     protected string $publicId;
     protected string $description;
     protected string $planId;
@@ -103,7 +106,7 @@ class StatementAction extends ValueObject
 
     public function getPublicUseName(): string
     {
-        return $this->publicUseName ? 'anonym' : 'namentlich';
+        return $this->publicUseName ? self::AUTHOR_ANONYMOUS : self::AUTHOR_NAMED;
     }
 
     public function setPublicUseName(bool $publicUseName): void
