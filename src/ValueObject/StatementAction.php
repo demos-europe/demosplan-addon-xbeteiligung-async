@@ -52,11 +52,24 @@ class StatementAction extends ValueObject
         $this->publicId = $publicId;
     }
 
-    //Remove html tags from original statement description
+    // Replace HTML line breaks with spaces before stripping tags
     public function getDescription(): string
     {
-        return strip_tags($this->description);
+        $withSpaces = str_replace([
+            '<br>',        // Standard HTML line break tag
+            '<br/>',       // XML/XHTML self-closing line break tag
+            '<br />',      // Self-closing line break with space (HTML5/XHTML compatible)
+            '</p>',        // Closing paragraph tag (ends a paragraph block)
+            '</li>',       // Closing list item tag (ends a bullet point or numbered item)
+            '&nbsp;'       // Non-breaking space HTML entity (prevents line wrapping)
+        ], ' ', $this->description);
+
+        $stripped = strip_tags($withSpaces);
+        return trim($stripped);
+
     }
+
+
 
     public function setDescription(string $description): void
     {
