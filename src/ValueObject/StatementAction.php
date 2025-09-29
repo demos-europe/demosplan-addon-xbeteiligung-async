@@ -52,9 +52,10 @@ class StatementAction extends ValueObject
         $this->publicId = $publicId;
     }
 
+    //Remove html tags from original statement description
     public function getDescription(): string
     {
-        return $this->description;
+        return strip_tags($this->description);
     }
 
     public function setDescription(string $description): void
