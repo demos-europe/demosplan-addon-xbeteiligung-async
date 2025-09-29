@@ -321,16 +321,35 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
             $verfasser->setOrganisation($organisation);
         }
 
-
         $natuerlichePerson = new NameNatuerlichePersonType();
-        //$natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
-        $fname = new AllgemeinerNameType();
-        $lname = new AllgemeinerNameType();
-        $fname->setName($statementCreated->getMeta()->getAuthorName());
-        $lname->setName($statementCreated->getMeta()->getAuthorName());
-        $natuerlichePerson->setFamilienname($lname);
-        $natuerlichePerson->setVorname($fname);
-        //$natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
+
+        $user = $statementCreated->getUser();
+        if (null !== $user) {
+            // Use actual user data when available
+            $natuerlichePerson->setTitel($user->getTitle());
+
+            $fname = new AllgemeinerNameType();
+            $lname = new AllgemeinerNameType();
+            $fname->setName($user->getFirstname());
+            $lname->setName($user->getLastname());
+
+            $natuerlichePerson->setFamilienname($lname);
+            $natuerlichePerson->setVorname($fname);
+            $natuerlichePerson->setAnrede($user->getGender());
+        } else {
+            // Fallback to meta data when user is null
+            $fname = new AllgemeinerNameType();
+            $lname = new AllgemeinerNameType();
+            $authorName = $statementCreated->getMeta()->getAuthorName();
+            $fname->setName($authorName);
+            $lname->setName($authorName);
+
+            $natuerlichePerson->setFamilienname($lname);
+            $natuerlichePerson->setVorname($fname);
+            // Title and gender would be null/empty when using meta data
+        }
+
+
         $verfasser->setName($natuerlichePerson);
         $statement->setVerfasser($verfasser);
 
