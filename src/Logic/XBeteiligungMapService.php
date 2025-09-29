@@ -109,7 +109,7 @@ class XBeteiligungMapService
         $bbox = $mapExtent;
         $mapExtent = $tempBoundingBox;
 
-        return new MapData($transformedGeoJson, $bbox, $mapExtent, $flaechenabgrezungsUrl);
+        return new MapData($transformedGeoJson, $bbox, $mapExtent, $flaechenabgrenzungsUrl);
     }
 
     private function calculateMapExtent(String $boundingBox): String
