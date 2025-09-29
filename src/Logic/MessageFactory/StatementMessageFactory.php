@@ -40,6 +40,8 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     private const DEFAULT_FEEDBACK_CODE = '1000'; // "E-Mail" - most common feedback method
     private const DEFAULT_PRIORITY_CODE = '3'; // "nicht vergeben" - priority not assigned
     private const DEFAULT_CONSIDERATION_CODE = '5000'; // "Die Stellungnahme wird zur Kenntnis genommen."
+
+   private const PRIVATE_PERSON  = 'Privatperson';
     /**
      * Builds a valid XBeteiligungsmessage as a response of creating a statement.
      *
@@ -83,21 +85,31 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $status->setCode($this->statusDerStellungnahme($statementCreated->getStatus()));
         $statement->setStatus($status);
         // set Verfasser --> user data
+        $verfasser = new VerfasserType();
         if ($this->getTypeOfPerson($statementCreated) === true) {
-            $verfasser = new VerfasserType();
             $verfasser->setPrivatperson(true);
-            $natuerlichePerson = new NameNatuerlichePersonType();
-            $natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
-            $fname = new AllgemeinerNameType();
-            $lname = new AllgemeinerNameType();
-            $fname->setName($statementCreated->getUser()->getFirstname());
-            $lname->setName($statementCreated->getUser()->getLastname());
-            $natuerlichePerson->setFamilienname($lname);
-            $natuerlichePerson->setVorname($fname);
-            $natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
-            $verfasser->setName($natuerlichePerson);
-            $statement->setVerfasser($verfasser);
         }
+
+        $natuerlichePerson = new NameNatuerlichePersonType();
+        //$natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
+        $fname = new AllgemeinerNameType();
+        $lname = new AllgemeinerNameType();
+        $fname->setName($statementCreated->getMeta()->getAuthorName());
+        $lname->setName($statementCreated->getMeta()->getAuthorName());
+        $natuerlichePerson->setFamilienname($lname);
+        $natuerlichePerson->setVorname($fname);
+        //$natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
+        $verfasser->setName($natuerlichePerson);
+        $statement->setVerfasser($verfasser);
+
+        //$natuerlichePerson = new NameNatuerlichePersonType();
+        //$natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
+        $name = new AllgemeinerNameType();
+        $name->setName($statementCreated->getMeta()->getAuthorName());
+        //$natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
+        $verfasser->setName($natuerlichePerson);
+        $statement->setVerfasser($verfasser);
+
         // set title
         $statement->setTitel($statementCreated->getTitle());
         // set beschreibung
@@ -149,11 +161,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
     private function getTypeOfPerson(StatementCreated $statementCreated): bool
     {
-        $privatPerson = true;
-        if ($statementCreated->getMeta()->getOrgaName() !== 'Privatperson') {
-            $privatPerson = false;
-        }
-        return $privatPerson;
+        return self::PRIVATE_PERSON === $statementCreated->getMeta()->getOrgaName();
     }
 
     private function statusDerStellungnahme($statusDerStellungnahme): string
