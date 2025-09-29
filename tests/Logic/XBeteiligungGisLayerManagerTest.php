@@ -33,6 +33,12 @@ class XBeteiligungGisLayerManagerTest extends TestCase
     private GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository;
     private ProcedureInterface $procedure;
 
+    private const PROCEDURE_ID = 'test-procedure-id';
+    private const WMS_BASE_URL = 'https://example.com/wms';
+    private const NO_URL_PROVIDED_MESSAGE = 'No flaechenabgrenzungsUrl provided';
+    private const FAILED_TO_PROCESS_MESSAGE = 'Failed to process WMS URL';
+    private const NO_LAYERS_FOUND_MESSAGE = 'No LAYERS parameter found';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -43,7 +49,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->procedure = $this->createMock(ProcedureInterface::class);
 
-        $this->procedure->method('getId')->willReturn('test-procedure-id');
+        $this->procedure->method('getId')->willReturn(self::PROCEDURE_ID);
 
         $this->sut = new XBeteiligungGisLayerManager(
             $this->entityManager,
@@ -59,33 +65,24 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
     public function testProcessWmsUrlWithNullUrl(): void
     {
-        $this->logger->expects($this->once())
-            ->method('info')
-            ->with(self::stringContains('No flaechenabgrenzungsUrl provided'));
-
-        $this->gisLayerFactory->expects($this->never())->method('createGisLayer');
+        $this->expectLoggerInfo(self::NO_URL_PROVIDED_MESSAGE);
+        $this->expectNoGisLayerCreation();
 
         $this->sut->processWmsUrl(null, $this->procedure);
     }
 
     public function testProcessWmsUrlWithEmptyUrl(): void
     {
-        $this->logger->expects($this->once())
-            ->method('info')
-            ->with(self::stringContains('No flaechenabgrenzungsUrl provided'));
-
-        $this->gisLayerFactory->expects($this->never())->method('createGisLayer');
+        $this->expectLoggerInfo(self::NO_URL_PROVIDED_MESSAGE);
+        $this->expectNoGisLayerCreation();
 
         $this->sut->processWmsUrl('', $this->procedure);
     }
 
     public function testProcessWmsUrlWithWhitespaceOnlyUrl(): void
     {
-        $this->logger->expects($this->once())
-            ->method('info')
-            ->with(self::stringContains('No flaechenabgrenzungsUrl provided'));
-
-        $this->gisLayerFactory->expects($this->never())->method('createGisLayer');
+        $this->expectLoggerInfo(self::NO_URL_PROVIDED_MESSAGE);
+        $this->expectNoGisLayerCreation();
 
         $this->sut->processWmsUrl('   ', $this->procedure);
     }
@@ -94,83 +91,43 @@ class XBeteiligungGisLayerManagerTest extends TestCase
     {
         $malformedUrl = 'not-a-valid-url';
 
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with(
-                self::stringContains('Failed to process WMS URL'),
-                self::arrayHasKey('error')
-            );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid WMS URL format - no query parameters');
+        $this->expectLoggerErrorWithException('Invalid WMS URL format - no query parameters');
 
         $this->sut->processWmsUrl($malformedUrl, $this->procedure);
     }
 
     public function testProcessWmsUrlWithMissingRequiredParameters(): void
     {
-        $urlWithoutLayers = 'https://example.com/wms?REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
+        $urlWithoutLayers = self::WMS_BASE_URL . '?REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
 
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with(
-                self::stringContains('Failed to process WMS URL'),
-                self::arrayHasKey('error')
-            );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing required WMS parameter: LAYERS');
+        $this->expectLoggerErrorWithException('Missing required WMS parameter: LAYERS');
 
         $this->sut->processWmsUrl($urlWithoutLayers, $this->procedure);
     }
 
     public function testProcessWmsUrlWithMissingBboxParameter(): void
     {
-        $urlWithoutBbox = 'https://example.com/wms?LAYERS=testlayer&REQUEST=GetMap&SRS=EPSG:25832';
+        $urlWithoutBbox = self::WMS_BASE_URL . '?LAYERS=testlayer&REQUEST=GetMap&SRS=EPSG:25832';
 
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with(
-                self::stringContains('Failed to process WMS URL'),
-                self::arrayHasKey('error')
-            );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing required WMS parameter: BBOX');
+        $this->expectLoggerErrorWithException('Missing required WMS parameter: BBOX');
 
         $this->sut->processWmsUrl($urlWithoutBbox, $this->procedure);
     }
 
     public function testProcessWmsUrlWithMissingRequestParameter(): void
     {
-        $urlWithoutRequest = 'https://example.com/wms?LAYERS=testlayer&BBOX=1,2,3,4&SRS=EPSG:25832';
+        $urlWithoutRequest = self::WMS_BASE_URL . '?LAYERS=testlayer&BBOX=1,2,3,4&SRS=EPSG:25832';
 
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with(
-                self::stringContains('Failed to process WMS URL'),
-                self::arrayHasKey('error')
-            );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing required WMS parameter: REQUEST');
+        $this->expectLoggerErrorWithException('Missing required WMS parameter: REQUEST');
 
         $this->sut->processWmsUrl($urlWithoutRequest, $this->procedure);
     }
 
     public function testProcessWmsUrlWithMissingSrsAndCrsParameters(): void
     {
-        $urlWithoutSrsOrCrs = 'https://example.com/wms?LAYERS=testlayer&BBOX=1,2,3,4&REQUEST=GetMap';
+        $urlWithoutSrsOrCrs = self::WMS_BASE_URL . '?LAYERS=testlayer&BBOX=1,2,3,4&REQUEST=GetMap';
 
-        $this->logger->expects($this->once())
-            ->method('error')
-            ->with(
-                self::stringContains('Failed to process WMS URL'),
-                self::arrayHasKey('error')
-            );
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Missing SRS or CRS parameter in WMS URL');
+        $this->expectLoggerErrorWithException('Missing SRS or CRS parameter in WMS URL');
 
         $this->sut->processWmsUrl($urlWithoutSrsOrCrs, $this->procedure);
     }
@@ -227,34 +184,10 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
     public function testProcessWmsUrlWithCaseInsensitiveParameters(): void
     {
-        $urlWithLowercaseParams = 'https://example.com/wms?layers=testlayer&request=GetMap&bbox=1,2,3,4&srs=EPSG:25832&service=wms&version=1.1.0';
+        $urlWithLowercaseParams = self::WMS_BASE_URL . '?layers=testlayer&request=GetMap&bbox=1,2,3,4&srs=EPSG:25832&service=wms&version=1.1.0';
 
-        $mockGisLayer = $this->createMock(GisLayerInterface::class);
+        $mockGisLayer = $this->createMockGisLayerWithParameterVerification('testlayer', 'wms', '1.1.0');
         $mockRootCategory = $this->createMockRootCategory();
-
-        // Verify that lowercase parameters are correctly parsed and used
-        $mockGisLayer->expects($this->once())
-            ->method('setName')
-            ->with('testlayer');
-
-        $mockGisLayer->expects($this->once())
-            ->method('setLayers')
-            ->with('testlayer');
-
-        $mockGisLayer->expects($this->once())
-            ->method('setServiceType')
-            ->with('wms');
-
-        $mockGisLayer->expects($this->once())
-            ->method('setLayerVersion')
-            ->with('1.1.0');
-
-        // Setup other required methods
-        $mockGisLayer->method('setUrl')->willReturnSelf();
-        $mockGisLayer->method('setProcedureId')->willReturnSelf();
-        $mockGisLayer->method('setType')->willReturnSelf();
-        $mockGisLayer->method('setDefaultVisibility')->willReturnSelf();
-        $mockGisLayer->method('getUrl')->willReturn('https://example.com/wms');
 
         $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory);
 
@@ -263,34 +196,10 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
     public function testProcessWmsUrlWithMixedCaseParameters(): void
     {
-        $urlWithMixedCase = 'https://example.com/wms?Layers=testlayer&Request=GetMap&BBox=1,2,3,4&Srs=EPSG:25832&Service=wms&Version=1.1.0';
+        $urlWithMixedCase = self::WMS_BASE_URL . '?Layers=testlayer&Request=GetMap&BBox=1,2,3,4&Srs=EPSG:25832&Service=wms&Version=1.1.0';
 
-        $mockGisLayer = $this->createMock(GisLayerInterface::class);
+        $mockGisLayer = $this->createMockGisLayerWithParameterVerification('testlayer', 'wms', '1.1.0');
         $mockRootCategory = $this->createMockRootCategory();
-
-        // Verify that mixed case parameters are correctly parsed and used
-        $mockGisLayer->expects($this->once())
-            ->method('setName')
-            ->with('testlayer');
-
-        $mockGisLayer->expects($this->once())
-            ->method('setLayers')
-            ->with('testlayer');
-
-        $mockGisLayer->expects($this->once())
-            ->method('setServiceType')
-            ->with('wms');
-
-        $mockGisLayer->expects($this->once())
-            ->method('setLayerVersion')
-            ->with('1.1.0');
-
-        // Setup other required methods
-        $mockGisLayer->method('setUrl')->willReturnSelf();
-        $mockGisLayer->method('setProcedureId')->willReturnSelf();
-        $mockGisLayer->method('setType')->willReturnSelf();
-        $mockGisLayer->method('setDefaultVisibility')->willReturnSelf();
-        $mockGisLayer->method('getUrl')->willReturn('https://example.com/wms');
 
         $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory);
 
@@ -299,20 +208,17 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
     public function testProcessWmsUrlWithEmptyLayersParameter(): void
     {
-        $urlWithEmptyLayers = 'https://example.com/wms?LAYERS=&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
+        $urlWithEmptyLayers = self::WMS_BASE_URL . '?LAYERS=&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
 
-        $this->logger->expects($this->once())
-            ->method('warning')
-            ->with(self::stringContains('No LAYERS parameter found'));
-
-        $this->gisLayerFactory->expects($this->never())->method('createGisLayer');
+        $this->expectLoggerWarning(self::NO_LAYERS_FOUND_MESSAGE);
+        $this->expectNoGisLayerCreation();
 
         $this->sut->processWmsUrl($urlWithEmptyLayers, $this->procedure);
     }
 
     public function testProcessWmsUrlWithLayersContainingWhitespace(): void
     {
-        $urlWithWhitespace = 'https://example.com/wms?LAYERS= layer1 , layer2 , &REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
+        $urlWithWhitespace = self::WMS_BASE_URL . '?LAYERS= layer1 , layer2 , &REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
 
         $mockGisLayer = $this->createMock(GisLayerInterface::class);
         $mockRootCategory = $this->createMockRootCategory();
@@ -345,11 +251,11 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
     public function testProcessWmsUrlWithNoRootCategory(): void
     {
-        $validUrl = 'https://example.com/wms?LAYERS=testlayer&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
+        $validUrl = self::WMS_BASE_URL . '?LAYERS=testlayer&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
 
         $this->gisLayerCategoryRepository->expects($this->once())
             ->method('getRootLayerCategory')
-            ->with('test-procedure-id')
+            ->with(self::PROCEDURE_ID)
             ->willReturn(null);
 
         $this->expectException(InvalidArgumentException::class);
@@ -360,7 +266,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
     public function testProcessWmsUrlWithInvalidUrlForCleanGeneration(): void
     {
-        $invalidUrl = 'https://example.com/wms?LAYERS=testlayer&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
+        $invalidUrl = self::WMS_BASE_URL . '?LAYERS=testlayer&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
 
         $mockGisLayer = $this->createMockGisLayer();
         $mockRootCategory = $this->createMockRootCategory();
@@ -369,14 +275,14 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $mockGisLayer->expects($this->once())
             ->method('setUrl')
-            ->with('https://example.com/wms');
+            ->with(self::WMS_BASE_URL);
 
         $this->sut->processWmsUrl($invalidUrl, $this->procedure);
     }
 
     public function testProcessWmsUrlWithoutServiceAndVersionParameters(): void
     {
-        $urlWithoutServiceVersion = 'https://example.com/wms?LAYERS=layer1&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
+        $urlWithoutServiceVersion = self::WMS_BASE_URL . '?LAYERS=layer1&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
 
         $mockGisLayer = $this->createMockGisLayer();
         $mockRootCategory = $this->createMockRootCategory();
@@ -395,7 +301,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
     public function testProcessWmsUrlWithSpecialCharactersInLayers(): void
     {
-        $urlWithSpecialChars = 'https://example.com/wms?LAYERS=layer_with-special.chars&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
+        $urlWithSpecialChars = self::WMS_BASE_URL . '?LAYERS=layer_with-special.chars&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
 
         $mockGisLayer = $this->createMockGisLayer();
         $mockRootCategory = $this->createMockRootCategory();
@@ -407,7 +313,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
     public function testProcessWmsUrlParameterExtractionAndVerification(): void
     {
-        $testUrl = 'https://example.com/wms?LAYERS=test_layer&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:4326&SERVICE=WMS&VERSION=1.1.0&FORMAT=image/png';
+        $testUrl = self::WMS_BASE_URL . '?LAYERS=test_layer&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:4326&SERVICE=WMS&VERSION=1.1.0&FORMAT=image/png';
 
         $mockGisLayer = $this->createMock(GisLayerInterface::class);
         $mockRootCategory = $this->createMockRootCategory();
@@ -446,10 +352,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
             });
 
         // Setup other methods
-        $mockGisLayer->method('setUrl')->willReturnSelf();
-        $mockGisLayer->method('setType')->willReturnSelf();
-        $mockGisLayer->method('setDefaultVisibility')->willReturnSelf();
-        $mockGisLayer->method('getUrl')->willReturn('https://example.com/wms');
+        $this->setupStandardMockGisLayerMethods($mockGisLayer);
 
         $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory);
 
@@ -460,7 +363,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         self::assertSame('test_layer', $setParameters['layers'], 'Layers parameter should be extracted correctly');
         self::assertSame('wms', $setParameters['serviceType'], 'Service type should be extracted correctly');
         self::assertSame('1.1.0', $setParameters['layerVersion'], 'Layer version should be extracted correctly');
-        self::assertSame('test-procedure-id', $setParameters['procedureId'], 'Procedure ID should be set correctly');
+        self::assertSame(self::PROCEDURE_ID, $setParameters['procedureId'], 'Procedure ID should be set correctly');
     }
 
     /**
@@ -505,8 +408,79 @@ class XBeteiligungGisLayerManagerTest extends TestCase
     }
 
     // ============================================================================
-    // HELPER METHODS AND DATA PROVIDERS
+    // HELPER METHODS FOR EXPECTATIONS
     // ============================================================================
+
+    private function expectLoggerInfo(string $message): void
+    {
+        $this->logger->expects($this->once())
+            ->method('info')
+            ->with(self::stringContains($message));
+    }
+
+    private function expectLoggerWarning(string $message): void
+    {
+        $this->logger->expects($this->once())
+            ->method('warning')
+            ->with(self::stringContains($message));
+    }
+
+    private function expectLoggerErrorWithException(string $exceptionMessage): void
+    {
+        $this->logger->expects($this->once())
+            ->method('error')
+            ->with(
+                self::stringContains(self::FAILED_TO_PROCESS_MESSAGE),
+                self::arrayHasKey('error')
+            );
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($exceptionMessage);
+    }
+
+    private function expectNoGisLayerCreation(): void
+    {
+        $this->gisLayerFactory->expects($this->never())->method('createGisLayer');
+    }
+
+    // ============================================================================
+    // HELPER METHODS FOR MOCK CREATION
+    // ============================================================================
+
+    private function createMockGisLayerWithParameterVerification(string $expectedLayerName, string $expectedServiceType, string $expectedVersion): GisLayerInterface
+    {
+        $mockGisLayer = $this->createMock(GisLayerInterface::class);
+
+        // Verify that parameters are correctly parsed and used
+        $mockGisLayer->expects($this->once())
+            ->method('setName')
+            ->with($expectedLayerName);
+
+        $mockGisLayer->expects($this->once())
+            ->method('setLayers')
+            ->with($expectedLayerName);
+
+        $mockGisLayer->expects($this->once())
+            ->method('setServiceType')
+            ->with($expectedServiceType);
+
+        $mockGisLayer->expects($this->once())
+            ->method('setLayerVersion')
+            ->with($expectedVersion);
+
+        $this->setupStandardMockGisLayerMethods($mockGisLayer);
+
+        return $mockGisLayer;
+    }
+
+    private function setupStandardMockGisLayerMethods(GisLayerInterface $mockGisLayer): void
+    {
+        $mockGisLayer->method('setUrl')->willReturnSelf();
+        $mockGisLayer->method('setProcedureId')->willReturnSelf();
+        $mockGisLayer->method('setType')->willReturnSelf();
+        $mockGisLayer->method('setDefaultVisibility')->willReturnSelf();
+        $mockGisLayer->method('getUrl')->willReturn(self::WMS_BASE_URL);
+    }
 
     private function createMockGisLayer()
     {
@@ -519,7 +493,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $mockGisLayer->method('setDefaultVisibility')->willReturnSelf();
         $mockGisLayer->method('setServiceType')->willReturnSelf();
         $mockGisLayer->method('setLayerVersion')->willReturnSelf();
-        $mockGisLayer->method('getUrl')->willReturn('https://example.com/wms');
+        $mockGisLayer->method('getUrl')->willReturn(self::WMS_BASE_URL);
 
         return $mockGisLayer;
     }
@@ -536,7 +510,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
     {
         $this->gisLayerCategoryRepository->expects($this->exactly($expectedLayerCount))
             ->method('getRootLayerCategory')
-            ->with('test-procedure-id')
+            ->with(self::PROCEDURE_ID)
             ->willReturn($mockRootCategory);
 
         $this->gisLayerFactory->expects($this->exactly($expectedLayerCount))
@@ -547,14 +521,18 @@ class XBeteiligungGisLayerManagerTest extends TestCase
             ->method('persist');
     }
 
+    // ============================================================================
+    // DATA PROVIDERS
+    // ============================================================================
+
     public static function invalidWmsUrlDataProvider(): array
     {
         return [
-            'url without query parameters' => ['https://example.com/wms'],
-            'url with empty query' => ['https://example.com/wms?'],
-            'url with only fragment' => ['https://example.com/wms#fragment'],
+            'url without query parameters' => [self::WMS_BASE_URL],
+            'url with empty query' => [self::WMS_BASE_URL . '?'],
+            'url with only fragment' => [self::WMS_BASE_URL . '#fragment'],
             'completely malformed url' => ['not-a-url-at-all'],
-            'url with special characters' => ['https://example.com/wms?LAYERS=test<>layer'],
+            'url with special characters' => [self::WMS_BASE_URL . '?LAYERS=test<>layer'],
         ];
     }
 
@@ -574,31 +552,31 @@ class XBeteiligungGisLayerManagerTest extends TestCase
                 '1.3.0'
             ],
             'basic WMS 1.1.0 with SRS' => [
-                'https://example.com/wms?LAYERS=layer1&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832&SERVICE=WMS&VERSION=1.1.0',
+                self::WMS_BASE_URL . '?LAYERS=layer1&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832&SERVICE=WMS&VERSION=1.1.0',
                 ['layer1'],
                 'wms',
                 '1.1.0'
             ],
             'WMS 1.3.0 with CRS' => [
-                'https://example.com/wms?LAYERS=layer1&REQUEST=GetMap&BBOX=1,2,3,4&CRS=EPSG:4326&SERVICE=WMS&VERSION=1.3.0',
+                self::WMS_BASE_URL . '?LAYERS=layer1&REQUEST=GetMap&BBOX=1,2,3,4&CRS=EPSG:4326&SERVICE=WMS&VERSION=1.3.0',
                 ['layer1'],
                 'wms',
                 '1.3.0'
             ],
             'multiple layers' => [
-                'https://example.com/wms?LAYERS=layer1,layer2,layer3&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832&SERVICE=WMS&VERSION=1.1.0',
+                self::WMS_BASE_URL . '?LAYERS=layer1,layer2,layer3&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832&SERVICE=WMS&VERSION=1.1.0',
                 ['layer1', 'layer2', 'layer3'],
                 'wms',
                 '1.1.0'
             ],
             'without service parameter defaults to wms' => [
-                'https://example.com/wms?LAYERS=layer1&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832&VERSION=1.1.0',
+                self::WMS_BASE_URL . '?LAYERS=layer1&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832&VERSION=1.1.0',
                 ['layer1'],
                 'wms',
                 '1.1.0'
             ],
             'without version parameter' => [
-                'https://example.com/wms?LAYERS=layer1&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832&SERVICE=WMS',
+                self::WMS_BASE_URL . '?LAYERS=layer1&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832&SERVICE=WMS',
                 ['layer1'],
                 'wms',
                 null
