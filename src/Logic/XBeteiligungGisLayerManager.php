@@ -132,7 +132,7 @@ class XBeteiligungGisLayerManager
         $gisLayer = $this->gisLayerFactory->createGisLayer();
 
         $gisLayer->setName($layerName);
-        $gisLayer->setUrl($url);
+        $gisLayer->setUrl($this->buildCleanLayerUrl($url));
         $gisLayer->setLayers($layerName);
         $gisLayer->setProcedureId($procedure->getId());
 
@@ -164,8 +164,36 @@ class XBeteiligungGisLayerManager
         $this->logger->info(self::LOG_PREFIX . 'Created GIS layer', [
             'layerName' => $layerName,
             'procedureId' => $procedure->getId(),
-            'url' => $url,
+            'cleanUrl' => $gisLayer->getUrl(),
         ]);
+    }
+
+    /**
+     * Build clean layer URL by extracting base URL components without query parameters
+     *
+     * @throws InvalidArgumentException
+     */
+    private function buildCleanLayerUrl(string $wmsUrl): string
+    {
+        $scheme = parse_url($wmsUrl, PHP_URL_SCHEME);
+        $host = parse_url($wmsUrl, PHP_URL_HOST);
+        $path = parse_url($wmsUrl, PHP_URL_PATH);
+
+        if (false === $scheme || false === $host || false === $path) {
+            $this->logger->warning(self::LOG_PREFIX . 'Unable to parse WMS URL for clean URL generation, using original URL', [
+                'wmsUrl' => $wmsUrl
+            ]);
+            return $wmsUrl;
+        }
+
+        $cleanUrl = $scheme . '://' . $host . $path;
+
+        $this->logger->debug(self::LOG_PREFIX . 'Built clean layer URL', [
+            'originalUrl' => $wmsUrl,
+            'cleanUrl' => $cleanUrl
+        ]);
+
+        return $cleanUrl;
     }
 
     /**
