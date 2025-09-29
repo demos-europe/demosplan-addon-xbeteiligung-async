@@ -482,7 +482,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $mockGisLayer->method('getUrl')->willReturn(self::WMS_BASE_URL);
     }
 
-    private function createMockGisLayer()
+    private function createMockGisLayer(): GisLayerInterface
     {
         $mockGisLayer = $this->createMock(GisLayerInterface::class);
         $mockGisLayer->method('setName')->willReturnSelf();
@@ -498,7 +498,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         return $mockGisLayer;
     }
 
-    private function createMockRootCategory()
+    private function createMockRootCategory(): GisLayerCategoryInterface
     {
         $mockRootCategory = $this->createMock(GisLayerCategoryInterface::class);
         $mockRootCategory->method('addLayer')->willReturnSelf();
