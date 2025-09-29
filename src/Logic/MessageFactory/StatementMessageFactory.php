@@ -8,6 +8,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AllgemeinerNameType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AnschriftType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameNatuerlichePersonType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701\AllgemeinStellungnahmeNeuabgegeben0701AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
@@ -333,8 +334,12 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $verfasser->setName($natuerlichePerson);
         $statement->setVerfasser($verfasser);
 
-        //$anschrift = new AnschriftType();
-        //$anschrift->setOrt($statementCreated->getMeta()->)
+        $anschrift = new AnschriftType();
+        $anschrift->setStrasse($statementCreated->getMeta()->getOrgaStreet());
+        $anschrift->setHausnummer($statementCreated->getMeta()->getHouseNumber());
+        $anschrift->setPostfach($statementCreated->getMeta()->getOrgaPostalCode());
+        $anschrift->setOrt($statementCreated->getMeta()->getOrgaCity());
+        $verfasser->setAnschrift($anschrift);
 
         //$natuerlichePerson = new NameNatuerlichePersonType();
         //$natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
