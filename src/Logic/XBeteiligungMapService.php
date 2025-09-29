@@ -96,22 +96,9 @@ class XBeteiligungMapService
         $transformedGeoJson = json_encode($featureCollection, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
         $this->logger->info('created FeatureCollection with original and transformed coordinates: ' . $transformedGeoJson);
 
-        // extract a boundingBox by getting the most bottom, most left, most right and most upper coordinate from the
-        // given polygon
-        $flatCoordinates =  $transformedCoordinates;
-        $yVals = [];
-        $xVals = [];
-        foreach ($flatCoordinates as $xyBundle) {
-            $xVals[] = $xyBundle[0];
-            $yVals[] = $xyBundle[1];
-        }
-        $xMax = max($xVals);
-        $yMax = max($yVals);
-        $xMin = min($xVals);
-        $yMin = min($yVals);
+        $bbox = $this->calculateBboxFromCoordinates($transformedCoordinates);
+        $this->logger->info('calculated bounding box from polygon coordinates', ['bbox' => $bbox]);
 
-        $bbox = implode(',', [$xMin, $yMin, $xMax, $yMax]);
-        $this->logger->info('bounding box transformed to', ['bbox' => $bbox]);
         $mapExtent = $this->calculateMapExtent($bbox);
 
         // refs: T32377 & refs: T32201 after fixing the DataBase and FE - this has to be removed as well.
@@ -149,4 +136,23 @@ class XBeteiligungMapService
 
         return $mapExtent;
     }
+
+
+    private function calculateBboxFromCoordinates(array $transformedCoordinates): string
+    {
+        $yVals = [];
+        $xVals = [];
+        foreach ($transformedCoordinates as $xyBundle) {
+            $xVals[] = $xyBundle[0];
+            $yVals[] = $xyBundle[1];
+        }
+
+        $xMax = max($xVals);
+        $yMax = max($yVals);
+        $xMin = min($xVals);
+        $yMin = min($yVals);
+
+        return implode(',', [$xMin, $yMin, $xMax, $yMax]);
+    }
+
 }

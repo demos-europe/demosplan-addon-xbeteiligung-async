@@ -32,7 +32,6 @@ class XBeteiligungGisLayerManager
 
     private const LAYER_TYPE_OVERLAY = 'overlay';
     private const DEFAULT_SERVICE_TYPE = 'wms';
-    private const LAYER_NAME_PREFIX = 'XBeteiligung';
     private const LOG_PREFIX = 'XBeteiligung GIS Layer Manager: ';
 
     public function __construct(
@@ -82,12 +81,12 @@ class XBeteiligungGisLayerManager
 
         $requiredParams = [self::WMS_PARAM_LAYERS, self::WMS_PARAM_BBOX, self::WMS_PARAM_REQUEST];
         foreach ($requiredParams as $param) {
-            if (!isset($params[$param])) {
+            if (!$this->hasParam($params, $param)) {
                 throw new InvalidArgumentException("Missing required WMS parameter: {$param}");
             }
         }
 
-        if (!isset($params[self::WMS_PARAM_SRS]) && !isset($params[self::WMS_PARAM_CRS])) {
+        if (!$this->hasParam($params, self::WMS_PARAM_SRS) && !$this->hasParam($params, self::WMS_PARAM_CRS)) {
             throw new InvalidArgumentException('Missing SRS or CRS parameter in WMS URL');
         }
 
@@ -104,7 +103,7 @@ class XBeteiligungGisLayerManager
             return [];
         }
 
-        $layersString = $params[self::WMS_PARAM_LAYERS] ?? '';
+        $layersString = $this->getParam($params, self::WMS_PARAM_LAYERS) ?? '';
         if ('' === $layersString) {
             $this->logger->warning(self::LOG_PREFIX . 'No LAYERS parameter found in WMS URL', ['url' => $url]);
 
@@ -132,7 +131,7 @@ class XBeteiligungGisLayerManager
 
         $gisLayer = $this->gisLayerFactory->createGisLayer();
 
-        $gisLayer->setName(self::LAYER_NAME_PREFIX . ": {$layerName}");
+        $gisLayer->setName($layerName);
         $gisLayer->setUrl($url);
         $gisLayer->setLayers($layerName);
         $gisLayer->setProcedureId($procedure->getId());
@@ -142,11 +141,12 @@ class XBeteiligungGisLayerManager
 
         try {
             $params = $this->parseUrlParams($url);
-            $serviceType = isset($params[self::WMS_PARAM_SERVICE]) ? strtolower($params[self::WMS_PARAM_SERVICE]) : self::DEFAULT_SERVICE_TYPE;
-            $gisLayer->setServiceType($serviceType);
+            $serviceType = $this->getParam($params, self::WMS_PARAM_SERVICE);
+            $gisLayer->setServiceType($serviceType ? strtolower($serviceType) : self::DEFAULT_SERVICE_TYPE);
 
-            if (isset($params[self::WMS_PARAM_VERSION])) {
-                $gisLayer->setLayerVersion($params[self::WMS_PARAM_VERSION]);
+            $version = $this->getParam($params, self::WMS_PARAM_VERSION);
+            if ($version) {
+                $gisLayer->setLayerVersion($version);
             }
         } catch (InvalidArgumentException $e) {
             $this->logger->warning(self::LOG_PREFIX . 'Could not parse service parameters from URL, using defaults', [
@@ -182,5 +182,34 @@ class XBeteiligungGisLayerManager
         parse_str($queryString, $params);
 
         return $params;
+    }
+
+    /**
+     * Case-insensitive parameter check
+     */
+    private function hasParam(array $params, string $paramName): bool
+    {
+        return null !== $this->getParam($params, $paramName);
+    }
+
+    /**
+     * Case-insensitive parameter retrieval
+     */
+    private function getParam(array $params, string $paramName): ?string
+    {
+        // First try exact case match
+        if (isset($params[$paramName])) {
+            return $params[$paramName];
+        }
+
+        // Then try case-insensitive search
+        $paramNameLower = strtolower($paramName);
+        foreach ($params as $key => $value) {
+            if (strtolower($key) === $paramNameLower) {
+                return $value;
+            }
+        }
+
+        return null;
     }
 }

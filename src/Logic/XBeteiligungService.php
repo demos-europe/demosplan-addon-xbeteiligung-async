@@ -1440,7 +1440,7 @@ class XBeteiligungService
      */
     private function extractOriginalGeltungsbereichFromTerritory(?string $territory): ?string
     {
-        if (null === $territory) {
+        if (null === $territory || '' === trim($territory)) {
             return null;
         }
 
