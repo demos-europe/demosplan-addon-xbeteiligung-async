@@ -168,12 +168,6 @@ class XBeteiligungGisLayerManager
         ]);
     }
 
-    public function flush(): void
-    {
-        $this->entityManager->flush();
-        $this->logger->debug(self::LOG_PREFIX . 'Flushed GIS layer changes to database');
-    }
-
     /**
      * @return array<string, string>
      * @throws InvalidArgumentException
