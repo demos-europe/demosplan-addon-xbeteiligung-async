@@ -14,14 +14,12 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\ValueObject;
 
 use DateTime;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 
 class ProcedurePhaseData extends ValueObject
 {
     public function __construct(
-        private ?PublicParticipationPhase $publicParticipationPhase,
-        private ?InstitutionParticipationPhase $institutionParticipationPhase,
+        private ?string $publicParticipationPhaseKey,
+        private ?string $institutionParticipationPhaseKey,
         private ?DateTime $publicParticipationStartDate,
         private ?DateTime $publicParticipationEndDate,
         private ?DateTime $institutionParticipationStartDate,
@@ -29,8 +27,8 @@ class ProcedurePhaseData extends ValueObject
         private ?int $publicParticipationIteration,
         private ?int $institutionParticipationIteration
     ) {
-        $this->publicParticipationPhase = $publicParticipationPhase;
-        $this->institutionParticipationPhase = $institutionParticipationPhase;
+        $this->publicParticipationPhaseKey = $publicParticipationPhaseKey;
+        $this->institutionParticipationPhaseKey = $institutionParticipationPhaseKey;
         $this->publicParticipationStartDate = $publicParticipationStartDate;
         $this->publicParticipationEndDate = $publicParticipationEndDate;
         $this->institutionParticipationStartDate = $institutionParticipationStartDate;
@@ -41,14 +39,14 @@ class ProcedurePhaseData extends ValueObject
         $this->lock();
     }
 
-    public function getPublicParticipationPhase(): ?PublicParticipationPhase
+    public function getPublicParticipationPhaseKey(): ?string
     {
-        return $this->publicParticipationPhase;
+        return $this->publicParticipationPhaseKey;
     }
 
-    public function getInstitutionParticipationPhase(): ?InstitutionParticipationPhase
+    public function getInstitutionParticipationPhaseKey(): ?string
     {
-        return $this->institutionParticipationPhase;
+        return $this->institutionParticipationPhaseKey;
     }
 
     public function getPublicParticipationStartDate(): ?DateTime
