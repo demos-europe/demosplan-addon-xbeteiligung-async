@@ -326,7 +326,10 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $user = $statementCreated->getUser();
         if (null !== $user) {
             // Use actual user data when available
-            $natuerlichePerson->setTitel($user->getTitle());
+            if (!empty($user->getTitle())) {
+                $natuerlichePerson->setTitel($user->getTitle());
+            }
+
 
             $fname = new AllgemeinerNameType();
             $lname = new AllgemeinerNameType();
@@ -335,7 +338,11 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
             $natuerlichePerson->setFamilienname($lname);
             $natuerlichePerson->setVorname($fname);
-            $natuerlichePerson->setAnrede($user->getGender());
+            if (!empty($user->getGender())) {
+                $natuerlichePerson->setAnrede($user->getGender());
+            }
+
+
         } else {
             // Fallback to meta data when user is null
             $fname = new AllgemeinerNameType();
