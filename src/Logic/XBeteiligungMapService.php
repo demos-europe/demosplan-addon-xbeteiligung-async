@@ -30,7 +30,7 @@ class XBeteiligungMapService
     /**
      * @throws JsonException
      */
-    public function setMapData(?string $geltungsbereich, ?string $flaechenabgrezungsUrl): ?MapData
+    public function setMapData(?string $geltungsbereich, ?string $flaechenabgrenzungsUrl): ?MapData
     {
         if (null === $geltungsbereich) {
             $this->logger->warning(
