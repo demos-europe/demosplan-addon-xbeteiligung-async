@@ -7,6 +7,11 @@
 - Delete InstitutionParticipationPhase, PublicParticipationPhase, and ProcedurePhaseKey enums
 - Simplify procedure phase handling by using hardcoded 'configuration' phase for all procedures
 
+### Added
+- Territory display fix for XML-processed geltungsbereich
+- Automatic GIS layer creation from flaechenabgrenzungsUrl in XBeteiligung messages
+- Support for MultiPolygon geometries
+
 ## v0.35 (2025-09-25)
 - fix rabbitMQ message send error for unbound procedures
 

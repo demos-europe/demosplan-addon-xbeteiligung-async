@@ -27,7 +27,10 @@ class XBeteiligungMapService
     }
 
 
-    public function setMapData(?string $geltungsbereich): ?MapData
+    /**
+     * @throws JsonException
+     */
+    public function setMapData(?string $geltungsbereich, ?string $flaechenabgrenzungsUrl): ?MapData
     {
         if (null === $geltungsbereich) {
             $this->logger->warning(
@@ -56,33 +59,46 @@ class XBeteiligungMapService
 
         $transformedCoordinates = [];
 
-        foreach ($polygon['coordinates'][0] as $coordinate) {
+        // Handle both Polygon and MultiPolygon structures
+        $coordinates = $polygon['coordinates'];
+        if ('MultiPolygon' === $polygon['type']) {
+            // For MultiPolygon, coordinates are nested one level deeper: coordinates[0][0]
+            $coordinates = $coordinates[0];
+        }
+
+        foreach ($coordinates[0] as $coordinate) {
             $pointSrc = new Point($coordinate[0], $coordinate[1], $proj4326);
             $pointDst = $proj4->transform($proj3857, $pointSrc);
             $transformedCoordinates[] = [$pointDst->__get('x'), $pointDst->__get('y')];
         }
 
-        $transformedGeoJson = json_encode([
-            'type' => 'Polygon',
-            'coordinates' => [$transformedCoordinates]
-        ]);
-        $this->logger->info('transformed coordinates are: ' . $transformedGeoJson);
+        // Create FeatureCollection with both original (WGS84) and transformed (Web Mercator) geometries
+        // This matches the format expected by the frontend and used in manual entries
+        $featureCollection = [
+            'type' => 'FeatureCollection',
+            'features' => [
+                [
+                    'type' => 'Feature',
+                    'geometry' => $polygon,  // Original WGS84 geometry from XML
+                    'properties' => null
+                ],
+                [
+                    'type' => 'Feature',
+                    'geometry' => [
+                        'type' => 'Polygon',
+                        'coordinates' => [$transformedCoordinates]  // Transformed Web Mercator coordinates
+                    ],
+                    'properties' => null
+                ]
+            ]
+        ];
 
-        // extract a boundingBox by getting the most bottom, most left, most right and most upper coordinate from the
-        // given polygon
-        $flatCoordinates =  $transformedCoordinates;
-        $xVals = $yVals = [];
-        foreach ($flatCoordinates as $xyBundle) {
-            $xVals[] = $xyBundle[0];
-            $yVals[] = $xyBundle[1];
-        }
-        $xMax = max($xVals);
-        $yMax = max($yVals);
-        $xMin = min($xVals);
-        $yMin = min($yVals);
+        $transformedGeoJson = json_encode($featureCollection, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+        $this->logger->info('created FeatureCollection with original and transformed coordinates: ' . $transformedGeoJson);
 
-        $bbox = implode(',', [$xMin, $yMin, $xMax, $yMax]);
-        $this->logger->info('bounding box transformed to', ['bbox' => $bbox]);
+        $bbox = $this->calculateBboxFromCoordinates($transformedCoordinates);
+        $this->logger->info('calculated bounding box from polygon coordinates', ['bbox' => $bbox]);
+
         $mapExtent = $this->calculateMapExtent($bbox);
 
         // refs: T32377 & refs: T32201 after fixing the DataBase and FE - this has to be removed as well.
@@ -93,7 +109,7 @@ class XBeteiligungMapService
         $bbox = $mapExtent;
         $mapExtent = $tempBoundingBox;
 
-        return new MapData($transformedGeoJson, $bbox, $mapExtent);
+        return new MapData($transformedGeoJson, $bbox, $mapExtent, $flaechenabgrenzungsUrl);
     }
 
     private function calculateMapExtent(String $boundingBox): String
@@ -120,4 +136,23 @@ class XBeteiligungMapService
 
         return $mapExtent;
     }
+
+
+    private function calculateBboxFromCoordinates(array $transformedCoordinates): string
+    {
+        $yVals = [];
+        $xVals = [];
+        foreach ($transformedCoordinates as $xyBundle) {
+            $xVals[] = $xyBundle[0];
+            $yVals[] = $xyBundle[1];
+        }
+
+        $xMax = max($xVals);
+        $yMax = max($yVals);
+        $xMin = min($xVals);
+        $yMin = min($yVals);
+
+        return implode(',', [$xMin, $yMin, $xMax, $yMax]);
+    }
+
 }
