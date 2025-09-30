@@ -58,10 +58,6 @@ class VerfasserBuilder
             $naturalPerson->setTitel($user->getTitle());
         }
 
-        if (!empty($user->getGender())) {
-            $naturalPerson->setAnrede($user->getGender());
-        }
-
         $firstName = $this->createAllgemeinerName($user->getFirstname());
         $lastName = $this->createAllgemeinerName($user->getLastname());
 
