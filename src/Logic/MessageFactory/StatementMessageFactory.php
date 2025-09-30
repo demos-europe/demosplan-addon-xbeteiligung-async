@@ -386,12 +386,30 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         $meta = $statementCreated->getMeta();
         $address = new AnschriftType();
+        $hasAddressData = false;
 
-        $address->setStrasse($meta->getOrgaStreet());
-        $address->setHausnummer($meta->getHouseNumber());
-        $address->setPostfach($meta->getOrgaPostalCode());
-        $address->setOrt($meta->getOrgaCity());
+        if (!empty($meta->getOrgaStreet())) {
+            $address->setStrasse($meta->getOrgaStreet());
+            $hasAddressData = true;
+        }
 
-        $verfasser->setAnschrift($address);
+        if (!empty($meta->getHouseNumber())) {
+            $address->setHausnummer($meta->getHouseNumber());
+            $hasAddressData = true;
+        }
+
+        if (!empty($meta->getOrgaPostalCode())) {
+            $address->setPostfach($meta->getOrgaPostalCode());
+            $hasAddressData = true;
+        }
+
+        if (!empty($meta->getOrgaCity())) {
+            $address->setOrt($meta->getOrgaCity());
+            $hasAddressData = true;
+        }
+
+        if ($hasAddressData) {
+            $verfasser->setAnschrift($address);
+        }
     }
 }

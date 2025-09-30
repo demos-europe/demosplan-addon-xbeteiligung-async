@@ -224,7 +224,7 @@ class StatementAction extends ValueObject
         $this->tags = $tags;
     }
 
-    public function getUser(): UserInterface
+    public function getUser(): ?UserInterface
     {
         return $this->user;
     }
