@@ -23,7 +23,6 @@ class VerfasserBuilder
         $this->setVerfasserType($verfasser, $statementCreated);
         $this->setPersonalDetails($verfasser, $statementCreated);
         $this->setAddress($verfasser, $statementCreated);
-        $this->setKommunikation($verfasser, $statementCreated);
 
         return $verfasser;
     }
@@ -158,84 +157,6 @@ class VerfasserBuilder
         if ($hasAddressData) {
             $verfasser->setAnschrift($address);
         }
-    }
-
-    private function setKommunikation(VerfasserType $verfasser, StatementCreated $statementCreated): void
-    {
-        $user = $statementCreated->getUser();
-        $feedback = $statementCreated->getFeedback();
-        $istDienstlich = $this->determineIstDienstlich($statementCreated);
-
-        // Follow same pattern as personal details and address
-        if (null !== $user && self::PRIVATE_PERSON !== $user->getFirstname()) {
-            $this->setKommunikationFromUser($verfasser, $user, $feedback, $istDienstlich);
-        } else {
-            $this->setKommunikationFromMeta($verfasser, $statementCreated, $feedback, $istDienstlich);
-        }
-    }
-
-    private function setKommunikationFromUser(VerfasserType $verfasser, $user, string $feedback, bool $istDienstlich): void
-    {
-        // Primary: Email based on feedback preference
-        if ($feedback === 'email' && !empty($user->getEmail())) {
-            $this->addEmailKommunikation($verfasser, $user->getEmail(), $istDienstlich);
-        }
-
-        // Secondary: Phone from address if available
-        $address = $user->getAddress();
-        if ($address && !empty($address->getPhone())) {
-            $this->addPhoneKommunikation($verfasser, $address->getPhone(), $istDienstlich);
-        }
-
-        // Tertiary: Alternative email from address if different
-        if ($address && !empty($address->getEmail()) && $address->getEmail() !== $user->getEmail()) {
-            $this->addEmailKommunikation($verfasser, $address->getEmail(), $istDienstlich);
-        }
-    }
-
-    private function setKommunikationFromMeta(VerfasserType $verfasser, StatementCreated $statementCreated, string $feedback, bool $istDienstlich): void
-    {
-        $meta = $statementCreated->getMeta();
-
-        // Primary: Email based on feedback preference
-        if ($feedback === 'email' && !empty($meta->getOrgaEmail())) {
-            $this->addEmailKommunikation($verfasser, $meta->getOrgaEmail(), $istDienstlich);
-        }
-
-        // Secondary: Phone from misc data if available
-        $userPhone = $meta->getMiscDataValue(StatementMetaInterface::USER_PHONE);
-        if (!empty($userPhone)) {
-            $this->addPhoneKommunikation($verfasser, $userPhone, $istDienstlich);
-        }
-    }
-
-    private function addEmailKommunikation(VerfasserType $verfasser, string $email, bool $istDienstlich): void
-    {
-        $emailKommunikation = new KommunikationType();
-        $kanal = new CodeErreichbarkeitType();
-        $kanal->setCode('email');
-        $emailKommunikation->setKanal($kanal);
-        $emailKommunikation->setKennung($email);
-        $emailKommunikation->setIstDienstlich($istDienstlich);
-        $verfasser->addToKommunikation($emailKommunikation);
-    }
-
-    private function addPhoneKommunikation(VerfasserType $verfasser, string $phone, bool $istDienstlich): void
-    {
-        $phoneKommunikation = new KommunikationType();
-        $kanal = new CodeErreichbarkeitType();
-        $kanal->setCode('phone');
-        $phoneKommunikation->setKanal($kanal);
-        $phoneKommunikation->setKennung($phone);
-        $phoneKommunikation->setIstDienstlich($istDienstlich);
-        $verfasser->addToKommunikation($phoneKommunikation);
-    }
-
-    private function determineIstDienstlich(StatementCreated $statementCreated): bool
-    {
-        // If it's a private person making the statement -> private communication (false)
-        // If it's an organization making the statement -> official/business communication (true)
-        return !$this->getTypeOfPerson($statementCreated);
     }
 
     private function getTypeOfPerson(StatementCreated $statementCreated): bool
