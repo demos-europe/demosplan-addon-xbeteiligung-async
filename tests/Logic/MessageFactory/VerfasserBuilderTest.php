@@ -36,20 +36,38 @@ class VerfasserBuilderTest extends TestCase
         $this->statementCreated->method('getUser')->willReturn($this->user);
     }
 
+    private function setupUserWithName(string $firstName, string $lastName, string $title = ''): void
+    {
+        $this->user->method('getFirstname')->willReturn($firstName);
+        $this->user->method('getLastname')->willReturn($lastName);
+        $this->user->method('getTitle')->willReturn($title);
+        $this->user->method('getAddress')->willReturn($this->address);
+    }
+
+    private function setupAddressData(string $street = '', string $houseNumber = '', string $postalCode = '', string $city = ''): void
+    {
+        $this->address->method('getStreet')->willReturn($street);
+        $this->address->method('getHouseNumber')->willReturn($houseNumber);
+        $this->address->method('getPostalCode')->willReturn($postalCode);
+        $this->address->method('getCity')->willReturn($city);
+    }
+
     private function setupEmptyAddressMocks(): void
     {
-        $this->address->method('getStreet')->willReturn('');
-        $this->address->method('getHouseNumber')->willReturn('');
-        $this->address->method('getPostalCode')->willReturn('');
-        $this->address->method('getCity')->willReturn('');
+        $this->setupAddressData();
+    }
+
+    private function setupMetaAddressData(string $street = '', string $houseNumber = '', string $postalCode = '', string $city = ''): void
+    {
+        $this->meta->method('getOrgaStreet')->willReturn($street);
+        $this->meta->method('getHouseNumber')->willReturn($houseNumber);
+        $this->meta->method('getOrgaPostalCode')->willReturn($postalCode);
+        $this->meta->method('getOrgaCity')->willReturn($city);
     }
 
     private function setupEmptyMetaAddressMocks(): void
     {
-        $this->meta->method('getOrgaStreet')->willReturn('');
-        $this->meta->method('getHouseNumber')->willReturn('');
-        $this->meta->method('getOrgaPostalCode')->willReturn('');
-        $this->meta->method('getOrgaCity')->willReturn('');
+        $this->setupMetaAddressData();
     }
 
     private function assertBasicVerfasser(VerfasserType $verfasser): void
@@ -90,15 +108,8 @@ class VerfasserBuilderTest extends TestCase
 
     public function testBuildVerfasserWithUserData(): void
     {
-        $this->user->method('getFirstname')->willReturn('John');
-        $this->user->method('getLastname')->willReturn('Doe');
-        $this->user->method('getAddress')->willReturn($this->address);
-
-        $this->address->method('getStreet')->willReturn('Main Street');
-        $this->address->method('getHouseNumber')->willReturn('123');
-        $this->address->method('getPostalCode')->willReturn('12345');
-        $this->address->method('getCity')->willReturn('Test City');
-
+        $this->setupUserWithName('John', 'Doe');
+        $this->setupAddressData('Main Street', '123', '12345', 'Test City');
         $this->meta->method('getOrgaName')->willReturn('Test Org');
         $this->setupBasicMocks();
 
@@ -122,11 +133,7 @@ class VerfasserBuilderTest extends TestCase
 
         $this->meta->method('getOrgaName')->willReturn('Privatperson');
         $this->meta->method('getAuthorName')->willReturn('Anonymous User');
-        $this->meta->method('getOrgaStreet')->willReturn('Meta Street');
-        $this->meta->method('getHouseNumber')->willReturn('456');
-        $this->meta->method('getOrgaPostalCode')->willReturn('54321');
-        $this->meta->method('getOrgaCity')->willReturn('Meta City');
-
+        $this->setupMetaAddressData('Meta Street', '456', '54321', 'Meta City');
         $this->setupBasicMocks();
 
         $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
@@ -144,10 +151,7 @@ class VerfasserBuilderTest extends TestCase
 
     public function testBuildVerfasserWithoutAddressData(): void
     {
-        $this->user->method('getFirstname')->willReturn('John');
-        $this->user->method('getLastname')->willReturn('Doe');
-        $this->user->method('getAddress')->willReturn($this->address);
-
+        $this->setupUserWithName('John', 'Doe');
         $this->setupEmptyAddressMocks();
         $this->meta->method('getOrgaName')->willReturn('Test Org');
         $this->setupEmptyMetaAddressMocks();
@@ -162,15 +166,8 @@ class VerfasserBuilderTest extends TestCase
 
     public function testBuildVerfasserWithPartialAddressData(): void
     {
-        $this->user->method('getFirstname')->willReturn('John');
-        $this->user->method('getLastname')->willReturn('Doe');
-        $this->user->method('getAddress')->willReturn($this->address);
-
-        $this->address->method('getStreet')->willReturn('Main Street');
-        $this->address->method('getHouseNumber')->willReturn('');
-        $this->address->method('getPostalCode')->willReturn('');
-        $this->address->method('getCity')->willReturn('Test City');
-
+        $this->setupUserWithName('John', 'Doe');
+        $this->setupAddressData('Main Street', '', '', 'Test City');
         $this->meta->method('getOrgaName')->willReturn('Test Org');
         $this->setupBasicMocks();
 
@@ -188,10 +185,7 @@ class VerfasserBuilderTest extends TestCase
     {
         $this->meta->method('getOrgaName')->willReturn('Meta Organization');
         $this->meta->method('getAuthorName')->willReturn('Meta Author');
-        $this->meta->method('getOrgaStreet')->willReturn('Meta Street');
-        $this->meta->method('getHouseNumber')->willReturn('789');
-        $this->meta->method('getOrgaPostalCode')->willReturn('67890');
-        $this->meta->method('getOrgaCity')->willReturn('Meta City');
+        $this->setupMetaAddressData('Meta Street', '789', '67890', 'Meta City');
 
         $this->statementCreated->method('getMeta')->willReturn($this->meta);
         $this->statementCreated->method('getUser')->willReturn(null);
