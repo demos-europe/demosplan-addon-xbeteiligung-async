@@ -384,10 +384,51 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
     private function setAddress(VerfasserType $verfasser, StatementCreated $statementCreated): void
     {
-        $meta = $statementCreated->getMeta();
+        $user = $statementCreated->getUser();
+
+        if (null !== $user && self::PRIVATE_PERSON !== $user->getFirstname()) {
+            $this->setAddressFromUser($verfasser, $user);
+        } else {
+            $this->setAddressFromMeta($verfasser, $statementCreated->getMeta());
+        }
+    }
+
+    private function setAddressFromUser(VerfasserType $verfasser, $user): void
+    {
         $address = new AnschriftType();
         $hasAddressData = false;
+        // Use user address data
+        $userAddress = $user->getAddress();
 
+        if (!empty($userAddress->getStreet())) {
+            $address->setStrasse($userAddress->getStreet());
+            $hasAddressData = true;
+        }
+
+        if (!empty($userAddress->getHouseNumber())) {
+            $address->setHausnummer($userAddress->getHouseNumber());
+            $hasAddressData = true;
+        }
+
+        if (!empty($userAddress->getPostalCode())) {
+            $address->setPostfach($userAddress->getPostalCode());
+            $hasAddressData = true;
+        }
+
+        if (!empty($userAddress->getCity())) {
+            $address->setOrt($userAddress->getCity());
+            $hasAddressData = true;
+        }
+
+        if ($hasAddressData) {
+            $verfasser->setAnschrift($address);
+        }
+    }
+
+    private function setAddressFromMeta(VerfasserType $verfasser, $meta): void
+    {
+        $address = new AnschriftType();
+        $hasAddressData = false;
         if (!empty($meta->getOrgaStreet())) {
             $address->setStrasse($meta->getOrgaStreet());
             $hasAddressData = true;
@@ -412,4 +453,5 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
             $verfasser->setAnschrift($address);
         }
     }
+
 }
