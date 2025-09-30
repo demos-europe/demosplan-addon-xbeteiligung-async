@@ -179,6 +179,13 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 $procedure->getSettings()->setTerritory($procedureDataValueObject->getMapData()->getTerritory());
                 $procedure->getSettings()->setBoundingBox($procedureDataValueObject->getMapData()->getBbox());
                 $procedure->getSettings()->setMapExtent($procedureDataValueObject->getMapData()->getMapExtent());
+
+                // Process flaechenabgrenzungsUrl for GIS layer creation
+                $this->gisLayerManager->processWmsUrl(
+                    $procedureDataValueObject->getMapData()->getFlaechenabgrenzungsUrl(),
+                    $procedure
+                );
+
                 return $procedure;
             }
         );

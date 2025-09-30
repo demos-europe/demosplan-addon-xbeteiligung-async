@@ -27,6 +27,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanart
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
+use JsonException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
@@ -532,7 +533,7 @@ class XBeteiligungService
         $participationType->setVerfahrensschrittKommunal(
             $this->getPublicProcedurePhaseCodeType($procedure)
         );
-        $participationType->setGeltungsbereich($procedure->getSettings()->getTerritory());
+        $participationType->setGeltungsbereich($this->extractOriginalGeltungsbereichFromTerritory($procedure->getSettings()->getTerritory()));
         $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure, $participationType));
         $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure, $participationType));
 
@@ -1426,5 +1427,77 @@ class XBeteiligungService
             ]);
             return null;
         }
+    }
+
+    /**
+     * Extract the original WGS84 polygon from a territory FeatureCollection.
+     *
+     * The territory field now contains a FeatureCollection with two features:
+     * 1. Original WGS84 geometry (MultiPolygon or Polygon)
+     * 2. Transformed Web Mercator geometry (Polygon)
+     *
+     * For outgoing XBeteiligung messages, we need the original WGS84 geometry.
+     */
+    private function extractOriginalGeltungsbereichFromTerritory(?string $territory): ?string
+    {
+        if (null === $territory || '' === trim($territory)) {
+            return null;
+        }
+
+        try {
+            $featureCollection = json_decode($territory, true, 512, JSON_THROW_ON_ERROR);
+            return $this->processExtractedTerritoryData($featureCollection, $territory);
+
+        } catch (JsonException $e) {
+            $this->logger->error('Failed to parse territory JSON for Geltungsbereich extraction', [
+                'territory' => $territory,
+                'error' => $e->getMessage()
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function extractGeometryFromTerritoryData(array $featureCollection, string $territory): ?string
+    {
+        $hasType = isset($featureCollection['type']);
+        $isLegacyGeometry = $hasType && in_array($featureCollection['type'], ['Polygon', 'MultiPolygon']);
+
+        // Handle legacy format (direct polygon/multipolygon)
+        if ($isLegacyGeometry) {
+            return $territory; // Already in correct format
+        }
+
+        $isFeatureCollection = $hasType && 'FeatureCollection' === $featureCollection['type'];
+        $hasFeaturesArray = isset($featureCollection['features']);
+        $hasFeatures = $hasFeaturesArray && count($featureCollection['features']) > 0;
+
+        // Handle new FeatureCollection format
+        if ($isFeatureCollection && $hasFeatures) {
+            // Return the first feature's geometry (original WGS84)
+            $originalGeometry = $featureCollection['features'][0]['geometry'];
+            return json_encode($originalGeometry, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function processExtractedTerritoryData(array $featureCollection, string $territory): ?string
+    {
+        $result = $this->extractGeometryFromTerritoryData($featureCollection, $territory);
+
+        if (null === $result) {
+            $this->logger->warning('Unable to extract original Geltungsbereich from territory format', [
+                'territory' => $territory
+            ]);
+        }
+
+        return $result;
     }
 }
