@@ -24,9 +24,13 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahr
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\StellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\VerfasserBuilder;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
 use JsonException;
+use Psr\Log\LoggerInterface;
 
 class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 {
@@ -38,6 +42,16 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     private const DEFAULT_FEEDBACK_CODE = '1000'; // "E-Mail" - most common feedback method
     private const DEFAULT_PRIORITY_CODE = '3'; // "nicht vergeben" - priority not assigned
     private const DEFAULT_CONSIDERATION_CODE = '5000'; // "Die Stellungnahme wird zur Kenntnis genommen."
+
+    public function __construct(
+        CommonHelpers $commonHelpers,
+        LoggerInterface $logger,
+        PermissionEvaluatorInterface $permissionEvaluator,
+        ReusableMessageBlocks $reusableMessageBlocks,
+        private readonly VerfasserBuilder $verfasserBuilder,
+    ) {
+        parent::__construct($commonHelpers, $logger, $permissionEvaluator, $reusableMessageBlocks);
+    }
 
     /**
      * Builds a valid XBeteiligungsmessage as a response of creating a statement.
@@ -82,8 +96,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $status->setCode($this->statusDerStellungnahme($statementCreated->getStatus()));
         $statement->setStatus($status);
         // set Verfasser --> user data
-        $verfasserBuilder = new VerfasserBuilder();
-        $verfasser = $verfasserBuilder->buildVerfasser($statementCreated);
+        $verfasser = $this->verfasserBuilder->buildVerfasser($statementCreated);
         $statement->setVerfasser($verfasser);
 
         // set title
