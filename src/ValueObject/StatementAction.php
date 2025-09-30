@@ -435,15 +435,6 @@ class StatementAction extends ValueObject
         return $mappedPhaseCode;
     }
 
-    public function getPhaseCodeKommunale($phaseKey, $publicStatement): ?string
-    {
-        return self::mapPhaseKeyKommunale($phaseKey, $publicStatement);
-    }
-    public function getPartPhaseCode($phaseKey, $publicStatement): ?string
-    {
-        return self::mapPartPhaseKey($phaseKey, $publicStatement);
-    }
-
     public function getPhaseCodeRaumordnung($phaseKey, $publicStatement): ?string
     {
         return self::mapPhaseKeyRaumordnung($phaseKey, $publicStatement);
