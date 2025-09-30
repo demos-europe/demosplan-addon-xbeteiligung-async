@@ -30,6 +30,33 @@ class VerfasserBuilderTest extends TestCase
         $this->address = $this->createMock(AddressInterface::class);
     }
 
+    private function setupBasicMocks(): void
+    {
+        $this->statementCreated->method('getMeta')->willReturn($this->meta);
+        $this->statementCreated->method('getUser')->willReturn($this->user);
+    }
+
+    private function setupEmptyAddressMocks(): void
+    {
+        $this->address->method('getStreet')->willReturn('');
+        $this->address->method('getHouseNumber')->willReturn('');
+        $this->address->method('getPostalCode')->willReturn('');
+        $this->address->method('getCity')->willReturn('');
+    }
+
+    private function setupEmptyMetaAddressMocks(): void
+    {
+        $this->meta->method('getOrgaStreet')->willReturn('');
+        $this->meta->method('getHouseNumber')->willReturn('');
+        $this->meta->method('getOrgaPostalCode')->willReturn('');
+        $this->meta->method('getOrgaCity')->willReturn('');
+    }
+
+    private function assertBasicVerfasser(VerfasserType $verfasser): void
+    {
+        $this->assertInstanceOf(VerfasserType::class, $verfasser);
+    }
+
     public function testBuildVerfasserWithPrivatePerson(): void
     {
         $this->meta->method('getOrgaName')->willReturn('Privatperson');
@@ -39,7 +66,7 @@ class VerfasserBuilderTest extends TestCase
 
         $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
 
-        $this->assertInstanceOf(VerfasserType::class, $verfasser);
+        $this->assertBasicVerfasser($verfasser);
         $this->assertTrue($verfasser->getPrivatperson());
         $this->assertNull($verfasser->getOrganisation());
     }
@@ -55,7 +82,7 @@ class VerfasserBuilderTest extends TestCase
 
         $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
 
-        $this->assertInstanceOf(VerfasserType::class, $verfasser);
+        $this->assertBasicVerfasser($verfasser);
         $this->assertNull($verfasser->getPrivatperson());
         $this->assertNotNull($verfasser->getOrganisation());
         $this->assertEquals($orgaName, $verfasser->getOrganisation()->getName());
@@ -73,12 +100,11 @@ class VerfasserBuilderTest extends TestCase
         $this->address->method('getCity')->willReturn('Test City');
 
         $this->meta->method('getOrgaName')->willReturn('Test Org');
-        $this->statementCreated->method('getMeta')->willReturn($this->meta);
-        $this->statementCreated->method('getUser')->willReturn($this->user);
+        $this->setupBasicMocks();
 
         $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
 
-        $this->assertInstanceOf(VerfasserType::class, $verfasser);
+        $this->assertBasicVerfasser($verfasser);
         $this->assertEquals('John', $verfasser->getName()->getVorname()->getName());
         $this->assertEquals('Doe', $verfasser->getName()->getFamilienname()->getName());
         $this->assertNotNull($verfasser->getAnschrift());
@@ -92,10 +118,7 @@ class VerfasserBuilderTest extends TestCase
     {
         $this->user->method('getFirstname')->willReturn('Privatperson');
         $this->user->method('getAddress')->willReturn($this->address);
-        $this->address->method('getStreet')->willReturn('');
-        $this->address->method('getHouseNumber')->willReturn('');
-        $this->address->method('getPostalCode')->willReturn('');
-        $this->address->method('getCity')->willReturn('');
+        $this->setupEmptyAddressMocks();
 
         $this->meta->method('getOrgaName')->willReturn('Privatperson');
         $this->meta->method('getAuthorName')->willReturn('Anonymous User');
@@ -104,12 +127,11 @@ class VerfasserBuilderTest extends TestCase
         $this->meta->method('getOrgaPostalCode')->willReturn('54321');
         $this->meta->method('getOrgaCity')->willReturn('Meta City');
 
-        $this->statementCreated->method('getMeta')->willReturn($this->meta);
-        $this->statementCreated->method('getUser')->willReturn($this->user);
+        $this->setupBasicMocks();
 
         $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
 
-        $this->assertInstanceOf(VerfasserType::class, $verfasser);
+        $this->assertBasicVerfasser($verfasser);
         $this->assertTrue($verfasser->getPrivatperson());
         $this->assertEquals('Anonymous User', $verfasser->getName()->getVorname()->getName());
         $this->assertEquals('Anonymous User', $verfasser->getName()->getFamilienname()->getName());
@@ -126,23 +148,14 @@ class VerfasserBuilderTest extends TestCase
         $this->user->method('getLastname')->willReturn('Doe');
         $this->user->method('getAddress')->willReturn($this->address);
 
-        $this->address->method('getStreet')->willReturn('');
-        $this->address->method('getHouseNumber')->willReturn('');
-        $this->address->method('getPostalCode')->willReturn('');
-        $this->address->method('getCity')->willReturn('');
-
+        $this->setupEmptyAddressMocks();
         $this->meta->method('getOrgaName')->willReturn('Test Org');
-        $this->meta->method('getOrgaStreet')->willReturn('');
-        $this->meta->method('getHouseNumber')->willReturn('');
-        $this->meta->method('getOrgaPostalCode')->willReturn('');
-        $this->meta->method('getOrgaCity')->willReturn('');
-
-        $this->statementCreated->method('getMeta')->willReturn($this->meta);
-        $this->statementCreated->method('getUser')->willReturn($this->user);
+        $this->setupEmptyMetaAddressMocks();
+        $this->setupBasicMocks();
 
         $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
 
-        $this->assertInstanceOf(VerfasserType::class, $verfasser);
+        $this->assertBasicVerfasser($verfasser);
         $this->assertNull($verfasser->getAnschrift());
         $this->assertNull($verfasser->getName()->getTitel());
     }
@@ -159,12 +172,11 @@ class VerfasserBuilderTest extends TestCase
         $this->address->method('getCity')->willReturn('Test City');
 
         $this->meta->method('getOrgaName')->willReturn('Test Org');
-        $this->statementCreated->method('getMeta')->willReturn($this->meta);
-        $this->statementCreated->method('getUser')->willReturn($this->user);
+        $this->setupBasicMocks();
 
         $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
 
-        $this->assertInstanceOf(VerfasserType::class, $verfasser);
+        $this->assertBasicVerfasser($verfasser);
         $this->assertNotNull($verfasser->getAnschrift());
         $this->assertEquals('Main Street', $verfasser->getAnschrift()->getStrasse());
         $this->assertEquals('Test City', $verfasser->getAnschrift()->getOrt());
@@ -186,7 +198,7 @@ class VerfasserBuilderTest extends TestCase
 
         $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
 
-        $this->assertInstanceOf(VerfasserType::class, $verfasser);
+        $this->assertBasicVerfasser($verfasser);
         $this->assertNull($verfasser->getPrivatperson());
         $this->assertNotNull($verfasser->getOrganisation());
         $this->assertEquals('Meta Organization', $verfasser->getOrganisation()->getName());
