@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.36 (2025-09-30)
 
 ### Added
 - Territory display fix for XML-processed geltungsbereich
