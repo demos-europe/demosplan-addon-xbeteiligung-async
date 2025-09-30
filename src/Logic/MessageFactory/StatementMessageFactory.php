@@ -9,6 +9,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundExcept
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AllgemeinerNameType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AnschriftType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\KommunikationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameNatuerlichePersonType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701\AllgemeinStellungnahmeNeuabgegeben0701AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
@@ -87,7 +88,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $status->setCode($this->statusDerStellungnahme($statementCreated->getStatus()));
         $statement->setStatus($status);
         // set Verfasser --> user data
-        $verfasser = $this->buildVerfasser($statementCreated, $statement);
+        $verfasser = $this->buildVerfasser($statementCreated);
         $statement->setVerfasser($verfasser);
 
         // set title
@@ -310,69 +311,87 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         return $result;
     }
 
-    private function buildVerfasser($statementCreated, $statement): VerfasserType {
+    private function buildVerfasser(StatementCreated $statementCreated): VerfasserType
+    {
         $verfasser = new VerfasserType();
 
-        if (true === $this->getTypeOfPerson($statementCreated)) {
+        $this->setVerfasserType($verfasser, $statementCreated);
+        $this->setPersonalDetails($verfasser, $statementCreated);
+        $this->setAddress($verfasser, $statementCreated);
+
+        return $verfasser;
+    }
+
+    private function setVerfasserType(VerfasserType $verfasser, StatementCreated $statementCreated): void
+    {
+        if ($this->getTypeOfPerson($statementCreated)) {
             $verfasser->setPrivatperson(true);
         } else {
             $organisation = new OrganisationType();
             $organisation->setName($statementCreated->getMeta()->getOrgaName());
             $verfasser->setOrganisation($organisation);
         }
+    }
 
-        $natuerlichePerson = new NameNatuerlichePersonType();
-
+    private function setPersonalDetails(VerfasserType $verfasser, StatementCreated $statementCreated): void
+    {
         $user = $statementCreated->getUser();
-        if (null !== $user) {
-            // Use actual user data when available
-            if (!empty($user->getTitle())) {
-                $natuerlichePerson->setTitel($user->getTitle());
-            }
+        $naturalPerson = new NameNatuerlichePersonType();
 
-
-            $fname = new AllgemeinerNameType();
-            $lname = new AllgemeinerNameType();
-            $fname->setName($user->getFirstname());
-            $lname->setName($user->getLastname());
-
-            $natuerlichePerson->setFamilienname($lname);
-            $natuerlichePerson->setVorname($fname);
-            if (!empty($user->getGender())) {
-                $natuerlichePerson->setAnrede($user->getGender());
-            }
-
-
+        if (null !== $user && self::PRIVATE_PERSON !== $user->getFirstname()) {
+            $this->setPersonalDetailsFromUser($naturalPerson, $user);
         } else {
-            // Fallback to meta data when user is null
-            $fname = new AllgemeinerNameType();
-            $lname = new AllgemeinerNameType();
-            $authorName = $statementCreated->getMeta()->getAuthorName();
-            $fname->setName($authorName);
-            $lname->setName($authorName);
-
-            $natuerlichePerson->setFamilienname($lname);
-            $natuerlichePerson->setVorname($fname);
-            // Title and gender would be null/empty when using meta data
+            $this->setPersonalDetailsFromMeta($naturalPerson, $statementCreated);
         }
 
+        $verfasser->setName($naturalPerson);
+    }
 
-        $verfasser->setName($natuerlichePerson);
-        $statement->setVerfasser($verfasser);
+    private function setPersonalDetailsFromUser(NameNatuerlichePersonType $naturalPerson, $user): void
+    {
+        if (!empty($user->getTitle())) {
+            $naturalPerson->setTitel($user->getTitle());
+        }
 
-        $anschrift = new AnschriftType();
-        $anschrift->setStrasse($statementCreated->getMeta()->getOrgaStreet());
-        $anschrift->setHausnummer($statementCreated->getMeta()->getHouseNumber());
-        $anschrift->setPostfach($statementCreated->getMeta()->getOrgaPostalCode());
-        $anschrift->setOrt($statementCreated->getMeta()->getOrgaCity());
-        $verfasser->setAnschrift($anschrift);
+        if (!empty($user->getGender())) {
+            $naturalPerson->setAnrede($user->getGender());
+        }
 
-        //$natuerlichePerson = new NameNatuerlichePersonType();
-        //$natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
-        $name = new AllgemeinerNameType();
-        $name->setName($statementCreated->getMeta()->getAuthorName());
-        //$natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
-        $verfasser->setName($natuerlichePerson);
-        return $verfasser;
+        $firstName = $this->createAllgemeinerName($user->getFirstname());
+        $lastName = $this->createAllgemeinerName($user->getLastname());
+
+        $naturalPerson->setVorname($firstName);
+        $naturalPerson->setFamilienname($lastName);
+    }
+
+    private function setPersonalDetailsFromMeta(NameNatuerlichePersonType $naturalPerson, StatementCreated $statementCreated): void
+    {
+        $authorName = $statementCreated->getMeta()->getAuthorName();
+        $firstName = $this->createAllgemeinerName($authorName);
+        $lastName = $this->createAllgemeinerName($authorName);
+
+        $naturalPerson->setVorname($firstName);
+        $naturalPerson->setFamilienname($lastName);
+    }
+
+    private function createAllgemeinerName(string $name): AllgemeinerNameType
+    {
+        $nameType = new AllgemeinerNameType();
+        $nameType->setName($name);
+
+        return $nameType;
+    }
+
+    private function setAddress(VerfasserType $verfasser, StatementCreated $statementCreated): void
+    {
+        $meta = $statementCreated->getMeta();
+        $address = new AnschriftType();
+
+        $address->setStrasse($meta->getOrgaStreet());
+        $address->setHausnummer($meta->getHouseNumber());
+        $address->setPostfach($meta->getOrgaPostalCode());
+        $address->setOrt($meta->getOrgaCity());
+
+        $verfasser->setAnschrift($address);
     }
 }
