@@ -43,6 +43,10 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     private const DEFAULT_PRIORITY_CODE = '3'; // "nicht vergeben" - priority not assigned
     private const DEFAULT_CONSIDERATION_CODE = '5000'; // "Die Stellungnahme wird zur Kenntnis genommen."
 
+    private const DEFAULT_PROCEDURE_PHASE_CODE = '0815';
+
+    private const LIST_VERSION_ID = '3';
+
     public function __construct(
         CommonHelpers $commonHelpers,
         LoggerInterface $logger,
@@ -119,12 +123,8 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $this->getProcedurePhase($statementCreated, $statement);
         // set verfahrensteilschritt
         $partParticipationType = new CodeVerfahrensteilschrittType();
-        $phaseCode = $statementCreated->getPartPhaseCode(
-            $statementCreated->getPhase(),
-            $statementCreated->getPublicStatement()
-        );
-        $partParticipationType->setCode($phaseCode);
-        $partParticipationType->setListVersionID('3');
+        $partParticipationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
+        $partParticipationType->setListVersionID(self::LIST_VERSION_ID);
         $statement->setVerfahrensteilschritt($partParticipationType);
         // set priority
         $priority = new CodePrioritaetDerStellungnahmeType();
@@ -255,20 +255,22 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     {
         if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
             $participationType = new CodeVerfahrensschrittKommunalType();
-            $phaseCode = $statementCreated->getPhaseCodeKommunale($statementCreated->getPhase(), $statementCreated->getPublicStatement());
-            $participationType->setCode($phaseCode);
-            $participationType->setListVersionID('3');
+            $participationType->setName($statementCreated->getPhase());
+            $participationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
+            $participationType->setListVersionID(self::LIST_VERSION_ID);
             $statement->setVerfahrensschrittKommunal($participationType);
         }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
             $participationType = new CodeVerfahrensschrittRaumordnungType();
             $phaseCode = $statementCreated->getPhaseCodeRaumordnung($statementCreated->getPhase(), $statementCreated->getPublicStatement());
-            $participationType->setCode($phaseCode);
-            $participationType->setListVersionID('3');
+            $participationType->setName($statementCreated->getPhase());
+            $participationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
+            $participationType->setListVersionID(self::LIST_VERSION_ID);
             $statement->setVerfahrensschrittRaumordnung($participationType);
         }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
             $participationType = new CodeVerfahrensschrittPlanfeststellungType();
             $phaseCode = $statementCreated->getPhaseCodePlanfeststellung() ?? 'configuration';
-            $participationType->setCode($phaseCode);
+            $participationType->setName($statementCreated->getPhase());
+            $participationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
             $statement->setVerfahrensschrittPlanfeststellung($participationType);
         }
     }
