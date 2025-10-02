@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\StatementTest;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\AddressInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
@@ -26,6 +27,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCr
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\VerfasserBuilder;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\VerfasserType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
@@ -113,7 +116,8 @@ class StatementCreatorTest extends TestCase
             $this->createMock(CommonHelpers::class),
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->permissionEvaluator,
-            $reusableMessageBlocks
+            $reusableMessageBlocks,
+            new VerfasserBuilder()
         );
     }
 
@@ -142,8 +146,8 @@ class StatementCreatorTest extends TestCase
 
         $stellungnahme = $content->getStellungnahme();
         $this->validateStatement($statementCreated, $stellungnahme);
-        self::assertSame('0300', $stellungnahme->getVerfahrensteilschritt()->getCode());
-        self::assertSame('2000', $stellungnahme->getVerfahrensschrittKommunal()->getCode());
+        self::assertSame('0815', $stellungnahme->getVerfahrensteilschritt()->getCode());
+        self::assertSame('0815', $stellungnahme->getVerfahrensschrittKommunal()->getCode());
     }
 
     private function createStatement0701(int $version): StatementCreated
@@ -191,6 +195,14 @@ class StatementCreatorTest extends TestCase
         $this->user->method('getLastName')->willReturn($lastName);
         $this->user->method('getGender')->willReturn($gender);
         $this->user->method('getTitle')->willReturn($userTitle);
+
+        // Configure address mock
+        $addressMock = $this->createMock(AddressInterface::class);
+        $addressMock->method('getStreet')->willReturn('Musterstraße');
+        $addressMock->method('getHouseNumber')->willReturn('123');
+        $addressMock->method('getPostalCode')->willReturn('12345');
+        $addressMock->method('getCity')->willReturn('Musterstadt');
+        $this->user->method('getAddress')->willReturn($addressMock);
 
         $statementCreated = new StatementCreated($this->user, $this->procedure, $this->meta);
         $statementCreated->setPublicId($statementId);
