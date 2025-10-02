@@ -1072,7 +1072,7 @@ class XBeteiligungService
 
         $auditRecord = null;
 
-        if (self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageStringIdentifier) {
+        if (XBeteiligungMessageType::KOMMUNAL_INITIIEREN->value === $messageStringIdentifier) {
             /** @var KommunalInitiieren0401 $kommunalInitiieren401 */
             $kommunalInitiieren401 = $this->incomingMessageParser->getXmlObject($messageXml, '401');
 
@@ -1095,7 +1095,7 @@ class XBeteiligungService
             }
         }
 
-        if (self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageStringIdentifier)
+        if (XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value === $messageStringIdentifier)
         {
             /** @var KommunalAktualisieren0402 $kommunalAktualisieren402 */
             $kommunalAktualisieren402 = $this->incomingMessageParser->getXmlObject($messageXml, '402');
@@ -1118,7 +1118,7 @@ class XBeteiligungService
             }
         }
 
-        if (self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER === $messageStringIdentifier) {
+        if (XBeteiligungMessageType::PLANFESTSTELLUNG_INITIIEREN->value === $messageStringIdentifier) {
             /** @var PlanfeststellungInitiieren0201 $planfeststellungInitiieren201 */
             $planfeststellungInitiieren201 = $this->incomingMessageParser->getXmlObject($messageXml, '0201');
 
@@ -1140,7 +1140,7 @@ class XBeteiligungService
             }
         }
 
-        if (self::NEW_STATEMENT_OK_MESSAGE_IDENTIFIER === $messageStringIdentifier)
+        if (XBeteiligungMessageType::STELLUNGNAHME_OK->value === $messageStringIdentifier)
         {
             /** @var AllgemeinStellungnahmeNeuabgegebenOK0711 $newStatementOK711 */
             $newStatementOK711 = $this->incomingMessageParser->getXmlObject($messageXml, '711');
@@ -1173,7 +1173,7 @@ class XBeteiligungService
             return null;
         }
 
-        if (self::NEW_STATEMENT_NOK_MESSAGE_IDENTIFIER === $messageStringIdentifier) {
+        if (XBeteiligungMessageType::STELLUNGNAHME_NOK->value === $messageStringIdentifier) {
             /** @var AllgemeinStellungnahmeNeuabgegebenNOK0721 $newStatementNOK721 */
             $newStatementNOK721 = $this->incomingMessageParser->getXmlObject($messageXml, '721');
             $statementId = $this->removeStatementIdPrefix(
