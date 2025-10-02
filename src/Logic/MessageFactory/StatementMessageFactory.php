@@ -27,6 +27,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\VerfasserBuilde
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
 use JsonException;
@@ -48,11 +49,12 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     private const LIST_VERSION_ID = '3';
 
     public function __construct(
-        CommonHelpers $commonHelpers,
-        LoggerInterface $logger,
-        PermissionEvaluatorInterface $permissionEvaluator,
-        ReusableMessageBlocks $reusableMessageBlocks,
+        CommonHelpers                     $commonHelpers,
+        LoggerInterface                   $logger,
+        PermissionEvaluatorInterface      $permissionEvaluator,
+        ReusableMessageBlocks             $reusableMessageBlocks,
         private readonly VerfasserBuilder $verfasserBuilder,
+        private readonly PhaseBuilder     $phaseBuilder,
     ) {
         parent::__construct($commonHelpers, $logger, $permissionEvaluator, $reusableMessageBlocks);
     }
@@ -120,10 +122,11 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $artDerStellungnahme->setCode($this->getArtOfStatement($statementCreated->getPublicUseName()));
         $statement->setArtDerStellungnahme($artDerStellungnahme);
         // set verfahrenschritt
-        $this->getProcedurePhase($statementCreated, $statement);
+        $this->phaseBuilder->setProcedurePhase($statementCreated, $statement);
         // set verfahrensteilschritt
         $partParticipationType = new CodeVerfahrensteilschrittType();
         $partParticipationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
+        $partParticipationType->setName($statementCreated->getProcedure()->getPhaseName());
         $partParticipationType->setListVersionID(self::LIST_VERSION_ID);
         $statement->setVerfahrensteilschritt($partParticipationType);
         // set priority
@@ -248,32 +251,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $statement->setDurchgang($procedure->getDurchgang());
     }
 
-    /**
-     * @throws ProjectPrefixNotFoundException
-     */
-    private function getProcedurePhase(StatementCreated $statementCreated, StellungnahmeType $statement): void
-    {
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
-            $participationType = new CodeVerfahrensschrittKommunalType();
-            $participationType->setName($statementCreated->getPhase());
-            $participationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
-            $participationType->setListVersionID(self::LIST_VERSION_ID);
-            $statement->setVerfahrensschrittKommunal($participationType);
-        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
-            $participationType = new CodeVerfahrensschrittRaumordnungType();
-            $phaseCode = $statementCreated->getPhaseCodeRaumordnung($statementCreated->getPhase(), $statementCreated->getPublicStatement());
-            $participationType->setName($statementCreated->getPhase());
-            $participationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
-            $participationType->setListVersionID(self::LIST_VERSION_ID);
-            $statement->setVerfahrensschrittRaumordnung($participationType);
-        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
-            $participationType = new CodeVerfahrensschrittPlanfeststellungType();
-            $phaseCode = $statementCreated->getPhaseCodePlanfeststellung() ?? 'configuration';
-            $participationType->setName($statementCreated->getPhase());
-            $participationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
-            $statement->setVerfahrensschrittPlanfeststellung($participationType);
-        }
-    }
 
     private function getAbwaegungVorschlag($abwaegungVorschlag): string
     {
