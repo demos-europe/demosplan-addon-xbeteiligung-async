@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tools;
 
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
@@ -101,7 +102,7 @@ class RabbitMQMessageBroker
         if ($this->config->auditEnabled) {
             $auditRecord = $this->auditService->auditSentMessage(
                 $xmlString,
-                XBeteiligungService::NEW_STATEMENT_MESSAGE_IDENTIFIER, // Statement message type
+                XBeteiligungMessageType::STELLUNGNAHME_NEUABGEGEBEN->value, // Statement message type
                 $statementCreated->getProcedureId(),
                 $statementCreated->getPlanId(),
                 null, // responseToMessageId
