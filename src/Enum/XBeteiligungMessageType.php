@@ -122,4 +122,27 @@ enum XBeteiligungMessageType: string
             default => null,
         };
     }
+
+    /**
+     * Get the message code used for XML parsing.
+     *
+     * @return string|null The message code (e.g., '401', '402') or null if not applicable
+     */
+    public function getMessageCode(): ?string
+    {
+        return match ($this) {
+            self::KOMMUNAL_INITIIEREN => '401',
+            self::KOMMUNAL_AKTUALISIEREN => '402',
+            self::KOMMUNAL_LOESCHEN => '409',
+            self::RAUMORDNUNG_INITIIEREN => '301',
+            self::RAUMORDNUNG_AKTUALISIEREN => '302',
+            self::RAUMORDNUNG_LOESCHEN => '309',
+            self::PLANFESTSTELLUNG_INITIIEREN => '0201',
+            self::PLANFESTSTELLUNG_AKTUALISIEREN => '202',
+            self::PLANFESTSTELLUNG_LOESCHEN => '209',
+            self::STELLUNGNAHME_OK => '711',
+            self::STELLUNGNAHME_NOK => '721',
+            default => null,
+        };
+    }
 }
