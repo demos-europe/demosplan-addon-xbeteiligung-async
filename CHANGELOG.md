@@ -3,6 +3,11 @@
 ## UNRELEASED
 ## v0.36 (2025-09-30)
 
+### Removed
+- Remove enum-based procedure phase mapping system (DPLAN-16438)
+- Delete InstitutionParticipationPhase, PublicParticipationPhase, and ProcedurePhaseKey enums
+- Simplify procedure phase handling by using hardcoded 'configuration' phase for all procedures
+
 ### Added
 - Territory display fix for XML-processed geltungsbereich
 - Automatic GIS layer creation from flaechenabgrenzungsUrl in XBeteiligung messages
