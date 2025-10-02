@@ -1,7 +1,6 @@
 # Changelog
 
 ## UNRELEASED
-## v0.36 (2025-10-02)
 - Remove enum-based procedure phase mapping system (DPLAN-16438)
 - Delete InstitutionParticipationPhase, PublicParticipationPhase, and ProcedurePhaseKey enums
 - Simplify procedure phase handling by using hardcoded 'configuration' phase for all procedures
