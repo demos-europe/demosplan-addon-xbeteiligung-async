@@ -38,7 +38,7 @@ class XBeteiligungMessageProcessor
      *
      * @param IncomingMessageData $messageData Message data containing xml content and routing key
      *
-     * @return ResponseValue Response data for sending back to RabbitMQ
+     * @return ResponseValue|null Response data for sending back to RabbitMQ
      * @throws SchemaException
      */
     public function processIncomingMessage(IncomingMessageData $messageData): ?ResponseValue
