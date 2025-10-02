@@ -889,7 +889,7 @@ class XBeteiligungService
         // Audit K3 message creation if audit is enabled
         $auditEnabled = $this->parameterBag->get('addon_xbeteiligung_async_enable_audit');
         if ($auditEnabled) {
-            $messageType = $this->determineMessageTypeFromContent($procedureMessage->getMessage());
+            $messageType = XBeteiligungMessageType::fromXmlContent($procedureMessage->getMessage());
             $planId = $this->extractPlanIdFromXml($procedureMessage->getMessage(), $messageType);
 
             $auditRecord = $this->auditService->auditK3Message(
@@ -911,7 +911,7 @@ class XBeteiligungService
         // Audit K3 message creation (for 402/409/302/309 messages during flush)
         $auditEnabled = $this->parameterBag->get('addon_xbeteiligung_async_enable_audit', false);
         if ($auditEnabled && null !== $this->auditService) {
-            $messageType = $this->determineMessageTypeFromContent($procedureMessage->getMessage());
+            $messageType = XBeteiligungMessageType::fromXmlContent($procedureMessage->getMessage());
             $planId = $this->extractPlanIdFromXml($procedureMessage->getMessage(), $messageType);
             $auditRecord = $this->auditService->auditK3Message(
                 $procedureMessage->getMessage(),
@@ -987,7 +987,7 @@ class XBeteiligungService
     {
         $this->logger->debug('Process xml message.', ['messageXml' => substr($messageXml, 0, 500) . '...']);
 
-        $messageStringIdentifier = $this->determineMessageTypeFromContent($messageXml);
+        $messageStringIdentifier = XBeteiligungMessageType::fromXmlContent($messageXml);
         $this->logger->debug('Extracted message string identifier.', ['messageStringIdentifier' => $messageStringIdentifier]);
 
         $auditRecord = null;
@@ -1175,16 +1175,6 @@ class XBeteiligungService
     private function determinePlanId(ProcedureInterface $procedure): string
     {
         return '' === $procedure->getXtaPlanId() ? $procedure->getId() : $procedure->getXtaPlanId();
-    }
-
-    /**
-     * Determine message type from XML content for K3 audit
-     *
-     * @deprecated Use XBeteiligungMessageType::fromXmlContent() instead
-     */
-    private function determineMessageTypeFromContent(string $xmlContent): string
-    {
-        return XBeteiligungMessageType::fromXmlContent($xmlContent);
     }
 
     /**
