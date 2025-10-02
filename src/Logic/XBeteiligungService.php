@@ -1263,17 +1263,17 @@ class XBeteiligungService
     private function determineMessageTypeFromContent(string $xmlContent): string
     {
         $messageTypes = [
-            self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER,
-            self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER,
-            self::DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER,
-            self::NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
-            self::UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
-            self::DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
-            self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
-            self::UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
-            self::DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER,
-            self::NEW_STATEMENT_OK_MESSAGE_IDENTIFIER,
-            self::NEW_STATEMENT_NOK_MESSAGE_IDENTIFIER,
+            XBeteiligungMessageType::KOMMUNAL_INITIIEREN->value,
+            XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value,
+            XBeteiligungMessageType::KOMMUNAL_LOESCHEN->value,
+            XBeteiligungMessageType::RAUMORDNUNG_INITIIEREN->value,
+            XBeteiligungMessageType::RAUMORDNUNG_AKTUALISIEREN->value,
+            XBeteiligungMessageType::RAUMORDNUNG_LOESCHEN->value,
+            XBeteiligungMessageType::PLANFESTSTELLUNG_INITIIEREN->value,
+            XBeteiligungMessageType::PLANFESTSTELLUNG_AKTUALISIEREN->value,
+            XBeteiligungMessageType::PLANFESTSTELLUNG_LOESCHEN->value,
+            XBeteiligungMessageType::STELLUNGNAHME_OK->value,
+            XBeteiligungMessageType::STELLUNGNAHME_NOK->value,
         ];
 
         foreach ($messageTypes as $messageType) {
