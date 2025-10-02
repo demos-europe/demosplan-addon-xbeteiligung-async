@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\MessageFactory;
 
+use DemosEurope\DemosplanAddon\Contracts\Entities\AddressInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\AddressInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\VerfasserBuilder;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\VerfasserType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use PHPUnit\Framework\MockObject\MockObject;

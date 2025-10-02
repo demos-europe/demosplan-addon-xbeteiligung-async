@@ -1,17 +1,14 @@
 <?php
 
-namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AllgemeinerNameType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AnschriftType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeErreichbarkeitType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\KommunikationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameNatuerlichePersonType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\StellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\VerfasserType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
-use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 
 class VerfasserBuilder
 {
