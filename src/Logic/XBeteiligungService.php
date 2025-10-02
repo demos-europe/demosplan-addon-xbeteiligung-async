@@ -84,95 +84,15 @@ use Webmozart\Assert\Assert;
 
 class XBeteiligungService
 {
-    private const PARTICIPATION_RAUMORDNUNG_PHASE = 'Erwiderung /Planänderung bzw. Auswertung';
     private const WMS_DEFAULT_WIDTH = 512;
     private const DIMENSION_WIDTH = 'width';
     private const DIMENSION_HEIGHT = 'height';
-
     private const PLACEHOLDER_PROCEDURE_PHASE_CODE = '0815';
-
-    private const PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP = [
-        'configuration' => [
-            'code' => '5000',
-            'name' => 'Konfiguration betroffene Öffentlichkeit',
-        ],
-        'participation' => [
-            'code' => '5200',
-            'name' => self::PARTICIPATION_RAUMORDNUNG_PHASE,
-        ],
-        'discussiondate' => [
-            'code' => '5400',
-            'name' => 'Erörterungstermin',
-        ],
-        'earlyparticipation' => [
-            'code' => '5500',
-            'name' => 'Erneute Anhörung Betroffener (Öffentlichkeit) (Durchlaufnummer)',
-        ],
-        'evaluating' => [
-            'code' => '5600',
-            'name' => 'Auswertung betroffene Öffentlichkeit',
-        ],
-        'closed' => [
-            'code' => '5700',
-            'name' => 'Beschlussfassung betroffene Öffentlichkeit',
-        ]
-    ];
-
-    private const PUBLICPARTICIPATIONPHASPLANFESTSTELLUNGMAP = [
-        'configuration' => [
-            'code' => '9998',
-            'name' => 'kein VS',
-        ]
-    ];
-    private const INSTITUTIONPARTICIPATIONPHASRAUMORDNUNGMAP = [
-        'configuration' => [
-            'code' => '4000',
-            'name' => 'Konfiguration TöB',
-        ],
-        'participation' => [
-            'code' => '4200',
-            'name' => self::PARTICIPATION_RAUMORDNUNG_PHASE,
-        ],
-        'renewparticipation' => [
-            'code' => '4500',
-            'name' => 'Erneute Anhörung TöB (Durchlaufnummer)',
-        ],
-        'discussiondate' => [
-            'code' => '4400',
-            'name' => 'Erörterungstermin',
-        ],
-        'evaluating' => [
-            'code' => '4600',
-            'name' => 'Auswertung TöB',
-        ],
-        'closed' => [
-            'code' => '4700',
-            'name' => 'Beschlussfassung TöB',
-        ]
-    ];
-
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
 
     /** Statement ID prefix that needs to be removed for database storage */
     public const STATEMENT_ID_PREFIX = 'ID_';
-    public const NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.0401';
-    public const UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Aktualisieren.0402';
-    public const DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'kommunal.Loeschen.0409';
-    public const NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'raumordnung.Initiieren.0301';
-    public const UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'raumordnung.Aktualisieren.0302';
-    public const DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'raumordnung.Loeschen.0309';
-    public const NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Initiieren.0201';
-    public const UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Aktualisieren.0202';
-    public const DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER = 'planfeststellung.Loeschen.0209';
-    public const NEW_STATEMENT_MESSAGE_IDENTIFIER = 'allgemein.stellungnahme.Neuabgegeben.0701';
-    public const NEW_STATEMENT_OK_MESSAGE_IDENTIFIER = 'allgemein.stellungnahme.Neuabgegeben.OK.0711';
-    public const NEW_STATEMENT_NOK_MESSAGE_IDENTIFIER = 'allgemein.stellungnahme.Neuabgegeben.NOK.0721';
-    public const NEW_KOMMUNAL_OK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.OK.0411';
-    public const NEW_KOMMUNAL_NOK_MESSAGE_IDENTIFIER = 'kommunal.Initiieren.NOK.0421';
-    public const UNKNOWN_MESSAGE_TYPE = 'unknown';
-    public const UNKNOWN_RESPONSE_MESSAGE_TYPE = 'unknown.response';
-    public const AUDIT_ENABLE_PARAMETER = 'addon_xbeteiligung_async_enable_audit';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
     public const MISSING_USER_ERROR_CODE = '0300';
     public const WRONG_ATTACHMENT_FORMAT_ERROR_CODE = '0200';
