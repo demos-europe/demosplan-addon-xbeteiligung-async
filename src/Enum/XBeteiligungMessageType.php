@@ -12,6 +12,19 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Enum;
 
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenNOK0721;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenOK0711;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschen0409;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschen0209;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
+use InvalidArgumentException;
+
 /**
  * XBeteiligung message type identifiers.
  *
@@ -59,5 +72,54 @@ enum XBeteiligungMessageType: string
         }
 
         return self::UNKNOWN->value;
+    }
+
+    /**
+     * Get SOAP class for message type deserialization.
+     *
+     * @return string SOAP schema class name for XML deserialization
+     */
+    public function getSoapClass(): string
+    {
+        return match ($this) {
+            self::KOMMUNAL_INITIIEREN => KommunalInitiieren0401::class,
+            self::KOMMUNAL_AKTUALISIEREN => KommunalAktualisieren0402::class,
+            self::KOMMUNAL_LOESCHEN => KommunalLoeschen0409::class,
+            self::RAUMORDNUNG_INITIIEREN => RaumordnungInitiieren0301::class,
+            self::RAUMORDNUNG_AKTUALISIEREN => RaumordnungAktualisieren0302::class,
+            self::RAUMORDNUNG_LOESCHEN => RaumordnungLoeschen0309::class,
+            self::PLANFESTSTELLUNG_INITIIEREN => PlanfeststellungInitiieren0201::class,
+            self::PLANFESTSTELLUNG_AKTUALISIEREN => PlanfeststellungAktualisieren0202::class,
+            self::PLANFESTSTELLUNG_LOESCHEN => PlanfeststellungLoeschen0209::class,
+            self::STELLUNGNAHME_OK => AllgemeinStellungnahmeNeuabgegebenOK0711::class,
+            self::STELLUNGNAHME_NOK => AllgemeinStellungnahmeNeuabgegebenNOK0721::class,
+            default => throw new InvalidArgumentException('No SOAP class defined for message type: ' . $this->value),
+        };
+    }
+
+    /**
+     * Create message type from short message code.
+     *
+     * Maps short codes (401, 402, etc.) used in message parsing to enum cases.
+     *
+     * @param string $code Short message code (e.g., '401', '402')
+     * @return self|null Enum case or null if code not found
+     */
+    public static function fromCode(string $code): ?self
+    {
+        return match ($code) {
+            '401' => self::KOMMUNAL_INITIIEREN,
+            '402' => self::KOMMUNAL_AKTUALISIEREN,
+            '409' => self::KOMMUNAL_LOESCHEN,
+            '301' => self::RAUMORDNUNG_INITIIEREN,
+            '302' => self::RAUMORDNUNG_AKTUALISIEREN,
+            '309' => self::RAUMORDNUNG_LOESCHEN,
+            '201', '0201' => self::PLANFESTSTELLUNG_INITIIEREN, // Support both formats
+            '202' => self::PLANFESTSTELLUNG_AKTUALISIEREN,
+            '209' => self::PLANFESTSTELLUNG_LOESCHEN,
+            '711' => self::STELLUNGNAHME_OK,
+            '721' => self::STELLUNGNAHME_NOK,
+            default => null,
+        };
     }
 }
