@@ -9,6 +9,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundExcept
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\StellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
@@ -30,7 +31,7 @@ class PhaseBuilder
     /**
      * @throws ProjectPrefixNotFoundException
      */
-    public function setProcedurePhase(StatementCreated $statementCreated, StellungnahmeType $statement): void
+    public function setVerfahrenschritt(StatementCreated $statementCreated, StellungnahmeType $statement): void
     {
         $phaseName = $this->getPhaseName($statementCreated);
         $phaseType = $this->createPhaseType();
@@ -78,7 +79,7 @@ class PhaseBuilder
         };
     }
 
-    public function getPhaseName($statementCreated) {
+    private function getPhaseName($statementCreated) {
         // If internal statement, use internal phase name
         if (StatementInterface::INTERNAL === $statementCreated->getPublicStatement()) {
             return $this->globalConfig->getPhaseNameWithPriorityInternal($statementCreated->getPhase());
@@ -86,6 +87,16 @@ class PhaseBuilder
 
         // Default to external phase name
         return $this->globalConfig->getPhaseNameWithPriorityExternal($statementCreated->getPhase());
+
+    }
+
+    public function setVerfahrensteilschritt(StatementCreated $statementCreated, StellungnahmeType $statement)
+    {
+        $partParticipationType = new CodeVerfahrensteilschrittType();
+        $partParticipationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
+        $partParticipationType->setName($this->getPhaseName($statementCreated));
+        $partParticipationType->setListVersionID(self::LIST_VERSION_ID);
+        $statement->setVerfahrensteilschritt($partParticipationType);
 
     }
 }

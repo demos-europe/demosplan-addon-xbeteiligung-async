@@ -121,13 +121,9 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $artDerStellungnahme->setCode($this->getArtOfStatement($statementCreated->getPublicUseName()));
         $statement->setArtDerStellungnahme($artDerStellungnahme);
         // set verfahrenschritt
-        $this->phaseBuilder->setProcedurePhase($statementCreated, $statement);
+        $this->phaseBuilder->setVerfahrenschritt($statementCreated, $statement);
         // set verfahrensteilschritt
-        $partParticipationType = new CodeVerfahrensteilschrittType();
-        $partParticipationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
-        $partParticipationType->setName($this->phaseBuilder->getPhaseName($statementCreated));
-        $partParticipationType->setListVersionID(self::LIST_VERSION_ID);
-        $statement->setVerfahrensteilschritt($partParticipationType);
+        $this->phaseBuilder->setVerfahrensteilschritt($statementCreated, $statement);
         // set priority
         $priority = new CodePrioritaetDerStellungnahmeType();
         $priority->setCode($this->getPriority($statementCreated->getPriority()));

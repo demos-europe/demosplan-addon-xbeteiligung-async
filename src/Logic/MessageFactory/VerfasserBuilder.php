@@ -8,6 +8,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeErreichbar
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\KommunikationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameNatuerlichePersonType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\OrganisationType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\StellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\VerfasserType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
@@ -16,7 +17,7 @@ class VerfasserBuilder
 {
     private const PRIVATE_PERSON = 'Privatperson';
 
-    public function setVerfasser(StatementCreated $statementCreated, $statement): void
+    public function setVerfasser(StatementCreated $statementCreated, StellungnahmeType $statement): void
     {
         $verfasser = $this->buildVerfasser($statementCreated);
         $statement->setVerfasser($verfasser);
