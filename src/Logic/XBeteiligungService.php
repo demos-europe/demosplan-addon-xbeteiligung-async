@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateInterval;
 use DateTime;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType\BeteiligungPlanfeststellungOeffentlichkeitArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType;
@@ -1330,42 +1331,42 @@ class XBeteiligungService
         try {
             // Extract planId based on message type structure with proper type casting
             return match ($messageType) {
-                self::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                XBeteiligungMessageType::KOMMUNAL_INITIIEREN->value => (function() use ($xmlContent) {
                     /** @var KommunalInitiieren0401 $xmlObject */
                     $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '401');
                     return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
                 })(),
-                self::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value => (function() use ($xmlContent) {
                     /** @var KommunalAktualisieren0402 $xmlObject */
                     $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '402');
                     return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
                 })(),
-                self::NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                XBeteiligungMessageType::RAUMORDNUNG_INITIIEREN->value => (function() use ($xmlContent) {
                     /** @var RaumordnungInitiieren0301 $xmlObject */
                     $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '301');
                     return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
                 })(),
-                self::UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                XBeteiligungMessageType::RAUMORDNUNG_AKTUALISIEREN->value => (function() use ($xmlContent) {
                     /** @var RaumordnungAktualisieren0302 $xmlObject */
                     $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '302');
                     return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
                 })(),
-                self::DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                XBeteiligungMessageType::KOMMUNAL_LOESCHEN->value => (function() use ($xmlContent) {
                     /** @var KommunalLoeschen0409 $xmlObject */
                     $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '409');
                     return $xmlObject?->getNachrichteninhalt()?->getPlanID();
                 })(),
-                self::DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                XBeteiligungMessageType::RAUMORDNUNG_LOESCHEN->value => (function() use ($xmlContent) {
                     /** @var RaumordnungLoeschen0309 $xmlObject */
                     $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '309');
                     return $xmlObject?->getNachrichteninhalt()?->getPlanID();
                 })(),
-                self::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                XBeteiligungMessageType::PLANFESTSTELLUNG_INITIIEREN->value => (function() use ($xmlContent) {
                     /** @var PlanfeststellungInitiieren0201 $xmlObject */
                     $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '201');
                     return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
                 })(),
-                self::UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER => (function() use ($xmlContent) {
+                XBeteiligungMessageType::PLANFESTSTELLUNG_AKTUALISIEREN->value => (function() use ($xmlContent) {
                     /** @var PlanfeststellungAktualisieren0202 $xmlObject */
                     $xmlObject = $this->incomingMessageParser->getXmlObject($xmlContent, '202');
                     return $xmlObject?->getNachrichteninhalt()?->getBeteiligung()?->getPlanID();
