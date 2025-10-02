@@ -47,6 +47,8 @@ class XBeteiligungCustomerMappingService
         '14' => 'sn',  // Sachsen
         '15' => 'st',  // Sachsen-Anhalt
         '16' => 'th',  // Thüringen
+        '98' => 'hh',  // develop environment     maybe we should use a test customer here?
+        '99' => 'hh'   // integration environment maybe we should use a test customer here?
     ];
 
     public function __construct(

@@ -1,9 +1,9 @@
 # Changelog
 
 ## UNRELEASED
-## v0.36 (2025-09-30)
+- added 98,99 ags codes in customer mapping
 
-### Added
+## v0.36 (2025-09-30)
 - Territory display fix for XML-processed geltungsbereich
 - Automatic GIS layer creation from flaechenabgrenzungsUrl in XBeteiligung messages
 - Support for MultiPolygon geometries
