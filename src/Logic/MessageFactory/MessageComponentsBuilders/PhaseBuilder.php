@@ -75,7 +75,7 @@ class PhaseBuilder
             CodeVerfahrensschrittKommunalType::class => $statement->setVerfahrensschrittKommunal($participationType),
             CodeVerfahrensschrittRaumordnungType::class => $statement->setVerfahrensschrittRaumordnung($participationType),
             CodeVerfahrensschrittPlanfeststellungType::class => $statement->setVerfahrensschrittPlanfeststellung($participationType),
-            default => $this->logger->warning('Unknown participation type encountered', ['class' => $participationType::class])
+            default => $this->logger->error('Unknown participation type encountered', ['class' => $participationType::class])
         };
     }
 

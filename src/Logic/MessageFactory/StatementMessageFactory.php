@@ -104,7 +104,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         // set beschreibung
         $statement->setBeschreibung($statementCreated->getDescription());
         //set durchgang
-        $this->getIteration($statement, $statementCreated);
+        $statement->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
         // set datum
         $statement->setDatum($statementCreated->getCreatedAt());
         // set art der rueckmeldung
@@ -220,27 +220,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         );
         return self::DEFAULT_PRIORITY_CODE; // "nicht vergeben" - priority not assigned
     }
-
-    /**
-     * @throws ProjectPrefixNotFoundException
-     */
-    private function getIteration(StellungnahmeType $statement, StatementCreated $statementCreated): void
-    {
-        $procedure = null;
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
-            $procedure = new BeteiligungKommunalTOEBType();
-        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
-            $procedure = new BeteiligungRaumordnungType();
-        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
-            $procedure = new BeteiligungPlanfeststellungType();
-        }elseif ($procedure === null) {
-            $this->logger->error('No procedure found.');
-            throw new ProjectPrefixNotFoundException();
-        }
-        $procedure->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
-        $statement->setDurchgang($procedure->getDurchgang());
-    }
-
 
     private function getAbwaegungVorschlag($abwaegungVorschlag): string
     {
