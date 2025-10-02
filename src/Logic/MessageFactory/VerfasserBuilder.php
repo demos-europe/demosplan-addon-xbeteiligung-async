@@ -16,7 +16,13 @@ class VerfasserBuilder
 {
     private const PRIVATE_PERSON = 'Privatperson';
 
-    public function buildVerfasser(StatementCreated $statementCreated): VerfasserType
+    public function setVerfasser(StatementCreated $statementCreated, $statement): void
+    {
+        $verfasser = $this->buildVerfasser($statementCreated);
+        $statement->setVerfasser($verfasser);
+    }
+
+    private function buildVerfasser(StatementCreated $statementCreated): VerfasserType
     {
         $verfasser = new VerfasserType();
 

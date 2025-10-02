@@ -102,8 +102,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $status->setCode($this->statusDerStellungnahme($statementCreated->getStatus()));
         $statement->setStatus($status);
         // set Verfasser --> user data
-        $verfasser = $this->verfasserBuilder->buildVerfasser($statementCreated);
-        $statement->setVerfasser($verfasser);
+        $this->verfasserBuilder->setVerfasser($statementCreated, $statement);
 
         // set title
         $statement->setTitel($statementCreated->getTitle());

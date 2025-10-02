@@ -12,6 +12,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\VerfasserTy
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class VerfasserBuilderTest extends TestCase
 {
@@ -75,6 +76,15 @@ class VerfasserBuilderTest extends TestCase
         $this->assertInstanceOf(VerfasserType::class, $verfasser);
     }
 
+    private function callPrivateBuildVerfasser(StatementCreated $statementCreated): VerfasserType
+    {
+        $reflection = new ReflectionClass($this->verfasserBuilder);
+        $method = $reflection->getMethod('buildVerfasser');
+        $method->setAccessible(true);
+
+        return $method->invoke($this->verfasserBuilder, $statementCreated);
+    }
+
     public function testBuildVerfasserWithPrivatePerson(): void
     {
         $this->meta->method('getOrgaName')->willReturn('Privatperson');
@@ -82,7 +92,7 @@ class VerfasserBuilderTest extends TestCase
         $this->statementCreated->method('getMeta')->willReturn($this->meta);
         $this->statementCreated->method('getUser')->willReturn(null);
 
-        $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
+        $verfasser = $this->callPrivateBuildVerfasser($this->statementCreated);
 
         $this->assertBasicVerfasser($verfasser);
         $this->assertTrue($verfasser->getPrivatperson());
@@ -98,7 +108,7 @@ class VerfasserBuilderTest extends TestCase
         $this->statementCreated->method('getMeta')->willReturn($this->meta);
         $this->statementCreated->method('getUser')->willReturn(null);
 
-        $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
+        $verfasser = $this->callPrivateBuildVerfasser($this->statementCreated);
 
         $this->assertBasicVerfasser($verfasser);
         $this->assertNull($verfasser->getPrivatperson());
@@ -113,7 +123,7 @@ class VerfasserBuilderTest extends TestCase
         $this->meta->method('getOrgaName')->willReturn('Test Org');
         $this->setupBasicMocks();
 
-        $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
+        $verfasser = $this->callPrivateBuildVerfasser($this->statementCreated);
 
         $this->assertBasicVerfasser($verfasser);
         $this->assertEquals('John', $verfasser->getName()->getVorname()->getName());
@@ -136,7 +146,7 @@ class VerfasserBuilderTest extends TestCase
         $this->setupMetaAddressData('Meta Street', '456', '54321', 'Meta City');
         $this->setupBasicMocks();
 
-        $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
+        $verfasser = $this->callPrivateBuildVerfasser($this->statementCreated);
 
         $this->assertBasicVerfasser($verfasser);
         $this->assertTrue($verfasser->getPrivatperson());
@@ -157,7 +167,7 @@ class VerfasserBuilderTest extends TestCase
         $this->setupEmptyMetaAddressMocks();
         $this->setupBasicMocks();
 
-        $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
+        $verfasser = $this->callPrivateBuildVerfasser($this->statementCreated);
 
         $this->assertBasicVerfasser($verfasser);
         $this->assertNull($verfasser->getAnschrift());
@@ -171,7 +181,7 @@ class VerfasserBuilderTest extends TestCase
         $this->meta->method('getOrgaName')->willReturn('Test Org');
         $this->setupBasicMocks();
 
-        $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
+        $verfasser = $this->callPrivateBuildVerfasser($this->statementCreated);
 
         $this->assertBasicVerfasser($verfasser);
         $this->assertNotNull($verfasser->getAnschrift());
@@ -190,7 +200,7 @@ class VerfasserBuilderTest extends TestCase
         $this->statementCreated->method('getMeta')->willReturn($this->meta);
         $this->statementCreated->method('getUser')->willReturn(null);
 
-        $verfasser = $this->verfasserBuilder->buildVerfasser($this->statementCreated);
+        $verfasser = $this->callPrivateBuildVerfasser($this->statementCreated);
 
         $this->assertBasicVerfasser($verfasser);
         $this->assertNull($verfasser->getPrivatperson());
