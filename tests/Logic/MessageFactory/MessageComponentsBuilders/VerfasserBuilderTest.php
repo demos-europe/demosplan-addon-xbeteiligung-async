@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\MessageFactory;
+namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\MessageFactory\MessageComponentsBuilders;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\AddressInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
