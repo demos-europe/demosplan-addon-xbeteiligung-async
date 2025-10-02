@@ -2,6 +2,8 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
+use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
@@ -19,7 +21,9 @@ class PhaseBuilder
 
     public function __construct(
         private readonly PermissionEvaluatorInterface $permissionEvaluator,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly GlobalConfigInterface $globalConfig,
+
     ) {
     }
 
@@ -28,8 +32,9 @@ class PhaseBuilder
      */
     public function setProcedurePhase(StatementCreated $statementCreated, StellungnahmeType $statement): void
     {
+        $phaseName = $this->getPhaseName($statementCreated);
         $phaseType = $this->createPhaseType();
-        $this->configurePhase($phaseType, $statementCreated);
+        $this->configurePhase($phaseType, $phaseName);
         $this->setPhaseTypeToStatement($phaseType, $statement);
     }
 
@@ -56,9 +61,9 @@ class PhaseBuilder
 
     private function configurePhase(
         CodeVerfahrensschrittKommunalType|CodeVerfahrensschrittRaumordnungType|CodeVerfahrensschrittPlanfeststellungType $phaseType,
-        StatementCreated $statementCreated): void
+        string $phaseName): void
     {
-        $phaseType->setName($statementCreated->getProcedure()->getPhaseName());
+        $phaseType->setName($phaseName);
         $phaseType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
         $phaseType->setListVersionID(self::LIST_VERSION_ID);
     }
@@ -71,5 +76,16 @@ class PhaseBuilder
             CodeVerfahrensschrittPlanfeststellungType::class => $statement->setVerfahrensschrittPlanfeststellung($participationType),
             default => $this->logger->warning('Unknown participation type encountered', ['class' => $participationType::class])
         };
+    }
+
+    public function getPhaseName($statementCreated) {
+        // If internal statement, use internal phase name
+        if (StatementInterface::INTERNAL === $statementCreated->getPublicStatement()) {
+            return $this->globalConfig->getPhaseNameWithPriorityInternal($statementCreated->getPhase());
+        }
+
+        // Default to external phase name
+        return $this->globalConfig->getPhaseNameWithPriorityExternal($statementCreated->getPhase());
+
     }
 }

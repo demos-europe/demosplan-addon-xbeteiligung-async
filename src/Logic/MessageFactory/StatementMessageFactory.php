@@ -126,7 +126,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         // set verfahrensteilschritt
         $partParticipationType = new CodeVerfahrensteilschrittType();
         $partParticipationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
-        $partParticipationType->setName($statementCreated->getProcedure()->getPhaseName());
+        $partParticipationType->setName($this->phaseBuilder->getPhaseName($statementCreated));
         $partParticipationType->setListVersionID(self::LIST_VERSION_ID);
         $statement->setVerfahrensteilschritt($partParticipationType);
         // set priority
