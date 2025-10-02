@@ -263,6 +263,14 @@ direct EntityManager transactions
 - Refactor and eliminate code duplication between create and update methods in XBeteiligungRestController
 - Enhance test coverage with comprehensive PATCH endpoint tests
 
+### Added
+- Georeferencing support for statements with GeoJSON to XBeteiligung conversion (ADO-24467)
+  - Added GeoreferenzierungConverter to convert GeoJSON Point features to GML Points
+  - Enhanced StatementAction with polygon property for storing GeoJSON data
+  - Updated StatementMessageFactory to include georeferencing in 0701 messages
+  - Added GML namespace support to AllgemeinStellungnahmeNeuabgegeben0701 schema
+  - Fixed gml:id attribute serialization in AbstractGMLTypeType schema
+
 ## v0.10.7 (2025-06-14)
 
 ### Fixed

@@ -1,5 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
@@ -140,6 +150,16 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         }
         // set Schlagwort
         $statement->setSchlagwort($statementCreated->getTags());
+        // set Einzeichnung
+        // TODO: May need to reproject coordinates to another coordinate system
+        // depending on XBeteiligung standard requirements (e.g., EPSG:25832, EPSG:4326)
+        $polygon = $statementCreated->getPolygon();
+        if ('' !== $polygon) {
+            $georeferenzierung = $this->georeferenzierungConverter->convertGeoJsonToGeoreferenzierung($polygon);
+            if ($georeferenzierung !== null) {
+                $statement->setGeoreferenzierung([$georeferenzierung]);
+            }
+        }
         $nachricht = new NachrichteninhaltAnonymousPHPType();
         $nachricht->setStellungnahme($statement);
         $nachricht->setVorgangsID($this->commonHelpers->uuid());
@@ -311,7 +331,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $simpleXML = simplexml_load_string($xml);
 
         $simpleXML->addAttribute('xmlns:xmlns:xsi', 'https://www.w3.org/2001/XMLSchema-instance');
-        $simpleXML->addAttribute('xmlns:xmlns:gml', 'https://www.opengis.net/gml/3.2');
 
         $result = $simpleXML->asXML();
         if (!is_string($result)) {

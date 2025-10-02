@@ -7,7 +7,6 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
-use Doctrine\Common\Collections\Collection;
 
 class StatementAction extends ValueObject
 {
@@ -31,6 +30,9 @@ class StatementAction extends ValueObject
     protected ?string $votePla;
     protected array $tags;
     protected string $publicStatement = '';
+
+    protected string $polygon = '';
+
     protected ?UserInterface $user;
     protected StatementMetaInterface $meta;
 
@@ -215,6 +217,16 @@ class StatementAction extends ValueObject
     public function getMeta(): StatementMetaInterface
     {
         return $this->meta;
+    }
+
+    public function getPolygon(): string
+    {
+        return $this->polygon;
+    }
+
+    public function setPolygon(string $polygon): void
+    {
+        $this->polygon = $polygon;
     }
 
     /**

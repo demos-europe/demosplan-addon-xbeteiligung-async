@@ -6,3 +6,4 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellu
         g2g: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
         behoerde: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
         kommunikation: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+        gml: 'http://www.opengis.net/gml/3.2'

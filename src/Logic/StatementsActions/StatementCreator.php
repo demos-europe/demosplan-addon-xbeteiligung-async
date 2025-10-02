@@ -62,6 +62,7 @@ class StatementCreator
         $statementCreated->setVotePla($eventStatement->getVotePla());
         $statementCreated->setPublicStatement($eventStatement->getPublicStatement());
         $statementCreated->setTags($eventStatement->getTags()->toArray());
+        $statementCreated->setPolygon($eventStatement->getPolygon());
         $statementCreated->lock();
 
         return $statementCreated;

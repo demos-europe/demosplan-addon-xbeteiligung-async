@@ -125,6 +125,19 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiie
         kommunikation: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
 ```
 
+**Special case for AllgemeinStellungnahmeNeuabgegeben0701.yml (includes GML namespace for georeferencing):**
+```yaml
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701:
+    xml_root_name: xbeteiligung:allgemein.stellungnahme.Neuabgegeben.0701
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+    xml_namespaces:
+        xbeteiligung: 'https://www.xleitstelle.de/xbeteiligung/12'
+        g2g: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
+        behoerde: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
+        kommunikation: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
+        gml: 'http://www.opengis.net/gml/3.2'
+```
+
 **Example configuration for response message files:**
 ```yaml
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiierenOK0411:
@@ -198,6 +211,18 @@ autor:
         namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
 ```
 
+[`src/Soap/Metadata/Schema.Gml.AbstractGMLTypeType.yml`](src/Soap/Metadata/Schema.Gml.AbstractGMLTypeType.yml):
+```yaml
+id:
+    expose: true
+    access_type: public_method
+    serialized_name: "gml:id"
+    accessor:
+        getter: getId
+        setter: setId
+    xml_attribute: true
+    type: string
+```
 
 comment out `namespace: ...` in [`Schema.Code.CodeType.yml`](src/Soap/Metadata/Schema.Code.CodeType.yml)
 for the fields `code` and `name`.
