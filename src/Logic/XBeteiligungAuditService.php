@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateTime;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungMessageAuditRepository;
 use Psr\Log\LoggerInterface;
 
@@ -318,7 +319,7 @@ class XBeteiligungAuditService
 
         foreach ($auditRecords as $record) {
             if ($record->isReceived() &&
-                XBeteiligungService::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $record->getMessageType() &&
+                XBeteiligungMessageType::KOMMUNAL_INITIIEREN->value === $record->getMessageType() &&
                 $record->getProcedureId() === $procedureId &&
                 $record->getTargetSystem() === self::TARGET_SYSTEM_COCKPIT) {
                 return $record;
@@ -335,7 +336,7 @@ class XBeteiligungAuditService
     {
         $auditRecords = $this->auditRepository->findBy([
             'statementId' => $statementId,
-            'messageType' => XBeteiligungService::NEW_STATEMENT_MESSAGE_IDENTIFIER,
+            'messageType' => XBeteiligungMessageType::STELLUNGNAHME_NEUABGEGEBEN->value,
             'direction' => self::DIRECTION_SENT
         ]);
 
