@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  */
@@ -16,7 +16,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfigurat
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungOutgoingRoutingKeyBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -102,22 +101,5 @@ class XBeteiligungMessageProcessor
             );
             throw $e;
         }
-    }
-
-    /**
-     * Determine message type from XML response content
-     */
-    private function determineResponseMessageType(string $xmlContent): string
-    {
-        // Check for OK responses
-        if (str_contains($xmlContent, XBeteiligungService::NEW_KOMMUNAL_OK_MESSAGE_IDENTIFIER)) {
-            return XBeteiligungService::NEW_KOMMUNAL_OK_MESSAGE_IDENTIFIER;
-        }
-        if (str_contains($xmlContent, XBeteiligungService::NEW_KOMMUNAL_NOK_MESSAGE_IDENTIFIER)) {
-            return XBeteiligungService::NEW_KOMMUNAL_NOK_MESSAGE_IDENTIFIER;
-        }
-
-        // Default fallback
-        return XBeteiligungService::UNKNOWN_RESPONSE_MESSAGE_TYPE;
     }
 }
