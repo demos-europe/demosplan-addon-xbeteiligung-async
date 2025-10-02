@@ -35,9 +35,9 @@ enum XBeteiligungMessageType: string
     case PLANFESTSTELLUNG_INITIIEREN = 'planfeststellung.Initiieren.0201';
     case PLANFESTSTELLUNG_AKTUALISIEREN = 'planfeststellung.Aktualisieren.0202';
     case PLANFESTSTELLUNG_LOESCHEN = 'planfeststellung.Loeschen.0209';
-    case STATEMENT_NEUABGEGEBEN = 'allgemein.stellungnahme.Neuabgegeben.0701';
-    case STATEMENT_OK = 'allgemein.stellungnahme.Neuabgegeben.OK.0711';
-    case STATEMENT_NOK = 'allgemein.stellungnahme.Neuabgegeben.NOK.0721';
+    case STELLUNGNAHME_NEUABGEGEBEN = 'allgemein.stellungnahme.Neuabgegeben.0701';
+    case STELLUNGNAHME_OK = 'allgemein.stellungnahme.Neuabgegeben.OK.0711';
+    case STELLUNGNAHME_NOK = 'allgemein.stellungnahme.Neuabgegeben.NOK.0721';
     case UNKNOWN = 'unknown';
     case UNKNOWN_RESPONSE = 'unknown.response';
 }
