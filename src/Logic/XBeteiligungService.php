@@ -1259,30 +1259,12 @@ class XBeteiligungService
 
     /**
      * Determine message type from XML content for K3 audit
+     *
+     * @deprecated Use XBeteiligungMessageType::fromXmlContent() instead
      */
     private function determineMessageTypeFromContent(string $xmlContent): string
     {
-        $messageTypes = [
-            XBeteiligungMessageType::KOMMUNAL_INITIIEREN->value,
-            XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value,
-            XBeteiligungMessageType::KOMMUNAL_LOESCHEN->value,
-            XBeteiligungMessageType::RAUMORDNUNG_INITIIEREN->value,
-            XBeteiligungMessageType::RAUMORDNUNG_AKTUALISIEREN->value,
-            XBeteiligungMessageType::RAUMORDNUNG_LOESCHEN->value,
-            XBeteiligungMessageType::PLANFESTSTELLUNG_INITIIEREN->value,
-            XBeteiligungMessageType::PLANFESTSTELLUNG_AKTUALISIEREN->value,
-            XBeteiligungMessageType::PLANFESTSTELLUNG_LOESCHEN->value,
-            XBeteiligungMessageType::STELLUNGNAHME_OK->value,
-            XBeteiligungMessageType::STELLUNGNAHME_NOK->value,
-        ];
-
-        foreach ($messageTypes as $messageType) {
-            if (str_contains($xmlContent, $messageType)) {
-                return $messageType;
-            }
-        }
-
-        return self::UNKNOWN_MESSAGE_TYPE;
+        return XBeteiligungMessageType::fromXmlContent($xmlContent);
     }
 
     /**

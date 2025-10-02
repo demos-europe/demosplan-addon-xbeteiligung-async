@@ -40,4 +40,24 @@ enum XBeteiligungMessageType: string
     case STELLUNGNAHME_NOK = 'allgemein.stellungnahme.Neuabgegeben.NOK.0721';
     case UNKNOWN = 'unknown';
     case UNKNOWN_RESPONSE = 'unknown.response';
+
+    /**
+     * Determine message type from XML content.
+     *
+     * Scans the XML content for known message type identifiers and returns
+     * the matching enum case's value as string.
+     *
+     * @param string $xmlContent XML message content to analyze
+     * @return string The detected message type string or 'unknown' if no match found
+     */
+    public static function fromXmlContent(string $xmlContent): string
+    {
+        foreach (self::cases() as $messageType) {
+            if (str_contains($xmlContent, $messageType->value)) {
+                return $messageType->value;
+            }
+        }
+
+        return self::UNKNOWN->value;
+    }
 }
