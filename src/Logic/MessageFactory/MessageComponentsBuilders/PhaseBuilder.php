@@ -42,7 +42,10 @@ class PhaseBuilder
     /**
      * @throws ProjectPrefixNotFoundException
      */
-    private function createPhaseType(): CodeVerfahrensschrittKommunalType|CodeVerfahrensschrittRaumordnungType|CodeVerfahrensschrittPlanfeststellungType
+    private function createPhaseType():
+    CodeVerfahrensschrittKommunalType|
+    CodeVerfahrensschrittRaumordnungType|
+    CodeVerfahrensschrittPlanfeststellungType
     {
         if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
             return new CodeVerfahrensschrittKommunalType();
@@ -61,7 +64,9 @@ class PhaseBuilder
     }
 
     private function configurePhase(
-        CodeVerfahrensschrittKommunalType|CodeVerfahrensschrittRaumordnungType|CodeVerfahrensschrittPlanfeststellungType $phaseType,
+        CodeVerfahrensschrittKommunalType|
+        CodeVerfahrensschrittRaumordnungType|
+        CodeVerfahrensschrittPlanfeststellungType $phaseType,
         string $phaseName): void
     {
         $phaseType->setName($phaseName);
@@ -69,7 +74,11 @@ class PhaseBuilder
         $phaseType->setListVersionID(self::LIST_VERSION_ID);
     }
 
-    private function setPhaseTypeToStatement(object $participationType, StellungnahmeType $statement): void
+    private function setPhaseTypeToStatement(
+        CodeVerfahrensschrittKommunalType|
+        CodeVerfahrensschrittRaumordnungType|
+        CodeVerfahrensschrittPlanfeststellungType $participationType,
+        StellungnahmeType $statement): void
     {
         match ($participationType::class) {
             CodeVerfahrensschrittKommunalType::class => $statement->setVerfahrensschrittKommunal($participationType),
@@ -79,7 +88,7 @@ class PhaseBuilder
         };
     }
 
-    private function getPhaseName($statementCreated) {
+    private function getPhaseName(StatementCreated $statementCreated) {
         // If internal statement, use internal phase name
         if (StatementInterface::INTERNAL === $statementCreated->getPublicStatement()) {
             return $this->globalConfig->getPhaseNameWithPriorityInternal($statementCreated->getPhase());

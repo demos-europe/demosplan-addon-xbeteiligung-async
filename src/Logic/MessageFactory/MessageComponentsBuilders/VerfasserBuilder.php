@@ -2,6 +2,8 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders;
 
+use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AllgemeinerNameType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AnschriftType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameNatuerlichePersonType;
@@ -56,7 +58,7 @@ class VerfasserBuilder
         $verfasser->setName($naturalPerson);
     }
 
-    private function setPersonalDetailsFromUser(NameNatuerlichePersonType $naturalPerson, $user): void
+    private function setPersonalDetailsFromUser(NameNatuerlichePersonType $naturalPerson, UserInterface $user): void
     {
         if (!empty($user->getTitle())) {
             $naturalPerson->setTitel($user->getTitle());
@@ -98,7 +100,7 @@ class VerfasserBuilder
         }
     }
 
-    private function setAddressFromUser(VerfasserType $verfasser, $user): void
+    private function setAddressFromUser(VerfasserType $verfasser, UserInterface $user): void
     {
         $address = new AnschriftType();
         $hasAddressData = false;
@@ -129,7 +131,7 @@ class VerfasserBuilder
         }
     }
 
-    private function setAddressFromMeta(VerfasserType $verfasser, $meta): void
+    private function setAddressFromMeta(VerfasserType $verfasser, StatementMetaInterface $meta): void
     {
         $address = new AnschriftType();
         $hasAddressData = false;
