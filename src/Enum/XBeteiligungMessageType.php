@@ -23,6 +23,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Planfestste
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\Incoming\GenericProcedureMessageHandler;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\Incoming\GenericStatementResponseHandler;
 use InvalidArgumentException;
 
 /**
@@ -143,6 +145,26 @@ enum XBeteiligungMessageType: string
             self::STELLUNGNAHME_OK => '711',
             self::STELLUNGNAHME_NOK => '721',
             default => null,
+        };
+    }
+
+    /**
+     * Get the handler class responsible for processing this message type.
+     *
+     * @return string The fully qualified class name of the handler
+     * @throws InvalidArgumentException If no handler class is defined for this message type
+     */
+    public function getHandlerClass(): string
+    {
+        return match ($this) {
+            self::KOMMUNAL_INITIIEREN,
+            self::KOMMUNAL_AKTUALISIEREN,
+            self::PLANFESTSTELLUNG_INITIIEREN => GenericProcedureMessageHandler::class,
+
+            self::STELLUNGNAHME_OK,
+            self::STELLUNGNAHME_NOK => GenericStatementResponseHandler::class,
+
+            default => throw new InvalidArgumentException('No handler class defined for message type: ' . $this->value),
         };
     }
 }
