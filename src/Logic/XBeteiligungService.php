@@ -20,13 +20,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Beteiligung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType\BeteiligungPlanfeststellungTOEBArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenNOK0721;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenOK0711;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
 use JsonException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -38,8 +34,6 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
@@ -72,8 +66,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Raumordnung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
-use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
-use InvalidArgumentException;
 use proj4php\Point;
 use proj4php\Proj;
 use proj4php\Proj4php;
@@ -90,9 +82,6 @@ class XBeteiligungService
     private const PLACEHOLDER_PROCEDURE_PHASE_CODE = '0815';
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
-
-    /** Statement ID prefix that needs to be removed for database storage */
-    public const STATEMENT_ID_PREFIX = 'ID_';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
     public const MISSING_USER_ERROR_CODE = '0300';
     public const WRONG_ATTACHMENT_FORMAT_ERROR_CODE = '0200';
@@ -106,8 +95,6 @@ class XBeteiligungService
     public function __construct(
         private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
         private readonly GlobalConfigInterface                  $globalConfig,
-        private readonly KommunaleProcedureCreater              $kommunaleProcedureCreater,
-        private readonly KommunaleProcedureUpdater              $kommunaleProcedureUpdater,
         private readonly LoggerInterface                        $logger,
         private readonly ParameterBagInterface                  $parameterBag,
         private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
@@ -978,241 +965,9 @@ class XBeteiligungService
         return $this->planningDocumentsLinkCreator;
     }
 
-    /**
-     * @throws SchemaException
-     * @throws InvalidArgumentException
-     * @throws Exception
-     */
-    public function processXmlMessage(string $messageXml, bool $auditEnabled = false, ?string $routingKey = null): ?ResponseValue
-    {
-        $this->logger->debug('Process xml message.', ['messageXml' => substr($messageXml, 0, 500) . '...']);
-
-        $messageStringIdentifier = XBeteiligungMessageType::fromXmlContent($messageXml);
-        $this->logger->debug('Extracted message string identifier.', ['messageStringIdentifier' => $messageStringIdentifier]);
-
-        $auditRecord = null;
-
-        if (XBeteiligungMessageType::KOMMUNAL_INITIIEREN->value === $messageStringIdentifier) {
-            /** @var KommunalInitiieren0401 $kommunalInitiieren401 */
-            $kommunalInitiieren401 = $this->incomingMessageParser->getXmlObject($messageXml, '401');
-
-            if ($auditEnabled) {
-                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier, $routingKey);
-            }
-
-            try {
-                $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage(
-                    $kommunalInitiieren401,
-                    $routingKey
-                );
-
-                $this->markAuditRecordAsProcessed($auditRecord, $response->getProcedureId());
-
-                return $response;
-            } catch (Exception $e) {
-                $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
-                throw $e;
-            }
-        }
-
-        if (XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value === $messageStringIdentifier)
-        {
-            /** @var KommunalAktualisieren0402 $kommunalAktualisieren402 */
-            $kommunalAktualisieren402 = $this->incomingMessageParser->getXmlObject($messageXml, '402');
-
-            if ($auditEnabled) {
-                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier, $routingKey);
-            }
-
-            try {
-                $response = $this->kommunaleProcedureUpdater->updateProcedure(
-                    $kommunalAktualisieren402
-                );
-
-                $this->markAuditRecordAsProcessed($auditRecord, $response->getProcedureId());
-
-                return $response;
-            } catch (Exception $e) {
-                $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
-                throw $e;
-            }
-        }
-
-        if (XBeteiligungMessageType::PLANFESTSTELLUNG_INITIIEREN->value === $messageStringIdentifier) {
-            /** @var PlanfeststellungInitiieren0201 $planfeststellungInitiieren201 */
-            $planfeststellungInitiieren201 = $this->incomingMessageParser->getXmlObject($messageXml, '0201');
-
-            if ($auditEnabled) {
-                $auditRecord = $this->createAuditRecordForXmlMessage($messageXml, $messageStringIdentifier, $routingKey);
-            }
-
-            try {
-                $response = $this->kommunaleProcedureCreater->createNewProcedureFromXBeteiligungMessageOrErrorMessage(
-                    $planfeststellungInitiieren201,
-                    $routingKey
-                );
-                $this->markAuditRecordAsProcessed($auditRecord, $response->getProcedureId());
-
-                return $response;
-            } catch (Exception $e) {
-                $this->markAuditRecordAsFailed($auditRecord, $e->getMessage());
-                throw $e;
-            }
-        }
-
-        if (XBeteiligungMessageType::STELLUNGNAHME_OK->value === $messageStringIdentifier)
-        {
-            /** @var AllgemeinStellungnahmeNeuabgegebenOK0711 $newStatementOK711 */
-            $newStatementOK711 = $this->incomingMessageParser->getXmlObject($messageXml, '711');
-            $statementId = $this->removeStatementIdPrefix(
-                $newStatementOK711->getNachrichteninhalt()?->getStellungnahmeID()
-            );
-
-            if ($auditEnabled) {
-                // Find original 701 message to get procedureId, planId and for correlation
-                $original701Message = $this->auditService->findOriginalOutgoing701MessageByStatementId($statementId);
-
-                $auditRecord = $this->auditService->auditReceivedMessage(
-                    $messageXml,
-                    $messageStringIdentifier,
-                    $original701Message?->getPlanId(), // planId from original 701
-                    $original701Message?->getProcedureId(), // procedureId from original 701
-                    $original701Message?->getId(), // responseToMessageId - link to original 701
-                    $statementId,
-                    $routingKey
-                );
-                $this->auditService->markAsProcessed($auditRecord->getId());
-            }
-
-            $this->logger->info('Statement OK response processed', [
-                'statementId' => $statementId,
-                'messageType' => $messageStringIdentifier
-            ]);
-
-            // Statement acknowledgments don't require a response - return null
-            return null;
-        }
-
-        if (XBeteiligungMessageType::STELLUNGNAHME_NOK->value === $messageStringIdentifier) {
-            /** @var AllgemeinStellungnahmeNeuabgegebenNOK0721 $newStatementNOK721 */
-            $newStatementNOK721 = $this->incomingMessageParser->getXmlObject($messageXml, '721');
-            $statementId = $this->removeStatementIdPrefix(
-                $newStatementNOK721->getNachrichteninhalt()?->getStellungnahmeID()
-            );
-            $errorMessagesArray = $newStatementNOK721->getNachrichteninhalt()?->getFehler();
-            $errorMessagesString = $this->extractErrorDescriptions($errorMessagesArray);
-
-            if ($auditEnabled) {
-                // Find original 701 message to get procedureId, planId and for correlation
-                $original701Message = $this->auditService->findOriginalOutgoing701MessageByStatementId($statementId);
-
-                $auditRecord = $this->auditService->auditReceivedMessage(
-                    $messageXml,
-                    $messageStringIdentifier,
-                    $original701Message?->getPlanId(), // planId from original 701
-                    $original701Message?->getProcedureId(), // procedureId from original 701
-                    $original701Message?->getId(), // responseToMessageId - link to original 701
-                    $statementId,
-                    $routingKey
-                );
-                $this->auditService->markAsFailed($auditRecord->getId(), $errorMessagesString);
-            }
-
-            $this->logger->warning('Statement NOK response processed', [
-                'statementId' => $statementId,
-                'errorMessage' => $errorMessagesString,
-                'messageType' => $messageStringIdentifier
-            ]);
-
-            // Statement acknowledgments don't require a response - return null
-            return null;
-        }
-
-        throw new InvalidArgumentException('Unsupported message type: ' . $messageStringIdentifier);
-    }
-
-    private function createAuditRecordForXmlMessage(
-        string $messageXml,
-        string $messageStringIdentifier,
-        ?string $routingKey = null
-    ): XBeteiligungMessageAudit
-    {
-        $planId = $this->extractPlanIdFromXml($messageXml, $messageStringIdentifier);
-        return $this->auditService->auditReceivedMessage(
-            $messageXml,
-            $messageStringIdentifier,
-            $planId,
-            null, // procedureId
-            null, // responseToMessageId
-            null, // statementId
-            $routingKey
-        );
-    }
-
-    private function markAuditRecordAsProcessed(
-        ?XBeteiligungMessageAudit $auditRecord,
-        ?string $procedureId = null
-    ): void
-    {
-        if (null !== $auditRecord) {
-            $this->auditService->markAsProcessed($auditRecord->getId());
-            if (null !== $procedureId) {
-                $this->auditService->updateAuditWithProcedureId($auditRecord->getId(), $procedureId);
-            }
-        }
-    }
-
-    private function markAuditRecordAsFailed(
-        ?XBeteiligungMessageAudit $auditRecord,
-        string $errorMessage
-    ): void
-    {
-        if (null !== $auditRecord) {
-            $this->auditService->markAsFailed($auditRecord->getId(), $errorMessage);
-        }
-    }
-
     private function determinePlanId(ProcedureInterface $procedure): string
     {
         return '' === $procedure->getXtaPlanId() ? $procedure->getId() : $procedure->getXtaPlanId();
-    }
-
-    /**
-     * Remove ID_ prefix from statement ID if present
-     *
-     * @param string|null $statementId The statement ID that may contain ID_ prefix
-     * @return string|null The statement ID without ID_ prefix
-     */
-    private function removeStatementIdPrefix(?string $statementId): ?string
-    {
-        if (null === $statementId) {
-            return null;
-        }
-
-        return str_replace(self::STATEMENT_ID_PREFIX, '', $statementId);
-    }
-
-    /**
-     * Extract readable error descriptions from FehlerType array
-     *
-     * @param mixed $errorMessage Array of FehlerType objects or other value
-     * @return string Readable error description
-     */
-    private function extractErrorDescriptions(array $errorMessage): string
-    {
-        $errorDescriptions = [];
-        foreach ($errorMessage as $fehler) {
-            if ($fehler instanceof FehlerType) {
-                $beschreibung = $fehler->getBeschreibung();
-                if (null !== $beschreibung) {
-                    $errorDescriptions[] = $beschreibung;
-                }
-            }
-        }
-
-        return [] !== $errorDescriptions
-            ? implode('; ', $errorDescriptions)
-            : 'Statement rejected by cockpit';
     }
 
     /**
