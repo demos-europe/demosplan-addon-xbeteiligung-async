@@ -137,7 +137,7 @@ class RabbitMQMessageBroker
      *
      * @throws Exception
      */
-    public function processMessages(string $queueName, int $maxMessages = null): void
+    public function processMessages(string $queueName, ?int $maxMessages = null): void
     {
         $maxMessages ??= $this->config->maxMessagesPerCycle;
 
