@@ -13,9 +13,10 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Services;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\MessageHandlerSelector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -26,9 +27,9 @@ class XBeteiligungMessageProcessor
 {
     public function __construct(
         private readonly XBeteiligungConfiguration $config,
-        private readonly XBeteiligungService $xBeteiligungService,
         private readonly XBeteiligungAuditService $auditService,
         private readonly XBeteiligungOutgoingRoutingKeyBuilder $outgoingRoutingKeyBuilder,
+        private readonly MessageHandlerSelector $messageHandlerSelector,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -46,7 +47,10 @@ class XBeteiligungMessageProcessor
         try {
             $this->logger->debug('Process single message', [$messageData->getBody()]);
 
-            $responseObject = $this->xBeteiligungService->processXmlMessage(
+            $messageType = XBeteiligungMessageType::fromXmlContent($messageData->getBody());
+            $handler = $this->messageHandlerSelector->getHandlerForMessageType($messageType);
+
+            $responseObject = $handler->handleIncomingMessage(
                 $messageData->getBody(),
                 $this->config->auditEnabled,
                 $messageData->getRoutingKey()
