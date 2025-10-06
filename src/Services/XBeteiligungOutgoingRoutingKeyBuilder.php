@@ -98,7 +98,7 @@ class XBeteiligungOutgoingRoutingKeyBuilder
         $senderAgs = $incomingComponents->agsCode2;    // demosplan AGS (was receiver)
         $receiverAgs = $incomingComponents->agsCode1;  // cockpit AGS (was sender)
 
-        $senderDvdvOrg = $this->config->xoevAddressPrefixKommunal;  // demosplan DVDV
+        $senderDvdvOrg = $this->config->getProjectSpecificXoevAddressPrefixForBeteiligung();  // demosplan DVDV
         $receiverDvdvOrg = $this->config->xoevAddressPrefixCockpit; // cockpit DVDV
 
         return implode('.', [

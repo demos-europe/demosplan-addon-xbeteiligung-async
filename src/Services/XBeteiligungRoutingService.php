@@ -69,7 +69,7 @@ class XBeteiligungRoutingService
             if (self::TEST_ENVIRONMENT_AGS_CODE === $agsData['sender']) {
                 $agsPart = self::TEST_ENVIRONMENT_ROUTING_PART;
             } else {
-                $agsPart = $this->config->xoevAddressPrefixKommunal.'.'.$agsData['receiver'].'.'.
+                $agsPart = $this->config->getProjectSpecificXoevAddressPrefixForBeteiligung().'.'.$agsData['receiver'].'.'.
                     $this->config->xoevAddressPrefixCockpit.'.'.$agsData['sender'];
             }
 
@@ -85,7 +85,7 @@ class XBeteiligungRoutingService
                 'routingKey' => $routingKey,
                 'procedureId' => $procedureId,
                 'projectType' => $projectType,
-                'xoevAddressPrefixKommunal' => $this->config->xoevAddressPrefixKommunal,
+                'xoevAddressPrefixKommunal' => $this->config->getProjectSpecificXoevAddressPrefixForBeteiligung(),
                 'xoevAddressPrefixCockpit' => $this->config->xoevAddressPrefixCockpit,
                 'senderAgs' => $agsData['sender'],
                 'receiverAgs' => $agsData['receiver']

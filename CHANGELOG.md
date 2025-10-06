@@ -6,6 +6,12 @@
 - Create generic message handlers to replace duplicated logic
 - Extract reusable services following Single Responsibility Principle
 
+## v0.39 (2025-10-06)
+**Customer Mapping and Routing Configuration (DPLAN-16733)**
+- Add support for AGS codes 98 and 99 in customer mapping for test environments
+- Replace hardcoded XÖEV address prefixes with dynamic project-specific prefixes
+- Update routing key builder to use project-specific prefixes (bdp/rog/pfv) based on procedure type
+
 ## v0.38 (2025-10-06)
 **Statement Message Factory Refactoring (DPLAN-15365)**
 - Extract phase handling logic to new `PhaseBuilder` class with project-specific phase type detection

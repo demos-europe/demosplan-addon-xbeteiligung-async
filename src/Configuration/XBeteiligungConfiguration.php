@@ -18,13 +18,13 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 class XBeteiligungConfiguration
 {
     private const RABBIT_MQ_EXCHANGE = '.beteiligung';
+    private const UNKOWN_PROCEDURE_MESSAGE_TYPE = 'Unknown procedure message type "%s"';
     public function __construct(
         public readonly bool $rabbitMqEnabled,
         public readonly int $requestTimeout,
         public readonly int $communicationDelay,
         public readonly string $procedureMessageType,
         public readonly bool $auditEnabled,
-        public readonly string $xoevAddressPrefixKommunal,
         public readonly string $xoevAddressPrefixCockpit,
         public readonly int $maxMessagesPerCycle,
         public readonly int $consumerTimeout,
@@ -65,7 +65,6 @@ class XBeteiligungConfiguration
             $params->get('addon_xbeteiligung_async_rabbitmq_communication_delay'),
             $params->get('addon_xbeteiligung_async_procedure_message_type'),
             $params->get('addon_xbeteiligung_async_enable_audit'),
-            'bdp',
             'bap',
             $params->get('addon_xbeteiligung_async_max_messages_per_cycle'),
             $params->get('addon_xbeteiligung_async_consumer_timeout'),
@@ -80,7 +79,19 @@ class XBeteiligungConfiguration
             'raumordnung' => 'rog',
             'planfeststellung' => 'pfv',
             default => throw new InvalidArgumentException(
-                sprintf('Unknown procedure message type "%s"', $this->procedureMessageType)
+                sprintf(self::UNKOWN_PROCEDURE_MESSAGE_TYPE, $this->procedureMessageType)
+            )
+        };
+    }
+
+    public function getProjectSpecificXoevAddressPrefixForBeteiligung(): string
+    {
+        return match (strtolower($this->procedureMessageType)) {
+            'kommunal' => 'bdp',
+            'raumordnung' => 'rog',
+            'planfeststellung' => 'pfv',
+            default => throw new InvalidArgumentException(
+                sprintf(self::UNKOWN_PROCEDURE_MESSAGE_TYPE, $this->procedureMessageType)
             )
         };
     }

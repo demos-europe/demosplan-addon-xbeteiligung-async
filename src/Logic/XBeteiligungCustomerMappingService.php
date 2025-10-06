@@ -47,108 +47,14 @@ class XBeteiligungCustomerMappingService
         '14' => 'sn',  // Sachsen
         '15' => 'st',  // Sachsen-Anhalt
         '16' => 'th',  // Thüringen
+        '98' => 'hh',  // develop environment     maybe we should use a test customer here?
+        '99' => 'hh'   // integration environment maybe we should use a test customer here?
     ];
 
     public function __construct(
         private readonly CustomerServiceInterface $customerService,
         private readonly LoggerInterface $logger
     ) {
-    }
-
-    /**
-     * Extract the federal state code from a XöV-Kennung-Code.
-     *
-     * XöV-Kennung-Code structure: 02 + federal state (2 digits) + rest
-     * For example: 020500200099 -> federal state code is "05" (positions 2-3)
-     *
-     * @param string $agsCode The XöV-Kennung-Code (minimum 4 digits)
-     * @return string The federal state code (2 digits)
-     * @throws InvalidArgumentException If XöV code is invalid
-     */
-    public function extractFederalStateCode(string $agsCode): string
-    {
-        if (strlen($agsCode) < 4) {
-            throw new InvalidArgumentException(
-                "XöV-Kennung-Code must be at least 4 characters long, got: {$agsCode}"
-            );
-        }
-
-        if (!ctype_digit($agsCode)) {
-            throw new InvalidArgumentException(
-                "XöV-Kennung-Code must contain only digits, got: {$agsCode}"
-            );
-        }
-
-        // Extract federal state code from positions 2-3 (3rd and 4th digits)
-        $federalStateCode = substr($agsCode, 2, 2);
-
-        $this->logger->debug('Extracted federal state code from XöV-Kennung-Code', [
-            'xoev_code' => $agsCode,
-            'federal_state_code' => $federalStateCode
-        ]);
-
-        return $federalStateCode;
-    }
-
-    /**
-     * Map a XöV-Kennung-Code to a customer subdomain.
-     *
-     * @param string $agsCode The XöV-Kennung-Code
-     * @return string The customer subdomain
-     * @throws InvalidArgumentException If XöV code or federal state mapping is invalid
-     */
-    public function mapAgsToCustomerSubdomain(string $agsCode): string
-    {
-        $federalStateCode = $this->extractFederalStateCode($agsCode);
-
-        if (!array_key_exists($federalStateCode, self::FEDERAL_STATE_TO_SUBDOMAIN_MAP)) {
-            throw new InvalidArgumentException(
-                "No subdomain mapping found for federal state code: {$federalStateCode} (AGS: {$agsCode})"
-            );
-        }
-
-        $subdomain = self::FEDERAL_STATE_TO_SUBDOMAIN_MAP[$federalStateCode];
-
-        $this->logger->debug('Mapped XöV-Kennung-Code to customer subdomain', [
-            'xoev_code' => $agsCode,
-            'federal_state_code' => $federalStateCode,
-            'subdomain' => $subdomain
-        ]);
-
-        return $subdomain;
-    }
-
-    /**
-     * Get a customer entity by XöV-Kennung-Code.
-     *
-     * @param string $agsCode The XöV-Kennung-Code
-     *
-     * @return CustomerInterface The customer entity
-     * @throws Exception
-     */
-    public function getCustomerByAgsCode(string $agsCode): CustomerInterface
-    {
-        $subdomain = $this->mapAgsToCustomerSubdomain($agsCode);
-
-        try {
-            $customer = $this->customerService->findCustomerBySubdomain($subdomain);
-
-            $this->logger->info('Successfully mapped XöV-Kennung-Code to customer', [
-                'xoev_code' => $agsCode,
-                'subdomain' => $subdomain,
-                'customer_id' => $customer->getId()
-            ]);
-
-            return $customer;
-        } catch (Exception $e) {
-            $this->logger->error('Customer not found for XöV-Kennung-Code', [
-                'xoev_code' => $agsCode,
-                'subdomain' => $subdomain,
-                'error' => $e->getMessage()
-            ]);
-
-            throw $e;
-        }
     }
 
     /**
