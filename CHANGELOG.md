@@ -6,6 +6,11 @@
 - Replace hardcoded XÖEV address prefixes with dynamic project-specific prefixes
 - Update routing key builder to use project-specific prefixes (bdp/rog/pfv) based on procedure type
 
+## v0.37 (2025-10-02)
+- Remove enum-based procedure phase mapping system (DPLAN-16438)
+- Delete InstitutionParticipationPhase, PublicParticipationPhase, and ProcedurePhaseKey enums
+- Simplify procedure phase handling by using hardcoded 'configuration' phase for all procedures
+
 ## v0.36 (2025-09-30)
 - Territory display fix for XML-processed geltungsbereich
 - Automatic GIS layer creation from flaechenabgrenzungsUrl in XBeteiligung messages

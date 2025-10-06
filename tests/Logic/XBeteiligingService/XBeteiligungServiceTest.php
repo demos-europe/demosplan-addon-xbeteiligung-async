@@ -127,6 +127,8 @@ abstract class XBeteiligungServiceTest extends TestCase
         $procedure->method('getPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
+        $procedure->method('getPublicParticipationPhaseName')->willReturn('configuration');
+        $procedure->method('getPhaseName')->willReturn('configuration');
         $procedure->method('getPhase')->willReturn('earlyparticipation');
         $procedure->method('getSettings')->willReturn($procedureSettingsMock);
         $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(
