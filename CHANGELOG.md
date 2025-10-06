@@ -1,7 +1,10 @@
 # Changelog
 
 ## UNRELEASED
-- added 98,99 ags codes in customer mapping
+**Customer Mapping and Routing Configuration (DPLAN-16733)**
+- Add support for AGS codes 98 and 99 in customer mapping for test environments
+- Replace hardcoded XÖEV address prefixes with dynamic project-specific prefixes
+- Update routing key builder to use project-specific prefixes (bdp/rog/pfv) based on procedure type
 
 ## v0.36 (2025-09-30)
 - Territory display fix for XML-processed geltungsbereich

@@ -43,7 +43,6 @@ class KommunaleProcedureHandlerFactory
             communicationDelay: 300,
             procedureMessageType: 'Kommunal',
             auditEnabled: true,
-            xoevAddressPrefixKommunal: 'bdp',
             xoevAddressPrefixCockpit: 'bap',
             maxMessagesPerCycle: 10,
             consumerTimeout: 5,

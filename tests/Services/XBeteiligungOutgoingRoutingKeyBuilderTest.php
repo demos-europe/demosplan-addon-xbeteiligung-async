@@ -34,7 +34,6 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
             300,            // communicationDelay
             'Kommunal',     // procedureMessageType
             true,           // auditEnabled
-            'bdp',          // xoevAddressPrefixKommunal
             'bap',          // xoevAddressPrefixCockpit
             10,             // maxMessagesPerCycle
             5,              // consumerTimeout
@@ -171,7 +170,6 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
             300,            // communicationDelay
             'Raumordnung',  // procedureMessageType (gives 'rog' prefix)
             true,           // auditEnabled
-            'custom_kommunal', // xoevAddressPrefixKommunal
             'custom_cockpit', // xoevAddressPrefixCockpit
             10,             // maxMessagesPerCycle
             5,              // consumerTimeout
@@ -190,7 +188,7 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
         $result = $customBuilder->buildFromIncomingRoutingKey($incomingRoutingKey, $outgoingMessageIdentifier);
 
         self::assertSame(
-            'rog.beteiligung.custom_kommunal.02.05.00200099.custom_cockpit.02.05.00200099.kommunal.Initiieren.OK.0411',
+            'rog.beteiligung.rog.02.05.00200099.custom_cockpit.02.05.00200099.kommunal.Initiieren.OK.0411',
             $result
         );
     }
