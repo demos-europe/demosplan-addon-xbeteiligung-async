@@ -33,6 +33,7 @@ class XBeteiligungGisLayerManager
     private const LAYER_TYPE_OVERLAY = 'overlay';
     private const DEFAULT_SERVICE_TYPE = 'wms';
     private const LOG_PREFIX = 'XBeteiligung GIS Layer Manager: ';
+    private const LAYER_NAME = 'Planzeichnung';
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -59,8 +60,8 @@ class XBeteiligungGisLayerManager
             $this->validateWmsUrl($flaechenabgrenzungsUrl);
             $layers = $this->extractLayersFromUrl($flaechenabgrenzungsUrl);
 
-            foreach ($layers as $layerName) {
-                $this->createGisLayer($flaechenabgrenzungsUrl, $layerName, $procedure);
+            if (count($layers) > 0) {
+                $this->createGisLayer($flaechenabgrenzungsUrl, $layers, $procedure);
             }
         } catch (Exception $e) {
             $this->logger->error(
@@ -122,7 +123,10 @@ class XBeteiligungGisLayerManager
         return $layers;
     }
 
-    private function createGisLayer(string $url, string $layerName, ProcedureInterface $procedure): void
+    /**
+     * @throws Exception
+     */
+    private function createGisLayer(string $url, array $layers, ProcedureInterface $procedure): void
     {
         $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
         if (null === $rootCategory) {
@@ -130,10 +134,11 @@ class XBeteiligungGisLayerManager
         }
 
         $gisLayer = $this->gisLayerFactory->createGisLayer();
+        $layersString = implode(',', $layers);
 
-        $gisLayer->setName($layerName);
+        $gisLayer->setName(self::LAYER_NAME);
         $gisLayer->setUrl($this->buildCleanLayerUrl($url));
-        $gisLayer->setLayers($layerName);
+        $gisLayer->setLayers($layersString);
         $gisLayer->setProcedureId($procedure->getId());
 
         $gisLayer->setType(self::LAYER_TYPE_OVERLAY);
@@ -161,8 +166,9 @@ class XBeteiligungGisLayerManager
         $this->entityManager->persist($gisLayer);
         $this->entityManager->persist($rootCategory);
 
-        $this->logger->info(self::LOG_PREFIX . 'Created GIS layer', [
-            'layerName' => $layerName,
+        $this->logger->info(self::LOG_PREFIX . 'Created single GIS layer with all layers', [
+            'layers' => $layersString,
+            'layerCount' => count($layers),
             'procedureId' => $procedure->getId(),
             'cleanUrl' => $gisLayer->getUrl(),
         ]);
