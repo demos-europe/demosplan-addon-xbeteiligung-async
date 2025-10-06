@@ -1,6 +1,14 @@
 # Changelog
 
 ## UNRELEASED
+**Statement Message Factory Refactoring (DPLAN-15365)**
+- Extract phase handling logic to new `PhaseBuilder` class with project-specific phase type detection
+- Extract statement author (Verfasser) creation to new `VerfasserBuilder` class with improved personal data handling
+- Refactor `StatementMessageFactory` by extracting complex logic into specialized builder classes
+- Improve statement text processing by properly handling HTML content (replace line breaks with spaces before stripping tags)
+- Add comprehensive unit tests for PhaseBuilder and VerfasserBuilder components
+- Remove unused methods from StatementAction value object to simplify codebase
+
 ## v0.37 (2025-10-02)
 - Remove enum-based procedure phase mapping system (DPLAN-16438)
 - Delete InstitutionParticipationPhase, PublicParticipationPhase, and ProcedurePhaseKey enums
