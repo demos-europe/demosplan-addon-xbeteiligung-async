@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.38 (2025-10-06)
 **Statement Message Factory Refactoring (DPLAN-15365)**
 - Extract phase handling logic to new `PhaseBuilder` class with project-specific phase type detection
 - Extract statement author (Verfasser) creation to new `VerfasserBuilder` class with improved personal data handling
