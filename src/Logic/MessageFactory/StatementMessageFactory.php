@@ -2,15 +2,17 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory;
 
+use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\AllgemeinerNameType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameNatuerlichePersonType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701\AllgemeinStellungnahmeNeuabgegeben0701AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701\AllgemeinStellungnahmeNeuabgegeben0701AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungType;
@@ -19,16 +21,12 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeArtDerR
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeArtDerStellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePrioritaetDerStellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeStatusDerStellungnahmeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\StellungnahmeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\VerfasserType;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 use DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon;
 use Exception;
 use JsonException;
+use Psr\Log\LoggerInterface;
 
 class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 {
@@ -40,6 +38,22 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     private const DEFAULT_FEEDBACK_CODE = '1000'; // "E-Mail" - most common feedback method
     private const DEFAULT_PRIORITY_CODE = '3'; // "nicht vergeben" - priority not assigned
     private const DEFAULT_CONSIDERATION_CODE = '5000'; // "Die Stellungnahme wird zur Kenntnis genommen."
+
+    private const DEFAULT_PROCEDURE_PHASE_CODE = '0815';
+
+    private const LIST_VERSION_ID = '3';
+
+    public function __construct(
+        CommonHelpers                     $commonHelpers,
+        LoggerInterface                   $logger,
+        PermissionEvaluatorInterface      $permissionEvaluator,
+        ReusableMessageBlocks             $reusableMessageBlocks,
+        private readonly VerfasserBuilder $verfasserBuilder,
+        private readonly PhaseBuilder     $phaseBuilder,
+    ) {
+        parent::__construct($commonHelpers, $logger, $permissionEvaluator, $reusableMessageBlocks);
+    }
+
     /**
      * Builds a valid XBeteiligungsmessage as a response of creating a statement.
      *
@@ -83,27 +97,14 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $status->setCode($this->statusDerStellungnahme($statementCreated->getStatus()));
         $statement->setStatus($status);
         // set Verfasser --> user data
-        if ($this->getTypeOfPerson($statementCreated) === true) {
-            $verfasser = new VerfasserType();
-            $verfasser->setPrivatperson(true);
-            $natuerlichePerson = new NameNatuerlichePersonType();
-            $natuerlichePerson->setTitel($statementCreated->getUser()->getTitle());
-            $fname = new AllgemeinerNameType();
-            $lname = new AllgemeinerNameType();
-            $fname->setName($statementCreated->getUser()->getFirstname());
-            $lname->setName($statementCreated->getUser()->getLastname());
-            $natuerlichePerson->setFamilienname($lname);
-            $natuerlichePerson->setVorname($fname);
-            $natuerlichePerson->setAnrede($statementCreated->getUser()->getGender());
-            $verfasser->setName($natuerlichePerson);
-            $statement->setVerfasser($verfasser);
-        }
+        $this->verfasserBuilder->setVerfasser($statementCreated, $statement);
+
         // set title
         $statement->setTitel($statementCreated->getTitle());
         // set beschreibung
         $statement->setBeschreibung($statementCreated->getDescription());
         //set durchgang
-        $this->getIteration($statement, $statementCreated);
+        $statement->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
         // set datum
         $statement->setDatum($statementCreated->getCreatedAt());
         // set art der rueckmeldung
@@ -115,16 +116,9 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $artDerStellungnahme->setCode($this->getArtOfStatement($statementCreated->getPublicUseName()));
         $statement->setArtDerStellungnahme($artDerStellungnahme);
         // set verfahrenschritt
-        $this->getProcedurePhase($statementCreated, $statement);
+        $this->phaseBuilder->setVerfahrenschritt($statementCreated, $statement);
         // set verfahrensteilschritt
-        $partParticipationType = new CodeVerfahrensteilschrittType();
-        $phaseCode = $statementCreated->getPartPhaseCode(
-            $statementCreated->getPhase(),
-            $statementCreated->getPublicStatement()
-        );
-        $partParticipationType->setCode($phaseCode);
-        $partParticipationType->setListVersionID('3');
-        $statement->setVerfahrensteilschritt($partParticipationType);
+        $this->phaseBuilder->setVerfahrensteilschritt($statementCreated, $statement);
         // set priority
         $priority = new CodePrioritaetDerStellungnahmeType();
         $priority->setCode($this->getPriority($statementCreated->getPriority()));
@@ -145,15 +139,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $nachricht->setVorgangsID($this->commonHelpers->uuid());
 
         return $nachricht;
-    }
-
-    private function getTypeOfPerson(StatementCreated $statementCreated): bool
-    {
-        $privatPerson = true;
-        if ($statementCreated->getMeta()->getOrgaName() !== 'Privatperson') {
-            $privatPerson = false;
-        }
-        return $privatPerson;
     }
 
     private function statusDerStellungnahme($statusDerStellungnahme): string
@@ -236,51 +221,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         return self::DEFAULT_PRIORITY_CODE; // "nicht vergeben" - priority not assigned
     }
 
-    /**
-     * @throws ProjectPrefixNotFoundException
-     */
-    private function getIteration(StellungnahmeType $statement, StatementCreated $statementCreated): void
-    {
-        $procedure = null;
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
-            $procedure = new BeteiligungKommunalTOEBType();
-        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
-            $procedure = new BeteiligungRaumordnungType();
-        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
-            $procedure = new BeteiligungPlanfeststellungType();
-        }elseif ($procedure === null) {
-            $this->logger->error('No procedure found.');
-            throw new ProjectPrefixNotFoundException();
-        }
-        $procedure->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
-        $statement->setDurchgang($procedure->getDurchgang());
-    }
-
-    /**
-     * @throws ProjectPrefixNotFoundException
-     */
-    private function getProcedurePhase(StatementCreated $statementCreated, StellungnahmeType $statement): void
-    {
-        if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
-            $participationType = new CodeVerfahrensschrittKommunalType();
-            $phaseCode = $statementCreated->getPhaseCodeKommunale($statementCreated->getPhase(), $statementCreated->getPublicStatement());
-            $participationType->setCode($phaseCode);
-            $participationType->setListVersionID('3');
-            $statement->setVerfahrensschrittKommunal($participationType);
-        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_rog_create())) {
-            $participationType = new CodeVerfahrensschrittRaumordnungType();
-            $phaseCode = $statementCreated->getPhaseCodeRaumordnung($statementCreated->getPhase(), $statementCreated->getPublicStatement());
-            $participationType->setCode($phaseCode);
-            $participationType->setListVersionID('3');
-            $statement->setVerfahrensschrittRaumordnung($participationType);
-        }elseif ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_pln_create())) {
-            $participationType = new CodeVerfahrensschrittPlanfeststellungType();
-            $phaseCode = $statementCreated->getPhaseCodePlanfeststellung() ?? 'configuration';
-            $participationType->setCode($phaseCode);
-            $statement->setVerfahrensschrittPlanfeststellung($participationType);
-        }
-    }
-
     private function getAbwaegungVorschlag($abwaegungVorschlag): string
     {
         $abwaegungVorschlagMapping = [
@@ -321,4 +261,6 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
         return $result;
     }
+
+
 }
