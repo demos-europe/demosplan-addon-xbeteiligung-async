@@ -1,6 +1,10 @@
 # Changelog
 
 ## UNRELEASED
+**Message Processing Architecture Refactoring (DPLAN-16438)**
+- Refactor XBeteiligung message processing to eliminate code duplication
+- Create generic message handlers to replace duplicated logic
+- Extract reusable services following Single Responsibility Principle
 ## v0.37 (2025-10-02)
 - Remove enum-based procedure phase mapping system (DPLAN-16438)
 - Delete InstitutionParticipationPhase, PublicParticipationPhase, and ProcedurePhaseKey enums
