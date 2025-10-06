@@ -6,6 +6,12 @@
 - Create generic message handlers to replace duplicated logic
 - Extract reusable services following Single Responsibility Principle
 
+## v0.40 (2025-10-06)
+**GIS Layer Management Improvements**
+- Consolidate multiple GIS layers into single "Planzeichnung" overlay for better map organization
+- Change XBeteiligungGisLayerManager to create one overlay containing all layers as comma-separated string instead of individual overlays per layer
+- Update comprehensive test suite to reflect single layer creation pattern
+
 ## v0.39 (2025-10-06)
 **Customer Mapping and Routing Configuration (DPLAN-16733)**
 - Add support for AGS codes 98 and 99 in customer mapping for test environments
