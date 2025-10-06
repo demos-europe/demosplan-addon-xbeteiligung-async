@@ -83,13 +83,13 @@ class XBeteiligungService
     public const STANDARD = 'XBeteiligung';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
-    public const MISSING_USER_ERROR_CODE = '0300';
-    public const WRONG_ATTACHMENT_FORMAT_ERROR_CODE = '0200';
+    public const MISSING_USER_ERROR_CODE = '3000';
+    public const WRONG_ATTACHMENT_FORMAT_ERROR_CODE = '3000';
     public const WRONG_ATTACHMENT_FORMAT_ERROR_DESCRIPTION = 'Falsches Dateiformat der Anlage';
-    public const ACCESS_DENIED_ERROR_CODE = '0300';
+    public const ACCESS_DENIED_ERROR_CODE = '3000';
     public const ACCESS_DENIED_ERROR_DESCRIPTION = 'Der/Die Nutzer*in hat nicht die notwendigen Rechte um ein Verfahren anzulegen';
-    public const MISCELLANEOUS_ERROR_CODE = '0300';
-    public const GENERIC_ERROR_CODE = '0300';
+    public const MISCELLANEOUS_ERROR_CODE = '3000';
+    public const GENERIC_ERROR_CODE = '3000';
     public const GENERIC_ERROR_DESCRIPTION = 'Während der Erstellung/Bearbeitung des Verfahrens ist ein Fehler aufgetreten.';
 
     public function __construct(
