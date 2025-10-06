@@ -1,6 +1,10 @@
 # Changelog
 
 ## UNRELEASED
+**Error Code List Fix for NOK Messages (DPLAN-16732)**
+- Fix incorrect error type (Fehlerart) codes in NOK messages according to XBeteiligung XSD schema
+- Update error codes from invalid values (0200, 0300) to correct XSD-compliant value '3000' (Fehler)
+- Add proper listURI and listVersionID attributes to CodeFehlerartType in error responses
 ## v0.39 (2025-10-06)
 **Customer Mapping and Routing Configuration (DPLAN-16733)**
 - Add support for AGS codes 98 and 99 in customer mapping for test environments

@@ -23,7 +23,6 @@ use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungGisLayerManager;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
@@ -104,6 +103,8 @@ abstract class ProcedureCommonFeatures
     {
         $errorCodeType = new CodeFehlerartType();
         $errorCodeType->setCode($errorCode);
+        $errorCodeType->setListURI('urn:xoev-de:xleitstelle:codeliste:fehlerart');
+        $errorCodeType->setListVersionID('1.0');
         $errorType = new FehlerType();
         $errorType->setBeschreibung($errorDescription);
         $errorType->setArt($errorCodeType);
