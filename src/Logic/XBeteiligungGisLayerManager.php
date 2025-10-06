@@ -58,10 +58,10 @@ class XBeteiligungGisLayerManager
 
         try {
             $this->validateWmsUrl($flaechenabgrenzungsUrl);
-            $layers = $this->extractLayersFromUrl($flaechenabgrenzungsUrl);
+            $layersString = $this->extractLayersFromUrl($flaechenabgrenzungsUrl);
 
-            if (count($layers) > 0) {
-                $this->createGisLayer($flaechenabgrenzungsUrl, $layers, $procedure);
+            if ('' !== $layersString) {
+                $this->createGisLayer($flaechenabgrenzungsUrl, $layersString, $procedure);
             }
         } catch (Exception $e) {
             $this->logger->error(
@@ -94,39 +94,40 @@ class XBeteiligungGisLayerManager
         $this->logger->debug(self::LOG_PREFIX . 'WMS URL validation successful', ['url' => $url]);
     }
 
-    private function extractLayersFromUrl(string $url): array
+    private function extractLayersFromUrl(string $url): string
     {
         try {
             $params = $this->parseUrlParams($url);
         } catch (InvalidArgumentException $e) {
             $this->logger->warning(self::LOG_PREFIX . 'Unable to parse URL for layer extraction', ['url' => $url, 'error' => $e->getMessage()]);
 
-            return [];
+            return '';
         }
 
         $layersString = $this->getParam($params, self::WMS_PARAM_LAYERS) ?? '';
         if ('' === $layersString) {
             $this->logger->warning(self::LOG_PREFIX . 'No LAYERS parameter found in WMS URL', ['url' => $url]);
 
-            return [];
+            return '';
         }
 
         $layers = array_map('trim', explode(',', $layersString));
         $layers = array_filter($layers); // Remove empty strings
+        $cleanLayersString = implode(',', $layers);
 
         $this->logger->info(self::LOG_PREFIX . 'Extracted layers from WMS URL', [
             'url' => $url,
-            'layers' => $layers,
+            'layers' => $cleanLayersString,
             'layerCount' => count($layers),
         ]);
 
-        return $layers;
+        return $cleanLayersString;
     }
 
     /**
      * @throws Exception
      */
-    private function createGisLayer(string $url, array $layers, ProcedureInterface $procedure): void
+    private function createGisLayer(string $url, string $layersString, ProcedureInterface $procedure): void
     {
         $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
         if (null === $rootCategory) {
@@ -134,7 +135,6 @@ class XBeteiligungGisLayerManager
         }
 
         $gisLayer = $this->gisLayerFactory->createGisLayer();
-        $layersString = implode(',', $layers);
 
         $gisLayer->setName(self::LAYER_NAME);
         $gisLayer->setUrl($this->buildCleanLayerUrl($url));
@@ -166,9 +166,11 @@ class XBeteiligungGisLayerManager
         $this->entityManager->persist($gisLayer);
         $this->entityManager->persist($rootCategory);
 
+        $layerCount = substr_count($layersString, ',') + 1;
+
         $this->logger->info(self::LOG_PREFIX . 'Created single GIS layer with all layers', [
             'layers' => $layersString,
-            'layerCount' => count($layers),
+            'layerCount' => $layerCount,
             'procedureId' => $procedure->getId(),
             'cleanUrl' => $gisLayer->getUrl(),
         ]);
