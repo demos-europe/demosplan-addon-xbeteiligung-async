@@ -33,6 +33,7 @@ class XBeteiligungGisLayerManager
     private const LAYER_TYPE_OVERLAY = 'overlay';
     private const DEFAULT_SERVICE_TYPE = 'wms';
     private const LOG_PREFIX = 'XBeteiligung GIS Layer Manager: ';
+    private const LAYER_NAME = 'Planzeichnung';
 
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
@@ -57,10 +58,10 @@ class XBeteiligungGisLayerManager
 
         try {
             $this->validateWmsUrl($flaechenabgrenzungsUrl);
-            $layers = $this->extractLayersFromUrl($flaechenabgrenzungsUrl);
+            $layersString = $this->extractLayersFromUrl($flaechenabgrenzungsUrl);
 
-            foreach ($layers as $layerName) {
-                $this->createGisLayer($flaechenabgrenzungsUrl, $layerName, $procedure);
+            if ('' !== $layersString) {
+                $this->createGisLayer($flaechenabgrenzungsUrl, $layersString, $procedure);
             }
         } catch (Exception $e) {
             $this->logger->error(
@@ -93,36 +94,40 @@ class XBeteiligungGisLayerManager
         $this->logger->debug(self::LOG_PREFIX . 'WMS URL validation successful', ['url' => $url]);
     }
 
-    private function extractLayersFromUrl(string $url): array
+    private function extractLayersFromUrl(string $url): string
     {
         try {
             $params = $this->parseUrlParams($url);
         } catch (InvalidArgumentException $e) {
             $this->logger->warning(self::LOG_PREFIX . 'Unable to parse URL for layer extraction', ['url' => $url, 'error' => $e->getMessage()]);
 
-            return [];
+            return '';
         }
 
         $layersString = $this->getParam($params, self::WMS_PARAM_LAYERS) ?? '';
         if ('' === $layersString) {
             $this->logger->warning(self::LOG_PREFIX . 'No LAYERS parameter found in WMS URL', ['url' => $url]);
 
-            return [];
+            return '';
         }
 
         $layers = array_map('trim', explode(',', $layersString));
         $layers = array_filter($layers); // Remove empty strings
+        $cleanLayersString = implode(',', $layers);
 
         $this->logger->info(self::LOG_PREFIX . 'Extracted layers from WMS URL', [
             'url' => $url,
-            'layers' => $layers,
+            'layers' => $cleanLayersString,
             'layerCount' => count($layers),
         ]);
 
-        return $layers;
+        return $cleanLayersString;
     }
 
-    private function createGisLayer(string $url, string $layerName, ProcedureInterface $procedure): void
+    /**
+     * @throws Exception
+     */
+    private function createGisLayer(string $url, string $layersString, ProcedureInterface $procedure): void
     {
         $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
         if (null === $rootCategory) {
@@ -131,9 +136,9 @@ class XBeteiligungGisLayerManager
 
         $gisLayer = $this->gisLayerFactory->createGisLayer();
 
-        $gisLayer->setName($layerName);
+        $gisLayer->setName(self::LAYER_NAME);
         $gisLayer->setUrl($this->buildCleanLayerUrl($url));
-        $gisLayer->setLayers($layerName);
+        $gisLayer->setLayers($layersString);
         $gisLayer->setProcedureId($procedure->getId());
 
         $gisLayer->setType(self::LAYER_TYPE_OVERLAY);
@@ -161,8 +166,11 @@ class XBeteiligungGisLayerManager
         $this->entityManager->persist($gisLayer);
         $this->entityManager->persist($rootCategory);
 
-        $this->logger->info(self::LOG_PREFIX . 'Created GIS layer', [
-            'layerName' => $layerName,
+        $layerCount = substr_count($layersString, ',') + 1;
+
+        $this->logger->info(self::LOG_PREFIX . 'Created single GIS layer with all layers', [
+            'layers' => $layersString,
+            'layerCount' => $layerCount,
             'procedureId' => $procedure->getId(),
             'cleanUrl' => $gisLayer->getUrl(),
         ]);

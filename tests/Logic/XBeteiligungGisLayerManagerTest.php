@@ -141,13 +141,21 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory);
 
+        $mockGisLayer->expects($this->once())
+            ->method('setName')
+            ->with('Planzeichnung');
+
+        $mockGisLayer->expects($this->once())
+            ->method('setLayers')
+            ->with('vektordaten');
+
         $this->logger->expects($this->exactly(3))
             ->method('info')
             ->with(
                 static::logicalOr(
                 self::stringContains('Processing WMS URL'),
                 self::stringContains('Extracted layers from WMS URL'),
-                self::stringContains('Created GIS layer')
+                self::stringContains('Created single GIS layer with all layers')
             ));
 
         $this->logger->expects($this->atLeastOnce())
@@ -168,15 +176,23 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $mockGisLayer = $this->createMockGisLayer();
         $mockRootCategory = $this->createMockRootCategory();
 
-        $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory, 2);
+        $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory, 1);
 
-        $this->logger->expects($this->exactly(4))
+        $mockGisLayer->expects($this->once())
+            ->method('setName')
+            ->with('Planzeichnung');
+
+        $mockGisLayer->expects($this->once())
+            ->method('setLayers')
+            ->with('vektordaten,bp_raster');
+
+        $this->logger->expects($this->exactly(3))
             ->method('info')
             ->with(
                 static::logicalOr(
                 self::stringContains('Processing WMS URL'),
                 self::stringContains('Extracted layers from WMS URL'),
-                self::stringContains('Created GIS layer')
+                self::stringContains('Created single GIS layer with all layers')
             ));
 
         $this->sut->processWmsUrl($validUrl, $this->procedure);
@@ -223,17 +239,20 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $mockGisLayer = $this->createMock(GisLayerInterface::class);
         $mockRootCategory = $this->createMockRootCategory();
 
-        // Collect the layer names that setName() is called with
-        $layerNames = [];
-        $mockGisLayer->method('setName')
-            ->willReturnCallback(function ($name) use (&$layerNames, $mockGisLayer) {
-                $layerNames[] = $name;
+        // Collect the layer string that setLayers() is called with
+        $layersString = null;
+        $mockGisLayer->method('setLayers')
+            ->willReturnCallback(function ($layers) use (&$layersString, $mockGisLayer) {
+                $layersString = $layers;
                 return $mockGisLayer;
             });
 
+        $mockGisLayer->expects($this->once())
+            ->method('setName')
+            ->with('Planzeichnung');
+
         // Setup other methods as usual
         $mockGisLayer->method('setUrl')->willReturnSelf();
-        $mockGisLayer->method('setLayers')->willReturnSelf();
         $mockGisLayer->method('setProcedureId')->willReturnSelf();
         $mockGisLayer->method('setType')->willReturnSelf();
         $mockGisLayer->method('setDefaultVisibility')->willReturnSelf();
@@ -241,12 +260,12 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $mockGisLayer->method('setLayerVersion')->willReturnSelf();
         $mockGisLayer->method('getUrl')->willReturn('https://example.com/wms');
 
-        $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory, 2);
+        $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory, 1);
 
         $this->sut->processWmsUrl($urlWithWhitespace, $this->procedure);
 
-        // Verify that layer names are trimmed correctly
-        self::assertSame(['layer1', 'layer2'], $layerNames, 'Layer names should be trimmed of whitespace');
+        // Verify that layer names are trimmed correctly and joined with comma
+        self::assertSame('layer1,layer2', $layersString, 'Layer names should be trimmed of whitespace and joined with comma');
     }
 
     public function testProcessWmsUrlWithNoRootCategory(): void
@@ -359,7 +378,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $this->sut->processWmsUrl($testUrl, $this->procedure);
 
         // Verify all parameters are extracted and set correctly
-        self::assertSame('test_layer', $setParameters['name'], 'Layer name should be extracted correctly');
+        self::assertSame('Planzeichnung', $setParameters['name'], 'Layer name should be "Planzeichnung"');
         self::assertSame('test_layer', $setParameters['layers'], 'Layers parameter should be extracted correctly');
         self::assertSame('wms', $setParameters['serviceType'], 'Service type should be extracted correctly');
         self::assertSame('1.1.0', $setParameters['layerVersion'], 'Layer version should be extracted correctly');
@@ -392,14 +411,22 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $mockGisLayer = $this->createMockGisLayer();
         $mockRootCategory = $this->createMockRootCategory();
 
-        $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory, count($expectedLayers));
+        $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory, 1);
 
-        $mockGisLayer->expects($this->exactly(count($expectedLayers)))
+        $mockGisLayer->expects($this->once())
+            ->method('setName')
+            ->with('Planzeichnung');
+
+        $mockGisLayer->expects($this->once())
+            ->method('setLayers')
+            ->with(implode(',', $expectedLayers));
+
+        $mockGisLayer->expects($this->once())
             ->method('setServiceType')
             ->with($expectedServiceType);
 
         if (null !== $expectedVersion) {
-            $mockGisLayer->expects($this->exactly(count($expectedLayers)))
+            $mockGisLayer->expects($this->once())
                 ->method('setLayerVersion')
                 ->with($expectedVersion);
         }
@@ -447,18 +474,18 @@ class XBeteiligungGisLayerManagerTest extends TestCase
     // HELPER METHODS FOR MOCK CREATION
     // ============================================================================
 
-    private function createMockGisLayerWithParameterVerification(string $expectedLayerName, string $expectedServiceType, string $expectedVersion): GisLayerInterface
+    private function createMockGisLayerWithParameterVerification(string $expectedLayersString, string $expectedServiceType, string $expectedVersion): GisLayerInterface
     {
         $mockGisLayer = $this->createMock(GisLayerInterface::class);
 
         // Verify that parameters are correctly parsed and used
         $mockGisLayer->expects($this->once())
             ->method('setName')
-            ->with($expectedLayerName);
+            ->with('Planzeichnung');
 
         $mockGisLayer->expects($this->once())
             ->method('setLayers')
-            ->with($expectedLayerName);
+            ->with($expectedLayersString);
 
         $mockGisLayer->expects($this->once())
             ->method('setServiceType')
