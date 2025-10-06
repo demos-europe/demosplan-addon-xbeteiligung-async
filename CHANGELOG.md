@@ -8,6 +8,17 @@
 - Improve statement text processing by properly handling HTML content (replace line breaks with spaces before stripping tags)
 - Add comprehensive unit tests for PhaseBuilder and VerfasserBuilder components
 - Remove unused methods from StatementAction value object to simplify codebase
+
+## v0.37 (2025-10-02)
+- Remove enum-based procedure phase mapping system (DPLAN-16438)
+- Delete InstitutionParticipationPhase, PublicParticipationPhase, and ProcedurePhaseKey enums
+- Simplify procedure phase handling by using hardcoded 'configuration' phase for all procedures
+
+## v0.36 (2025-09-30)
+- Territory display fix for XML-processed geltungsbereich
+- Automatic GIS layer creation from flaechenabgrenzungsUrl in XBeteiligung messages
+- Support for MultiPolygon geometries
+
 ## v0.35 (2025-09-25)
 - fix rabbitMQ message send error for unbound procedures
 

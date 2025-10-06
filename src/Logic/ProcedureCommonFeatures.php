@@ -23,6 +23,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungGisLayerManager;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
@@ -60,6 +61,7 @@ abstract class ProcedureCommonFeatures
         protected readonly XBeteiligungConfiguration          $xbeteiligungConfiguration,
         protected readonly XBeteiligungRoutingKeyParser       $routingKeyParser,
         protected readonly ProcedureDataExtractor            $procedureDataExtractor,
+        protected readonly XBeteiligungGisLayerManager        $gisLayerManager,
     )
     {
     }
@@ -68,11 +70,11 @@ abstract class ProcedureCommonFeatures
         ProcedureInterface $procedure,
         ProcedurePhaseData $procedurePhaseData,
     ): void {
-        if (null !== $procedurePhaseData->getPublicParticipationPhase()) {
-            $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhase()->getKey());
+        if (null !== $procedurePhaseData->getPublicParticipationPhaseKey()) {
+            $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhaseKey());
         }
-        if (null !== $procedurePhaseData->getInstitutionParticipationPhase()) {
-            $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhase()->getKey());
+        if (null !== $procedurePhaseData->getInstitutionParticipationPhaseKey()) {
+            $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhaseKey());
         }
         if (null !== $procedurePhaseData->getPublicParticipationStartDate()) {
             $procedure->setPublicParticipationStartDate($procedurePhaseData->getPublicParticipationStartDate());

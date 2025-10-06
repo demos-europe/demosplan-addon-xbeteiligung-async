@@ -13,8 +13,6 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
@@ -24,6 +22,7 @@ use Psr\Log\LoggerInterface;
 
 class ProcedurePhaseExtractor
 {
+    private const CONFIGURATION_PHASE = 'configuration';
     public function __construct(private readonly LoggerInterface $logger)
     {
     }
@@ -54,21 +53,6 @@ class ProcedurePhaseExtractor
         $beteiligungKommunalTOEBFormal = $beteiligungKommunalTOEBArt?->getBeteiligungKommunalFormalTOEB();
         $codeBeteiligungTOEB = $beteiligungKommunalTOEBFormal?->getCode();
 
-
-        $publicParticipationPhase = null !== $codeVerfahrensschrittType
-            ? PublicParticipationPhase::fromCode($codeVerfahrensschrittType)
-            : null;
-        $publicParticipationPhase = null !== $codeBeteiligungOeffentlichkeit
-            ? PublicParticipationPhase::fromCode($codeBeteiligungOeffentlichkeit)
-            : $publicParticipationPhase;
-
-        $institutionParticipationPhase = null !== $codeVerfahrensschrittType
-            ? InstitutionParticipationPhase::fromCode($codeVerfahrensschrittType)
-            : null;
-        $institutionParticipationPhase = null !== $codeBeteiligungTOEB
-            ? InstitutionParticipationPhase::fromCode($codeBeteiligungTOEB)
-            : $institutionParticipationPhase;
-
         $this->logWarningsForMissingCodes(
             $codeVerfahrensschrittType,
             $codeBeteiligungOeffentlichkeit,
@@ -76,8 +60,8 @@ class ProcedurePhaseExtractor
         );
 
         return new ProcedurePhaseData(
-            $publicParticipationPhase,
-            $institutionParticipationPhase,
+            self::CONFIGURATION_PHASE,
+            self::CONFIGURATION_PHASE,
             $beginnOeffentlichkeit,
             $endeOeffentlichkeit,
             $beginnTOEB,

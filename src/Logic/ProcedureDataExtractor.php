@@ -20,6 +20,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Beteiligung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure\ProcedureDataValueObject;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
+use JsonException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -38,6 +39,7 @@ class ProcedureDataExtractor
 
     /**
      * @throws FormatException
+     * @throws JsonException
      */
     public function extract(KommunalInitiieren0401|PlanfeststellungInitiieren0201 $xmlObject): ProcedureDataValueObject
     {
@@ -48,8 +50,9 @@ class ProcedureDataExtractor
         $planDescription = $messageContent->getBeschreibungPlanungsanlass();
         $orgaName = $messageContent->getAkteurVorhaben()->getVeranlasser()?->getName()?->getName();
         $geltungsbereich = $messageContent->getGeltungsbereich();
+        $flaechenabgrenzungsUrl = $messageContent->getFlaechenabgrenzungUrl();
 
-        $mapData = $this->xbeteiligungMapService->setMapData($geltungsbereich);
+        $mapData = $this->xbeteiligungMapService->setMapData($geltungsbereich, $flaechenabgrenzungsUrl);
         $procedurePhaseData = $this->procedurePhaseExtractor->extract($messageContent);
         $anlagen = $this->anlagenExtractor->extract($messageContent);
 

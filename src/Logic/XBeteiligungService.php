@@ -27,6 +27,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanart
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\FehlerType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
+use JsonException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
@@ -36,8 +37,6 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
@@ -88,6 +87,8 @@ class XBeteiligungService
     private const WMS_DEFAULT_WIDTH = 512;
     private const DIMENSION_WIDTH = 'width';
     private const DIMENSION_HEIGHT = 'height';
+
+    private const PLACEHOLDER_PROCEDURE_PHASE_CODE = '0815';
 
     private const PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP = [
         'configuration' => [
@@ -419,50 +420,28 @@ class XBeteiligungService
 
     private function createCodeTypeRaumordnung(
         string $listUri,
-        string $publicParticipationPhase
+        string $publicParticipationPhaseName
     ): CodeVerfahrensschrittRaumordnungType
     {
         $codeType = new  CodeVerfahrensschrittRaumordnungType();
         $codeType->setListVersionID('1.0');
         $codeType->setListURI($listUri);
-
-        if (array_key_exists($publicParticipationPhase, self::PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP)) {
-            $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP[$publicParticipationPhase]['code'];
-            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASRAUMORDNUNGMAP[$publicParticipationPhase]['name'];
-        } else {
-            // Default fallback when no mapping is found to avoid empty code field
-            // which would cause XSD validation to fail
-            $this->logger->warning(
-                'Unknown public participation phase encountered in XBeteiligung Raumordnung mapping',
-                ['value' => $publicParticipationPhase, 'fallback' => '5000']
-            );
-            $procedurePhaseCode = '5000'; // "Konfiguration betroffene Öffentlichkeit" - most common starting phase
-            $procedurePhaseName = 'Konfiguration betroffene Öffentlichkeit';
-        }
-
-        $codeType->setCode($procedurePhaseCode);
-        $codeType->setName($procedurePhaseName);
+        $codeType->setCode(self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
+        $codeType->setName($publicParticipationPhaseName);
 
         return $codeType;
     }
 
     private function createCodeTypePlanfeststellung(
         string $listUri,
-        string $publicParticipationPhase
+        string $publicParticipationPhaseName
     ): CodeVerfahrensschrittPlanfeststellungType
     {
         $codeType = new  CodeVerfahrensschrittPlanfeststellungType();
         $codeType->setListVersionID('1.0');
         $codeType->setListURI($listUri);
-        $procedurePhaseCode = '';
-        $procedurePhaseName = '';
-        if (array_key_exists($publicParticipationPhase, self::PUBLICPARTICIPATIONPHASPLANFESTSTELLUNGMAP)) {
-            $procedurePhaseCode = self::PUBLICPARTICIPATIONPHASPLANFESTSTELLUNGMAP[$publicParticipationPhase]['code'];
-            $procedurePhaseName = self::PUBLICPARTICIPATIONPHASPLANFESTSTELLUNGMAP[$publicParticipationPhase]['name'];
-        }
-
-        $codeType->setCode($procedurePhaseCode);
-        $codeType->setName($procedurePhaseName);
+        $codeType->setCode(self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
+        $codeType->setName($publicParticipationPhaseName);
 
         return $codeType;
     }
@@ -529,10 +508,8 @@ class XBeteiligungService
         ProcedureInterface $procedure
     ): BeteiligungKommunalType {
         $participationType->setPlanartKommunal($this->createNewCodePlanartKommunalType()); // optional
-        $participationType->setVerfahrensschrittKommunal(
-            $this->getPublicProcedurePhaseCodeType($procedure)
-        );
-        $participationType->setGeltungsbereich($procedure->getSettings()->getTerritory());
+        $participationType->setVerfahrensschrittKommunal($this->getPublicProcedurePhaseCodeType($procedure));
+        $participationType->setGeltungsbereich($this->extractOriginalGeltungsbereichFromTerritory($procedure->getSettings()->getTerritory()));
         $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure, $participationType));
         $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure, $participationType));
 
@@ -547,7 +524,7 @@ class XBeteiligungService
         $participationType->setVerfahrensschritt(
             $this->createCodeTypeRaumordnung(
                 'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung',
-                $procedure->getPublicParticipationPhase()
+                $procedure->getPublicParticipationPhaseName()
             )
         );
         // ***********currently for 0301 and 0302 required fields*******************************************************
@@ -583,7 +560,7 @@ class XBeteiligungService
         $participationType->setVerfahrensschrittPlanfeststellung(
             $this->createCodeTypePlanfeststellung(
                 'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung',
-                $procedure->getPublicParticipationPhase()
+                $procedure->getPublicParticipationPhaseName()
             )
         );
 
@@ -725,7 +702,7 @@ class XBeteiligungService
             $participationOeffentlichkeitArtType->setBeteiligungPlanfeststellungFormalOeffentlichkeit(
                 $this->createCodeTypePlanfeststellung(
                     'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung',
-                    $procedure->getPublicParticipationPhase())
+                    $procedure->getPublicParticipationPhaseName())
             );
             $participationType->setBeteiligungPlanfeststellungOeffentlichkeitArt($participationOeffentlichkeitArtType);
         }
@@ -747,7 +724,7 @@ class XBeteiligungService
             $participationOeffentlichkeitArtType->setBeteiligungPlanfeststellungFormalTOEB(
                 $this->createCodeTypePlanfeststellung(
                     'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung',
-                    $procedure->getPhase())
+                    $procedure->getPhaseName())
             );
             $participationType->setBeteiligungPlanfeststellungTOEBArt($participationOeffentlichkeitArtType);
         }
@@ -1030,37 +1007,13 @@ class XBeteiligungService
         $this->procedureMessageRepository->saveOnFlush($procedureMessage);
     }
 
-    private function getInstitutionProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittKommunalType
-    {
-        $codeProcedurePhase = new CodeVerfahrensschrittKommunalType();
-        $codeProcedurePhase->setListVersionID('1.0');
-        $procedurePhase = InstitutionParticipationPhase::fromKey($procedure->getPhase());
-        if(null !== $procedurePhase) {
-            $codeProcedurePhase->setCode(
-                $procedurePhase->getCode()
-            );
-            $codeProcedurePhase->setName(
-                $procedurePhase->getName()
-            );
-        }
-
-        return $codeProcedurePhase;
-    }
-
     private function getPublicProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittKommunalType
     {
         $codeProcedurePhase = new CodeVerfahrensschrittKommunalType();
         $codeProcedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
         $codeProcedurePhase->setListVersionID('1.0');
-        $publicParticipationPhase = PublicParticipationPhase::fromKey($procedure->getPublicParticipationPhase());
-        if (null !== $publicParticipationPhase) {
-            $codeProcedurePhase->setCode(
-                $publicParticipationPhase->getCode()
-            );
-            $codeProcedurePhase->setName(
-                $publicParticipationPhase->getName()
-            );
-        }
+        $codeProcedurePhase->setCode(self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
+        $codeProcedurePhase->setName($procedure->getPublicParticipationPhaseName());
 
         return $codeProcedurePhase;
     }
@@ -1426,5 +1379,77 @@ class XBeteiligungService
             ]);
             return null;
         }
+    }
+
+    /**
+     * Extract the original WGS84 polygon from a territory FeatureCollection.
+     *
+     * The territory field now contains a FeatureCollection with two features:
+     * 1. Original WGS84 geometry (MultiPolygon or Polygon)
+     * 2. Transformed Web Mercator geometry (Polygon)
+     *
+     * For outgoing XBeteiligung messages, we need the original WGS84 geometry.
+     */
+    private function extractOriginalGeltungsbereichFromTerritory(?string $territory): ?string
+    {
+        if (null === $territory || '' === trim($territory)) {
+            return null;
+        }
+
+        try {
+            $featureCollection = json_decode($territory, true, 512, JSON_THROW_ON_ERROR);
+            return $this->processExtractedTerritoryData($featureCollection, $territory);
+
+        } catch (JsonException $e) {
+            $this->logger->error('Failed to parse territory JSON for Geltungsbereich extraction', [
+                'territory' => $territory,
+                'error' => $e->getMessage()
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function extractGeometryFromTerritoryData(array $featureCollection, string $territory): ?string
+    {
+        $hasType = isset($featureCollection['type']);
+        $isLegacyGeometry = $hasType && in_array($featureCollection['type'], ['Polygon', 'MultiPolygon']);
+
+        // Handle legacy format (direct polygon/multipolygon)
+        if ($isLegacyGeometry) {
+            return $territory; // Already in correct format
+        }
+
+        $isFeatureCollection = $hasType && 'FeatureCollection' === $featureCollection['type'];
+        $hasFeaturesArray = isset($featureCollection['features']);
+        $hasFeatures = $hasFeaturesArray && count($featureCollection['features']) > 0;
+
+        // Handle new FeatureCollection format
+        if ($isFeatureCollection && $hasFeatures) {
+            // Return the first feature's geometry (original WGS84)
+            $originalGeometry = $featureCollection['features'][0]['geometry'];
+            return json_encode($originalGeometry, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function processExtractedTerritoryData(array $featureCollection, string $territory): ?string
+    {
+        $result = $this->extractGeometryFromTerritoryData($featureCollection, $territory);
+
+        if (null === $result) {
+            $this->logger->warning('Unable to extract original Geltungsbereich from territory format', [
+                'territory' => $territory
+            ]);
+        }
+
+        return $result;
     }
 }

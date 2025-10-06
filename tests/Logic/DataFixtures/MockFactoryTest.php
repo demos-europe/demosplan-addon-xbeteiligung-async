@@ -42,6 +42,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungCustomerMappingSer
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingKeyParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\RoutingKeyComponents;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungGisLayerManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -337,6 +338,15 @@ class MockFactoryTest
                 default => 'Unbekannte interne Phase'
             };
         });
+  
+        return $mock;
+    }
+
+    public function getXBeteiligungGisLayerManagerMock(): XBeteiligungGisLayerManager|MockObject
+    {
+        $mock = $this->testCase->createMockObject(XBeteiligungGisLayerManager::class);
+        $mock->method('processWmsUrl');
+
         return $mock;
     }
 }

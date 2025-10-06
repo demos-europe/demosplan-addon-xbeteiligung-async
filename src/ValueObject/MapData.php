@@ -14,7 +14,12 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\ValueObject;
 
 class MapData extends ValueObject
 {
-    public function __construct(private string $territory, private string $bbox, private string $mapExtent) {
+    public function __construct(
+        private string $territory,
+        private string $bbox,
+        private string $mapExtent,
+        private string $flaechenabgrenzungsUrl
+    ) {
         $this->lock();
     }
 
@@ -28,5 +33,9 @@ class MapData extends ValueObject
 
     public function getMapExtent(): string {
         return $this->mapExtent;
+    }
+
+    public function getFlaechenabgrenzungsUrl(): string {
+        return $this->flaechenabgrenzungsUrl;
     }
 }
