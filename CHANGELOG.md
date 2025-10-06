@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.39 (2025-10-06)
 **Customer Mapping and Routing Configuration (DPLAN-16733)**
 - Add support for AGS codes 98 and 99 in customer mapping for test environments
 - Replace hardcoded XÖEV address prefixes with dynamic project-specific prefixes
