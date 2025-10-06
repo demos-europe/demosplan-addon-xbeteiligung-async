@@ -1,6 +1,13 @@
 # Changelog
 
 ## UNRELEASED
+**Statement Message Factory Refactoring (DPLAN-15365)**
+- Extract phase handling logic to new `PhaseBuilder` class with project-specific phase type detection
+- Extract statement author (Verfasser) creation to new `VerfasserBuilder` class with improved personal data handling
+- Refactor `StatementMessageFactory` by extracting complex logic into specialized builder classes
+- Improve statement text processing by properly handling HTML content (replace line breaks with spaces before stripping tags)
+- Add comprehensive unit tests for PhaseBuilder and VerfasserBuilder components
+- Remove unused methods from StatementAction value object to simplify codebase
 ## v0.35 (2025-09-25)
 - fix rabbitMQ message send error for unbound procedures
 
