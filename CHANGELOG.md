@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.40 (2025-10-06)
 **GIS Layer Management Improvements**
 - Consolidate multiple GIS layers into single "Planzeichnung" overlay for better map organization
 - Change XBeteiligungGisLayerManager to create one overlay containing all layers as comma-separated string instead of individual overlays per layer
