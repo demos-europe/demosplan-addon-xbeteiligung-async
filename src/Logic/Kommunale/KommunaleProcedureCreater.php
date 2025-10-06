@@ -261,45 +261,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     }
 
     /**
-     * Gets customer based on AGS code extraction from 401 message
-     *
-     * @throws Exception if AGS mapping fails
-     */
-    private function getCustomerFromAgsMapping(KommunalInitiieren0401 $xmlObject401): CustomerInterface
-    {
-        try {
-            $agsCodes = $this->agsService->extractAgsCodesFromXmlObject($xmlObject401);
-            $senderAgs = $agsCodes['sender'];
-
-            if (null !== $senderAgs) {
-                if (self::TEST_ENVIRONMENT_AGS_CODE === $senderAgs) {
-                    $customer = $this->customerService->findCustomerBySubdomain(self::TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN);
-                } else
-                {
-                    $customer = $this->customerMappingService->getCustomerByAgsCode($senderAgs);
-                }
-
-                $this->logger->info('Successfully mapped AGS code to customer for 401 message', [
-                    'senderAgs' => $senderAgs,
-                    'customerId' => $customer->getId(),
-                    'messageType' => '401'
-                ]);
-
-                return $customer;
-            }
-
-            throw new AgsCodeNotFoundException();
-        } catch (Exception $exception) {
-            $this->logger->error('Failed to get customer based on AGS mapping', [
-                'errorMessage' => $exception->getMessage(),
-                'exception' => $exception,
-                'messageType' => '401'
-            ]);
-            throw $exception;
-        }
-    }
-
-    /**
      * Gets customer based on AGS code extraction from routing key
      *
      * @throws Exception if AGS mapping fails
