@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures;
 
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
@@ -24,7 +25,6 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Form\Procedure\AbstractProcedureFormTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CustomerServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
@@ -269,27 +269,27 @@ class MockFactoryTest
             $customerMock->method('getId')->willReturn('test-customer-id');
             return $customerMock;
         });
-        
+
         // Mock the new getCustomerByFederalStateCode method
         $mock->method('getCustomerByFederalStateCode')->willReturnCallback(function () {
             $customerMock = $this->testCase->createMockObject(\DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface::class);
             $customerMock->method('getId')->willReturn('test-customer-id');
             return $customerMock;
         });
-        
+
         return $mock;
     }
 
     public function getXBeteiligungRoutingKeyParserMock(): XBeteiligungRoutingKeyParser|MockObject
     {
         $mock = $this->testCase->createMockObject(XBeteiligungRoutingKeyParser::class);
-        
+
         // Mock parseRoutingKey to return test routing components
         $mock->method('parseRoutingKey')->willReturnCallback(function (string $routingKey) {
             // Parse a test routing key: nrw.cockpit.bap.02.05.00200099.bdp.02.05.00200099.kommunal.initiieren.0401
             return new RoutingKeyComponents(
                 mandant: 'nrw',
-                direction: 'cockpit', 
+                direction: 'cockpit',
                 dvdvOrg1: 'bap',
                 agsCode1: '02.05.00200099',
                 dvdvOrg2: 'bdp',
@@ -297,10 +297,10 @@ class MockFactoryTest
                 messageIdentifier: 'kommunal.initiieren.0401'
             );
         });
-        
+
         // Mock extractFederalStateCodeFromRoutingKey to return test federal state
         $mock->method('extractFederalStateCodeFromRoutingKey')->willReturn('05');
-        
+
         return $mock;
     }
 
@@ -319,10 +319,34 @@ class MockFactoryTest
         return $this->testCase->createMockObject(AnlagenExtractor::class);
     }
 
+    public function getGlobalConfigInterfaceMock(): GlobalConfigInterface|MockObject
+    {
+        $mock = $this->testCase->createMockObject(GlobalConfigInterface::class);
+        $mock->method('getPhaseNameWithPriorityExternal')->willReturnCallback(function($phase) {
+            return match($phase) {
+                'earlyparticipation' => 'Frühzeitige Bürgerbeteiligung',
+                'participation' => 'Öffentlichkeitsbeteiligung',
+                'configuration' => 'Konfiguration',
+                default => 'Unbekannte Phase'
+            };
+        });
+        $mock->method('getPhaseNameWithPriorityInternal')->willReturnCallback(function($phase) {
+            return match($phase) {
+                'earlyparticipation' => 'Frühzeitige interne Beteiligung',
+                'participation' => 'Interne Beteiligung',
+                'configuration' => 'Konfiguration intern',
+                default => 'Unbekannte interne Phase'
+            };
+        });
+  
+        return $mock;
+    }
+
     public function getXBeteiligungGisLayerManagerMock(): XBeteiligungGisLayerManager|MockObject
     {
         $mock = $this->testCase->createMockObject(XBeteiligungGisLayerManager::class);
         $mock->method('processWmsUrl');
+
         return $mock;
     }
 }

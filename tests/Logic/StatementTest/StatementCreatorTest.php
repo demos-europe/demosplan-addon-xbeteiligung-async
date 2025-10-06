@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\StatementTest;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\AddressInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
@@ -22,6 +23,8 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\XBeteiligungResponseMessageFactory;
@@ -31,11 +34,11 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde\BehoerdeTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation\KommunikationTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation\KommunikationTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\StellungnahmeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
@@ -108,7 +111,13 @@ class StatementCreatorTest extends TestCase
             $this->createMock(CommonHelpers::class),
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->permissionEvaluator,
-            $reusableMessageBlocks
+            $reusableMessageBlocks,
+            new VerfasserBuilder(),
+            new PhaseBuilder(
+                $this->permissionEvaluator,
+                $this->mockFactory->getLoggerInterfaceMock(),
+                $this->mockFactory->getGlobalConfigInterfaceMock()
+            )
         );
     }
 
@@ -137,8 +146,8 @@ class StatementCreatorTest extends TestCase
 
         $stellungnahme = $content->getStellungnahme();
         $this->validateStatement($statementCreated, $stellungnahme);
-        self::assertSame('0300', $stellungnahme->getVerfahrensteilschritt()->getCode());
-        self::assertSame('2000', $stellungnahme->getVerfahrensschrittKommunal()->getCode());
+        self::assertSame('0815', $stellungnahme->getVerfahrensteilschritt()->getCode());
+        self::assertSame('0815', $stellungnahme->getVerfahrensschrittKommunal()->getCode());
     }
 
     private function createStatement0701(int $version): StatementCreated
@@ -186,6 +195,14 @@ class StatementCreatorTest extends TestCase
         $this->user->method('getLastName')->willReturn($lastName);
         $this->user->method('getGender')->willReturn($gender);
         $this->user->method('getTitle')->willReturn($userTitle);
+
+        // Configure address mock
+        $addressMock = $this->createMock(AddressInterface::class);
+        $addressMock->method('getStreet')->willReturn('Musterstraße');
+        $addressMock->method('getHouseNumber')->willReturn('123');
+        $addressMock->method('getPostalCode')->willReturn('12345');
+        $addressMock->method('getCity')->willReturn('Musterstadt');
+        $this->user->method('getAddress')->willReturn($addressMock);
 
         $statementCreated = new StatementCreated($this->user, $this->procedure, $this->meta);
         $statementCreated->setPublicId($statementId);
