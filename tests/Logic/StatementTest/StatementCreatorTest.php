@@ -25,6 +25,7 @@ use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
@@ -115,7 +116,12 @@ class StatementCreatorTest extends TestCase
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->permissionEvaluator,
             $reusableMessageBlocks,
-            new VerfasserBuilder()
+            new VerfasserBuilder(),
+            new PhaseBuilder(
+                $this->permissionEvaluator,
+                $this->mockFactory->getLoggerInterfaceMock(),
+                $this->mockFactory->getGlobalConfigInterfaceMock()
+            )
         );
     }
 

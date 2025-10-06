@@ -7,7 +7,6 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\MessageFactory\Mes
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
@@ -216,7 +215,7 @@ class PhaseBuilderTest extends TestCase
             ->with($this->callback(function ($verfahrensteilschritt) {
                 return $verfahrensteilschritt instanceof \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType
                     && $verfahrensteilschritt->getCode() === '0815'
-                    && $verfahrensteilschritt->getName() === 'External Phase'
+                    && $verfahrensteilschritt->getName() === null // verfahrensteilschritt should not have a name according to XSD
                     && $verfahrensteilschritt->getListVersionID() === '3';
             }));
 
@@ -231,7 +230,7 @@ class PhaseBuilderTest extends TestCase
         $this->statement->expects($this->once())
             ->method('setVerfahrensteilschritt')
             ->with($this->callback(function ($verfahrensteilschritt) {
-                return $verfahrensteilschritt->getName() === 'Internal Phase';
+                return $verfahrensteilschritt->getName() === null; // verfahrensteilschritt should not have a name according to XSD
             }));
 
         $this->phaseBuilder->setVerfahrensteilschritt($this->statementCreated, $this->statement);

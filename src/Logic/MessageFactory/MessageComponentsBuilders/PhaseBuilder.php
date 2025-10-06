@@ -103,7 +103,8 @@ class PhaseBuilder
     {
         $partParticipationType = new CodeVerfahrensteilschrittType();
         $partParticipationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
-        $partParticipationType->setName($this->getPhaseName($statementCreated));
+        // Note: verfahrensteilschritt does NOT have a name element according to XSD schema
+        // $partParticipationType->setName($this->getPhaseName($statementCreated));
         $partParticipationType->setListVersionID(self::LIST_VERSION_ID);
         $statement->setVerfahrensteilschritt($partParticipationType);
 
