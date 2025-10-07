@@ -2,11 +2,20 @@
 
 declare(strict_types=1);
 
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\MessageFactory\MessageComponentsBuilders;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
@@ -25,6 +34,7 @@ class PhaseBuilderTest extends TestCase
     private MockObject|PermissionEvaluatorInterface $permissionEvaluator;
     private MockObject|LoggerInterface $logger;
     private MockObject|GlobalConfigInterface $globalConfig;
+    private XBeteiligungConfiguration $xbeteiligungConfiguration;
     private MockObject|StatementCreated $statementCreated;
     private MockObject|StellungnahmeType $statement;
 
@@ -36,10 +46,31 @@ class PhaseBuilderTest extends TestCase
         $this->statementCreated = $this->createMock(StatementCreated::class);
         $this->statement = $this->createMock(StellungnahmeType::class);
 
+        // Setup default configuration values
+        $this->setupXBeteiligungConfiguration('1234', '5678');
+
         $this->phaseBuilder = new PhaseBuilder(
             $this->permissionEvaluator,
             $this->logger,
-            $this->globalConfig
+            $this->globalConfig,
+            $this->xbeteiligungConfiguration
+        );
+    }
+
+    private function setupXBeteiligungConfiguration(string $verfahrensschrittCode, string $verfahrensteilschrittCode): void
+    {
+        $this->xbeteiligungConfiguration = new XBeteiligungConfiguration(
+            rabbitMqEnabled: true,
+            requestTimeout: 30,
+            communicationDelay: 0,
+            procedureMessageType: 'kommunal',
+            auditEnabled: true,
+            xoevAddressPrefixCockpit: 'test-cockpit',
+            maxMessagesPerCycle: 10,
+            consumerTimeout: 60,
+            procedureTypeName: 'test',
+            verfahrensschrittCode: $verfahrensschrittCode,
+            verfahrensteilschrittCode: $verfahrensteilschrittCode,
         );
     }
 
@@ -214,7 +245,7 @@ class PhaseBuilderTest extends TestCase
             ->method('setVerfahrensteilschritt')
             ->with($this->callback(function ($verfahrensteilschritt) {
                 return $verfahrensteilschritt instanceof \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType
-                    && $verfahrensteilschritt->getCode() === '0815'
+                    && $verfahrensteilschritt->getCode() === '5678' // Uses configured value, not fallback
                     && $verfahrensteilschritt->getName() === null // verfahrensteilschritt should not have a name according to XSD
                     && $verfahrensteilschritt->getListVersionID() === '3';
             }));
@@ -234,5 +265,81 @@ class PhaseBuilderTest extends TestCase
             }));
 
         $this->phaseBuilder->setVerfahrensteilschritt($this->statementCreated, $this->statement);
+    }
+
+    public function testSetVerfahrensteilschrittUsesFallbackWhenConfigurationIsEmpty(): void
+    {
+        // Create new PhaseBuilder with empty verfahrensteilschrittCode
+        $this->setupXBeteiligungConfiguration('1234', ''); // Empty verfahrensteilschrittCode
+        $phaseBuilder = new PhaseBuilder(
+            $this->permissionEvaluator,
+            $this->logger,
+            $this->globalConfig,
+            $this->xbeteiligungConfiguration
+        );
+
+        $this->setupStatementCreatedMocks();
+
+        $this->statement->expects($this->once())
+            ->method('setVerfahrensteilschritt')
+            ->with($this->callback(function ($verfahrensteilschritt) {
+                return $verfahrensteilschritt->getCode() === '0815'; // Should use fallback
+            }));
+
+        $phaseBuilder->setVerfahrensteilschritt($this->statementCreated, $this->statement);
+    }
+
+    public function testSetVerfahrenschrittUsesFallbackWhenConfigurationIsEmpty(): void
+    {
+        // Create new PhaseBuilder with empty verfahrensschrittCode
+        $this->setupXBeteiligungConfiguration('', '5678'); // Empty verfahrensschrittCode
+        $phaseBuilder = new PhaseBuilder(
+            $this->permissionEvaluator,
+            $this->logger,
+            $this->globalConfig,
+            $this->xbeteiligungConfiguration
+        );
+
+        $this->setupStatementCreatedMocks();
+        $this->setupGlobalConfigMocks();
+        $this->permissionEvaluator->method('isPermissionEnabled')
+            ->willReturnCallback(function($permission) {
+                if ($permission->getPermissionName() === 'feature_procedure_message_kom_create') return true;
+                return false;
+            });
+
+        $this->statement->expects($this->once())->method('setVerfahrensschrittKommunal')
+            ->with($this->callback(function ($verfahrensschritt) {
+                return $verfahrensschritt->getCode() === '0815'; // Should use fallback
+            }));
+
+        $phaseBuilder->setVerfahrenschritt($this->statementCreated, $this->statement);
+    }
+
+    public function testSetVerfahrenschrittUsesConfiguredValue(): void
+    {
+        // Create new PhaseBuilder with specific verfahrensschrittCode
+        $this->setupXBeteiligungConfiguration('9999', '5678'); // Non-empty verfahrensschrittCode
+        $phaseBuilder = new PhaseBuilder(
+            $this->permissionEvaluator,
+            $this->logger,
+            $this->globalConfig,
+            $this->xbeteiligungConfiguration
+        );
+
+        $this->setupStatementCreatedMocks();
+        $this->setupGlobalConfigMocks();
+        $this->permissionEvaluator->method('isPermissionEnabled')
+            ->willReturnCallback(function($permission) {
+                if ($permission->getPermissionName() === 'feature_procedure_message_kom_create') return true;
+                return false;
+            });
+
+        $this->statement->expects($this->once())->method('setVerfahrensschrittKommunal')
+            ->with($this->callback(function ($verfahrensschritt) {
+                return $verfahrensschritt->getCode() === '9999'; // Should use configured value
+            }));
+
+        $phaseBuilder->setVerfahrenschritt($this->statementCreated, $this->statement);
     }
 }

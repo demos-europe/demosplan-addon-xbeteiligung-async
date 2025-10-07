@@ -44,3 +44,9 @@ parameters:
 
   # Consumer timeout in seconds for individual message processing
   addon_xbeteiligung_async_consumer_timeout: 5
+
+  # Verfahrensschritt code
+  addon_xbeteiligung_async_verfahrensschritt_code: ''
+
+  # Verfahrensteilschritt code
+  addon_xbeteiligung_async_verfahrensteilschritt_code: ''

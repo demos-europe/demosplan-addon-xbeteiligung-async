@@ -1,6 +1,10 @@
 # Changelog
 
 ## UNRELEASED
+**Configurable Procedure Step Codes**
+- Add configurable verfahrensschrittCode and verfahrensteilschrittCode parameters
+- Replace hardcoded '0815' codes with configurable values, fallback to '0815' if empty
+
 ## v0.42 (2025-10-07)
 **Fix Routing Key Customer Mapping (DPLAN-16438)**
 - Fix incorrect customer mapping using receiver AGS instead of sender AGS from routing key
