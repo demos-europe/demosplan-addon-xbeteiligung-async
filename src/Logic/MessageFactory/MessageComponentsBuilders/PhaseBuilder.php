@@ -1,11 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
+use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
@@ -24,7 +35,7 @@ class PhaseBuilder
         private readonly PermissionEvaluatorInterface $permissionEvaluator,
         private readonly LoggerInterface $logger,
         private readonly GlobalConfigInterface $globalConfig,
-
+        private readonly XBeteiligungConfiguration $xbeteiligungConfiguration,
     ) {
     }
 
@@ -70,7 +81,10 @@ class PhaseBuilder
         string $phaseName): void
     {
         $phaseType->setName($phaseName);
-        $phaseType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
+        $code = '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
+            ? self::DEFAULT_PROCEDURE_PHASE_CODE
+            : $this->xbeteiligungConfiguration->verfahrensschrittCode;
+        $phaseType->setCode($code);
         $phaseType->setListVersionID(self::LIST_VERSION_ID);
     }
 
@@ -102,7 +116,10 @@ class PhaseBuilder
     public function setVerfahrensteilschritt(StatementCreated $statementCreated, StellungnahmeType $statement)
     {
         $partParticipationType = new CodeVerfahrensteilschrittType();
-        $partParticipationType->setCode(self::DEFAULT_PROCEDURE_PHASE_CODE);
+        $code = '' === $this->xbeteiligungConfiguration->verfahrensteilschrittCode
+            ? self::DEFAULT_PROCEDURE_PHASE_CODE
+            : $this->xbeteiligungConfiguration->verfahrensteilschrittCode;
+        $partParticipationType->setCode($code);
         // Note: verfahrensteilschritt does NOT have a name element according to XSD schema
         // $partParticipationType->setName($this->getPhaseName($statementCreated));
         $partParticipationType->setListVersionID(self::LIST_VERSION_ID);

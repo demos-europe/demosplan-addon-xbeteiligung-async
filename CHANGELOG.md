@@ -6,6 +6,17 @@
 - Create generic message handlers to replace duplicated logic
 - Extract reusable services following Single Responsibility Principle
 
+## v0.43 (2025-10-07)
+**Configurable Procedure Step Codes**
+- Add configurable verfahrensschrittCode and verfahrensteilschrittCode parameters
+- Replace hardcoded '0815' codes with configurable values, fallback to '0815' if empty
+
+## v0.42 (2025-10-07)
+**Fix Routing Key Customer Mapping (DPLAN-16438)**
+- Fix incorrect customer mapping using receiver AGS instead of sender AGS from routing key
+- Remove obsolete XBeteiligungRoutingService and test environment specific code
+- Update federal state code extraction to use receiver AGS for correct customer resolution
+
 ## v0.41 (2025-10-06)
 **Error Code List Fix for NOK Messages (DPLAN-16732)**
 - Fix incorrect error type (Fehlerart) codes in NOK messages according to XBeteiligung XSD schema

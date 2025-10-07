@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  */
@@ -29,6 +29,8 @@ class XBeteiligungConfiguration
         public readonly int $maxMessagesPerCycle,
         public readonly int $consumerTimeout,
         public readonly string $procedureTypeName,
+        public readonly string $verfahrensschrittCode,
+        public readonly string $verfahrensteilschrittCode,
     ) {
         if ($this->requestTimeout <= 0) {
             throw new InvalidArgumentException('Request timeout must be positive');
@@ -69,6 +71,8 @@ class XBeteiligungConfiguration
             $params->get('addon_xbeteiligung_async_max_messages_per_cycle'),
             $params->get('addon_xbeteiligung_async_consumer_timeout'),
             $params->get('addon_xbeteiligung_async_procedure_type_name'),
+            $params->get('addon_xbeteiligung_async_verfahrensschritt_code'),
+            $params->get('addon_xbeteiligung_async_verfahrensteilschritt_code'),
         );
     }
 

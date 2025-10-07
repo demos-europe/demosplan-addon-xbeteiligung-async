@@ -318,8 +318,11 @@ class XBeteiligungAuditService
         );
 
         foreach ($auditRecords as $record) {
-            if ($record->isReceived() &&
-                XBeteiligungMessageType::KOMMUNAL_INITIIEREN->value === $record->getMessageType() &&
+            $initialMessageType =
+                XBeteiligungMessageType::KOMMUNAL_INITIIEREN->value  === $record->getMessageType() ||
+                XBeteiligungMessageType::PLANFESTSTELLUNG_INITIIEREN->value === $record->getMessageType();
+            if ($initialMessageType &&
+                $record->isReceived() &&
                 $record->getProcedureId() === $procedureId &&
                 $record->getTargetSystem() === self::TARGET_SYSTEM_COCKPIT) {
                 return $record;

@@ -37,7 +37,9 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
             'bap',          // xoevAddressPrefixCockpit
             10,             // maxMessagesPerCycle
             5,              // consumerTimeout
-            'Test Procedure Type' // procedureTypeName
+            'Test Procedure Type', // procedureTypeName
+            '1234',         // verfahrensschrittCode
+            '5678'          // verfahrensteilschrittCode
         );
 
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -173,7 +175,9 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
             'custom_cockpit', // xoevAddressPrefixCockpit
             10,             // maxMessagesPerCycle
             5,              // consumerTimeout
-            'Test Procedure Type' // procedureTypeName
+            'Test Procedure Type', // procedureTypeName
+            '9999',         // verfahrensschrittCode
+            '8888'          // verfahrensteilschrittCode
         );
 
         $customBuilder = new XBeteiligungOutgoingRoutingKeyBuilder(

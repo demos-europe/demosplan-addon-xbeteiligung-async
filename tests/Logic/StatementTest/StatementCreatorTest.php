@@ -116,7 +116,20 @@ class StatementCreatorTest extends TestCase
             new PhaseBuilder(
                 $this->permissionEvaluator,
                 $this->mockFactory->getLoggerInterfaceMock(),
-                $this->mockFactory->getGlobalConfigInterfaceMock()
+                $this->mockFactory->getGlobalConfigInterfaceMock(),
+                new \DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration(
+                    rabbitMqEnabled: true,
+                    requestTimeout: 30,
+                    communicationDelay: 0,
+                    procedureMessageType: 'kommunal',
+                    auditEnabled: true,
+                    xoevAddressPrefixCockpit: 'test-cockpit',
+                    maxMessagesPerCycle: 10,
+                    consumerTimeout: 60,
+                    procedureTypeName: 'test',
+                    verfahrensschrittCode: '',
+                    verfahrensteilschrittCode: ''
+                )
             )
         );
     }
