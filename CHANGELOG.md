@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.44 (2025-10-07)
 **Message Processing Architecture Refactoring (DPLAN-16438)**
 - Refactor XBeteiligung message processing to eliminate code duplication
 - Create generic message handlers to replace duplicated logic
