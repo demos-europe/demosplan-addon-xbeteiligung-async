@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.42 (2025-10-07)
 **Fix Routing Key Customer Mapping (DPLAN-16438)**
 - Fix incorrect customer mapping using receiver AGS instead of sender AGS from routing key
 - Remove obsolete XBeteiligungRoutingService and test environment specific code
