@@ -102,9 +102,9 @@ class XBeteiligungRoutingKeyParser
     /**
      * Get sender AGS code for customer mapping
      */
-    public function getSenderAgsFromRoutingKey(string $routingKey): string
+    public function getReceiverAgsFromRoutingKey(string $routingKey): string
     {
-        return $this->parseRoutingKey($routingKey)->getSenderAgs();
+        return $this->parseRoutingKey($routingKey)->getReceiverAgs();
     }
 
     /**
@@ -115,7 +115,7 @@ class XBeteiligungRoutingKeyParser
      */
     public function extractFederalStateCodeFromRoutingKey(string $routingKey): string
     {
-        $senderAgs = $this->getSenderAgsFromRoutingKey($routingKey);
+        $senderAgs = $this->getReceiverAgsFromRoutingKey($routingKey);
 
         // AGS format: "02.05.00200099" -> split and get second element
         $agsParts = explode('.', $senderAgs);

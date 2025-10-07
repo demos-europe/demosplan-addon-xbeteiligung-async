@@ -108,7 +108,7 @@ class XBeteiligungRoutingKeyParserTest extends TestCase
     {
         $routingKey = 'nrw.cockpit.bap.02.05.00200099.bdp.02.05.00200099.kommunal.initiieren.0401';
 
-        $result = $this->parser->getSenderAgsFromRoutingKey($routingKey);
+        $result = $this->parser->getReceiverAgsFromRoutingKey($routingKey);
 
         // For incoming messages (cockpit), sender is agsCode1
         self::assertSame('02.05.00200099', $result);
