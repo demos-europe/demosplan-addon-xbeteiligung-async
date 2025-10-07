@@ -9,7 +9,8 @@ use DemosEurope\DemosplanAddon\Contracts\Logger\ApiLoggerInterface;
 use DemosEurope\DemosplanAddon\Contracts\MessageBagInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Controller\XBeteiligungRestController;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\MessageHandlerSelector;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\Incoming\IncomingMessageHandlerInterface;
 use EDT\JsonApi\RequestHandling\MessageFormatter;
 use EDT\JsonApi\Validation\FieldsValidator;
 use EDT\Wrapping\TypeProviders\PrefilledTypeProvider;
@@ -26,7 +27,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 class XBeteiligungRestControllerTest extends TestCase
 {
     private XBeteiligungRestController $controller;
-    private MockObject|XBeteiligungService $xBeteiligungService;
+    private MockObject|MessageHandlerSelector $messageHandlerSelector;
+    private MockObject|IncomingMessageHandlerInterface $messageHandler;
     private MockObject|LoggerInterface $logger;
     private MockObject|ContainerInterface $container;
     private MockObject|ParameterBagInterface $parameterBag;
@@ -41,7 +43,8 @@ class XBeteiligungRestControllerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->xBeteiligungService = $this->createMock(XBeteiligungService::class);
+        $this->messageHandlerSelector = $this->createMock(MessageHandlerSelector::class);
+        $this->messageHandler = $this->createMock(IncomingMessageHandlerInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->container = $this->createMock(ContainerInterface::class);
         $this->parameterBag = $this->createMock(ParameterBagInterface::class);
@@ -76,7 +79,6 @@ class XBeteiligungRestControllerTest extends TestCase
     private function executeProcedureTest(
         string $methodName,
         string $xmlData,
-        string $expectedMessageType,
         string $responsePayload,
         string $authToken,
         bool $shouldThrowException = false
@@ -97,26 +99,32 @@ class XBeteiligungRestControllerTest extends TestCase
         // For empty payload, the service won't be called due to early validation
         if (!empty($xmlData)) {
             if ($shouldThrowException) {
-                $this->xBeteiligungService->expects($this->once())
-                    ->method('processXmlMessage')
+                $this->messageHandlerSelector->expects($this->once())
+                    ->method('getHandlerForMessageType')
+                    ->willReturn($this->messageHandler);
+                $this->messageHandler->expects($this->once())
+                    ->method('handleIncomingMessage')
                     ->willThrowException(new \Exception('Service error'));
             } else {
                 $responseValue = new ResponseValue();
                 $responseValue->setMessageXml($responsePayload);
 
-                $this->xBeteiligungService->expects($this->once())
-                    ->method('processXmlMessage')
-                    ->with($xmlData)
+                $this->messageHandlerSelector->expects($this->once())
+                    ->method('getHandlerForMessageType')
+                    ->willReturn($this->messageHandler);
+                $this->messageHandler->expects($this->once())
+                    ->method('handleIncomingMessage')
+                    ->with($xmlData, false, null)
                     ->willReturn($responseValue);
             }
         } else {
             // For empty payload, service should never be called
-            $this->xBeteiligungService->expects($this->never())
-                ->method('processXmlMessage');
+            $this->messageHandlerSelector->expects($this->never())
+                ->method('getHandlerForMessageType');
         }
 
         // Execute controller method
-        return $this->controller->$methodName($request, $this->xBeteiligungService, $this->logger);
+        return $this->controller->$methodName($request, $this->messageHandlerSelector, $this->logger);
     }
 
     /**
@@ -137,7 +145,7 @@ class XBeteiligungRestControllerTest extends TestCase
         }
 
         // Execute controller method
-        return $this->controller->$methodName($request, $this->xBeteiligungService, $this->logger);
+        return $this->controller->$methodName($request, $this->messageHandlerSelector, $this->logger);
     }
 
     /**
@@ -145,10 +153,9 @@ class XBeteiligungRestControllerTest extends TestCase
      */
     private function assertSuccessfulResponse(Response $response, string $expectedContent): void
     {
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(200, $response->getStatusCode());
-        $this->assertEquals($expectedContent, $response->getContent());
-        $this->assertEquals('application/xml', $response->headers->get('Content-Type'));
+        static::assertSame(200, $response->getStatusCode());
+        static::assertSame($expectedContent, $response->getContent());
+        static::assertSame('application/xml', $response->headers->get('Content-Type'));
     }
 
     /**
@@ -156,9 +163,8 @@ class XBeteiligungRestControllerTest extends TestCase
      */
     private function assertUnauthorizedResponse(Response $response): void
     {
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(401, $response->getStatusCode());
-        $this->assertEquals('Unauthorized', $response->getContent());
+        static::assertSame(401, $response->getStatusCode());
+        static::assertSame('Unauthorized', $response->getContent());
     }
 
     /**
@@ -166,9 +172,8 @@ class XBeteiligungRestControllerTest extends TestCase
      */
     private function assertBadRequestResponse(Response $response, string $expectedMessage): void
     {
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(400, $response->getStatusCode());
-        $this->assertEquals($expectedMessage, $response->getContent());
+        static::assertSame(400, $response->getStatusCode());
+        static::assertSame($expectedMessage, $response->getContent());
     }
 
     /**
@@ -176,21 +181,18 @@ class XBeteiligungRestControllerTest extends TestCase
      */
     private function assertServerErrorResponse(Response $response, string $expectedMessageSubstring): void
     {
-        $this->assertInstanceOf(Response::class, $response);
-        $this->assertEquals(500, $response->getStatusCode());
-        $this->assertStringContainsString($expectedMessageSubstring, $response->getContent());
+        static::assertSame(500, $response->getStatusCode());
+        static::assertStringContainsString($expectedMessageSubstring, $response->getContent());
     }
 
     public function testCreateProcedureWithValidData(): void
     {
-        $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>test</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>';
-        $expectedMessageType = 'kommunal.Initiieren.0401';
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test content</ns5:kommunal.Initiieren.0401>';
         $expectedResponse = '<xml>response</xml>';
 
         $response = $this->executeProcedureTest(
             'createProcedure',
             $xmlData,
-            $expectedMessageType,
             $expectedResponse,
             'Bearer valid-token'
         );
@@ -210,7 +212,6 @@ class XBeteiligungRestControllerTest extends TestCase
             'createProcedure',
             '',
             '',
-            '',
             'Bearer valid-token'
         );
         $this->assertBadRequestResponse($response, 'Empty request payload');
@@ -218,14 +219,12 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testUpdateProcedureWithValidData(): void
     {
-        $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>test update</xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>';
-        $expectedMessageType = 'kommunal.Aktualisieren.0402';
+        $xmlData = '<ns5:kommunal.Aktualisieren.0402 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test update</ns5:kommunal.Aktualisieren.0402>';
         $expectedResponse = '<xml>update response</xml>';
 
         $response = $this->executeProcedureTest(
             'updateProcedure',
             $xmlData,
-            $expectedMessageType,
             $expectedResponse,
             'Bearer valid-token'
         );
@@ -245,7 +244,6 @@ class XBeteiligungRestControllerTest extends TestCase
             'updateProcedure',
             '',
             '',
-            '',
             'Bearer valid-token'
         );
         $this->assertBadRequestResponse($response, 'Empty request payload');
@@ -253,12 +251,11 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testUpdateProcedureWithServiceException(): void
     {
-        $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>test update</xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>';
+        $xmlData = '<ns5:kommunal.Aktualisieren.0402 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test update</ns5:kommunal.Aktualisieren.0402>';
 
         $response = $this->executeProcedureTest(
             'updateProcedure',
             $xmlData,
-            'kommunal.Aktualisieren.0402',
             '',
             'Bearer valid-token',
             true
@@ -269,12 +266,11 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testCreateProcedureWithServiceException(): void
     {
-        $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>test</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>';
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test</ns5:kommunal.Initiieren.0401>';
 
         $response = $this->executeProcedureTest(
             'createProcedure',
             $xmlData,
-            'kommunal.Initiieren.0401',
             '',
             'Bearer valid-token',
             true
@@ -285,13 +281,12 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testAuthTokenWithoutBearerPrefix(): void
     {
-        $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>test</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>';
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test</ns5:kommunal.Initiieren.0401>';
         $expectedResponse = '<xml>response</xml>';
 
         $response = $this->executeProcedureTest(
             'createProcedure',
             $xmlData,
-            'kommunal.Initiieren.0401',
             $expectedResponse,
             'valid-token' // Without "Bearer " prefix
         );

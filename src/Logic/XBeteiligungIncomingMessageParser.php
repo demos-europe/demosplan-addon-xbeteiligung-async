@@ -5,25 +5,15 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  */
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenNOK0721;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenOK0711;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalLoeschen0409;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungLoeschen0209;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungLoeschen0309;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
@@ -32,57 +22,6 @@ class XBeteiligungIncomingMessageParser
 {
     public const INCOMING_MESSAGE = 'Incoming Message could not be validated';
     public const UNEXPECTED_NAME = 'Unexpected name, won’t continue';
-
-    private array $messageTypeMapping = [
-        '401' => [
-            'class' => KommunalInitiieren0401::class,
-            'identifier' => XBeteiligungService::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER
-        ],
-        '402' => [
-            'class' => KommunalAktualisieren0402::class,
-            'identifier' => XBeteiligungService::UPDATE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER
-        ],
-        '409' => [
-            'class' => KommunalLoeschen0409::class,
-            'identifier' => XBeteiligungService::DELETE_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER
-        ],
-        '301' => [
-            'class' => RaumordnungInitiieren0301::class,
-            'identifier' => XBeteiligungService::NEW_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
-        ],
-        '302' => [
-            'class' => RaumordnungAktualisieren0302::class,
-            'identifier' => XBeteiligungService::UPDATE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
-        ],
-        '309' => [
-            'class' => RaumordnungLoeschen0309::class,
-            'identifier' => XBeteiligungService::DELETE_RAUMORDNUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
-        ],
-        '201' => [
-            'class' => PlanfeststellungInitiieren0201::class,
-            'identifier' => XBeteiligungService::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
-        ],
-        '0201' => [
-            'class' => PlanfeststellungInitiieren0201::class,
-            'identifier' => XBeteiligungService::NEW_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
-        ],
-        '202' => [
-            'class' => PlanfeststellungAktualisieren0202::class,
-            'identifier' => XBeteiligungService::UPDATE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
-        ],
-        '209' => [
-            'class' => PlanfeststellungLoeschen0209::class,
-            'identifier' => XBeteiligungService::DELETE_PLANFESTSTELLUNG_PROCEDURE_XML_MESSAGE_IDENTIFIER
-        ],
-        '711' => [
-            'class' => AllgemeinStellungnahmeNeuabgegebenOK0711::class,
-            'identifier' => XBeteiligungService::NEW_STATEMENT_OK_MESSAGE_IDENTIFIER
-        ],
-        '721' => [
-            'class' => AllgemeinStellungnahmeNeuabgegebenNOK0721::class,
-            'identifier' => XBeteiligungService::NEW_STATEMENT_NOK_MESSAGE_IDENTIFIER
-        ],
-    ];
 
     public function __construct(private readonly LoggerInterface $logger)
     {
@@ -93,12 +32,13 @@ class XBeteiligungIncomingMessageParser
      */
     public function getXmlObject(string $incomingMessage, string $messageType): NachrichtG2GTypeType
     {
-        if (!isset($this->messageTypeMapping[$messageType])) {
+        $messageEnum = XBeteiligungMessageType::fromCode($messageType);
+        if (null === $messageEnum) {
             throw new SchemaException("Invalid message type: $messageType");
         }
 
-        $messageClass = $this->messageTypeMapping[$messageType]['class'];
-        $expectedXmlName = $this->messageTypeMapping[$messageType]['identifier'];
+        $messageClass = $messageEnum->getSoapClass();
+        $expectedXmlName = $messageEnum->value;
 
         $simpleXML = $this->getSimpleXmlElementWithCertainty($incomingMessage, $messageType);
         $this->validateRequiredNamespace($simpleXML);

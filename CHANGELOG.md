@@ -1,6 +1,11 @@
 # Changelog
 
 ## UNRELEASED
+**Message Processing Architecture Refactoring (DPLAN-16438)**
+- Refactor XBeteiligung message processing to eliminate code duplication
+- Create generic message handlers to replace duplicated logic
+- Extract reusable services following Single Responsibility Principle
+
 ## v0.43 (2025-10-07)
 **Configurable Procedure Step Codes**
 - Add configurable verfahrensschrittCode and verfahrensteilschrittCode parameters
