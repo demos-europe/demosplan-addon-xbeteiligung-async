@@ -41,13 +41,6 @@ use function sprintf;
 
 class KommunaleProcedureCreater extends ProcedureCommonFeatures
 {
-    /** Test environment AGS code identifier used in development/testing */
-    private const TEST_ENVIRONMENT_AGS_CODE = 'xyz.00.01';
-
-    /** Default customer subdomain for test environment procedures */
-    private const TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN = 'hh';
-
-
     /**
      * Creates a procedure from an incoming XBeteiligung message.
      * If everything goes well returns a Beteiligung2PlanungBeteiligungNeuOK0411 success Object
@@ -272,13 +265,9 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         }
 
         try {
-            if (str_contains($incomingRoutingKey, self::TEST_ENVIRONMENT_AGS_CODE)) {
-                $customer = $this->customerService->findCustomerBySubdomain(self::TEST_ENVIRONMENT_CUSTOMER_SUBDOMAIN);
-            } else {
-                // Extract federal state code directly from routing key and use customer mapping service
-                $federalStateCode = $this->routingKeyParser->extractFederalStateCodeFromRoutingKey($incomingRoutingKey);
-                $customer = $this->customerMappingService->getCustomerByFederalStateCode($federalStateCode);
-            }
+            // Extract federal state code directly from routing key and use customer mapping service
+            $federalStateCode = $this->routingKeyParser->extractFederalStateCodeFromRoutingKey($incomingRoutingKey);
+            $customer = $this->customerMappingService->getCustomerByFederalStateCode($federalStateCode);
 
             $this->logger->info('Successfully mapped AGS code to customer from routing key for 401 message', [
                 'customerId' => $customer->getId(),
