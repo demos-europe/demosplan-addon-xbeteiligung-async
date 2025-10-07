@@ -46,7 +46,9 @@ class KommunaleProcedureHandlerFactory
             xoevAddressPrefixCockpit: 'bap',
             maxMessagesPerCycle: 10,
             consumerTimeout: 5,
-            procedureTypeName: 'Allgemeine Beteiligung'
+            procedureTypeName: 'Allgemeine Beteiligung',
+            verfahrensschrittCode: '1234',
+            verfahrensteilschrittCode: '5678'
         );
 
         $anlagenExtractor = $this->mockFactory->getAnlagenExtractor();
