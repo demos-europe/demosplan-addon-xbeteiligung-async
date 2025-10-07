@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.43 (2025-10-07)
 **Configurable Procedure Step Codes**
 - Add configurable verfahrensschrittCode and verfahrensteilschrittCode parameters
 - Replace hardcoded '0815' codes with configurable values, fallback to '0815' if empty
