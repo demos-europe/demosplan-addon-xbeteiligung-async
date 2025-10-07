@@ -104,6 +104,26 @@ class PhaseBuilderTest extends TestCase
         return $method->invoke($this->phaseBuilder);
     }
 
+    private function createPhaseBuilderWithConfiguration(string $verfahrensschrittCode, string $verfahrensteilschrittCode): PhaseBuilder
+    {
+        $this->setupXBeteiligungConfiguration($verfahrensschrittCode, $verfahrensteilschrittCode);
+        return new PhaseBuilder(
+            $this->permissionEvaluator,
+            $this->logger,
+            $this->globalConfig,
+            $this->xbeteiligungConfiguration
+        );
+    }
+
+    private function setupKommunalPermission(): void
+    {
+        $this->permissionEvaluator->method('isPermissionEnabled')
+            ->willReturnCallback(function($permission) {
+                if ($permission->getPermissionName() === 'feature_procedure_message_kom_create') return true;
+                return false;
+            });
+    }
+
     public function testSetVerfahrenschrittWithKommunalPermission(): void
     {
         $this->setupStatementCreatedMocks();
@@ -269,15 +289,7 @@ class PhaseBuilderTest extends TestCase
 
     public function testSetVerfahrensteilschrittUsesFallbackWhenConfigurationIsEmpty(): void
     {
-        // Create new PhaseBuilder with empty verfahrensteilschrittCode
-        $this->setupXBeteiligungConfiguration('1234', ''); // Empty verfahrensteilschrittCode
-        $phaseBuilder = new PhaseBuilder(
-            $this->permissionEvaluator,
-            $this->logger,
-            $this->globalConfig,
-            $this->xbeteiligungConfiguration
-        );
-
+        $phaseBuilder = $this->createPhaseBuilderWithConfiguration('1234', ''); // Empty verfahrensteilschrittCode
         $this->setupStatementCreatedMocks();
 
         $this->statement->expects($this->once())
@@ -291,22 +303,10 @@ class PhaseBuilderTest extends TestCase
 
     public function testSetVerfahrenschrittUsesFallbackWhenConfigurationIsEmpty(): void
     {
-        // Create new PhaseBuilder with empty verfahrensschrittCode
-        $this->setupXBeteiligungConfiguration('', '5678'); // Empty verfahrensschrittCode
-        $phaseBuilder = new PhaseBuilder(
-            $this->permissionEvaluator,
-            $this->logger,
-            $this->globalConfig,
-            $this->xbeteiligungConfiguration
-        );
-
+        $phaseBuilder = $this->createPhaseBuilderWithConfiguration('', '5678'); // Empty verfahrensschrittCode
         $this->setupStatementCreatedMocks();
         $this->setupGlobalConfigMocks();
-        $this->permissionEvaluator->method('isPermissionEnabled')
-            ->willReturnCallback(function($permission) {
-                if ($permission->getPermissionName() === 'feature_procedure_message_kom_create') return true;
-                return false;
-            });
+        $this->setupKommunalPermission();
 
         $this->statement->expects($this->once())->method('setVerfahrensschrittKommunal')
             ->with($this->callback(function ($verfahrensschritt) {
@@ -318,22 +318,10 @@ class PhaseBuilderTest extends TestCase
 
     public function testSetVerfahrenschrittUsesConfiguredValue(): void
     {
-        // Create new PhaseBuilder with specific verfahrensschrittCode
-        $this->setupXBeteiligungConfiguration('9999', '5678'); // Non-empty verfahrensschrittCode
-        $phaseBuilder = new PhaseBuilder(
-            $this->permissionEvaluator,
-            $this->logger,
-            $this->globalConfig,
-            $this->xbeteiligungConfiguration
-        );
-
+        $phaseBuilder = $this->createPhaseBuilderWithConfiguration('9999', '5678'); // Non-empty verfahrensschrittCode
         $this->setupStatementCreatedMocks();
         $this->setupGlobalConfigMocks();
-        $this->permissionEvaluator->method('isPermissionEnabled')
-            ->willReturnCallback(function($permission) {
-                if ($permission->getPermissionName() === 'feature_procedure_message_kom_create') return true;
-                return false;
-            });
+        $this->setupKommunalPermission();
 
         $this->statement->expects($this->once())->method('setVerfahrensschrittKommunal')
             ->with($this->callback(function ($verfahrensschritt) {
