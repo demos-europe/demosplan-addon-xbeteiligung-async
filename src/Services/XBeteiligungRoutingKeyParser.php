@@ -100,7 +100,7 @@ class XBeteiligungRoutingKeyParser
     }
 
     /**
-     * Get sender AGS code for customer mapping
+     * Get receiver AGS code for customer mapping
      */
     public function getReceiverAgsFromRoutingKey(string $routingKey): string
     {
