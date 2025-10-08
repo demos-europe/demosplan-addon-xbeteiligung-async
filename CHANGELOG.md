@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Add support for AGS codes 98 and 99 in customer mapping for test environments
+
 ## v0.44 (2025-10-07)
 **Message Processing Architecture Refactoring (DPLAN-16438)**
 - Refactor XBeteiligung message processing to eliminate code duplication
