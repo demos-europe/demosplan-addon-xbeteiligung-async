@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.45 (2025-10-08)
 - Add support for AGS codes 98 and 99 in customer mapping for test environments
 
 ## v0.44 (2025-10-07)
