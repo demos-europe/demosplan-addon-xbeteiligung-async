@@ -47,6 +47,8 @@ class XBeteiligungCustomerMappingService
         '14' => 'sn',  // Sachsen
         '15' => 'st',  // Sachsen-Anhalt
         '16' => 'th',  // Thüringen
+        '98' => 'hh',  // develop environment
+        '99' => 'hh',  // integration environment
     ];
 
     public function __construct(
