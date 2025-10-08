@@ -50,12 +50,15 @@ class ReusableMessageBlocks
     /**
      * @throws Exception
      */
-    public function createMessageHeadFor(NachrichtG2GTypeType $messageObject): NachrichtenkopfG2g
-    {
+    public function createMessageHeadFor(
+        NachrichtG2GTypeType $messageObject,
+        ?string $authorKennung = '',
+        ?string $leserKennung = ''
+    ): NachrichtenkopfG2g {
         $messageHead = new NachrichtenkopfG2g();
         $messageHead->setIdentifikationNachricht($this->createMessageIdentification($messageObject)); // required
-        $messageHead->setLeser($this->createReaderInformation($messageObject)); // required
-        $messageHead->setAutor($this->createAuthorInformation($messageObject)); // required
+        $messageHead->setLeser($this->createReaderInformation($messageObject, $leserKennung)); // required
+        $messageHead->setAutor($this->createAuthorInformation($messageObject, $authorKennung)); // required
 
         return $messageHead;
     }
@@ -87,12 +90,14 @@ class ReusableMessageBlocks
     /**
      * @throws UnsupportedMessageTypeException
      */
-    public function createReaderInformation(NachrichtG2GTypeType $messageObject): Leser
-    {
+    public function createReaderInformation(
+        NachrichtG2GTypeType $messageObject,
+        ?string $leserKennung = ''
+    ): Leser {
         $headerInformationForMessage = $this->commonHelpers->mapClassToMessageIndentifier($messageObject);
 
         $reader = new Leser();
-        $reader->setKennung('xyz:0002'); // required
+        $reader->setKennung($leserKennung); // required
         $reader->setName($headerInformationForMessage['recipient']); // required
         $reader->setVerzeichnisdienst($this->createVerzeichnisdienst()); // required
 
@@ -108,12 +113,14 @@ class ReusableMessageBlocks
         return $reader;
     }
 
-    public function createAuthorInformation(NachrichtG2GTypeType $messageObject): Autor
-    {
+    public function createAuthorInformation(
+        NachrichtG2GTypeType $messageObject,
+        ?string $authorKennung = ''
+    ): Autor {
         $headerInformationForMessage = $this->commonHelpers->mapClassToMessageIndentifier($messageObject);
 
         $author = new Autor();
-        $author->setKennung('xyz:0001');
+        $author->setKennung($authorKennung);
         $author->setName($headerInformationForMessage['author']); // required
         $author->setVerzeichnisdienst($this->createVerzeichnisdienst()); // required
 

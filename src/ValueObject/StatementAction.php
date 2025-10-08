@@ -7,7 +7,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
-use Doctrine\Common\Collections\Collection;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\MessageHead\BehoerdeTypeKennung;
 
 class StatementAction extends ValueObject
 {
@@ -36,6 +36,7 @@ class StatementAction extends ValueObject
     protected string $publicStatement = '';
     protected ?UserInterface $user;
     protected StatementMetaInterface $meta;
+    protected BehoerdeTypeKennung $behoerdeTypeKennung;
 
     public function __construct(?UserInterface $user, ProcedureInterface $procedure, StatementMetaInterface $meta)
     {
@@ -338,5 +339,15 @@ class StatementAction extends ValueObject
     public function getPhaseCodePlanfeststellung(): ?string
     {
         return self::mapPhaseKeyPlanfeststellung($this->phaseKey);
+    }
+
+    public function setBehoerdeTypeKennung(BehoerdeTypeKennung $behoerdeTypeKennung): void
+    {
+        $this->behoerdeTypeKennung = $behoerdeTypeKennung;
+    }
+
+    public function getBehoerdeTypeKennung(): BehoerdeTypeKennung
+    {
+        return $this->behoerdeTypeKennung;
     }
 }

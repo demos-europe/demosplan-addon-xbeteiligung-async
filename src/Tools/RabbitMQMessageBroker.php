@@ -21,10 +21,12 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCre
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageProcessor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingKeyParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\IncomingMessageData;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungOutgoingRoutingKeyBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\MessageHead\BehoerdeTypeKennung;
 use Exception;
 use OldSound\RabbitMqBundle\RabbitMq\RpcClient;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
@@ -42,6 +44,7 @@ class RabbitMQMessageBroker
         private readonly StatementCreator $statementCreator,
         private readonly StatementMessageFactory $statementMessageFactory,
         private readonly XBeteiligungAuditService $auditService,
+        private readonly XBeteiligungRoutingKeyParser $outgoingRoutingKeyParser,
     ) {
     }
 
@@ -94,6 +97,18 @@ class RabbitMQMessageBroker
             return null;
         }
 
+        // Get original incoming routing key from audit for routing key-based outgoing message
+        $originalAuditRecord = $this->auditService->findOriginalIncoming401Message($statementCreated->getProcedureId());
+        $incomingRoutingKey = $originalAuditRecord?->getRoutingKey();
+        $routingKeyComponents = $this->outgoingRoutingKeyParser->parseRoutingKey($incomingRoutingKey);
+        $beteiligungPrefix = $routingKeyComponents->dvdvOrg2;
+        $cockpitPrefix = $routingKeyComponents->dvdvOrg1;
+        $beteiligungAgs = $routingKeyComponents->agsCode2;
+        $cockpitAgs = $routingKeyComponents->agsCode1;
+        $authorKennung = $beteiligungPrefix.':'.str_replace('.', '', $beteiligungAgs);
+        $leserKennung = $cockpitPrefix.':'.str_replace('.', '', $cockpitAgs);
+        $statementCreated->setBehoerdeTypeKennung(new BehoerdeTypeKennung($authorKennung, $leserKennung));
+
         $xmlString = $this->statementMessageFactory->createBeteiligung2PlanungStellungnahmeNeu0701($statementCreated);
         $this->logger->info('Send StatementCreated to RabbitMQ', [$xmlString]);
 
@@ -110,9 +125,7 @@ class RabbitMQMessageBroker
             );
         }
 
-        // Get original incoming routing key from audit for routing key-based outgoing message
-        $originalAuditRecord = $this->auditService->findOriginalIncoming401Message($statementCreated->getProcedureId());
-        $incomingRoutingKey = $originalAuditRecord?->getRoutingKey();
+
 
         if (null === $incomingRoutingKey) {
             $this->logger->warning('No original incoming routing key found for procedure', [

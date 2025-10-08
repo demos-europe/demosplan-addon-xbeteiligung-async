@@ -65,7 +65,11 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
 
         /** @var AllgemeinStellungnahmeNeuabgegeben0701 $message */
         $message = $this->reusableMessageBlocks->setProductInfo($message);
-        $header = $this->reusableMessageBlocks->createMessageHeadFor($message);
+        $header = $this->reusableMessageBlocks->createMessageHeadFor(
+            $message,
+            $statementCreated->getBehoerdeTypeKennung()->getAuthorKennung(),
+            $statementCreated->getBehoerdeTypeKennung()->getLeserKennung()
+        );
         $message->setNachrichtenkopfG2g($header);
         $content = $this->createXBeteiligungStellungnahmeNeu0701Content($statementCreated);
         $message->setNachrichteninhalt($content);
