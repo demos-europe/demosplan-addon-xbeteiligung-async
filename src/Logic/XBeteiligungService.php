@@ -866,7 +866,7 @@ class XBeteiligungService
             $xml,
             false,
             $error,
-            false,
+            0,
             $procedureId
         );
     }

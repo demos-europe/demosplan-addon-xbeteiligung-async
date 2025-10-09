@@ -61,7 +61,7 @@ class ProcedureMessage implements UuidEntityInterface
         string $message,
         bool $deleted,
         bool $error,
-        bool $requestCount,
+        int $requestCount,
         string $procedureId
     ) {
         $this->message = $message;
