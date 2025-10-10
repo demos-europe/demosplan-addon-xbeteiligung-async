@@ -28,7 +28,7 @@ use Psr\Log\LoggerInterface;
 
 class PhaseBuilder
 {
-    private const DEFAULT_PROCEDURE_PHASE_CODE = '0815';
+    private const DEFAULT_PROCEDURE_PHASE_CODE = 'invalid';
     private const LIST_VERSION_ID = '3';
 
     public function __construct(
