@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Add test cockpit environment mappings (AGS codes 94-97) to XBeteiligungCustomerMappingService
+- Update develop environment mapping description for AGS code 98
 - Disable procedure phase update
 - Fix ProcedureMessage requestCount parameter type from bool to int
 - Standardize license headers and strict types across codebase (105 PHP files)
