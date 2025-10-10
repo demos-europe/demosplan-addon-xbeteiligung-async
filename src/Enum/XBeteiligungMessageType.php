@@ -160,7 +160,7 @@ enum XBeteiligungMessageType: string
     {
         return match ($this) {
             self::KOMMUNAL_INITIIEREN,
-            self::KOMMUNAL_AKTUALISIEREN,
+            //self::KOMMUNAL_AKTUALISIEREN, Disable update via XBeteiligung for now
             self::PLANFESTSTELLUNG_INITIIEREN => GenericProcedureMessageHandler::class,
 
             self::STELLUNGNAHME_OK,
