@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- Disable procedure phase update
 - Fix ProcedureMessage requestCount parameter type from bool to int
 - Standardize license headers and strict types across codebase (105 PHP files)
 ## v0.45 (2025-10-08)
