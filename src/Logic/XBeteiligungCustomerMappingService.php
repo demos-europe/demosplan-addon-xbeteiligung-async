@@ -47,7 +47,11 @@ class XBeteiligungCustomerMappingService
         '14' => 'sn',  // Sachsen
         '15' => 'st',  // Sachsen-Anhalt
         '16' => 'th',  // Thüringen
-        '98' => 'hh',  // develop environment
+        '94' => 'hh',  // test cockpit environment
+        '95' => 'hh',  // test cockpit environment
+        '96' => 'hh',  // test cockpit environment
+        '97' => 'hh',  // test cockpit environment
+        '98' => 'hh',  // init develop environment
         '99' => 'hh',  // integration environment
     ];
 
