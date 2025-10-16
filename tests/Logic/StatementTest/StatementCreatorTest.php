@@ -159,8 +159,8 @@ class StatementCreatorTest extends TestCase
 
         $stellungnahme = $content->getStellungnahme();
         $this->validateStatement($statementCreated, $stellungnahme);
-        self::assertSame('0815', $stellungnahme->getVerfahrensteilschritt()->getCode());
-        self::assertSame('0815', $stellungnahme->getVerfahrensschrittKommunal()->getCode());
+        self::assertSame('invalid', $stellungnahme->getVerfahrensteilschritt()->getCode());
+        self::assertSame('invalid', $stellungnahme->getVerfahrensschrittKommunal()->getCode());
     }
 
     private function createStatement0701(int $version): StatementCreated
