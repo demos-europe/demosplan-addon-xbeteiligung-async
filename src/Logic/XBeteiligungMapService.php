@@ -79,17 +79,13 @@ class XBeteiligungMapService
             'features' => [
                 [
                     'type' => 'Feature',
-                    'geometry' => $polygon,  // Original WGS84 geometry from XML
-                    'properties' => null
-                ],
-                [
-                    'type' => 'Feature',
                     'geometry' => [
                         'type' => 'Polygon',
-                        'coordinates' => [$transformedCoordinates]  // Transformed Web Mercator coordinates
+                        'coordinates' => [$transformedCoordinates]  // Only EPSG:3857 coordinates
                     ],
                     'properties' => null
                 ]
+                // REMOVED: Original WGS84 feature (Vue was checking "isWGS84" and skipping transform)
             ]
         ];
 
