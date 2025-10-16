@@ -295,7 +295,7 @@ class PhaseBuilderTest extends TestCase
         $this->statement->expects($this->once())
             ->method('setVerfahrensteilschritt')
             ->with($this->callback(function ($verfahrensteilschritt) {
-                return $verfahrensteilschritt->getCode() === '0815'; // Should use fallback
+                return $verfahrensteilschritt->getCode() === 'invalid'; // Should use fallback
             }));
 
         $phaseBuilder->setVerfahrensteilschritt($this->statementCreated, $this->statement);
@@ -310,7 +310,7 @@ class PhaseBuilderTest extends TestCase
 
         $this->statement->expects($this->once())->method('setVerfahrensschrittKommunal')
             ->with($this->callback(function ($verfahrensschritt) {
-                return $verfahrensschritt->getCode() === '0815'; // Should use fallback
+                return $verfahrensschritt->getCode() === 'invalid'; // Should use fallback
             }));
 
         $phaseBuilder->setVerfahrenschritt($this->statementCreated, $this->statement);

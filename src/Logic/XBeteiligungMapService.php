@@ -79,11 +79,6 @@ class XBeteiligungMapService
             'features' => [
                 [
                     'type' => 'Feature',
-                    'geometry' => $polygon,  // Original WGS84 geometry from XML
-                    'properties' => null
-                ],
-                [
-                    'type' => 'Feature',
                     'geometry' => [
                         'type' => 'Polygon',
                         'coordinates' => [$transformedCoordinates]  // Transformed Web Mercator coordinates

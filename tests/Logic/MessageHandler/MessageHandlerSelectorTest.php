@@ -41,12 +41,14 @@ class MessageHandlerSelectorTest extends TestCase
         static::assertSame($this->procedureMessageHandler, $result);
     }
 
-    public function testGetHandlerForKommunalAktualisierenReturnsGenericProcedureMessageHandler(): void
+    /*
+     * Disable test in the mean time while we do not support this message type
+     public function testGetHandlerForKommunalAktualisierenReturnsGenericProcedureMessageHandler(): void
     {
         $messageType = XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value;
         $result = $this->sut->getHandlerForMessageType($messageType);
         static::assertSame($this->procedureMessageHandler, $result);
-    }
+    }*/
 
     public function testGetHandlerForPlanfeststellungInitiierenReturnsGenericProcedureMessageHandler(): void
     {

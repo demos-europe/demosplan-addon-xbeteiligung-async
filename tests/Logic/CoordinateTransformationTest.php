@@ -97,28 +97,23 @@ class CoordinateTransformationTest extends TestCase
 
         $resultingMapData = $this->sut->setMapData($initialGeoJson, $flaechenabgrenzungsUrl);
 
-        // The service now returns a FeatureCollection, so we need to parse it and verify the structure
+        // The service now returns a FeatureCollection with only EPSG:3857 coordinates
         $territoryJson = $resultingMapData->getTerritory();
         $territory = json_decode($territoryJson, true);
 
-        // Verify it's a FeatureCollection with 2 features
+        // Verify it's a FeatureCollection with 1 feature (only EPSG:3857)
         self::assertSame('FeatureCollection', $territory['type']);
-        self::assertCount(2, $territory['features']);
+        self::assertCount(1, $territory['features']);
 
-        // First feature should be the original WGS84 polygon
-        $originalFeature = $territory['features'][0];
-        self::assertSame('Feature', $originalFeature['type']);
-        self::assertSame('Polygon', $originalFeature['geometry']['type']);
-
-        // Second feature should be the transformed Web Mercator polygon
-        $transformedFeature = $territory['features'][1];
+        // The single feature should be the transformed EPSG:3857 polygon
+        $transformedFeature = $territory['features'][0];
         self::assertSame('Feature', $transformedFeature['type']);
         self::assertSame('Polygon', $transformedFeature['geometry']['type']);
 
         // Extract the transformed coordinates and verify they match expected values
         $expectedTransformed = json_decode($resultingGeoJson, true);
 
-        // Compare the transformed coordinates from the second feature
+        // Compare the transformed coordinates from the single feature
         self::assertSame($expectedTransformed['coordinates'], $transformedFeature['geometry']['coordinates']);
         $resultingBBox = explode(',', $resultingMapData->getBbox());
         self::assertSame(count($resultingBBox), count($boundingBox));
