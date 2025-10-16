@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- Fixed maps displaying polygons by not storing the original coordinate
 - Add test cockpit environment mappings (AGS codes 94-97) to XBeteiligungCustomerMappingService
 - Update develop environment mapping description for AGS code 98
 - Disable procedure phase update
