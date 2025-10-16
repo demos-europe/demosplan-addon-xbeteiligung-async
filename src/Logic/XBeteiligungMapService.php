@@ -81,7 +81,7 @@ class XBeteiligungMapService
                     'type' => 'Feature',
                     'geometry' => [
                         'type' => 'Polygon',
-                        'coordinates' => [$transformedCoordinates] // Transformed Web Mercator coordinates
+                        'coordinates' => [$transformedCoordinates]  // Transformed Web Mercator coordinates
                     ],
                     'properties' => null
                 ]
