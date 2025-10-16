@@ -81,11 +81,10 @@ class XBeteiligungMapService
                     'type' => 'Feature',
                     'geometry' => [
                         'type' => 'Polygon',
-                        'coordinates' => [$transformedCoordinates]  // Only EPSG:3857 coordinates
+                        'coordinates' => [$transformedCoordinates]
                     ],
                     'properties' => null
                 ]
-                // REMOVED: Original WGS84 feature (Vue was checking "isWGS84" and skipping transform)
             ]
         ];
 
