@@ -15,11 +15,13 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\Incoming;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Planfeststellung\PlanfeststellungProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungAktualisieren0202;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
@@ -33,6 +35,7 @@ class GenericProcedureMessageHandler implements IncomingMessageHandlerInterface
         private readonly XBeteiligungIncomingMessageParser $incomingMessageParser,
         private readonly KommunaleProcedureCreater $kommunaleProcedureCreater,
         private readonly KommunaleProcedureUpdater $kommunaleProcedureUpdater,
+        private readonly PlanfeststellungProcedureUpdater $planfeststellungProcedureUpdater,
         private readonly IncomingMessageAuditHelper $auditHelper,
         private readonly LoggerInterface $logger
     ) {
@@ -48,7 +51,7 @@ class GenericProcedureMessageHandler implements IncomingMessageHandlerInterface
             'routingKey' => $routingKey
         ]);
 
-        /* @var KommunalInitiieren0401|KommunalAktualisieren0402|PlanfeststellungInitiieren0201 $xmlObject */
+        /* @var KommunalInitiieren0401|KommunalAktualisieren0402|PlanfeststellungInitiieren0201|PlanfeststellungAktualisieren0202 $xmlObject */
         $xmlObject = $this->parseXmlMessage($messageXml);
 
         $auditRecord = null;
@@ -91,7 +94,7 @@ class GenericProcedureMessageHandler implements IncomingMessageHandlerInterface
      * @throws Exception
      */
     private function processMessage(
-        KommunalInitiieren0401|KommunalAktualisieren0402|PlanfeststellungInitiieren0201 $xmlObject,
+        KommunalInitiieren0401|KommunalAktualisieren0402|PlanfeststellungInitiieren0201|PlanfeststellungAktualisieren0202 $xmlObject,
         ?string $routingKey
     ): ResponseValue {
         return match ($this->currentMessageType) {
@@ -101,6 +104,8 @@ class GenericProcedureMessageHandler implements IncomingMessageHandlerInterface
                 $xmlObject,
                 $routingKey
             ),
+            XBeteiligungMessageType::PLANFESTSTELLUNG_AKTUALISIEREN->value
+            => $this->planfeststellungProcedureUpdater->updateProcedure($xmlObject),
             /*XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value
             => $this->kommunaleProcedureUpdater->updateProcedure($xmlObject),*/
             default
