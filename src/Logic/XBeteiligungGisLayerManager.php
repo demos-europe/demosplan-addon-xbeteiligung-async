@@ -33,6 +33,7 @@ class XBeteiligungGisLayerManager
 
     private const LAYER_TYPE_OVERLAY = 'overlay';
     private const DEFAULT_SERVICE_TYPE = 'wms';
+    private const OAF_SERVICE_TYPE = 'OAF';
     private const LOG_PREFIX = 'XBeteiligung GIS Layer Manager: ';
     private const LAYER_NAME = 'Planzeichnung';
 
@@ -253,7 +254,12 @@ class XBeteiligungGisLayerManager
             $capabilitiesData = json_decode($responseBody, true);
 
             // Extract storageCrs from response
-            $storageCrs = $capabilitiesData['storageCrs'] ?? 'EPSG:25833'; // fallback
+            $storageCrs = $capabilitiesData['storageCrs'] ?? null;
+
+            if (null === $storageCrs) {
+                throw new InvalidArgumentException(self::LOG_PREFIX . 'storageCrs not found in OAF response');
+            }
+
 
             $this->logger->info(self::LOG_PREFIX . 'Retrieved OAF capabilities', [
                 'url' => $url,
@@ -261,11 +267,15 @@ class XBeteiligungGisLayerManager
             ]);
 
         } catch (Exception $e) {
-            $this->logger->warning(self::LOG_PREFIX . 'Failed to retrieve OAF capabilities, using defaults', [
-                'url' => $url,
-                'error' => $e->getMessage()
-            ]);
-            $storageCrs = 'EPSG:25833'; // fallback value
+            $this->logger->error(
+                self::LOG_PREFIX . 'Failed to process OAF URL for GIS layers',
+                [
+                    'url' => $url,
+                    'error' => $e->getMessage(),
+                    'exception' => $e,
+                ]
+            );
+            throw $e;
         }
 
         $gisLayer = $this->gisLayerFactory->createGisLayer();
@@ -277,11 +287,11 @@ class XBeteiligungGisLayerManager
         $gisLayer->setType(self::LAYER_TYPE_OVERLAY);
         $gisLayer->setDefaultVisibility(true);
 
-        $gisLayer->setServiceType('OAF');
+        $gisLayer->setServiceType(self::OAF_SERVICE_TYPE);
 
         $gisLayer->setLayerVersion('1.3.0');
-        $gisLayer->setProjectionLabel($storageCrs); // Use extracted storageCrs
-        $gisLayer->setProjectionValue($this->convertCrsToProjectionValue($storageCrs));
+        $gisLayer->setProjectionValue($storageCrs); // Use extracted storageCrs
+        $gisLayer->setProjectionLabel($this->parseStorageCrsToEpsg($storageCrs));
 
         $rootCategory->addLayer($gisLayer);
 
@@ -289,22 +299,35 @@ class XBeteiligungGisLayerManager
         $this->entityManager->persist($rootCategory);
     }
 
-    private function convertCrsToProjectionValue(string $crs): string
+    private function parseStorageCrsToEpsg(string $storageCrs): string
     {
-        if (preg_match('/^EPSG:(\d+)$/', $crs, $matches)) {
-            return 'http://www.opengis.net/def/crs/EPSG/0/' . $matches[1];
+        // Handle EPSG URIs - more flexible like Vue.js
+        if (preg_match('/\/EPSG\/\d+\/(\d+)$/i', $storageCrs, $matches)) {
+            return 'EPSG:' . $matches[1];
         }
 
-        return 'http://www.opengis.net/def/crs/EPSG/0/25833';
+        // Handle CRS84 (maps to WGS84) like Vue.js
+        if (stripos($storageCrs, 'CRS84') !== false) {
+            return 'EPSG:4326';
+        }
+
+        // Handle already formatted EPSG
+        if (preg_match('/^EPSG:(\d+)$/i', $storageCrs)) {
+            return strtoupper($storageCrs); // Normalize case
+        }
+
+        // Return original if can't parse (like Vue.js)
+        return $storageCrs;
     }
+
 
     private function getCollectionUrl(string $url): string
     {
         $collectionsPattern = '/collections/';
         $collectionsIndex = strpos($url, $collectionsPattern);
 
-        if ($collectionsIndex === false) {
-            return $url; // No /collections/ found, return original
+        if (false === $collectionsIndex) {
+            throw new InvalidArgumentException(self::LOG_PREFIX . 'OAF URL does not contain /collections/ pattern');
         }
 
         // Find the start of the collection name
@@ -314,7 +337,7 @@ class XBeteiligungGisLayerManager
         $nextSlashIndex = strpos($url, '/', $collectionNameStart);
 
         if ($nextSlashIndex === false) {
-            return $url; // No slash after collection name, return original
+            throw new InvalidArgumentException(self::LOG_PREFIX . ' No slash after collection name');
         }
 
         // Return everything up to (but not including) the next slash
