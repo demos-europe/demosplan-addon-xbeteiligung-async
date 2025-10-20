@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Factory\GisLayerFactoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
@@ -42,8 +41,7 @@ class XBeteiligungGisLayerManager
         private readonly LoggerInterface $logger,
         private readonly GisLayerFactoryInterface $gisLayerFactory,
         private readonly GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository,
-        private readonly HttpClientInterface $httpClient, // Add this
-
+        private readonly OafExtractor $oafExtractor,
     ) {
     }
 
@@ -58,21 +56,21 @@ class XBeteiligungGisLayerManager
             return;
         }
 
-        $isOafUrl = $this->validateOafUrl($flaechenabgrenzungsUrl);
+        $isOafUrl = $this->oafExtractor->validateOafUrl($flaechenabgrenzungsUrl);
 
         if (!$isOafUrl) {
             $this->processWmsUrl($flaechenabgrenzungsUrl, $procedure);
             return;
         }
 
-        $this->createGisLayerForOaf($flaechenabgrenzungsUrl, $procedure);
+        $this->oafExtractor->createGisLayerFromOaf($flaechenabgrenzungsUrl, $procedure);
 
     }
 
     /**
      * @throws Exception
      */
-    public function processWmsUrl(?string $flaechenabgrenzungsUrl, ProcedureInterface $procedure): void
+    private function processWmsUrl(?string $flaechenabgrenzungsUrl, ProcedureInterface $procedure): void
     {
         if (null === $flaechenabgrenzungsUrl || '' === trim($flaechenabgrenzungsUrl)) {
             $this->logger->info(self::LOG_PREFIX . 'No flaechenabgrenzungsUrl provided - skipping GIS layer creation');
@@ -119,31 +117,6 @@ class XBeteiligungGisLayerManager
 
         $this->logger->debug(self::LOG_PREFIX . 'WMS URL validation successful', ['url' => $url]);
     }
-
-    private function validateOafUrl(string $url): bool
-    {
-        $collectionsPattern = '/collections/';
-        $lowerUrl = strtolower($url);
-        $collectionsIndex = strpos($lowerUrl, $collectionsPattern);
-
-        // Check if URL contains /collections/ (case-insensitive)
-        if ($collectionsIndex === false) {
-            return false;
-        }
-
-        // Check if /collections/ is not at the end (there must be content after it)
-        $afterCollections = substr($url, $collectionsIndex + strlen($collectionsPattern));
-        $hasNoCollectionName = trim($afterCollections) === '' ||
-            $afterCollections === '/' ||
-            preg_match('/^\/+$/', $afterCollections);
-
-        if ($hasNoCollectionName) {
-            return false;
-        }
-
-        return true;
-    }
-
 
     private function extractLayersFromUrl(string $url): string
     {
@@ -226,127 +199,6 @@ class XBeteiligungGisLayerManager
             'cleanUrl' => $gisLayer->getUrl(),
         ]);
     }
-
-    private function createGisLayerForOaf(string $url, ProcedureInterface $procedure): void
-    {
-        $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
-        if (null === $rootCategory) {
-            throw new InvalidArgumentException('Procedure has no root layer category, cannot add layers');
-        }
-
-        // Call the URL to get capabilities and extract storageCrs
-        try {
-
-            // Get collection URL by removing everything after collections/COLLECTION_NAME
-            $collectionUrl = $this->getCollectionUrl($url);
-
-
-            $response = $this->httpClient->request('GET', $collectionUrl, [
-                'timeout' => 30,
-                'headers' => [
-                    'Accept' => 'application/json',
-                ],
-            ]);
-
-            $responseBody = $response->getContent();
-
-            // Parse JSON response
-            $capabilitiesData = json_decode($responseBody, true);
-
-            // Extract storageCrs from response
-            $storageCrs = $capabilitiesData['storageCrs'] ?? null;
-
-            if (null === $storageCrs) {
-                throw new InvalidArgumentException(self::LOG_PREFIX . 'storageCrs not found in OAF response');
-            }
-
-
-            $this->logger->info(self::LOG_PREFIX . 'Retrieved OAF capabilities', [
-                'url' => $url,
-                'storageCrs' => $storageCrs
-            ]);
-
-        } catch (Exception $e) {
-            $this->logger->error(
-                self::LOG_PREFIX . 'Failed to process OAF URL for GIS layers',
-                [
-                    'url' => $url,
-                    'error' => $e->getMessage(),
-                    'exception' => $e,
-                ]
-            );
-            throw $e;
-        }
-
-        $gisLayer = $this->gisLayerFactory->createGisLayer();
-
-        $gisLayer->setName(self::LAYER_NAME);
-        $gisLayer->setUrl($this->buildCleanLayerUrl($url));
-        $gisLayer->setProcedureId($procedure->getId());
-
-        $gisLayer->setType(self::LAYER_TYPE_OVERLAY);
-        $gisLayer->setDefaultVisibility(true);
-
-        $gisLayer->setServiceType(self::OAF_SERVICE_TYPE);
-
-        $gisLayer->setLayerVersion('1.3.0');
-        $gisLayer->setProjectionValue($storageCrs); // Use extracted storageCrs
-        $gisLayer->setProjectionLabel($this->parseStorageCrsToEpsg($storageCrs));
-
-        $rootCategory->addLayer($gisLayer);
-
-        $this->entityManager->persist($gisLayer);
-        $this->entityManager->persist($rootCategory);
-    }
-
-    private function parseStorageCrsToEpsg(string $storageCrs): string
-    {
-        // Handle EPSG URIs - more flexible like Vue.js
-        if (preg_match('/\/EPSG\/\d+\/(\d+)$/i', $storageCrs, $matches)) {
-            return 'EPSG:' . $matches[1];
-        }
-
-        // Handle CRS84 (maps to WGS84) like Vue.js
-        if (stripos($storageCrs, 'CRS84') !== false) {
-            return 'EPSG:4326';
-        }
-
-        // Handle already formatted EPSG
-        if (preg_match('/^EPSG:(\d+)$/i', $storageCrs)) {
-            return strtoupper($storageCrs); // Normalize case
-        }
-
-        // Return original if can't parse (like Vue.js)
-        return $storageCrs;
-    }
-
-
-    private function getCollectionUrl(string $url): string
-    {
-        $collectionsPattern = '/collections/';
-        $collectionsIndex = strpos($url, $collectionsPattern);
-
-        if (false === $collectionsIndex) {
-            throw new InvalidArgumentException(self::LOG_PREFIX . 'OAF URL does not contain /collections/ pattern');
-        }
-
-        // Find the start of the collection name
-        $collectionNameStart = $collectionsIndex + strlen($collectionsPattern);
-
-        // Find the next slash after the collection name
-        $nextSlashIndex = strpos($url, '/', $collectionNameStart);
-
-        if ($nextSlashIndex === false) {
-            throw new InvalidArgumentException(self::LOG_PREFIX . ' No slash after collection name');
-        }
-
-        // Return everything up to (but not including) the next slash
-        return substr($url, 0, $nextSlashIndex);
-    }
-
-
-
-
 
     /**
      * Build clean layer URL by extracting base URL components without query parameters
