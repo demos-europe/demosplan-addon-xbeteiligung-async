@@ -38,20 +38,18 @@ class ProcedurePhaseExtractor
         $zeitraumOeffentlichkeit = $beteiligungOeffentlichkeit?->getZeitraum();
         $beginnOeffentlichkeit = $zeitraumOeffentlichkeit?->getBeginn();
         $endeOeffentlichkeit = $zeitraumOeffentlichkeit?->getEnde();
-        $beteiligungKommunalOeffentlichkeitArt = $beteiligungOeffentlichkeit
-            ?->getBeteiligungKommunalOeffentlichkeitArt();
-        $beteiligungKommunalFormalOeffentlichkeit = $beteiligungKommunalOeffentlichkeitArt
-            ?->getBeteiligungKommunalFormalOeffentlichkeit();
-        $codeBeteiligungOeffentlichkeit = $beteiligungKommunalFormalOeffentlichkeit?->getCode();
+        $beteiligungOeffentlichkeitArt = $this->getBeteiligungOeffentlichkeitArt($beteiligungOeffentlichkeit, $beteiligungType);
+        $beteiligungFormalOeffentlichkeit = $this->getBeteiligungFormalOeffentlichkeit($beteiligungOeffentlichkeitArt, $beteiligungType);
+        $codeBeteiligungOeffentlichkeit = $beteiligungFormalOeffentlichkeit?->getCode();
 
-        $beteiligungKommunalTOEB = $beteiligungType->getBeteiligungTOEB();
-        $durchgangTOEB = $beteiligungKommunalTOEB?->getDurchgang() ?? 1;
-        $zeitraumTOEB = $beteiligungKommunalTOEB?->getZeitraum();
+        $beteiligungTOEB = $beteiligungType->getBeteiligungTOEB();
+        $durchgangTOEB = $beteiligungTOEB?->getDurchgang() ?? 1;
+        $zeitraumTOEB = $beteiligungTOEB?->getZeitraum();
         $beginnTOEB = $zeitraumTOEB?->getBeginn();
         $endeTOEB = $zeitraumTOEB?->getEnde();
-        $beteiligungKommunalTOEBArt = $beteiligungKommunalTOEB?->getBeteiligungKommunalTOEBArt();
-        $beteiligungKommunalTOEBFormal = $beteiligungKommunalTOEBArt?->getBeteiligungKommunalFormalTOEB();
-        $codeBeteiligungTOEB = $beteiligungKommunalTOEBFormal?->getCode();
+        $beteiligungTOEBArt = $this->getBeteiligungTOEBArt($beteiligungTOEB, $beteiligungType);
+        $beteiligungFormalTOEB = $this->getBeteiligungFormalTOEB($beteiligungTOEBArt, $beteiligungType);
+        $codeBeteiligungTOEB = $beteiligungFormalTOEB?->getCode();
 
         $this->logWarningsForMissingCodes(
             $codeVerfahrensschrittType,
@@ -84,6 +82,70 @@ class ProcedurePhaseExtractor
 
 
         return $verfahrensschrittType;
+    }
+
+    private function getBeteiligungOeffentlichkeitArt($beteiligungOeffentlichkeit, $beteiligungType) {
+        if (null === $beteiligungOeffentlichkeit) {
+            return null;
+        }
+
+        if ($beteiligungType instanceof BeteiligungKommunalType) {
+            return $beteiligungOeffentlichkeit->getBeteiligungKommunalOeffentlichkeitArt();
+        }
+
+        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
+            return $beteiligungOeffentlichkeit->getBeteiligungPlanfeststellungOeffentlichkeitArt();
+        }
+
+        return null;
+    }
+
+    private function getBeteiligungFormalOeffentlichkeit($beteiligungOeffentlichkeitArt, $beteiligungType) {
+        if (null === $beteiligungOeffentlichkeitArt) {
+            return null;
+        }
+
+        if ($beteiligungType instanceof BeteiligungKommunalType) {
+            return $beteiligungOeffentlichkeitArt->getBeteiligungKommunalFormalOeffentlichkeit();
+        }
+
+        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
+            return $beteiligungOeffentlichkeitArt->getBeteiligungPlanfeststellungFormalOeffentlichkeit();
+        }
+
+        return null;
+    }
+
+    private function getBeteiligungTOEBArt($beteiligungTOEB, $beteiligungType) {
+        if (null === $beteiligungTOEB) {
+            return null;
+        }
+
+        if ($beteiligungType instanceof BeteiligungKommunalType) {
+            return $beteiligungTOEB->getBeteiligungKommunalTOEBArt();
+        }
+
+        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
+            return $beteiligungTOEB->getBeteiligungPlanfeststellungTOEBArt();
+        }
+
+        return null;
+    }
+
+    private function getBeteiligungFormalTOEB($beteiligungTOEBArt, $beteiligungType) {
+        if (null === $beteiligungTOEBArt) {
+            return null;
+        }
+
+        if ($beteiligungType instanceof BeteiligungKommunalType) {
+            return $beteiligungTOEBArt->getBeteiligungKommunalFormalTOEB();
+        }
+
+        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
+            return $beteiligungTOEBArt->getBeteiligungPlanfeststellungFormalTOEB();
+        }
+
+        return null;
     }
 
     private function logWarningsForMissingCodes(
