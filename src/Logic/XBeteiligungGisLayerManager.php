@@ -32,7 +32,6 @@ class XBeteiligungGisLayerManager
 
     private const LAYER_TYPE_OVERLAY = 'overlay';
     private const DEFAULT_SERVICE_TYPE = 'wms';
-
     private const LOG_PREFIX = 'XBeteiligung GIS Layer Manager: ';
     private const LAYER_NAME = 'Planzeichnung';
 
