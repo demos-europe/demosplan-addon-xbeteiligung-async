@@ -71,11 +71,6 @@ class XBeteiligungGisLayerManager
      */
     private function processWmsUrl(?string $flaechenabgrenzungsUrl, ProcedureInterface $procedure): void
     {
-        if (null === $flaechenabgrenzungsUrl || '' === trim($flaechenabgrenzungsUrl)) {
-            $this->logger->info(self::LOG_PREFIX . 'No flaechenabgrenzungsUrl provided - skipping GIS layer creation');
-
-            return;
-        }
 
         $this->logger->info(self::LOG_PREFIX . 'Processing WMS URL for GIS layers', ['url' => $flaechenabgrenzungsUrl]);
 
