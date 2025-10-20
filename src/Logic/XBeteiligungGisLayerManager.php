@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Factory\GisLayerFactoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
@@ -40,6 +41,8 @@ class XBeteiligungGisLayerManager
         private readonly LoggerInterface $logger,
         private readonly GisLayerFactoryInterface $gisLayerFactory,
         private readonly GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository,
+        private readonly HttpClientInterface $httpClient, // Add this
+
     ) {
     }
 
@@ -230,6 +233,41 @@ class XBeteiligungGisLayerManager
             throw new InvalidArgumentException('Procedure has no root layer category, cannot add layers');
         }
 
+        // Call the URL to get capabilities and extract storageCrs
+        try {
+
+            // Get collection URL by removing everything after collections/COLLECTION_NAME
+            $collectionUrl = $this->getCollectionUrl($url);
+
+
+            $response = $this->httpClient->request('GET', $collectionUrl, [
+                'timeout' => 30,
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+            ]);
+
+            $responseBody = $response->getContent();
+
+            // Parse JSON response
+            $capabilitiesData = json_decode($responseBody, true);
+
+            // Extract storageCrs from response
+            $storageCrs = $capabilitiesData['storageCrs'] ?? 'EPSG:25833'; // fallback
+
+            $this->logger->info(self::LOG_PREFIX . 'Retrieved OAF capabilities', [
+                'url' => $url,
+                'storageCrs' => $storageCrs
+            ]);
+
+        } catch (Exception $e) {
+            $this->logger->warning(self::LOG_PREFIX . 'Failed to retrieve OAF capabilities, using defaults', [
+                'url' => $url,
+                'error' => $e->getMessage()
+            ]);
+            $storageCrs = 'EPSG:25833'; // fallback value
+        }
+
         $gisLayer = $this->gisLayerFactory->createGisLayer();
 
         $gisLayer->setName(self::LAYER_NAME);
@@ -242,15 +280,50 @@ class XBeteiligungGisLayerManager
         $gisLayer->setServiceType('OAF');
 
         $gisLayer->setLayerVersion('1.3.0');
-        $gisLayer->setProjectionLabel('EPSG:25833');
-        $gisLayer->setProjectionValue('http://www.opengis.net/def/crs/EPSG/0/25833');
+        $gisLayer->setProjectionLabel($storageCrs); // Use extracted storageCrs
+        $gisLayer->setProjectionValue($this->convertCrsToProjectionValue($storageCrs));
 
         $rootCategory->addLayer($gisLayer);
 
         $this->entityManager->persist($gisLayer);
         $this->entityManager->persist($rootCategory);
-
     }
+
+    private function convertCrsToProjectionValue(string $crs): string
+    {
+        if (preg_match('/^EPSG:(\d+)$/', $crs, $matches)) {
+            return 'http://www.opengis.net/def/crs/EPSG/0/' . $matches[1];
+        }
+
+        return 'http://www.opengis.net/def/crs/EPSG/0/25833';
+    }
+
+    private function getCollectionUrl(string $url): string
+    {
+        $collectionsPattern = '/collections/';
+        $collectionsIndex = strpos($url, $collectionsPattern);
+
+        if ($collectionsIndex === false) {
+            return $url; // No /collections/ found, return original
+        }
+
+        // Find the start of the collection name
+        $collectionNameStart = $collectionsIndex + strlen($collectionsPattern);
+
+        // Find the next slash after the collection name
+        $nextSlashIndex = strpos($url, '/', $collectionNameStart);
+
+        if ($nextSlashIndex === false) {
+            return $url; // No slash after collection name, return original
+        }
+
+        // Return everything up to (but not including) the next slash
+        return substr($url, 0, $nextSlashIndex);
+    }
+
+
+
+
 
     /**
      * Build clean layer URL by extracting base URL components without query parameters
