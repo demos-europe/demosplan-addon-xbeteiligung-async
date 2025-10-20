@@ -28,6 +28,8 @@ class OafExtractor
     private const LAYER_TYPE_OVERLAY = 'overlay';
     private const LOG_PREFIX = 'XBeteiligung OAF Handler: ';
     private const LAYER_NAME = 'Planzeichnung';
+    private const COLLECTIONS_PATTERN =  '/collections/';
+    private const STORAGE_CRS =  'storageCrs';
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -41,9 +43,10 @@ class OafExtractor
     /**
      * @throws Exception
      */
-    public function processOafUrl(string $url, ProcedureInterface $procedure): void
+    public function processOafUrl(string $flaechenabgrenzungsUrl, ProcedureInterface $procedure): void
     {
-        $this->validateOafUrl($url);
+        $this->logger->info(self::LOG_PREFIX . 'Processing OAF URL for GIS layers', ['url' => $flaechenabgrenzungsUrl]);
+        $this->validateOafUrl($flaechenabgrenzungsUrl);
 
         $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
         if (null === $rootCategory) {
@@ -51,18 +54,22 @@ class OafExtractor
         }
 
         try {
-            $collectionUrl = $this->getCollectionUrl($url);
+            $collectionUrl = $this->getCollectionUrl($flaechenabgrenzungsUrl);
             $storageCrs = $this->fetchStorageCrs($collectionUrl);
 
-            $gisLayer = $this->createOafGisLayer($url, $storageCrs, $procedure);
+            $gisLayer = $this->createOafGisLayer($flaechenabgrenzungsUrl, $storageCrs, $procedure);
 
             $rootCategory->addLayer($gisLayer);
             $this->entityManager->persist($gisLayer);
             $this->entityManager->persist($rootCategory);
 
+            $this->logger->info(self::LOG_PREFIX . 'Created OAF layer ', [
+                'flaechenabgrenzungsUrl' => $flaechenabgrenzungsUrl
+            ]);
+
         } catch (Exception $e) {
             $this->logger->error(self::LOG_PREFIX . 'Failed to process OAF URL for GIS layers', [
-                'url' => $url,
+                'url' => $flaechenabgrenzungsUrl,
                 'error' => $e->getMessage(),
                 'exception' => $e,
             ]);
@@ -72,15 +79,14 @@ class OafExtractor
 
     public function validateOafUrl(string $url): bool
     {
-        $collectionsPattern = '/collections/';
         $lowerUrl = strtolower($url);
-        $collectionsIndex = strpos($lowerUrl, $collectionsPattern);
+        $collectionsIndex = strpos($lowerUrl, self::COLLECTIONS_PATTERN);
 
         if ($collectionsIndex === false) {
             return false;
         }
 
-        $afterCollections = substr($url, $collectionsIndex + strlen($collectionsPattern));
+        $afterCollections = substr($url, $collectionsIndex + strlen(self::COLLECTIONS_PATTERN));
         $hasNoCollectionName = trim($afterCollections) === '' ||
             $afterCollections === '/' ||
             preg_match('/^\/+$/', $afterCollections);
@@ -100,10 +106,10 @@ class OafExtractor
         $responseBody = $response->getContent();
         $capabilitiesData = json_decode($responseBody, true);
 
-        $storageCrs = $capabilitiesData['storageCrs'] ?? null;
+        $storageCrs = $capabilitiesData[self::STORAGE_CRS] ?? null;
 
         if (null === $storageCrs) {
-            throw new InvalidArgumentException(self::LOG_PREFIX . 'storageCrs not found in OAF response');
+            throw new InvalidArgumentException(self::LOG_PREFIX . self::STORAGE_CRS . 'not found in OAF response');
         }
 
         $this->logger->info(self::LOG_PREFIX . 'Retrieved OAF capabilities', [
@@ -133,14 +139,13 @@ class OafExtractor
 
     private function getCollectionUrl(string $url): string
     {
-        $collectionsPattern = '/collections/';
-        $collectionsIndex = strpos($url, $collectionsPattern);
+        $collectionsIndex = strpos($url, self::COLLECTIONS_PATTERN);
 
         if (false === $collectionsIndex) {
             throw new InvalidArgumentException(self::LOG_PREFIX . 'OAF URL does not contain /collections/ pattern');
         }
 
-        $collectionNameStart = $collectionsIndex + strlen($collectionsPattern);
+        $collectionNameStart = $collectionsIndex + strlen(self::COLLECTIONS_PATTERN);
         $nextSlashIndex = strpos($url, '/', $collectionNameStart);
 
         if ($nextSlashIndex === false) {
