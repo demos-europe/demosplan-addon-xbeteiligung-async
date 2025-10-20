@@ -41,7 +41,7 @@ class OafExtractor
     /**
      * @throws Exception
      */
-    public function createGisLayerFromOaf(string $url, ProcedureInterface $procedure): void
+    public function processOafUrl(string $url, ProcedureInterface $procedure): void
     {
         $this->validateOafUrl($url);
 

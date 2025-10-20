@@ -58,12 +58,12 @@ class XBeteiligungGisLayerManager
 
         $isOafUrl = $this->oafExtractor->validateOafUrl($flaechenabgrenzungsUrl);
 
-        if (!$isOafUrl) {
-            $this->processWmsUrl($flaechenabgrenzungsUrl, $procedure);
+        if ($isOafUrl) {
+            $this->oafExtractor->processOafUrl($flaechenabgrenzungsUrl, $procedure);
+
             return;
         }
-
-        $this->oafExtractor->createGisLayerFromOaf($flaechenabgrenzungsUrl, $procedure);
+        $this->processWmsUrl($flaechenabgrenzungsUrl, $procedure);
 
     }
 
