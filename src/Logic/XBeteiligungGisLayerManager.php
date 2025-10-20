@@ -43,6 +43,28 @@ class XBeteiligungGisLayerManager
     ) {
     }
 
+
+    /**
+     * @throws Exception
+     */
+    public function processUrl(?string $flaechenabgrenzungsUrl, ProcedureInterface $procedure): void {
+        if (null === $flaechenabgrenzungsUrl || '' === trim($flaechenabgrenzungsUrl)) {
+            $this->logger->info(self::LOG_PREFIX . 'No flaechenabgrenzungsUrl provided - skipping GIS layer creation');
+
+            return;
+        }
+
+        $isOafUrl = $this->validateOafUrl($flaechenabgrenzungsUrl);
+
+        if (!$isOafUrl) {
+            $this->processWmsUrl($flaechenabgrenzungsUrl, $procedure);
+            return;
+        }
+
+        $this->createGisLayerForOaf($flaechenabgrenzungsUrl, $procedure);
+
+    }
+
     /**
      * @throws Exception
      */
@@ -93,6 +115,31 @@ class XBeteiligungGisLayerManager
 
         $this->logger->debug(self::LOG_PREFIX . 'WMS URL validation successful', ['url' => $url]);
     }
+
+    private function validateOafUrl(string $url): bool
+    {
+        $collectionsPattern = '/collections/';
+        $lowerUrl = strtolower($url);
+        $collectionsIndex = strpos($lowerUrl, $collectionsPattern);
+
+        // Check if URL contains /collections/ (case-insensitive)
+        if ($collectionsIndex === false) {
+            return false;
+        }
+
+        // Check if /collections/ is not at the end (there must be content after it)
+        $afterCollections = substr($url, $collectionsIndex + strlen($collectionsPattern));
+        $hasNoCollectionName = trim($afterCollections) === '' ||
+            $afterCollections === '/' ||
+            preg_match('/^\/+$/', $afterCollections);
+
+        if ($hasNoCollectionName) {
+            return false;
+        }
+
+        return true;
+    }
+
 
     private function extractLayersFromUrl(string $url): string
     {
@@ -174,6 +221,35 @@ class XBeteiligungGisLayerManager
             'procedureId' => $procedure->getId(),
             'cleanUrl' => $gisLayer->getUrl(),
         ]);
+    }
+
+    private function createGisLayerForOaf(string $url, ProcedureInterface $procedure): void
+    {
+        $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
+        if (null === $rootCategory) {
+            throw new InvalidArgumentException('Procedure has no root layer category, cannot add layers');
+        }
+
+        $gisLayer = $this->gisLayerFactory->createGisLayer();
+
+        $gisLayer->setName(self::LAYER_NAME);
+        $gisLayer->setUrl($this->buildCleanLayerUrl($url));
+        $gisLayer->setProcedureId($procedure->getId());
+
+        $gisLayer->setType(self::LAYER_TYPE_OVERLAY);
+        $gisLayer->setDefaultVisibility(true);
+
+        $gisLayer->setServiceType('OAF');
+
+        $gisLayer->setLayerVersion('1.3.0');
+        $gisLayer->setProjectionLabel('EPSG:25833');
+        $gisLayer->setProjectionValue('http://www.opengis.net/def/crs/EPSG/0/25833');
+
+        $rootCategory->addLayer($gisLayer);
+
+        $this->entityManager->persist($gisLayer);
+        $this->entityManager->persist($rootCategory);
+
     }
 
     /**
