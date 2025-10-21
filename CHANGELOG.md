@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.47 (2025-10-21)
 - Add support for oaf format for Gis layer
 ## v0.46 (2025-10-16)
 - Fixed maps displaying polygons by not storing the original coordinate
