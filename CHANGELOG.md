@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- Add support for oaf format for Gis layer
 ## v0.46 (2025-10-16)
 - Fixed maps displaying polygons by not storing the original coordinate
 - Add test cockpit environment mappings (AGS codes 94-97) to XBeteiligungCustomerMappingService

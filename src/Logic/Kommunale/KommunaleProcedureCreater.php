@@ -174,7 +174,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 $procedure->getSettings()->setMapExtent($procedureDataValueObject->getMapData()->getMapExtent());
 
                 // Process flaechenabgrenzungsUrl for GIS layer creation
-                $this->gisLayerManager->processWmsUrl(
+                $this->gisLayerManager->processUrl(
                     $procedureDataValueObject->getMapData()->getFlaechenabgrenzungsUrl(),
                     $procedure
                 );

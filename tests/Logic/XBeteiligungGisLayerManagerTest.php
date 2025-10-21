@@ -17,6 +17,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Factory\GisLayerFactoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\OafExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungGisLayerManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -31,6 +32,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
     private LoggerInterface $logger;
     private GisLayerFactoryInterface $gisLayerFactory;
     private GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository;
+    private OafExtractor $oafExtractor;
     private ProcedureInterface $procedure;
 
     private const PROCEDURE_ID = 'test-procedure-id';
@@ -47,15 +49,20 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->gisLayerFactory = $this->createMock(GisLayerFactoryInterface::class);
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
+        $this->oafExtractor = $this->createMock(OafExtractor::class);
         $this->procedure = $this->createMock(ProcedureInterface::class);
 
         $this->procedure->method('getId')->willReturn(self::PROCEDURE_ID);
+
+        // Mock OAF extractor to always return false so WMS processing is used
+        $this->oafExtractor->method('validateOafUrl')->willReturn(false);
 
         $this->sut = new XBeteiligungGisLayerManager(
             $this->entityManager,
             $this->logger,
             $this->gisLayerFactory,
-            $this->gisLayerCategoryRepository
+            $this->gisLayerCategoryRepository,
+            $this->oafExtractor
         );
     }
 
@@ -68,7 +75,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $this->expectLoggerInfo(self::NO_URL_PROVIDED_MESSAGE);
         $this->expectNoGisLayerCreation();
 
-        $this->sut->processWmsUrl(null, $this->procedure);
+        $this->sut->processUrl(null, $this->procedure);
     }
 
     public function testProcessWmsUrlWithEmptyUrl(): void
@@ -76,7 +83,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $this->expectLoggerInfo(self::NO_URL_PROVIDED_MESSAGE);
         $this->expectNoGisLayerCreation();
 
-        $this->sut->processWmsUrl('', $this->procedure);
+        $this->sut->processUrl('', $this->procedure);
     }
 
     public function testProcessWmsUrlWithWhitespaceOnlyUrl(): void
@@ -84,7 +91,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $this->expectLoggerInfo(self::NO_URL_PROVIDED_MESSAGE);
         $this->expectNoGisLayerCreation();
 
-        $this->sut->processWmsUrl('   ', $this->procedure);
+        $this->sut->processUrl('   ', $this->procedure);
     }
 
     public function testProcessWmsUrlWithMalformedUrl(): void
@@ -93,7 +100,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->expectLoggerErrorWithException('Invalid WMS URL format - no query parameters');
 
-        $this->sut->processWmsUrl($malformedUrl, $this->procedure);
+        $this->sut->processUrl($malformedUrl, $this->procedure);
     }
 
     public function testProcessWmsUrlWithMissingRequiredParameters(): void
@@ -102,7 +109,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->expectLoggerErrorWithException('Missing required WMS parameter: LAYERS');
 
-        $this->sut->processWmsUrl($urlWithoutLayers, $this->procedure);
+        $this->sut->processUrl($urlWithoutLayers, $this->procedure);
     }
 
     public function testProcessWmsUrlWithMissingBboxParameter(): void
@@ -111,7 +118,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->expectLoggerErrorWithException('Missing required WMS parameter: BBOX');
 
-        $this->sut->processWmsUrl($urlWithoutBbox, $this->procedure);
+        $this->sut->processUrl($urlWithoutBbox, $this->procedure);
     }
 
     public function testProcessWmsUrlWithMissingRequestParameter(): void
@@ -120,7 +127,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->expectLoggerErrorWithException('Missing required WMS parameter: REQUEST');
 
-        $this->sut->processWmsUrl($urlWithoutRequest, $this->procedure);
+        $this->sut->processUrl($urlWithoutRequest, $this->procedure);
     }
 
     public function testProcessWmsUrlWithMissingSrsAndCrsParameters(): void
@@ -129,7 +136,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->expectLoggerErrorWithException('Missing SRS or CRS parameter in WMS URL');
 
-        $this->sut->processWmsUrl($urlWithoutSrsOrCrs, $this->procedure);
+        $this->sut->processUrl($urlWithoutSrsOrCrs, $this->procedure);
     }
 
     public function testProcessWmsUrlWithValidUrlAndSingleLayer(): void
@@ -166,7 +173,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
                 self::stringContains('Built clean layer URL')
             ));
 
-        $this->sut->processWmsUrl($validUrl, $this->procedure);
+        $this->sut->processUrl($validUrl, $this->procedure);
     }
 
     public function testProcessWmsUrlWithValidUrlAndMultipleLayers(): void
@@ -195,7 +202,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
                 self::stringContains('Created single GIS layer with all layers')
             ));
 
-        $this->sut->processWmsUrl($validUrl, $this->procedure);
+        $this->sut->processUrl($validUrl, $this->procedure);
     }
 
     public function testProcessWmsUrlWithCaseInsensitiveParameters(): void
@@ -207,7 +214,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory);
 
-        $this->sut->processWmsUrl($urlWithLowercaseParams, $this->procedure);
+        $this->sut->processUrl($urlWithLowercaseParams, $this->procedure);
     }
 
     public function testProcessWmsUrlWithMixedCaseParameters(): void
@@ -219,7 +226,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory);
 
-        $this->sut->processWmsUrl($urlWithMixedCase, $this->procedure);
+        $this->sut->processUrl($urlWithMixedCase, $this->procedure);
     }
 
     public function testProcessWmsUrlWithEmptyLayersParameter(): void
@@ -229,7 +236,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $this->expectLoggerWarning(self::NO_LAYERS_FOUND_MESSAGE);
         $this->expectNoGisLayerCreation();
 
-        $this->sut->processWmsUrl($urlWithEmptyLayers, $this->procedure);
+        $this->sut->processUrl($urlWithEmptyLayers, $this->procedure);
     }
 
     public function testProcessWmsUrlWithLayersContainingWhitespace(): void
@@ -262,7 +269,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory, 1);
 
-        $this->sut->processWmsUrl($urlWithWhitespace, $this->procedure);
+        $this->sut->processUrl($urlWithWhitespace, $this->procedure);
 
         // Verify that layer names are trimmed correctly and joined with comma
         self::assertSame('layer1,layer2', $layersString, 'Layer names should be trimmed of whitespace and joined with comma');
@@ -280,7 +287,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Procedure has no root layer category, cannot add layers');
 
-        $this->sut->processWmsUrl($validUrl, $this->procedure);
+        $this->sut->processUrl($validUrl, $this->procedure);
     }
 
     public function testProcessWmsUrlWithInvalidUrlForCleanGeneration(): void
@@ -296,7 +303,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
             ->method('setUrl')
             ->with(self::WMS_BASE_URL);
 
-        $this->sut->processWmsUrl($invalidUrl, $this->procedure);
+        $this->sut->processUrl($invalidUrl, $this->procedure);
     }
 
     public function testProcessWmsUrlWithoutServiceAndVersionParameters(): void
@@ -315,7 +322,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $mockGisLayer->expects($this->never())
             ->method('setLayerVersion');
 
-        $this->sut->processWmsUrl($urlWithoutServiceVersion, $this->procedure);
+        $this->sut->processUrl($urlWithoutServiceVersion, $this->procedure);
     }
 
     public function testProcessWmsUrlWithSpecialCharactersInLayers(): void
@@ -327,7 +334,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory);
 
-        $this->sut->processWmsUrl($urlWithSpecialChars, $this->procedure);
+        $this->sut->processUrl($urlWithSpecialChars, $this->procedure);
     }
 
     public function testProcessWmsUrlParameterExtractionAndVerification(): void
@@ -375,7 +382,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->setupMocksForValidUrl($mockGisLayer, $mockRootCategory);
 
-        $this->sut->processWmsUrl($testUrl, $this->procedure);
+        $this->sut->processUrl($testUrl, $this->procedure);
 
         // Verify all parameters are extracted and set correctly
         self::assertSame('Planzeichnung', $setParameters['name'], 'Layer name should be "Planzeichnung"');
@@ -400,7 +407,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
         $this->expectException(Exception::class);
 
-        $this->sut->processWmsUrl($invalidUrl, $this->procedure);
+        $this->sut->processUrl($invalidUrl, $this->procedure);
     }
 
     /**
@@ -431,7 +438,7 @@ class XBeteiligungGisLayerManagerTest extends TestCase
                 ->with($expectedVersion);
         }
 
-        $this->sut->processWmsUrl($url, $this->procedure);
+        $this->sut->processUrl($url, $this->procedure);
     }
 
     // ============================================================================

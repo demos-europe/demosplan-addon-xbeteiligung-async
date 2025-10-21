@@ -40,19 +40,37 @@ class XBeteiligungGisLayerManager
         private readonly LoggerInterface $logger,
         private readonly GisLayerFactoryInterface $gisLayerFactory,
         private readonly GisLayerCategoryRepositoryInterface $gisLayerCategoryRepository,
+        private readonly OafExtractor $oafExtractor,
     ) {
     }
+
 
     /**
      * @throws Exception
      */
-    public function processWmsUrl(?string $flaechenabgrenzungsUrl, ProcedureInterface $procedure): void
-    {
+    public function processUrl(?string $flaechenabgrenzungsUrl, ProcedureInterface $procedure): void {
         if (null === $flaechenabgrenzungsUrl || '' === trim($flaechenabgrenzungsUrl)) {
             $this->logger->info(self::LOG_PREFIX . 'No flaechenabgrenzungsUrl provided - skipping GIS layer creation');
 
             return;
         }
+
+        $isOafUrl = $this->oafExtractor->validateOafUrl($flaechenabgrenzungsUrl);
+
+        if ($isOafUrl) {
+            $this->oafExtractor->processOafUrl($flaechenabgrenzungsUrl, $procedure);
+
+            return;
+        }
+        $this->processWmsUrl($flaechenabgrenzungsUrl, $procedure);
+
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function processWmsUrl(?string $flaechenabgrenzungsUrl, ProcedureInterface $procedure): void
+    {
 
         $this->logger->info(self::LOG_PREFIX . 'Processing WMS URL for GIS layers', ['url' => $flaechenabgrenzungsUrl]);
 
