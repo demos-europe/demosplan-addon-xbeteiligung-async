@@ -29,6 +29,10 @@ class OafExtractorTest extends TestCase
     private OafExtractor $sut;
     private HttpClientInterface $httpClient;
     private LoggerInterface $logger;
+    private ReflectionClass $reflection;
+
+    private const DEFAULT_PROJECTION_VALUE = '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs';
+    private const DEFAULT_PROJECTION_LABEL = 'EPSG:25832';
 
     protected function setUp(): void
     {
@@ -47,6 +51,8 @@ class OafExtractorTest extends TestCase
             $gisLayerCategoryRepository,
             $entityManager
         );
+
+        $this->reflection = new ReflectionClass($this->sut);
     }
 
     #[DataProvider('resolveProjectionInfoDataProvider')]
@@ -58,7 +64,97 @@ class OafExtractorTest extends TestCase
         string $expectedValue,
         string $expectedLabel
     ): void {
-        // Setup HTTP client mock
+        $this->setupHttpClientMock($httpResponse, $httpException);
+
+        $result = $this->invokeResolveProjectionInfo($url);
+
+        $this->assertEquals($expectedValue, $result['value'], "Expected value mismatch for: $testName");
+        $this->assertEquals($expectedLabel, $result['label'], "Expected label mismatch for: $testName");
+    }
+
+    public static function resolveProjectionInfoDataProvider(): array
+    {
+        return [
+            // Default cases (all return same defaults)
+            'Invalid URL - No collections pattern' => [
+                'Invalid URL format',
+                'https://example.com/api/layers',
+                null, null,
+                self::DEFAULT_PROJECTION_VALUE, self::DEFAULT_PROJECTION_LABEL
+            ],
+            'Invalid URL - Empty collection name' => [
+                'Empty collection name',
+                'https://example.com/collections/',
+                null, null,
+                self::DEFAULT_PROJECTION_VALUE, self::DEFAULT_PROJECTION_LABEL
+            ],
+            'Valid URL but HTTP request fails' => [
+                'HTTP transport exception',
+                'https://example.com/collections/test-layer/items',
+                null, 'Connection timeout',
+                self::DEFAULT_PROJECTION_VALUE, self::DEFAULT_PROJECTION_LABEL
+            ],
+            'Valid URL but invalid JSON response' => [
+                'Malformed JSON',
+                'https://example.com/collections/test-layer/items',
+                'invalid-json-{{{', null,
+                self::DEFAULT_PROJECTION_VALUE, self::DEFAULT_PROJECTION_LABEL
+            ],
+            'Valid URL with no storageCrs in response' => [
+                'Missing storageCrs field',
+                'https://example.com/collections/test-layer/items',
+                '{"title": "Test Collection", "description": "A test collection"}', null,
+                self::DEFAULT_PROJECTION_VALUE, self::DEFAULT_PROJECTION_LABEL
+            ],
+
+            // CRS processing cases
+            'Valid URL with EPSG URI format CRS' => [
+                'EPSG URI format',
+                'https://example.com/collections/test-layer/items',
+                '{"storageCrs": "http://www.opengis.net/def/crs/EPSG/0/25832"}', null,
+                'EPSG:25832', 'http://www.opengis.net/def/crs/EPSG/0/25832'
+            ],
+            'Valid URL with CRS84 format' => [
+                'CRS84 format',
+                'https://example.com/collections/test-layer/items',
+                '{"storageCrs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"}', null,
+                'EPSG:4326', 'http://www.opengis.net/def/crs/OGC/1.3/CRS84'
+            ],
+            'Valid URL with already formatted EPSG' => [
+                'Pre-formatted EPSG',
+                'https://example.com/collections/test-layer/items',
+                '{"storageCrs": "EPSG:3857"}', null,
+                'EPSG:3857', 'EPSG:3857'
+            ],
+            'Valid URL with lowercase EPSG' => [
+                'Lowercase EPSG',
+                'https://example.com/collections/test-layer/items',
+                '{"storageCrs": "epsg:4326"}', null,
+                'EPSG:4326', 'epsg:4326'
+            ],
+            'Valid URL with unknown CRS format' => [
+                'Unknown CRS format',
+                'https://example.com/collections/test-layer/items',
+                '{"storageCrs": "CUSTOM:12345"}', null,
+                'CUSTOM:12345', 'CUSTOM:12345'
+            ],
+            'Valid URL with WGS84 EPSG URI' => [
+                'WGS84 EPSG URI',
+                'https://example.com/collections/boundary/items',
+                '{"storageCrs": "http://www.opengis.net/def/crs/EPSG/0/4326"}', null,
+                'EPSG:4326', 'http://www.opengis.net/def/crs/EPSG/0/4326'
+            ],
+            'Valid URL with Web Mercator' => [
+                'Web Mercator EPSG URI',
+                'https://example.com/collections/tiles/items',
+                '{"storageCrs": "http://www.opengis.net/def/crs/EPSG/0/3857"}', null,
+                'EPSG:3857', 'http://www.opengis.net/def/crs/EPSG/0/3857'
+            ]
+        ];
+    }
+
+    private function setupHttpClientMock(?string $httpResponse, ?string $httpException): void
+    {
         if ($httpException) {
             $this->httpClient
                 ->method('request')
@@ -70,128 +166,13 @@ class OafExtractorTest extends TestCase
                 ->method('request')
                 ->willReturn($response);
         }
-
-        // Use reflection to call private method
-        $reflection = new ReflectionClass($this->sut);
-        $method = $reflection->getMethod('resolveProjectionInfo');
-        $method->setAccessible(true);
-
-        $result = $method->invoke($this->sut, $url);
-
-        $this->assertEquals($expectedValue, $result['value'], "Expected value mismatch for: $testName");
-        $this->assertEquals($expectedLabel, $result['label'], "Expected label mismatch for: $testName");
     }
 
-    public function resolveProjectionInfoDataProvider(): array
+    private function invokeResolveProjectionInfo(string $url): array
     {
-        return [
-            'Invalid URL - No collections pattern' => [
-                'testName' => 'Invalid URL format',
-                'url' => 'https://example.com/api/layers',
-                'httpResponse' => null,
-                'httpException' => null,
-                'expectedValue' => '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs',
-                'expectedLabel' => 'EPSG:25832'
-            ],
+        $method = $this->reflection->getMethod('resolveProjectionInfo');
+        $method->setAccessible(true);
 
-            'Invalid URL - Empty collection name' => [
-                'testName' => 'Empty collection name',
-                'url' => 'https://example.com/collections/',
-                'httpResponse' => null,
-                'httpException' => null,
-                'expectedValue' => '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs',
-                'expectedLabel' => 'EPSG:25832'
-            ],
-
-            'Valid URL but HTTP request fails' => [
-                'testName' => 'HTTP transport exception',
-                'url' => 'https://example.com/collections/test-layer/items',
-                'httpResponse' => null,
-                'httpException' => 'Connection timeout',
-                'expectedValue' => '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs',
-                'expectedLabel' => 'EPSG:25832'
-            ],
-
-            'Valid URL but invalid JSON response' => [
-                'testName' => 'Malformed JSON',
-                'url' => 'https://example.com/collections/test-layer/items',
-                'httpResponse' => 'invalid-json-{{{',
-                'httpException' => null,
-                'expectedValue' => '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs',
-                'expectedLabel' => 'EPSG:25832'
-            ],
-
-            'Valid URL with no storageCrs in response' => [
-                'testName' => 'Missing storageCrs field',
-                'url' => 'https://example.com/collections/test-layer/items',
-                'httpResponse' => '{"title": "Test Collection", "description": "A test collection"}',
-                'httpException' => null,
-                'expectedValue' => '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs',
-                'expectedLabel' => 'EPSG:25832'
-            ],
-
-            'Valid URL with EPSG URI format CRS' => [
-                'testName' => 'EPSG URI format',
-                'url' => 'https://example.com/collections/test-layer/items',
-                'httpResponse' => '{"storageCrs": "http://www.opengis.net/def/crs/EPSG/0/25832"}',
-                'httpException' => null,
-                'expectedValue' => 'EPSG:25832',
-                'expectedLabel' => 'http://www.opengis.net/def/crs/EPSG/0/25832'
-            ],
-
-            'Valid URL with CRS84 format' => [
-                'testName' => 'CRS84 format',
-                'url' => 'https://example.com/collections/test-layer/items',
-                'httpResponse' => '{"storageCrs": "http://www.opengis.net/def/crs/OGC/1.3/CRS84"}',
-                'httpException' => null,
-                'expectedValue' => 'EPSG:4326',
-                'expectedLabel' => 'http://www.opengis.net/def/crs/OGC/1.3/CRS84'
-            ],
-
-            'Valid URL with already formatted EPSG' => [
-                'testName' => 'Pre-formatted EPSG',
-                'url' => 'https://example.com/collections/test-layer/items',
-                'httpResponse' => '{"storageCrs": "EPSG:3857"}',
-                'httpException' => null,
-                'expectedValue' => 'EPSG:3857',
-                'expectedLabel' => 'EPSG:3857'
-            ],
-
-            'Valid URL with lowercase EPSG' => [
-                'testName' => 'Lowercase EPSG',
-                'url' => 'https://example.com/collections/test-layer/items',
-                'httpResponse' => '{"storageCrs": "epsg:4326"}',
-                'httpException' => null,
-                'expectedValue' => 'EPSG:4326',
-                'expectedLabel' => 'epsg:4326'
-            ],
-
-            'Valid URL with unknown CRS format' => [
-                'testName' => 'Unknown CRS format',
-                'url' => 'https://example.com/collections/test-layer/items',
-                'httpResponse' => '{"storageCrs": "CUSTOM:12345"}',
-                'httpException' => null,
-                'expectedValue' => 'CUSTOM:12345',
-                'expectedLabel' => 'CUSTOM:12345'
-            ],
-
-            'Valid URL with WGS84 EPSG URI' => [
-                'testName' => 'WGS84 EPSG URI',
-                'url' => 'https://example.com/collections/boundary/items',
-                'httpResponse' => '{"storageCrs": "http://www.opengis.net/def/crs/EPSG/0/4326"}',
-                'httpException' => null,
-                'expectedValue' => 'EPSG:4326',
-                'expectedLabel' => 'http://www.opengis.net/def/crs/EPSG/0/4326'
-            ],
-
-            'Valid URL with Web Mercator' => [
-                'testName' => 'Web Mercator EPSG URI',
-                'url' => 'https://example.com/collections/tiles/items',
-                'httpResponse' => '{"storageCrs": "http://www.opengis.net/def/crs/EPSG/0/3857"}',
-                'httpException' => null,
-                'expectedValue' => 'EPSG:3857',
-                'expectedLabel' => 'http://www.opengis.net/def/crs/EPSG/0/3857'
-            ]
-        ];
+        return $method->invoke($this->sut, $url);
     }
 }
