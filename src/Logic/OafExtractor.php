@@ -48,7 +48,6 @@ class OafExtractor
     public function processOafUrl(string $flaechenabgrenzungsUrl, ProcedureInterface $procedure): void
     {
         $this->logger->info(self::LOG_PREFIX . 'Processing OAF URL for GIS layers', ['url' => $flaechenabgrenzungsUrl]);
-        $this->validateOafUrl($flaechenabgrenzungsUrl);
 
         $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
         if (null === $rootCategory) {
@@ -84,7 +83,7 @@ class OafExtractor
     {
         $collectionUrl = $this->getCollectionUrl($flaechenabgrenzungsUrl);
 
-        if (!$collectionUrl) {
+        if ('' === $collectionUrl) {
             $this->logger->warning(self::LOG_PREFIX . 'Failed to extract collection URL, using defaults');
             return [
                 'value' => self::DEFAULT_PROJECTION_VALUE,
@@ -94,7 +93,7 @@ class OafExtractor
 
         $storageCrs = $this->fetchStorageCrs($collectionUrl);
 
-        if (!$storageCrs) {
+        if ('' === $storageCrs) {
             $this->logger->info(self::LOG_PREFIX . 'No CRS found in collection, using defaults');
             return [
                 'value' => self::DEFAULT_PROJECTION_VALUE,
