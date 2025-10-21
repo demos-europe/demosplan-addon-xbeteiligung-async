@@ -26,10 +26,12 @@ class OafExtractor
 {
     private const OAF_SERVICE_TYPE = 'OAF';
     private const LAYER_TYPE_OVERLAY = 'overlay';
-    private const LOG_PREFIX = 'XBeteiligung OAF Handler: ';
+    private const LOG_PREFIX = 'XBeteiligung OAF Extractor: ';
     private const LAYER_NAME = 'Planzeichnung';
     private const COLLECTIONS_PATTERN =  '/collections/';
     private const STORAGE_CRS =  'storageCrs';
+    private const DEFAULT_PROJECTION_VALUE = '+proj=utm +zone=32 +ellps=GRS80 +units=m +no_defs';
+    private const DEFAULT_PROJECTION_LABEL = 'EPSG:25832';
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -54,10 +56,11 @@ class OafExtractor
         }
 
         try {
-            $collectionUrl = $this->getCollectionUrl($flaechenabgrenzungsUrl);
-            $storageCrs = $this->fetchStorageCrs($collectionUrl);
+            $projectionInfo = $this->resolveProjectionInfo($flaechenabgrenzungsUrl);
+            $projectionValue = $projectionInfo['value'];
+            $projectionLabel = $projectionInfo['label'];
 
-            $gisLayer = $this->createOafGisLayer($flaechenabgrenzungsUrl, $storageCrs, $procedure);
+            $gisLayer = $this->createOafGisLayer($flaechenabgrenzungsUrl, $projectionValue, $projectionLabel, $procedure);
 
             $rootCategory->addLayer($gisLayer);
             $this->entityManager->persist($gisLayer);
@@ -76,6 +79,35 @@ class OafExtractor
             throw $e;
         }
     }
+
+    private function resolveProjectionInfo(string $flaechenabgrenzungsUrl): array
+    {
+        $collectionUrl = $this->getCollectionUrl($flaechenabgrenzungsUrl);
+
+        if (!$collectionUrl) {
+            $this->logger->warning(self::LOG_PREFIX . 'Failed to extract collection URL, using defaults');
+            return [
+                'value' => self::DEFAULT_PROJECTION_VALUE,
+                'label' => self::DEFAULT_PROJECTION_LABEL
+            ];
+        }
+
+        $storageCrs = $this->fetchStorageCrs($collectionUrl);
+
+        if (!$storageCrs) {
+            $this->logger->info(self::LOG_PREFIX . 'No CRS found in collection, using defaults');
+            return [
+                'value' => self::DEFAULT_PROJECTION_VALUE,
+                'label' => self::DEFAULT_PROJECTION_LABEL
+            ];
+        }
+
+        return [
+            'value' => $this->parseStorageCrsToEpsg($storageCrs),
+            'label' => $storageCrs
+        ];
+    }
+
 
     public function validateOafUrl(string $url): bool
     {
@@ -96,12 +128,18 @@ class OafExtractor
 
     private function fetchStorageCrs(string $collectionUrl): string
     {
-        $response = $this->httpClient->request('GET', $collectionUrl, [
-            'timeout' => 30,
-            'headers' => [
-                'Accept' => 'application/json',
-            ],
-        ]);
+        try {
+            $response = $this->httpClient->request('GET', $collectionUrl, [
+                'timeout' => 30,
+                'headers' => [
+                    'Accept' => 'application/json',
+                    ],
+                ]);
+        } catch (Exception $e) {
+            $this->logger->warning(self::LOG_PREFIX . 'Failed to fetch collectionUrl.', ['collectionUrl' => $collectionUrl, 'error' => $e->getMessage()]);
+            return '';
+        }
+
 
         $responseBody = $response->getContent();
         $capabilitiesData = json_decode($responseBody, true);
@@ -109,7 +147,8 @@ class OafExtractor
         $storageCrs = $capabilitiesData[self::STORAGE_CRS] ?? null;
 
         if (null === $storageCrs) {
-            throw new InvalidArgumentException(self::LOG_PREFIX . self::STORAGE_CRS . 'not found in OAF response');
+            $this->logger->warning(self::LOG_PREFIX . self::STORAGE_CRS . 'not found in OAF response', ['collectionUrl' => $collectionUrl]);
+            return '';
         }
 
         $this->logger->info(self::LOG_PREFIX . 'Retrieved OAF capabilities', [
@@ -120,7 +159,7 @@ class OafExtractor
         return $storageCrs;
     }
 
-    private function createOafGisLayer(string $originalUrl, string $storageCrs, ProcedureInterface $procedure): GisLayerInterface
+    private function createOafGisLayer(string $originalUrl, string $projectionValue, string $projectionLabel, ProcedureInterface $procedure): GisLayerInterface
     {
         $gisLayer = $this->gisLayerFactory->createGisLayer();
 
@@ -130,9 +169,8 @@ class OafExtractor
         $gisLayer->setType(self::LAYER_TYPE_OVERLAY);
         $gisLayer->setDefaultVisibility(true);
         $gisLayer->setServiceType(self::OAF_SERVICE_TYPE);
-        $gisLayer->setLayerVersion('1.3.0');
-        $gisLayer->setProjectionValue($storageCrs);
-        $gisLayer->setProjectionLabel($this->parseStorageCrsToEpsg($storageCrs));
+        $gisLayer->setProjectionValue($projectionValue);
+        $gisLayer->setProjectionLabel($projectionLabel);
 
         return $gisLayer;
     }
@@ -142,14 +180,20 @@ class OafExtractor
         $collectionsIndex = strpos($url, self::COLLECTIONS_PATTERN);
 
         if (false === $collectionsIndex) {
-            throw new InvalidArgumentException(self::LOG_PREFIX . 'OAF URL does not contain /collections/ pattern');
+            $this->logger->warning(self::LOG_PREFIX . 'OAF URL does not contain /collections/ pattern', [
+                'url' => $url
+            ]);
+            return '';
         }
 
         $collectionNameStart = $collectionsIndex + strlen(self::COLLECTIONS_PATTERN);
         $nextSlashIndex = strpos($url, '/', $collectionNameStart);
 
-        if ($nextSlashIndex === false) {
-            throw new InvalidArgumentException(self::LOG_PREFIX . ' No slash after collection name');
+        if (false === $nextSlashIndex) {
+            $this->logger->warning(self::LOG_PREFIX . ' No slash after collection name', [
+                'url' => $url
+            ]);
+            return '';
         }
 
         return substr($url, 0, $nextSlashIndex);
