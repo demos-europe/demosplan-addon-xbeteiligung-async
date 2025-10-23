@@ -195,7 +195,7 @@ Execute comprehensive tests to ensure the migration was successful:
 
 ```bash
 # Run specific XBeteiligung service tests
-./vendor/bin/phpunit tests/Logic/XBeteiligingService/ --verbose
+./vendor/bin/phpunit tests/Logic/XBeteiligungService/ --verbose
 
 # Run all addon tests
 ./vendor/bin/phpunit tests/ --verbose

@@ -72,6 +72,7 @@ class PlanfeststellungProcedureUpdater extends ProcedureCommonFeatures
         // Update procedure documents will implemented later
 
         $connection = $this->entityManager->getConnection();
+        $procedureUpdated = null;
         try {
             $connection->beginTransaction();
             $procedureUpdated = $this->procedureService->updateProcedureObject($procedureToUpdate);
@@ -79,6 +80,12 @@ class PlanfeststellungProcedureUpdater extends ProcedureCommonFeatures
         } catch (Exception $e) {
             $connection->rollBack();
             $this->logger->error('Procedure could not be updated.', ['errorMessage' => $e->getMessage()]);
+
+            // Return error response when update fails
+            return $this->planfeststellungMessageFactory->buildProcedureUpdateErrorResponse222(
+                $errorTypes,
+                $planfeststellungAktualisieren0202
+            );
         }
 
         // create OK message for procedure update
