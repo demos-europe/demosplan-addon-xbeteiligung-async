@@ -1,8 +1,12 @@
 # Changelog
 
 ## UNRELEASED
+- fix function call on null in VerfasserBuilder causing that created statements from users
+with role Institution Koordination with missing user address are not send to cockpit
+
 ## v0.47 (2025-10-21)
 - Add support for oaf format for Gis layer
+
 ## v0.46 (2025-10-16)
 - Fixed maps displaying polygons by not storing the original coordinate
 - Add test cockpit environment mappings (AGS codes 94-97) to XBeteiligungCustomerMappingService
@@ -10,6 +14,7 @@
 - Disable procedure phase update
 - Fix ProcedureMessage requestCount parameter type from bool to int
 - Standardize license headers and strict types across codebase (105 PHP files)
+
 ## v0.45 (2025-10-08)
 - Add support for AGS codes 98 and 99 in customer mapping for test environments
 

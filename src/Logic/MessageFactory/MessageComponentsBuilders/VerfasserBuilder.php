@@ -116,24 +116,27 @@ class VerfasserBuilder
         $hasAddressData = false;
         $userAddress = $user->getAddress();
 
-        if (!empty($userAddress->getStreet())) {
-            $address->setStrasse($userAddress->getStreet());
-            $hasAddressData = true;
-        }
+        if (null !== $userAddress)
+        {
+            if ('' !== $userAddress->getStreet()) {
+                $address->setStrasse($userAddress->getStreet());
+                $hasAddressData = true;
+            }
 
-        if (!empty($userAddress->getHouseNumber())) {
-            $address->setHausnummer($userAddress->getHouseNumber());
-            $hasAddressData = true;
-        }
+            if ('' !== $userAddress->getHouseNumber()) {
+                $address->setHausnummer($userAddress->getHouseNumber());
+                $hasAddressData = true;
+            }
 
-        if (!empty($userAddress->getPostalCode())) {
-            $address->setPostfach($userAddress->getPostalCode());
-            $hasAddressData = true;
-        }
+            if ('' !== $userAddress->getPostalcode()) {
+                $address->setPostfach($userAddress->getPostalcode());
+                $hasAddressData = true;
+            }
 
-        if (!empty($userAddress->getCity())) {
-            $address->setOrt($userAddress->getCity());
-            $hasAddressData = true;
+            if ('' !== $userAddress->getCity()) {
+                $address->setOrt($userAddress->getCity());
+                $hasAddressData = true;
+            }
         }
 
         if ($hasAddressData) {
