@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- ensure XBeteiligung messages use current phase data, not stale enriched fields
+
 ## v0.48 (2025-10-28)
 - fix function call on null in VerfasserBuilder causing that created statements from users
 with role Institution Koordination with missing user address are not send to cockpit
