@@ -417,7 +417,18 @@ class XBeteiligungService
     ): BeteiligungKommunalType {
         $participationType->setPlanartKommunal($this->createNewCodePlanartKommunalType()); // optional
         $participationType->setVerfahrensschrittKommunal($this->getPublicProcedurePhaseCodeType($procedure));
-        $participationType->setGeltungsbereich($this->extractOriginalGeltungsbereichFromTerritory($procedure->getSettings()->getTerritory()));
+
+        // Extract and set Geltungsbereich from territory data
+        $territory = $procedure->getSettings()->getTerritory();
+        if (null === $territory || '' === trim($territory)) {
+            $this->logger->warning('XBeteiligung: Procedure has no territory data - Geltungsbereich will be missing in message', [
+                'procedureId' => $procedure->getId(),
+                'procedureName' => $procedure->getName()
+            ]);
+        }
+        $geltungsbereich = $this->extractOriginalGeltungsbereichFromTerritory($territory);
+        $participationType->setGeltungsbereich($geltungsbereich);
+
         $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure, $participationType));
         $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure, $participationType));
 
@@ -649,20 +660,22 @@ class XBeteiligungService
             Assert::notNull($rootCategory, 'new procedure has no root layer category');
 
             $gisLayers = $rootCategory->getGisLayers();
-            $baseLayer = null;
+            $bplanLayer = null;
             /** @var GisLayerInterface $gisLayer */
             foreach ($gisLayers as $gisLayer) {
-                $layerType = $gisLayer->getType();
                 $enabled = $gisLayer->isEnabled();
-                if ($enabled &&
-                    'base' === $layerType)
-                {
-                    $baseLayer = $gisLayer;
+                $isBplan = $gisLayer->isBplan();
+                if ($enabled && $isBplan) {
+                    $bplanLayer = $gisLayer;
+                    break; // Found the BPlan layer, no need to continue
                 }
             }
 
-            if (null === $baseLayer) {
-                $this->logger->warning('No enabled base layer found at new procedure');
+            if (null === $bplanLayer) {
+                $this->logger->warning('No enabled BPlan layer found for procedure', [
+                    'procedureId' => $procedure->getId(),
+                    'procedureName' => $procedure->getName()
+                ]);
 
                 return null;
             }
@@ -670,19 +683,19 @@ class XBeteiligungService
             // prior to wms v1.3.0 the keyword SRS has to be used instead of CRS within urls
             $crsORsrs = version_compare(
                 '1.3.0',
-                $baseLayer?->getLayerVersion(),
+                $bplanLayer->getLayerVersion(),
                 '<='
             ) ? 'CRS' : 'SRS';
-            // use default projection label in case base layer is not set, projection label is not set or projection label is empty string
-            $baseLayerProjection = $baseLayer?->getProjectionLabel();
+            // use default projection label in case BPlan layer projection label is not set or is empty string
+            $bplanLayerProjection = $bplanLayer->getProjectionLabel();
             $defaultProjection = $this->globalConfig->getMapDefaultProjection()['label'] ?? '';
 
-            if (empty($baseLayerProjection) && empty($defaultProjection)) {
-                $this->logger->error('XBeteiligung: Both base layer projection and default projection are empty');
-                throw new Exception('No valid projection label found - check base layer and map_default_projection configuration');
+            if (empty($bplanLayerProjection) && empty($defaultProjection)) {
+                $this->logger->error('XBeteiligung: Both BPlan layer projection and default projection are empty');
+                throw new Exception('No valid projection label found - check BPlan layer and map_default_projection configuration');
             }
 
-            $projectionLabel = strtoupper(!empty($baseLayerProjection) ? $baseLayerProjection : $defaultProjection);
+            $projectionLabel = strtoupper(!empty($bplanLayerProjection) ? $bplanLayerProjection : $defaultProjection);
             // for some projections after v1.3.0 the x and y coords are swapped
             // - there are more, but the common ones are at least treated:
             $areCoordsSwapped =
@@ -703,7 +716,7 @@ class XBeteiligungService
 
             $transformedBbox = implode(',', $transformedBboxArray);
 
-            $baseUrl = $baseLayer?->getUrl();
+            $baseUrl = $bplanLayer->getUrl();
 
             // Calculate height with division by zero protection
             $width = $widthAndHeight[self::DIMENSION_WIDTH];
@@ -724,7 +737,7 @@ class XBeteiligungService
 
             $urlParams = [
                 'SERVICE' => 'WMS',
-                'VERSION' => $baseLayer?->getLayerVersion(),
+                'VERSION' => $bplanLayer->getLayerVersion(),
                 'REQUEST' => 'GetMap',
                 'FORMAT' => 'image/png',
                 'TRANSPARENT' => 'true',
@@ -732,12 +745,11 @@ class XBeteiligungService
                 'HEIGHT' => (string)$calculatedHeight,
                 $crsORsrs => $projectionLabel,
                 'STYLES' => '',
-                'LAYERS' => $baseLayer?->getLayers(),
+                'LAYERS' => $bplanLayer->getLayers(),
                 'BBOX' => $transformedBbox,
             ];
-            $url = $baseUrl . '?' . http_build_query($urlParams);
 
-            return $url;
+            return $baseUrl . '?' . http_build_query($urlParams);
         } catch (Exception $exception) {
             $this->logger->error(
                 'XBeteiligung async: An error occurred on postProcedureCreate trying to build the wmsUrl to include xml',
