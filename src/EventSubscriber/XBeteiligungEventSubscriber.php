@@ -115,6 +115,11 @@ class XBeteiligungEventSubscriber implements EventSubscriberInterface
      */
     public function newProcedureCreated(PostNewProcedureCreatedEventInterface $event): void
     {
+        // procedureTemplates are not relevant for XBeteiligung messages
+        if ($event->getProcedure()->getMaster()) {
+            return;
+        }
+
         try {
             if ($this->permissionEvaluator->isPermissionEnabled(Features::feature_procedure_message_kom_create())) {
                 $xml = $this->xBeteiligungService->createProcedureNew401FromObject($event->getProcedure());

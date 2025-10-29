@@ -340,7 +340,7 @@ class MockFactoryTest
     public function getXBeteiligungGisLayerManagerMock(): XBeteiligungGisLayerManager|MockObject
     {
         $mock = $this->testCase->createMockObject(XBeteiligungGisLayerManager::class);
-        $mock->method('processWmsUrl');
+        // Note: processWmsUrl is private and cannot be mocked
 
         return $mock;
     }
