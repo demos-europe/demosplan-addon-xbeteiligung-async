@@ -234,6 +234,11 @@ class XBeteiligungProcedureChanged
      */
     public function onProcedureChanged(ProcedureInterface $procedure): void
     {
+        // procedureTemplates are not relevant for XBeteiligung messages
+        if ($procedure->getMaster()) {
+            return;
+        }
+
         try {
             $procedure->getDeleted()
                 ? $this->onProcedureSoftDeleted($procedure)

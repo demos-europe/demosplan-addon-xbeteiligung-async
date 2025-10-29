@@ -432,7 +432,7 @@ class XBeteiligungService
         $participationType->setVerfahrensschritt(
             $this->createCodeTypeRaumordnung(
                 'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung',
-                $procedure->getPublicParticipationPhaseName()
+                $this->getPublicParticipationPhaseNameFromKey($procedure)
             )
         );
         // ***********currently for 0301 and 0302 required fields*******************************************************
@@ -468,7 +468,7 @@ class XBeteiligungService
         $participationType->setVerfahrensschrittPlanfeststellung(
             $this->createCodeTypePlanfeststellung(
                 'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung',
-                $procedure->getPublicParticipationPhaseName()
+                $this->getPublicParticipationPhaseNameFromKey($procedure)
             )
         );
 
@@ -610,7 +610,7 @@ class XBeteiligungService
             $participationOeffentlichkeitArtType->setBeteiligungPlanfeststellungFormalOeffentlichkeit(
                 $this->createCodeTypePlanfeststellung(
                     'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung',
-                    $procedure->getPublicParticipationPhaseName())
+                    $this->getPublicParticipationPhaseNameFromKey($procedure))
             );
             $participationType->setBeteiligungPlanfeststellungOeffentlichkeitArt($participationOeffentlichkeitArtType);
         }
@@ -632,7 +632,7 @@ class XBeteiligungService
             $participationOeffentlichkeitArtType->setBeteiligungPlanfeststellungFormalTOEB(
                 $this->createCodeTypePlanfeststellung(
                     'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittplanfeststellung',
-                    $procedure->getPhaseName())
+                    $this->getInstitutionPhaseNameFromKey($procedure))
             );
             $participationType->setBeteiligungPlanfeststellungTOEBArt($participationOeffentlichkeitArtType);
         }
@@ -915,13 +915,39 @@ class XBeteiligungService
         $this->procedureMessageRepository->saveOnFlush($procedureMessage);
     }
 
+    /**
+     * Gets the current public participation phase name by looking up the phase key.
+     * This method is used during onFlush events where enriched entity fields may be stale.
+     *
+     * @param ProcedureInterface $procedure
+     * @return string The phase name from configuration
+     */
+    private function getPublicParticipationPhaseNameFromKey(ProcedureInterface $procedure): string
+    {
+        $phaseKey = $procedure->getPublicParticipationPhaseObject()->getKey();
+        return $this->globalConfig->getPhaseNameWithPriorityExternal($phaseKey);
+    }
+
+    /**
+     * Gets the current institution phase name by looking up the phase key.
+     * This method is used during onFlush events where enriched entity fields may be stale.
+     *
+     * @param ProcedureInterface $procedure
+     * @return string The phase name from configuration
+     */
+    private function getInstitutionPhaseNameFromKey(ProcedureInterface $procedure): string
+    {
+        $phaseKey = $procedure->getPhaseObject()->getKey();
+        return $this->globalConfig->getPhaseNameWithPriorityInternal($phaseKey);
+    }
+
     private function getPublicProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittKommunalType
     {
         $codeProcedurePhase = new CodeVerfahrensschrittKommunalType();
         $codeProcedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
         $codeProcedurePhase->setListVersionID('1.0');
         $codeProcedurePhase->setCode(self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
-        $codeProcedurePhase->setName($procedure->getPublicParticipationPhaseName());
+        $codeProcedurePhase->setName($this->getPublicParticipationPhaseNameFromKey($procedure));
 
         return $codeProcedurePhase;
     }
