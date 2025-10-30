@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.50 (2025-10-30)
 - fix geodata transmission to K3 portal by using BPlan layer instead of base layer for flaechenabgrenzungUrl (ADO-45461)
 
 ## v0.49 (2025-10-30)
