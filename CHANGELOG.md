@@ -3,6 +3,7 @@
 ## UNRELEASED
 ## v0.49 (2025-10-30)
 - ensure XBeteiligung messages use current phase data, not stale enriched fields
+- fix geodata transmission to K3 portal by using BPlan layer instead of base layer for flaechenabgrenzungUrl (ADO-45461)
 
 ## v0.48 (2025-10-28)
 - fix function call on null in VerfasserBuilder causing that created statements from users

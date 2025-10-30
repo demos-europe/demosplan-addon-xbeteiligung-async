@@ -158,6 +158,7 @@ class XBeteiligungGisLayerManager
         $gisLayer->setUrl($this->buildCleanLayerUrl($url));
         $gisLayer->setLayers($layersString);
         $gisLayer->setProcedureId($procedure->getId());
+        $gisLayer->setBplan(true);
 
         $gisLayer->setType(self::LAYER_TYPE_OVERLAY);
         $gisLayer->setDefaultVisibility(true);
