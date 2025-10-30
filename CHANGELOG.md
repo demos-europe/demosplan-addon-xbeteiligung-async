@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.49 (2025-10-30)
 - ensure XBeteiligung messages use current phase data, not stale enriched fields
 
 ## v0.48 (2025-10-28)
