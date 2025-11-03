@@ -23,6 +23,7 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
@@ -107,6 +108,10 @@ class StatementCreatorTest extends TestCase
         $this->XBeteiligungService = $xbeteiligungService;
         $this->logger = new Logger();
         $this->serializer = SerializerFactory::getSerializer();
+        $textSanitizer = $this->createMock(Din91379TextSanitizerService::class);
+        $textSanitizer->method('sanitize')->willReturnArgument(0);
+        $textSanitizer->method('sanitizeArray')->willReturnArgument(0);
+
         $this->sut = new StatementMessageFactory(
             $this->createMock(CommonHelpers::class),
             $this->mockFactory->getLoggerInterfaceMock(),
@@ -130,7 +135,8 @@ class StatementCreatorTest extends TestCase
                     verfahrensschrittCode: '',
                     verfahrensteilschrittCode: ''
                 )
-            )
+            ),
+            $textSanitizer
         );
     }
 
