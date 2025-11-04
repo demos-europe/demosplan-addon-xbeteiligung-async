@@ -18,6 +18,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
@@ -54,12 +55,13 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
     private const LIST_VERSION_ID = '3';
 
     public function __construct(
-        CommonHelpers                     $commonHelpers,
-        LoggerInterface                   $logger,
-        PermissionEvaluatorInterface      $permissionEvaluator,
-        ReusableMessageBlocks             $reusableMessageBlocks,
-        private readonly VerfasserBuilder $verfasserBuilder,
-        private readonly PhaseBuilder     $phaseBuilder,
+        CommonHelpers                              $commonHelpers,
+        LoggerInterface                            $logger,
+        PermissionEvaluatorInterface               $permissionEvaluator,
+        ReusableMessageBlocks                      $reusableMessageBlocks,
+        private readonly VerfasserBuilder          $verfasserBuilder,
+        private readonly PhaseBuilder              $phaseBuilder,
+        private readonly Din91379TextSanitizerService $textSanitizer,
     ) {
         parent::__construct($commonHelpers, $logger, $permissionEvaluator, $reusableMessageBlocks);
     }
@@ -109,10 +111,10 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         // set Verfasser --> user data
         $this->verfasserBuilder->setVerfasser($statementCreated, $statement);
 
-        // set title
-        $statement->setTitel($statementCreated->getTitle());
-        // set beschreibung
-        $statement->setBeschreibung($statementCreated->getDescription());
+        // set title (sanitize for DIN 91379 datatypeC compliance)
+        $statement->setTitel($this->textSanitizer->sanitize($statementCreated->getTitle()));
+        // set beschreibung (sanitize for DIN 91379 datatypeC compliance)
+        $statement->setBeschreibung($this->textSanitizer->sanitize($statementCreated->getDescription()));
         //set durchgang
         $statement->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
         // set datum
@@ -142,8 +144,8 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
                 )
             );
         }
-        // set Schlagwort
-        $statement->setSchlagwort($statementCreated->getTags());
+        // set Schlagwort (sanitize tags for DIN 91379 datatypeC compliance)
+        $statement->setSchlagwort($this->textSanitizer->sanitizeArray($statementCreated->getTags()));
         $nachricht = new NachrichteninhaltAnonymousPHPType();
         $nachricht->setStellungnahme($statement);
         $nachricht->setVorgangsID($this->commonHelpers->uuid());
