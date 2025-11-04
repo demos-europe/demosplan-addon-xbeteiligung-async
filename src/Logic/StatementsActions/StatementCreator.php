@@ -46,7 +46,7 @@ class StatementCreator
         $statementCreated->setCreatedAt($eventStatement->getCreated());
         $statementCreated->setPlanId($eventStatement->getProcedure()->getXtaPlanId());
         $statementCreated->setProcedureId($eventStatement->getProcedureId());
-        $statementCreated->setDescription($eventStatement->getTextShort());
+        $statementCreated->setDescription($eventStatement->getText());
         $routeParameters = [
             'procedureId' => $eventStatement->getProcedureId(),
             'statement'   => $eventStatement->getId(),
