@@ -2,6 +2,10 @@
 
 ## UNRELEASED
 - fix statement text 500 character limit in cockpit transmission (DPLAN-16941)
+- fix XSD validation error handling in StatementMessageFactory to prevent invalid XML transmission
+  - add XsdValidationException class for proper error handling
+  - StatementMessageFactory now throws exception when generated XML fails XSD schema validation
+  - prevents sending malformed XML messages to cockpit that would cause processing errors
 ## v0.50 (2025-10-30)
 - fix geodata transmission to K3 portal by using BPlan layer instead of base layer for flaechenabgrenzungUrl (ADO-45461)
 
