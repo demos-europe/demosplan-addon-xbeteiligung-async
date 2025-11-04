@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.51 (2025-11-04)
 - fix statement text 500 character limit in cockpit transmission (DPLAN-16941)
 - add comprehensive DIN SPEC 91379 datatypeC text sanitization for XBeteiligung statement messages to ensure character set compliance (DPLAN-16940)
   - implement Din91379TextSanitizerService with character replacement patterns for smart quotes, mathematical symbols, and prohibited Unicode scripts
