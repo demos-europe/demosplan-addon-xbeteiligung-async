@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.52 (2025-11-06)
 - fix duplicate name in xbeteiligung message
 
 ## v0.51 (2025-11-04)
