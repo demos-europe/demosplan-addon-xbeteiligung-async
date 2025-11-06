@@ -17,6 +17,7 @@ use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\NamespaceAdditionException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\XsdValidationException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
@@ -70,6 +71,7 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
      * Builds a valid XBeteiligungsmessage as a response of creating a statement.
      *
      * @throws Exception
+     * @throws XsdValidationException
      */
     public function createBeteiligung2PlanungStellungnahmeNeu0701(StatementCreated $statementCreated): string
     {
@@ -87,7 +89,14 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $path = AddonPath::getRootPath(
             'addons/vendor/'.XBeteiligungAsyncAddon::ADDON_NAME.'/Resources/xsd/'
         );
-        $this->commonHelpers->isValidMessage($messageXml, path: $path, messageClass: $message::class);
+
+        $isValid = $this->commonHelpers->isValidMessage($messageXml, path: $path, messageClass: $message::class);
+        if (!$isValid) {
+            throw new XsdValidationException(
+                'Generated XML for statement 701 message does not conform to XSD schema',
+                libxml_get_errors()
+            );
+        }
 
         return $messageXml;
     }

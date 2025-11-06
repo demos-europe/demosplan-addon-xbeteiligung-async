@@ -1,6 +1,11 @@
 # Changelog
 
 ## UNRELEASED
+- fix XSD validation error handling in StatementMessageFactory to prevent invalid XML transmission
+    - add XsdValidationException class for proper error handling
+    - StatementMessageFactory now throws exception when generated XML fails XSD schema validation
+    - prevents sending malformed XML messages to cockpit that would cause processing errors
+
 ## v0.51 (2025-11-04)
 - fix statement text 500 character limit in cockpit transmission (DPLAN-16941)
 - add comprehensive DIN SPEC 91379 datatypeC text sanitization for XBeteiligung statement messages to ensure character set compliance (DPLAN-16940)
