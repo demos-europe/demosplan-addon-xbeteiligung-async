@@ -85,7 +85,7 @@ class VerfasserBuilder
     {
         $authorName = $statementCreated->getMeta()->getAuthorName();
         $lastName = $this->createAllgemeinerName($authorName);
-        
+
         $naturalPerson->setFamilienname($lastName);
     }
 
