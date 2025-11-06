@@ -214,7 +214,7 @@ class VerfasserBuilderTest extends TestCase
         $this->assertNull($verfasser->getPrivatperson());
         $this->assertNotNull($verfasser->getOrganisation());
         $this->assertEquals('Meta Organization', $verfasser->getOrganisation()->getName());
-        $this->assertEquals('Meta Author', $verfasser->getName()->getVorname()->getName());
+        $this->assertNull($verfasser->getName()->getVorname());
         $this->assertEquals('Meta Author', $verfasser->getName()->getFamilienname()->getName());
         $this->assertNotNull($verfasser->getAnschrift());
         $this->assertEquals('Meta Street', $verfasser->getAnschrift()->getStrasse());

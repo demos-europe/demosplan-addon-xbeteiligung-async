@@ -84,10 +84,8 @@ class VerfasserBuilder
     private function setPersonalDetailsFromMeta(NameNatuerlichePersonType $naturalPerson, StatementCreated $statementCreated): void
     {
         $authorName = $statementCreated->getMeta()->getAuthorName();
-        $firstName = $this->createAllgemeinerName($authorName);
         $lastName = $this->createAllgemeinerName($authorName);
 
-        $naturalPerson->setVorname($firstName);
         $naturalPerson->setFamilienname($lastName);
     }
 
