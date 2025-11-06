@@ -158,7 +158,7 @@ class VerfasserBuilderTest extends TestCase
 
         $this->assertBasicVerfasser($verfasser);
         $this->assertTrue($verfasser->getPrivatperson());
-        $this->assertNull($verfasser->getName()->getVorname());
+        $this->assertEquals('Anonymous User', $verfasser->getName()->getVorname()->getName());
         $this->assertEquals('Anonymous User', $verfasser->getName()->getFamilienname()->getName());
         $this->assertNotNull($verfasser->getAnschrift());
         $this->assertEquals('Meta Street', $verfasser->getAnschrift()->getStrasse());
