@@ -85,8 +85,10 @@ class VerfasserBuilder
     {
         $authorName = $statementCreated->getMeta()->getAuthorName();
         $lastName = $this->createAllgemeinerName($authorName);
+        $vorname = $this->createAllgemeinerName('');
 
         $naturalPerson->setFamilienname($lastName);
+        $naturalPerson->setVorname($vorname);
     }
 
     private function createAllgemeinerName(string $name): AllgemeinerNameType
