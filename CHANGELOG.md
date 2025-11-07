@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.53 (2025-11-07)
 - fix XSD validation for missing vorname/familienname in verfasser data (DPP-560)
 
 ## v0.52 (2025-11-06)
