@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- fix XSD validation for missing vorname/familienname in verfasser data (DPP-560)
+
 ## v0.52 (2025-11-06)
 - fix duplicate name in xbeteiligung message
 

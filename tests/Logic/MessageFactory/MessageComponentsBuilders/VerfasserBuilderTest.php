@@ -158,7 +158,7 @@ class VerfasserBuilderTest extends TestCase
 
         $this->assertBasicVerfasser($verfasser);
         $this->assertTrue($verfasser->getPrivatperson());
-        $this->assertEquals('Anonymous User', $verfasser->getName()->getVorname()->getName());
+        $this->assertEquals('', $verfasser->getName()->getVorname()->getName());
         $this->assertEquals('Anonymous User', $verfasser->getName()->getFamilienname()->getName());
         $this->assertNotNull($verfasser->getAnschrift());
         $this->assertEquals('Meta Street', $verfasser->getAnschrift()->getStrasse());
@@ -214,7 +214,8 @@ class VerfasserBuilderTest extends TestCase
         $this->assertNull($verfasser->getPrivatperson());
         $this->assertNotNull($verfasser->getOrganisation());
         $this->assertEquals('Meta Organization', $verfasser->getOrganisation()->getName());
-        $this->assertNull($verfasser->getName()->getVorname());
+        $this->assertNotNull($verfasser->getName()->getVorname());
+        $this->assertEquals('', $verfasser->getName()->getVorname()->getName());
         $this->assertEquals('Meta Author', $verfasser->getName()->getFamilienname()->getName());
         $this->assertNotNull($verfasser->getAnschrift());
         $this->assertEquals('Meta Street', $verfasser->getAnschrift()->getStrasse());
