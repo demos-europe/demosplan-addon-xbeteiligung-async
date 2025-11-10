@@ -15,6 +15,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonContentMandatoryFieldsException;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonOrgaNotFoundException;
@@ -159,7 +160,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             function () use ($xmlObject, $customer) {
 
                 $procedureDataValueObject = $this->procedureDataExtractor->extract($xmlObject);
-                $procedure = $this->createProcedureEntity($procedureDataValueObject);
+                $procedure = $this->createProcedureEntity($procedureDataValueObject, $customer);
                 $procedure->setCustomer($customer);
 
                 $this->logger->info('Set procedure customer based on AGS mapping for 401 message', [
@@ -193,6 +194,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      */
     private function createProcedureEntity(
         ProcedureDataValueObject $procedureDataValueObject,
+        CustomerInterface $customer
     ): ProcedureInterface {
         // get user from message should be set, because of that userId here is not correct
         try {
@@ -220,7 +222,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             Assert::isInstanceOf($orga, OrgaInterface::class);
             $usersToAllowAccessToProcedure = $orga->getUsers();
             $usersToAllowAccessToProcedure = $usersToAllowAccessToProcedure->filter(
-                fn (UserInterface $user): bool => $user->isPlanner()
+                fn (UserInterface $user): bool => $this->isPlanerinCustomer($user, $customer)
             )->toArray();
             if (0 === count($usersToAllowAccessToProcedure)) {
                 $errorMessage = sprintf(
@@ -317,5 +319,18 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         );
 
         return $procedureType?->getId();
+    }
+
+    private function isPlanerinCustomer(UserInterface $user, CustomerInterface $customer): bool
+    {
+        $plannerRoles = [
+            RoleInterface::PLANNING_AGENCY_ADMIN,
+            RoleInterface::PLANNING_AGENCY_WORKER,
+            RoleInterface::PRIVATE_PLANNING_AGENCY,
+            RoleInterface::HEARING_AUTHORITY_ADMIN, // very similar to PLANNING_AGENCY_ADMIN (T27236#645613)
+            RoleInterface::HEARING_AUTHORITY_WORKER, // very similar to PLANNING_AGENCY_WORKER (T27236#645613)
+        ];
+
+        return $user->hasAnyOfRoles($plannerRoles, $customer);
     }
 }
