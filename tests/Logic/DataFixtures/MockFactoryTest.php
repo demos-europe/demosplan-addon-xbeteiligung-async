@@ -135,6 +135,7 @@ class MockFactoryTest
         $userMock->method('getId')->willReturn('a2780f23-160b-4a8b-a48b-f9448dc1bc24');
         $userMock->method('getName')->willReturn('Admin User');
         $userMock->method('isPlanner')->willReturn(true);
+        $userMock->method('hasAnyOfRoles')->willReturn(true);
 
         return $userMock;
     }
