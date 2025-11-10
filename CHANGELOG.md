@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.54 (2025-11-10)
 - fix organization validation to check for procedure creation permissions in the correct customer context (DPLAN-16969)
 
 ## v0.53 (2025-11-07)
