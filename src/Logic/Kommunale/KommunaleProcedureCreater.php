@@ -222,11 +222,11 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             Assert::isInstanceOf($orga, OrgaInterface::class);
             $usersToAllowAccessToProcedure = $orga->getUsers();
             $usersToAllowAccessToProcedure = $usersToAllowAccessToProcedure->filter(
-                fn (UserInterface $user): bool => $this->isPlanerinCustomer($user, $customer)
+                fn (UserInterface $user): bool => $this->mayCreateProcedures($user, $customer)
             )->toArray();
             if (0 === count($usersToAllowAccessToProcedure)) {
                 $errorMessage = sprintf(
-                    'Es gibt keine aktiven Planer in der Organisation "%s".',
+                    'Es gibt keine Benutzer mit Verfahrenserstellungsberechtigung in der Organisation "%s".',
                     $orga->getName()
                 );
 
@@ -321,16 +321,13 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         return $procedureType?->getId();
     }
 
-    private function isPlanerinCustomer(UserInterface $user, CustomerInterface $customer): bool
+    private function mayCreateProcedures(UserInterface $user, CustomerInterface $customer): bool
     {
-        $plannerRoles = [
+        $procedureCreationRoles = [
             RoleInterface::PLANNING_AGENCY_ADMIN,
-            RoleInterface::PLANNING_AGENCY_WORKER,
-            RoleInterface::PRIVATE_PLANNING_AGENCY,
             RoleInterface::HEARING_AUTHORITY_ADMIN, // very similar to PLANNING_AGENCY_ADMIN (T27236#645613)
-            RoleInterface::HEARING_AUTHORITY_WORKER, // very similar to PLANNING_AGENCY_WORKER (T27236#645613)
         ];
 
-        return $user->hasAnyOfRoles($plannerRoles, $customer);
+        return $user->hasAnyOfRoles($procedureCreationRoles, $customer);
     }
 }

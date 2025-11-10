@@ -1,7 +1,7 @@
 # Changelog
 
 ## UNRELEASED
-- fix organization validation to check for planners in the correct customer context (DPLAN-16969)
+- fix organization validation to check for procedure creation permissions in the correct customer context (DPLAN-16969)
 
 ## v0.53 (2025-11-07)
 - fix XSD validation for missing vorname/familienname in verfasser data (DPP-560)
