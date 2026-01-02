@@ -1,7 +1,7 @@
 {
   "name": "demos-europe/demosplan-addon-xbeteiligung-async",
   "description": "This plugin provides Handling of XBeteiligung messages",
-  "version": "v0.54",
+  "version": "v0.55",
   "type": "demosplan-addon",
   "license": "proprietary",
   "autoload": {
@@ -16,7 +16,7 @@
   },
   "minimum-stability": "stable",
   "require": {
-    "demos-europe/demosplan-addon": "^v0.60",
+    "demos-europe/demosplan-addon": "^v0.64",
     "demos-europe/demosplan-addon-installer": "^0",
     "doctrine/doctrine-bundle": "^2",
     "doctrine/doctrine-migrations-bundle": "^3.2",

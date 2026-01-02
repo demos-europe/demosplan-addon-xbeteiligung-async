@@ -1,6 +1,9 @@
 # Changelog
 
 ## UNRELEASED
+## v0.55 (2026-01-02)
+- require demos-europe/demosplan-addon version ^0.64
+
 ## v0.54 (2025-11-10)
 - fix organization validation to check for procedure creation permissions in the correct customer context (DPLAN-16969)
 
