@@ -49,7 +49,8 @@ class AnlagenExtractorTest extends TestCase
     private const PLANFEST_DATE = '2024-03-01';
     private const PLANFEST_CONTENT = 'base64encodedcontent';
 
-    private const DOCUMENT_TYPE_CODE = '0100';
+    private const DOCUMENT_CATEGORY_CODE = '0100';
+    private const DOCUMENT_CATEGORY_NAME = 'My Super Category Name';
     private const MIME_TYPE_PDF = 'application/pdf';
 
     protected function setUp(): void
@@ -73,7 +74,8 @@ class AnlagenExtractorTest extends TestCase
         self::assertSame(self::PUBLIC_TITLE, $publicAttachment->getTitle());
         self::assertSame(self::PUBLIC_VERSION, $publicAttachment->getVersion());
         self::assertSame(self::PUBLIC_DATE, $publicAttachment->getDate()->format('Y-m-d'));
-        self::assertSame(self::DOCUMENT_TYPE_CODE, $publicAttachment->getDocumentType());
+        self::assertSame(self::DOCUMENT_CATEGORY_CODE, $publicAttachment->getDocumentCategoryCode());
+        self::assertSame(self::DOCUMENT_CATEGORY_NAME, $publicAttachment->getDocumentCategoryName());
         self::assertSame(self::MIME_TYPE_PDF, $publicAttachment->getMimeType());
         self::assertSame(self::PUBLIC_FILENAME, $publicAttachment->getFileName());
         self::assertSame(self::PUBLIC_DOCUMENT_ID, $publicAttachment->getDocumentId());
@@ -89,7 +91,8 @@ class AnlagenExtractorTest extends TestCase
         self::assertSame(self::TOEB_TITLE, $toebAttachment->getTitle());
         self::assertSame(self::TOEB_VERSION, $toebAttachment->getVersion());
         self::assertSame(self::TOEB_DATE, $toebAttachment->getDate()->format('Y-m-d'));
-        self::assertNull($toebAttachment->getDocumentType());
+        self::assertNull($toebAttachment->getDocumentCategoryCode());
+        self::assertNull($toebAttachment->getDocumentCategoryName());
         self::assertSame(self::MIME_TYPE_PDF, $toebAttachment->getMimeType());
         self::assertNull($toebAttachment->getDocumentId());
         self::assertSame(self::TOEB_URL, $toebAttachment->getUrl());
@@ -115,7 +118,8 @@ class AnlagenExtractorTest extends TestCase
         self::assertSame(self::PLANFEST_TITLE, $attachment->getTitle());
         self::assertSame(self::PLANFEST_VERSION, $attachment->getVersion());
         self::assertSame(self::PLANFEST_DATE, $attachment->getDate()->format('Y-m-d'));
-        self::assertNull($attachment->getDocumentType());
+        self::assertNull($attachment->getDocumentCategoryCode());
+        self::assertNull($attachment->getDocumentCategoryName());
         self::assertSame(self::MIME_TYPE_PDF, $attachment->getMimeType());
         self::assertNull($attachment->getDocumentId());
         self::assertFalse($attachment->hasUrl());
@@ -221,7 +225,8 @@ class AnlagenExtractorTest extends TestCase
         $attachment->setDatum(new DateTime(self::PUBLIC_DATE));
 
         $anlageart = new CodeVerfahrensunterlagetypType();
-        $anlageart->setCode(self::DOCUMENT_TYPE_CODE);
+        $anlageart->setCode(self::DOCUMENT_CATEGORY_CODE);
+        $anlageart->setName(self::DOCUMENT_CATEGORY_NAME);
         $attachment->setAnlageart($anlageart);
 
         $mimeType = new CodeXBauMimeTypeType();

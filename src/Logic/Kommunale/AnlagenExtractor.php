@@ -122,14 +122,16 @@ class AnlagenExtractor
      */
     private function createAnlageValueObject(MetadatenAnlageType $metadatenAnlage): AnlageValueObject
     {
-        $anlageart = $metadatenAnlage->getAnlageart()?->getCode();
+        $anlageArtCode = $metadatenAnlage->getAnlageart()?->getCode();
+        $anlageArtName = $metadatenAnlage->getAnlageart()?->getName();
         $mimeType = $metadatenAnlage->getMimeType()?->getCode();
 
         $anlage = new AnlageValueObject(
             bezeichnung: $metadatenAnlage->getBezeichnung(),
             versionsnummer: $metadatenAnlage->getVersionsnummer(),
             datum: $metadatenAnlage->getDatum(),
-            anlageart: $anlageart,
+            anlageArtCode: $anlageArtCode,
+            anlageArtName: $anlageArtName,
             mimeType: $mimeType,
             dokument: $metadatenAnlage->getDokument()
         );
