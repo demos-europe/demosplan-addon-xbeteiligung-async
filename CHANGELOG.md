@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- bump demosplan-addon version from v0.64 to v0.65
 - Add XBeteiligungAttachmentService to process and save file attachments from XBeteiligung messages (DPLAN-15843)
   - Process base64-encoded documents from XML messages
   - Validate attachments (filename, content, encoding)
