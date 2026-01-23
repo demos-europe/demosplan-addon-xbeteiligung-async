@@ -184,7 +184,9 @@ class XBeteiligungAttachmentService
         ProcedureInterface $procedure,
         ?string $categoryName
     ): ElementsInterface {
-        $categoryName = $categoryName ?: self::DEFAULT_CATEGORY_NAME;
+        if (null === $categoryName || '' === $categoryName) {
+            $categoryName = self::DEFAULT_CATEGORY_NAME;
+        }
 
         $element = $this->findDocumentCategory($procedure, $categoryName);
 
