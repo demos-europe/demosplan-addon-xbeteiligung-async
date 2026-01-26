@@ -23,7 +23,8 @@ class AnlageValueObject
     private ?string $bezeichnung;
     private ?string $versionsnummer;
     private ?DateTime $datum;
-    private ?string $anlageart;
+    private ?string $anlageArtCode;
+    private ?string $anlageArtName;
     private ?string $mimeType;
     private ?string $dokumentId = null;
     private ?string $dateiname = null;
@@ -37,14 +38,16 @@ class AnlageValueObject
         ?string $bezeichnung,
         ?string $versionsnummer,
         ?DateTime $datum,
-        ?string $anlageart,
+        ?string $anlageArtCode,
+        ?string $anlageArtName,
         ?string $mimeType,
         ?string $dokument
     ) {
         $this->bezeichnung = $bezeichnung;
         $this->versionsnummer = $versionsnummer;
         $this->datum = $datum;
-        $this->anlageart = $anlageart;
+        $this->anlageArtCode = $anlageArtCode;
+        $this->anlageArtName = $anlageArtName;
         $this->mimeType = $mimeType;
         $this->dokument = $dokument;
     }
@@ -69,9 +72,14 @@ class AnlageValueObject
         return $this->datum;
     }
 
-    public function getDocumentType(): ?string
+    public function getDocumentCategoryCode(): ?string
     {
-        return $this->anlageart;
+        return $this->anlageArtCode;
+    }
+
+    public function getDocumentCategoryName(): ? string
+    {
+        return $this->anlageArtName;
     }
 
     public function getMimeType(): ?string

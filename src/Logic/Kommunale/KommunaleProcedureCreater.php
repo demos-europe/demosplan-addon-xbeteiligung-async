@@ -21,7 +21,6 @@ use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonContentMandatoryFieldsE
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonOrgaNotFoundException;
 use DemosEurope\DemosplanAddon\Contracts\Exceptions\AddonUserNotFoundException;
 use DemosEurope\DemosplanAddon\Contracts\Form\Procedure\AbstractProcedureFormTypeInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\FormatException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureCommonFeatures;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
@@ -65,7 +64,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             )];
             $this->logger->error('On create new Procedure: unable to determine user.', [
                 'errorMessage' => $exception->getMessage(),
-                'exception' => $exception
+                'exception' => $exception,
             ]);
         } catch (SchemaException $exception) {
             $errorTypes = [$this->getErrorType(
@@ -74,7 +73,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             )];
             $this->logger->error('On create new Procedure: wrong attachment format.', [
                 'errorMessage' => $exception->getMessage(),
-                'exception' => $exception
+                'exception' => $exception,
             ]);
         } catch (AccessDeniedException $exception) {
             $errorTypes = [$this->getErrorType(
@@ -83,7 +82,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             ];
             $this->logger->error('On create new Procedure: access not permitted.', [
                 'errorMessage' => $exception->getMessage(),
-                'exception' => $exception
+                'exception' => $exception,
             ]);
         } catch (AddonContentMandatoryFieldsException $exception) {
             $errorTypes = [];
@@ -92,7 +91,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             }
             $this->logger->error('On create new Procedure: mandatory field is missing.', [
                 'errorMessage' => $exception->getMessage(),
-                'exception' => $exception
+                'exception' => $exception,
             ]);
         } catch (AddonOrgaNotFoundException $exception) {
             $errorTypes = [$this->getErrorType(
@@ -102,19 +101,19 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             $this->logger->error('Terminating 401 procedure create attempt as no valid orga with at least one
                 active planner could be found for administration', [
                     'errorMessage' => $exception->getMessage(),
-                    'exception' => $exception
+                    'exception' => $exception,
             ]);
         } catch (InvalidArgumentException $exception) {
             //return untranslated error message?
             $errorTypes = [$this->getErrorType(XBeteiligungService::GENERIC_ERROR_CODE, $exception->getMessage())];
             $this->logger->error('On create new Procedure: invalid argument.', [
                 'errorMessage' => $exception->getMessage(),
-                'exception' => $exception
+                'exception' => $exception,
             ]);
         } catch (Exception $exception) {
             $this->logger->error('Unspecific exception', [
                 'errorMessage' => $exception->getMessage(),
-                'exception' => $exception
+                'exception' => $exception,
             ]);
             $errorTypes = [$this->getErrorType(
                 XBeteiligungService::GENERIC_ERROR_CODE,
@@ -126,7 +125,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     }
 
     /**
-     * @throws FormatException
      * @throws Exception
      */
     public function createNewKommunalProcedureFromXBeteiligungMessageWithResponse(
@@ -145,7 +143,6 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
      * @throws OptimisticLockException
      * @throws ConnectionException
      * @throws ORMException
-     * @throws FormatException
      * @throws Exception
      */
     public function createNewKommunalProcedureFromXBeteiligungMessage(
@@ -166,13 +163,15 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 $this->logger->info('Set procedure customer based on AGS mapping for 401 message', [
                     'procedureId' => $procedure->getId(),
                     'customerId' => $customer->getId(),
-                    'messageType' => '401'
+                    'messageType' => '401',
                 ]);
 
                 $this->setProcedurePhase($procedure, $procedureDataValueObject->getProcedurePhaseData());
                 $procedure->getSettings()->setTerritory($procedureDataValueObject->getMapData()->getTerritory());
                 $procedure->getSettings()->setBoundingBox($procedureDataValueObject->getMapData()->getBbox());
                 $procedure->getSettings()->setMapExtent($procedureDataValueObject->getMapData()->getMapExtent());
+
+                $this->xbeteiligungAttachmentService->saveAnlagenToProcedureCategories($procedure, $procedureDataValueObject->getAnlagen());
 
                 // Process flaechenabgrenzungsUrl for GIS layer creation
                 $this->gisLayerManager->processUrl(
@@ -274,7 +273,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
             $this->logger->info('Successfully mapped AGS code to customer from routing key for 401 message', [
                 'customerId' => $customer->getId(),
                 'messageType' => '401',
-                'routingKey' => $incomingRoutingKey
+                'routingKey' => $incomingRoutingKey,
             ]);
 
             return $customer;
@@ -283,7 +282,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 'errorMessage' => $exception->getMessage(),
                 'exception' => $exception,
                 'messageType' => '401',
-                'routingKey' => $incomingRoutingKey
+                'routingKey' => $incomingRoutingKey,
             ]);
             throw $exception;
         }
