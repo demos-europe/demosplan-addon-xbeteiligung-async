@@ -165,7 +165,7 @@ class XBeteiligungAttachmentService
         ProcedureInterface $procedure
     ): void {
         $this->logger->error(self::LOG_PREFIX.'Failed to process Anlage', [
-            'filename' => $anlage->getFileName() ?? 'unknown',
+            'filename' => $anlage->getFileName(),
             'procedureId' => $procedure->getId(),
             'error' => $exception->getMessage(),
             'exception' => $exception,
