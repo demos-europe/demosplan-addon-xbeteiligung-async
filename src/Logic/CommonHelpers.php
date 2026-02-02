@@ -15,6 +15,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\UnsupportedMessageTypeException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Unqualified\NachrichtG2GTypeType as UnqualifiedNachrichtG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeAktualisiert0702;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeGeloescht0709;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
@@ -381,7 +382,7 @@ class CommonHelpers
      *
      * @return array{ 'code' : string, 'name' : string, 'author' : string, 'recipient' : string }
      */
-    public function mapClassToMessageIndentifier(NachrichtG2GTypeType $messageObject): array
+    public function mapClassToMessageIndentifier(NachrichtG2GTypeType|UnqualifiedNachrichtG2GTypeType $messageObject): array
     {
         $className = $messageObject::class;
         if (array_key_exists($className, self::CLASS_TO_MESSAGE_TYPE_MAPPING)) {

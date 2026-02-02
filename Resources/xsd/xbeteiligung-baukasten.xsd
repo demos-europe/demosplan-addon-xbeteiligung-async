@@ -179,6 +179,11 @@
                <xs:documentation>Hier ist der Verfahrensschritt zu übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
+         <xs:element name="durchgang" minOccurs="0" type="xs:positiveInteger">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
          <xs:element name="verfahrensartKommunal"
                      minOccurs="0"
                      type="xbeteiligung:Code.VerfahrensartKommunal">
@@ -351,6 +356,13 @@
                <xs:documentation>Hier muss eine Zeichenkette übermittelt werden, die zur Zuordnung von Stellungnahmen zu einzelnen Beteiligungsverfahren genutzt werden kann.</xs:documentation>
             </xs:annotation>
          </xs:element>
+         <xs:element name="verfahrensteilschrittKommunal"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Verfahrensteilschritt">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Verfahrensteilschritt übermittelt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
          <xs:element name="durchgang" type="xs:positiveInteger">
             <xs:annotation>
                <xs:documentation>Hier ist die Durchgangsnummer des Verfahrens zu übermitteln.</xs:documentation>
@@ -420,6 +432,13 @@
          <xs:element name="beteiligungsID" minOccurs="0" type="din91379:datatypeC">
             <xs:annotation>
                <xs:documentation>Hier muss eine Zeichenkette übermittelt werden, die zur Zuordnung von Stellungnahmen zu einzelnen Beteiligungsverfahren genutzt werden kann.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="verfahrensteilschrittKommunal"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Verfahrensteilschritt">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Verfahrensteilschritt übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="durchgang" type="xs:positiveInteger">
@@ -519,6 +538,11 @@
                      type="xbeteiligung:Code.VerfahrensschrittPlanfeststellung">
             <xs:annotation>
                <xs:documentation>Hier ist der Verfahrensschritt zu übermitteln.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="durchgang" minOccurs="0" type="xs:positiveInteger">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="verfahrensartPlanfeststellung"
@@ -693,6 +717,13 @@
                <xs:documentation>Hier muss eine Zeichenkette übermittelt werden, die zur Zuordnung von Stellungnahmen zu einzelnen Beteiligungsverfahren genutzt werden kann.</xs:documentation>
             </xs:annotation>
          </xs:element>
+         <xs:element name="verfahrensteilschrittPlanfeststellung"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Verfahrensteilschritt">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Verfahrensteilschritt übermittelt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
          <xs:element name="durchgang" type="xs:positiveInteger">
             <xs:annotation>
                <xs:documentation>Hier ist die Durchgangsnummer des Verfahrens zu übermitteln.</xs:documentation>
@@ -762,6 +793,13 @@
          <xs:element name="beteiligungsID" minOccurs="0" type="din91379:datatypeC">
             <xs:annotation>
                <xs:documentation>Hier muss eine Zeichenkette übermittelt werden, die zur Zuordnung von Stellungnahmen zu einzelnen Beteiligungsverfahren genutzt werden kann.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
+         <xs:element name="verfahrensteilschrittPlanfeststellung"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Verfahrensteilschritt">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Verfahrensteilschritt übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="durchgang" type="xs:positiveInteger">
@@ -877,9 +915,16 @@
                <xs:documentation>Hier ist der Verfahrensschritt zur übermitteln.</xs:documentation>
             </xs:annotation>
          </xs:element>
+         <xs:element name="verfahrensteilschrittRaumordnung"
+                     minOccurs="0"
+                     type="xbeteiligung:Code.Verfahrensteilschritt">
+            <xs:annotation>
+               <xs:documentation>Hier kann der Verfahrensteilschritt übermittelt werden.</xs:documentation>
+            </xs:annotation>
+         </xs:element>
          <xs:element name="durchgang" type="xs:positiveInteger">
             <xs:annotation>
-               <xs:documentation>Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.</xs:documentation>
+               <xs:documentation>Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.</xs:documentation>
             </xs:annotation>
          </xs:element>
          <xs:element name="flaechenabgrenzungUrl" minOccurs="0" type="xs:anyURI">

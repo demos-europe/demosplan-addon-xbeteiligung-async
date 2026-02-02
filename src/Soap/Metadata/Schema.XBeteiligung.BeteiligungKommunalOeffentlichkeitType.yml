@@ -10,6 +10,16 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKomm
                 getter: getBeteiligungsID
                 setter: setBeteiligungsID
             type: string
+        verfahrensteilschrittKommunal:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensteilschrittKommunal
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVerfahrensteilschrittKommunal
+                setter: setVerfahrensteilschrittKommunal
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType
         durchgang:
             expose: true
             access_type: public_method

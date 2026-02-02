@@ -67,7 +67,14 @@ class BeteiligungRaumordnungType
     private $verfahrensschritt = null;
 
     /**
-     * Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.
+     * Hier kann der Verfahrensteilschritt übermittelt werden.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType $verfahrensteilschrittRaumordnung
+     */
+    private $verfahrensteilschrittRaumordnung = null;
+
+    /**
+     * Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.
      *
      * @var int $durchgang
      */
@@ -347,9 +354,35 @@ class BeteiligungRaumordnungType
     }
 
     /**
+     * Gets as verfahrensteilschrittRaumordnung
+     *
+     * Hier kann der Verfahrensteilschritt übermittelt werden.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType
+     */
+    public function getVerfahrensteilschrittRaumordnung()
+    {
+        return $this->verfahrensteilschrittRaumordnung;
+    }
+
+    /**
+     * Sets a new verfahrensteilschrittRaumordnung
+     *
+     * Hier kann der Verfahrensteilschritt übermittelt werden.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType $verfahrensteilschrittRaumordnung
+     * @return self
+     */
+    public function setVerfahrensteilschrittRaumordnung(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType $verfahrensteilschrittRaumordnung = null)
+    {
+        $this->verfahrensteilschrittRaumordnung = $verfahrensteilschrittRaumordnung;
+        return $this;
+    }
+
+    /**
      * Gets as durchgang
      *
-     * Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.
+     * Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.
      *
      * @return int
      */
@@ -361,7 +394,7 @@ class BeteiligungRaumordnungType
     /**
      * Sets a new durchgang
      *
-     * Hier ist die Durchgangsnummer des Beteiligungsverfahrens zu übermitteln.
+     * Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.
      *
      * @param int $durchgang
      * @return self

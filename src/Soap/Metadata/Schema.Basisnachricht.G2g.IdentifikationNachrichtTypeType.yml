@@ -30,12 +30,3 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\Identifik
                 getter: getErstellungszeitpunkt
                 setter: setErstellungszeitpunkt
             type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\DateTime
-nachrichtenUUID:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
-nachrichtentyp:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
-erstellungszeitpunkt:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'

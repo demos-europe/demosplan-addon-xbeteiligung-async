@@ -60,6 +60,16 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlan
                 getter: getVerfahrensschrittPlanfeststellung
                 setter: setVerfahrensschrittPlanfeststellung
             type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType
+        durchgang:
+            expose: true
+            access_type: public_method
+            serialized_name: durchgang
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getDurchgang
+                setter: setDurchgang
+            type: int
         verfahrensartPlanfeststellung:
             expose: true
             access_type: public_method
