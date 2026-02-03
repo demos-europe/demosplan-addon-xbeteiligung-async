@@ -38,3 +38,7 @@ services:
     DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungMessageAuditRepository:
         arguments:
             $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit'
+
+    DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureMappingRepository:
+        arguments:
+            $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedureMapping'
