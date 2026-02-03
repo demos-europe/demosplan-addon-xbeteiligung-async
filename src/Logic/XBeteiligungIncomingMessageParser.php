@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Unqualified\NachrichtG2GTypeType as UnqualifiedNachrichtG2GTypeType;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
@@ -30,7 +31,7 @@ class XBeteiligungIncomingMessageParser
     /**
      * @throws SchemaException
      */
-    public function getXmlObject(string $incomingMessage, string $messageType): NachrichtG2GTypeType
+    public function getXmlObject(string $incomingMessage, string $messageType): NachrichtG2GTypeType|UnqualifiedNachrichtG2GTypeType
     {
         $messageEnum = XBeteiligungMessageType::fromCode($messageType);
         if (null === $messageEnum) {
@@ -168,10 +169,10 @@ class XBeteiligungIncomingMessageParser
     /**
      * @throws SchemaException
      */
-    private function deserializeMessageWithCertainty(string $incomingMessage, string $className): NachrichtG2GTypeType
+    private function deserializeMessageWithCertainty(string $incomingMessage, string $className): NachrichtG2GTypeType|UnqualifiedNachrichtG2GTypeType
     {
         try {
-            /** @var NachrichtG2GTypeType $message */
+            /** @var NachrichtG2GTypeType|UnqualifiedNachrichtG2GTypeType $message */
             $message = SerializerFactory::getSerializer()->deserialize(
                 $incomingMessage,
                 $className,
