@@ -77,7 +77,7 @@
       </xs:annotation>
       <xs:complexType>
          <xs:complexContent>
-            <xs:extension base="bn-uq-g2g:Nachricht.G2GType">
+            <xs:extension base="bn-g2g:Nachricht.G2GType">
                <xs:sequence>
                   <xs:element name="nachrichteninhalt">
                      <xs:complexType>
