@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
 
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\PhaseCodeMapper;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
@@ -23,7 +24,9 @@ use Psr\Log\LoggerInterface;
 class ProcedurePhaseExtractor
 {
     private const CONFIGURATION_PHASE = 'configuration';
-    public function __construct(private readonly LoggerInterface $logger)
+    public function __construct(
+        private readonly LoggerInterface $logger,
+        private readonly PhaseCodeMapper $phaseCodeMapper)
     {
     }
 
@@ -50,6 +53,13 @@ class ProcedurePhaseExtractor
         $beteiligungTOEBArt = $this->getBeteiligungTOEBArt($beteiligungTOEB, $beteiligungType);
         $beteiligungFormalTOEB = $this->getBeteiligungFormalTOEB($beteiligungTOEBArt, $beteiligungType);
         $codeBeteiligungTOEB = $beteiligungFormalTOEB?->getCode();
+
+        $this->phaseCodeMapper->storeExternalProcedurePhaseCodes(
+            $beteiligungType->getPlanID(),
+            $codeBeteiligungOeffentlichkeit,
+            $codeBeteiligungTOEB
+          );
+
 
         $this->logWarningsForMissingCodes(
             $codeVerfahrensschrittType,
