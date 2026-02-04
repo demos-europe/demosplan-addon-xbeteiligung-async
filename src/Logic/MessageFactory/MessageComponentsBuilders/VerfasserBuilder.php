@@ -174,7 +174,7 @@ class VerfasserBuilder
         }
     }
 
-    private function getTypeOfPerson(StatementCreated $statementCreated): bool
+    public function getTypeOfPerson(StatementCreated $statementCreated): bool
     {
         return self::PRIVATE_PERSON === $statementCreated->getMeta()->getOrgaName();
     }

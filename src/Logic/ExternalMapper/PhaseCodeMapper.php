@@ -2,8 +2,11 @@
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper;
 
+use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedureMapping;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureMappingRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 
 /**
  * It will detect the corresponding phase in demos related to the corresponding external phase code
@@ -11,8 +14,12 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureMapp
  * to be used later when sending back the message
  */
 class PhaseCodeMapper {
+    private const DEFAULT_PROCEDURE_PHASE_CODE = 'invalid';
+
     public function __construct(
-        private readonly XBeteiligungProcedureMappingRepository $repository
+        private readonly XBeteiligungProcedureMappingRepository $repository,
+        private readonly VerfasserBuilder $verfasserBuilder,
+        private readonly XBeteiligungConfiguration $xbeteiligungConfiguration,
     ) {
     }
 
@@ -30,5 +37,30 @@ class PhaseCodeMapper {
             ->setInstitutionParticipationPhaseCode($institutionPhaseCode);
 
         $this->repository->save($mapping);
+    }
+
+    public function getExternalProcedurePhaseCode(StatementCreated $statementCreated): string {
+        /**
+         * @var XBeteiligungProcedureMapping $mapping
+         */
+        $planId = $statementCreated->getPlanId();
+        $mapping = $this->repository->findOneBy(['planId' => $planId]);
+        //@todo what happens when no mapping is found?
+        //@todo it hapens with the existing statements
+
+        if (!$mapping) {
+            $code = '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
+                ? self::DEFAULT_PROCEDURE_PHASE_CODE
+                : $this->xbeteiligungConfiguration->verfahrensschrittCode;
+            return $code;
+        }
+
+        if($this->verfasserBuilder->getTypeOfPerson($statementCreated)) {
+
+            return $mapping->getPublicParticipationPhaseCode();
+        }
+        return $mapping->getInstitutionParticipationPhaseCode();
+
+
     }
 }

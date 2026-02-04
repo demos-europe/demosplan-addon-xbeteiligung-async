@@ -18,6 +18,7 @@ use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\PhaseCodeMapper;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType;
@@ -34,8 +35,8 @@ class PhaseBuilder
     public function __construct(
         private readonly PermissionEvaluatorInterface $permissionEvaluator,
         private readonly LoggerInterface $logger,
-        private readonly GlobalConfigInterface $globalConfig,
         private readonly XBeteiligungConfiguration $xbeteiligungConfiguration,
+        private readonly PhaseCodeMapper  $phaseCodeMapper,
     ) {
     }
 
@@ -46,7 +47,8 @@ class PhaseBuilder
     {
         $phaseName = $this->getPhaseName($statementCreated);
         $phaseType = $this->createPhaseType();
-        $this->configurePhase($phaseType, $phaseName);
+        $phaseCode = $this->phaseCodeMapper->getExternalProcedurePhaseCode($statementCreated);
+        $this->configurePhase($phaseType, $phaseName, $phaseCode);
         $this->setPhaseTypeToStatement($phaseType, $statement);
     }
 
@@ -78,13 +80,11 @@ class PhaseBuilder
         CodeVerfahrensschrittKommunalType|
         CodeVerfahrensschrittRaumordnungType|
         CodeVerfahrensschrittPlanfeststellungType $phaseType,
-        string $phaseName): void
+        string $phaseName,
+        string $phaseCode): void
     {
         $phaseType->setName($phaseName);
-        $code = '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
-            ? self::DEFAULT_PROCEDURE_PHASE_CODE
-            : $this->xbeteiligungConfiguration->verfahrensschrittCode;
-        $phaseType->setCode($code);
+        $phaseType->setCode($phaseCode);
         $phaseType->setListVersionID(self::LIST_VERSION_ID);
     }
 
