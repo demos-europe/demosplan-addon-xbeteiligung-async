@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Add X-Addon-XBeteiligung-RoutingKey header for REST API requests
+
 ## v0.33 (2025-09-12)
 - fix token length check
 - improve logging
