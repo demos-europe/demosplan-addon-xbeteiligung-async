@@ -111,7 +111,46 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         $procedure->setDesc($description);
         $procedure->setExternalDesc($description);
 
+        // Update map data (territory, bounding box, map extent)
+        $this->updateMapData($procedure, $beteiligungKommunal);
+
+        // Update GIS layers
+        $this->updateGisLayers($procedure, $beteiligungKommunal);
+
         // Note: Document updates will be implemented in DPLAN-17308
+    }
+
+    private function updateMapData(
+        ProcedureInterface $procedure,
+        BeteiligungKommunalType $beteiligungKommunal
+    ): void {
+        $geltungsbereich = $beteiligungKommunal->getGeltungsbereich();
+        $flaechenabgrenzungsUrl = $beteiligungKommunal->getFlaechenabgrenzungUrl();
+
+        if (null !== $geltungsbereich || null !== $flaechenabgrenzungsUrl) {
+            $mapData = $this->xbeteiligungMapService->setMapData($geltungsbereich, $flaechenabgrenzungsUrl);
+
+            if (null !== $mapData->getTerritory()) {
+                $procedure->getSettings()->setTerritory($mapData->getTerritory());
+            }
+            if (null !== $mapData->getBbox()) {
+                $procedure->getSettings()->setBoundingBox($mapData->getBbox());
+            }
+            if (null !== $mapData->getMapExtent()) {
+                $procedure->getSettings()->setMapExtent($mapData->getMapExtent());
+            }
+        }
+    }
+
+    private function updateGisLayers(
+        ProcedureInterface $procedure,
+        BeteiligungKommunalType $beteiligungKommunal
+    ): void {
+        $flaechenabgrenzungsUrl = $beteiligungKommunal->getFlaechenabgrenzungUrl();
+
+        if (null !== $flaechenabgrenzungsUrl) {
+            $this->gisLayerManager->processUrl($flaechenabgrenzungsUrl, $procedure);
+        }
     }
 
     private function saveProcedureWithTransaction(ProcedureInterface $procedure): ProcedureInterface
