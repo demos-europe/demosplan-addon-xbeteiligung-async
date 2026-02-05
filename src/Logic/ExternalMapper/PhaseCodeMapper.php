@@ -26,7 +26,9 @@ class PhaseCodeMapper {
     public function storeExternalProcedurePhaseCodes(
         string $planId,
         ?string $publicPhaseCode,
-        ?string $institutionPhaseCode
+        ?string $institutionPhaseCode,
+        ?string $publicSubPhaseCode,
+        ?string $institutionSubPhaseCode,
     ): void {
         $mapping = $this->repository->findOneBy(['planId' => $planId])
             ?? (new XBeteiligungProcedureMapping())
@@ -34,7 +36,9 @@ class PhaseCodeMapper {
 
         $mapping
             ->setPublicParticipationPhaseCode($publicPhaseCode)
-            ->setInstitutionParticipationPhaseCode($institutionPhaseCode);
+            ->setInstitutionParticipationPhaseCode($institutionPhaseCode)
+            ->setPublicParticipationSubPhaseCode($publicSubPhaseCode)
+            ->setInstitutionParticipationSubPhaseCode($institutionSubPhaseCode);
 
         $this->repository->save($mapping);
     }

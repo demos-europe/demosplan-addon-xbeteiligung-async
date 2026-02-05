@@ -31,7 +31,7 @@ class XBeteiligungProcedureMapping implements UuidEntityInterface
     /**
      * Internal demosplan procedure ID
      */
-    #[ORM\Column(name: 'procedure_id', type: 'string', length: 36, nullable: false)]
+    #[ORM\Column(name: 'procedure_id', type: 'string', length: 36, nullable: true)]
     private string $procedureId;
 
     /**
@@ -49,11 +49,21 @@ class XBeteiligungProcedureMapping implements UuidEntityInterface
     private ?string $publicParticipationPhaseCode = null;
 
     /**
-     * Institution participation phase code
-     * Code representing the current phase for institutional participation
+     * Public participation sub phase code
+     * Code representing the current phase for public participation
+     * oeffentlichkeitVerfahrensteilschrittCode
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
-    private ?string $institutionParticipationPhaseCode = null;
+    private ?string $publicParticipationSubPhaseCode = null;
+
+    /**
+     * Institution participation phase code
+     * Code representing the current phase for institutional participation
+     * $toebVerfahrensteilschrittCode
+     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $institutionParticipationSubPhaseCode = null;
+
 
     /**
      * Timestamps
@@ -117,6 +127,28 @@ class XBeteiligungProcedureMapping implements UuidEntityInterface
         return $this;
     }
 
+    public function getPublicParticipationSubPhaseCode(): ?string
+    {
+        return $this->publicParticipationSubPhaseCode;
+    }
+
+    public function setPublicParticipationSubPhaseCode(?string $publicParticipationSubPhaseCode): self
+    {
+        $this->publicParticipationSubPhaseCode = $publicParticipationSubPhaseCode;
+        return $this;
+    }
+
+    public function getInstitutionParticipationSubPhaseCode(): ?string
+    {
+        return $this->institutionParticipationSubPhaseCode;
+    }
+
+    public function setInstitutionParticipationSubPhaseCode(?string $institutionParticipationSubPhaseCode): self
+    {
+        $this->institutionParticipationSubPhaseCode = $institutionParticipationSubPhaseCode;
+        return $this;
+    }
+
     public function getCreatedAt(): DateTime
     {
         return $this->createdAt;
@@ -136,7 +168,7 @@ class XBeteiligungProcedureMapping implements UuidEntityInterface
 
     public function hasInstitutionParticipationPhase(): bool
     {
-        return $this->institutionParticipationPhaseCode !== null;
+        return $this->institutionParticipationSubPhaseCode !== null;
     }
 }
 
