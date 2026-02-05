@@ -96,11 +96,10 @@ class ProcedurePhaseExtractor
 
     private function getOeffentlichkeitVerfahrensschrittCode($beteiligungOeffentlichkeit) {
         $verfahrensteilschrittCode = null;
-        if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalType ) {
-            /** @var BeteiligungKommunalType $beteiligungOeffentlichkeit */
-            return $beteiligungOeffentlichkeit->getVerfahrensschrittKommunal()->getCode();
+        if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalOeffentlichkeitType ) {
+            /** @var BeteiligungKommunalOeffentlichkeitType $beteiligungOeffentlichkeit */
+            return $beteiligungOeffentlichkeit->getBeteiligungKommunalOeffentlichkeitArt()->getBeteiligungKommunalFormalOeffentlichkeit()->getCode();
         }
-
         if ($beteiligungOeffentlichkeit instanceof BeteiligungPlanfeststellungOeffentlichkeitType ) {
             /** @var BeteiligungPlanfeststellungOeffentlichkeitType $beteiligungOeffentlichkeit */
             return $beteiligungOeffentlichkeit->getBeteiligungPlanfeststellungOeffentlichkeitArt()->getBeteiligungPlanfeststellungFormalOeffentlichkeit()->getCode();
@@ -108,14 +107,13 @@ class ProcedurePhaseExtractor
 
         return $verfahrensteilschrittCode;
 
-
     }
 
     private function getOeffentlichkeitVerfahrensteilschrittCode($beteiligungOeffentlichkeit) {
         $verfahrensteilschrittCode = null;
-        if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalType ) {
-            /** @var BeteiligungKommunalType $beteiligungOeffentlichkeit */
-            return $beteiligungOeffentlichkeit->getBeteiligungOeffentlichkeit()->getVerfahrensteilschrittKommunal()->getCode();
+        if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalOeffentlichkeitType ) {
+            /** @var BeteiligungKommunalOeffentlichkeitType $beteiligungOeffentlichkeit */
+            return $beteiligungOeffentlichkeit->getVerfahrensteilschrittKommunal()->getCode();
         }
 
         if ($beteiligungOeffentlichkeit instanceof BeteiligungPlanfeststellungOeffentlichkeitType ) {
