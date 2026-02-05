@@ -71,8 +71,10 @@ class ProcedurePhaseExtractor
 
         $this->phaseCodeMapper->storeExternalProcedurePhaseCodes(
             $beteiligungType->getPlanID(),
-            $codeBeteiligungOeffentlichkeit,
-            $codeBeteiligungTOEB
+            $oeffentlichkeitVerfahrensschrittCode,
+            $toebVerfahrensschrittCode,
+            $oeffentlichkeitVerfahrensteilschrittCode,
+            $toebVerfahrensteilschrittCode
           );
 
 
