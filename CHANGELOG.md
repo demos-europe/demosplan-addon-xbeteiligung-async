@@ -148,6 +148,9 @@ with role Institution Koordination with missing user address are not send to coc
 
 - improve rest api documentation
 
+## v0.33.1 (2026-02-05)
+- Add X-Addon-XBeteiligung-RoutingKey header for REST API requests
+
 ## v0.33 (2025-09-12)
 - fix token length check
 - improve logging
