@@ -44,15 +44,3 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde\Beho
                 entry_name: erreichbarkeit
                 namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
             type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation\Erreichbarkeit>
-Verzeichnisdienst:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
-kennung:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
-name:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
-erreichbarkeit:
-    xml_list:
-        namespace: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
