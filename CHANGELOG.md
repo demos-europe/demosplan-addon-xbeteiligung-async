@@ -1,15 +1,16 @@
 # Changelog
 
 ## UNRELEASED
-**Enable 0402 Procedure Update with Full Data (DPLAN-15682)**
-- Enable KOMMUNAL_AKTUALISIEREN message routing for 0402 updates
-- Procedure phases (public and institution participation) now update from 0402 messages
-- Procedure description updates from Planungsanlass
-- Map data updates: territory, bounding box, and map extent from Geltungsbereich
-- GIS layer updates from Flaechenabgrenzung URL
-- Transaction handling with rollback on error
-- OK (412) and NOK (422) response messages
-- Add comprehensive tests for procedure update handler including map/GIS updates
+**Enable 0402 Procedure Update (DPLAN-15682)**
+- Enable handling of KOMMUNAL_AKTUALISIEREN (0402) messages for procedure updates
+- Update procedure name and external name from incoming messages
+- Update procedure description from Planungsanlass
+- Update procedure phases (public and institution participation) with iteration numbers
+- Update map data (territory, bounding box, map extent) from Geltungsbereich
+- Update GIS layers from Flaechenabgrenzung URL
+- Transaction handling with automatic rollback on error
+- Return OK (412) or NOK (422) response messages with proper error details
+- Add comprehensive test coverage for procedure update functionality
 - Note: Document updates will be implemented in DPLAN-17308
 
 **XBeteiligung Standard v1.2 Update (DPLAN-17309)**
