@@ -100,11 +100,11 @@ class ProcedurePhaseExtractor
         $verfahrensteilschrittCode = null;
         if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalOeffentlichkeitType ) {
             /** @var BeteiligungKommunalOeffentlichkeitType $beteiligungOeffentlichkeit */
-            return $beteiligungOeffentlichkeit->getBeteiligungKommunalOeffentlichkeitArt()->getBeteiligungKommunalFormalOeffentlichkeit()->getCode();
+            return $beteiligungOeffentlichkeit->getBeteiligungKommunalOeffentlichkeitArt()?->getBeteiligungKommunalFormalOeffentlichkeit()?->getCode();
         }
         if ($beteiligungOeffentlichkeit instanceof BeteiligungPlanfeststellungOeffentlichkeitType ) {
             /** @var BeteiligungPlanfeststellungOeffentlichkeitType $beteiligungOeffentlichkeit */
-            return $beteiligungOeffentlichkeit->getBeteiligungPlanfeststellungOeffentlichkeitArt()->getBeteiligungPlanfeststellungFormalOeffentlichkeit()->getCode();
+            return $beteiligungOeffentlichkeit->getBeteiligungPlanfeststellungOeffentlichkeitArt()?->getBeteiligungPlanfeststellungFormalOeffentlichkeit()?->getCode();
         }
 
         return $verfahrensteilschrittCode;
@@ -115,12 +115,12 @@ class ProcedurePhaseExtractor
         $verfahrensteilschrittCode = null;
         if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalOeffentlichkeitType ) {
             /** @var BeteiligungKommunalOeffentlichkeitType $beteiligungOeffentlichkeit */
-            return $beteiligungOeffentlichkeit->getVerfahrensteilschrittKommunal()->getCode();
+            return $beteiligungOeffentlichkeit->getVerfahrensteilschrittKommunal()?->getCode();
         }
 
         if ($beteiligungOeffentlichkeit instanceof BeteiligungPlanfeststellungOeffentlichkeitType ) {
             /** @var BeteiligungPlanfeststellungOeffentlichkeitType $beteiligungOeffentlichkeit */
-            return $beteiligungOeffentlichkeit->getVerfahrensteilschrittPlanfeststellung()->getCode();
+            return $beteiligungOeffentlichkeit->getVerfahrensteilschrittPlanfeststellung()?->getCode();
         }
 
         return $verfahrensteilschrittCode;
@@ -132,12 +132,12 @@ class ProcedurePhaseExtractor
         $verfahrensteilschrittCode = null;
         if ($beteiligungTOEB instanceof BeteiligungKommunalTOEBType) {
             /** @var BeteiligungKommunalTOEBType $beteiligungOeffentlichkeit */
-            return $beteiligungTOEB->getBeteiligungKommunalTOEBArt()->getBeteiligungKommunalFormalTOEB()->getCode();
+            return $beteiligungTOEB->getBeteiligungKommunalTOEBArt()?->getBeteiligungKommunalFormalTOEB()?->getCode();
         }
 
         if ($beteiligungTOEB instanceof BeteiligungPlanfeststellungTOEBType ) {
             /** @var BeteiligungPlanfeststellungTOEBType $beteiligungOeffentlichkeit */
-            return $beteiligungTOEB->getBeteiligungPlanfeststellungTOEBArt()->getBeteiligungPlanfeststellungFormalTOEB()->getCode();
+            return $beteiligungTOEB->getBeteiligungPlanfeststellungTOEBArt()?->getBeteiligungPlanfeststellungFormalTOEB()?->getCode();
         }
 
         return $verfahrensteilschrittCode;
@@ -149,12 +149,12 @@ class ProcedurePhaseExtractor
         $verfahrensteilschrittCode = null;
         if ($beteiligungTOEB instanceof BeteiligungKommunalTOEBType) {
             /** @var BeteiligungKommunalTOEBType $beteiligungOeffentlichkeit */
-            return $beteiligungTOEB->getVerfahrensteilschrittKommunal()->getCode();
+            return $beteiligungTOEB->getVerfahrensteilschrittKommunal()?->getCode();
         }
 
         if ($beteiligungTOEB instanceof BeteiligungPlanfeststellungTOEBType ) {
             /** @var BeteiligungPlanfeststellungTOEBType $beteiligungOeffentlichkeit */
-            return $beteiligungTOEB->getVerfahrensteilschrittPlanfeststellung()->getCode();
+            return $beteiligungTOEB->getVerfahrensteilschrittPlanfeststellung()?->getCode();
         }
 
         return $verfahrensteilschrittCode;
