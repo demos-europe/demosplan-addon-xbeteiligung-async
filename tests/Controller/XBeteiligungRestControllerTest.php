@@ -310,12 +310,11 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testCreateProcedureWithMissingRoutingKey(): void
     {
-        $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>test</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>';
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test</ns5:kommunal.Initiieren.0401>';
 
         $response = $this->executeProcedureTest(
             'createProcedure',
             $xmlData,
-            '',
             '',
             'Bearer valid-token',
             false,
@@ -327,12 +326,11 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testCreateProcedureWithEmptyRoutingKey(): void
     {
-        $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>test</xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>';
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test</ns5:kommunal.Initiieren.0401>';
 
         $response = $this->executeProcedureTest(
             'createProcedure',
             $xmlData,
-            '',
             '',
             'Bearer valid-token',
             false,
@@ -344,12 +342,11 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testUpdateProcedureWithMissingRoutingKey(): void
     {
-        $xmlData = '<xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>test update</xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>';
+        $xmlData = '<ns5:kommunal.Aktualisieren.0402 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test update</ns5:kommunal.Aktualisieren.0402>';
 
         $response = $this->executeProcedureTest(
             'updateProcedure',
             $xmlData,
-            '',
             '',
             'Bearer valid-token',
             false,
