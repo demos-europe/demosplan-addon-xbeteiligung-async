@@ -30,12 +30,3 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\Nachricht
                 getter: getAutor
                 setter: setAutor
             type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\Autor
-identifikationNachricht:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
-leser:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
-autor:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'

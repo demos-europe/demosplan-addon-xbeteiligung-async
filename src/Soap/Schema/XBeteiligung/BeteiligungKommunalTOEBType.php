@@ -18,6 +18,13 @@ class BeteiligungKommunalTOEBType
     private $beteiligungsID = null;
 
     /**
+     * Hier kann der Verfahrensteilschritt übermittelt werden.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType $verfahrensteilschrittKommunal
+     */
+    private $verfahrensteilschrittKommunal = null;
+
+    /**
      * Hier ist die Durchgangsnummer des Verfahrens zu übermitteln.
      *
      * @var int $durchgang
@@ -91,6 +98,32 @@ class BeteiligungKommunalTOEBType
     public function setBeteiligungsID($beteiligungsID)
     {
         $this->beteiligungsID = $beteiligungsID;
+        return $this;
+    }
+
+    /**
+     * Gets as verfahrensteilschrittKommunal
+     *
+     * Hier kann der Verfahrensteilschritt übermittelt werden.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType
+     */
+    public function getVerfahrensteilschrittKommunal()
+    {
+        return $this->verfahrensteilschrittKommunal;
+    }
+
+    /**
+     * Sets a new verfahrensteilschrittKommunal
+     *
+     * Hier kann der Verfahrensteilschritt übermittelt werden.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType $verfahrensteilschrittKommunal
+     * @return self
+     */
+    public function setVerfahrensteilschrittKommunal(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType $verfahrensteilschrittKommunal = null)
+    {
+        $this->verfahrensteilschrittKommunal = $verfahrensteilschrittKommunal;
         return $this;
     }
 

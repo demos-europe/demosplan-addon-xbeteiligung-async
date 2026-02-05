@@ -1,6 +1,16 @@
 # Changelog
 
 ## UNRELEASED
+**XBeteiligung Standard v1.2 Update (DPLAN-17309)**
+- Update XBeteiligung XSD schemas to latest v1.2 release
+- Add verfahrensteilschritt field to additional procedure types:
+  - `verfahrensteilschrittKommunal` in BeteiligungKommunalTOEBType and BeteiligungKommunalOeffentlichkeitType
+  - `verfahrensteilschrittPlanfeststellung` in BeteiligungPlanfeststellungTOEBType and BeteiligungPlanfeststellungOeffentlichkeitType
+  - `verfahrensteilschrittRaumordnung` in BeteiligungRaumordnungType
+- Add `durchgang` field to BeteiligungKommunalType and BeteiligungPlanfeststellungType
+- Regenerate PHP classes and metadata from updated XSD files
+- Remove duplicate metadata sections from base schema files (BehoerdeTypeType, IdentifikationNachrichtTypeType, NachrichtenkopfG2GTypeType, KommunikationTypeType)
+
 ## v0.56 (2026-01-26)
 - bump demosplan-addon version from v0.64 to v0.65
 - Add XBeteiligungAttachmentService to process and save file attachments from XBeteiligung messages (DPLAN-15843)
