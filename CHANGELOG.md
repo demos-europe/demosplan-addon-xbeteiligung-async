@@ -1,6 +1,15 @@
 # Changelog
 
 ## UNRELEASED
+**Enable 0402 Procedure Update with Phases (DPLAN-15682)**
+- Enable KOMMUNAL_AKTUALISIEREN message routing for 0402 updates
+- Procedure phases (public and institution participation) now update from 0402 messages
+- Procedure description updates from Planungsanlass
+- Transaction handling with rollback on error
+- OK (412) and NOK (422) response messages
+- Add comprehensive tests for procedure update handler
+- Note: Document updates will be implemented in DPLAN-17308
+
 **XBeteiligung Standard v1.2 Update (DPLAN-17309)**
 - Update XBeteiligung XSD schemas to latest v1.2 release
 - Add verfahrensteilschritt field to additional procedure types:

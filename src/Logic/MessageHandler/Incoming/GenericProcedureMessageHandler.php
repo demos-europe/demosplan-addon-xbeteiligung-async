@@ -101,8 +101,8 @@ class GenericProcedureMessageHandler implements IncomingMessageHandlerInterface
                 $xmlObject,
                 $routingKey
             ),
-            /*XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value
-            => $this->kommunaleProcedureUpdater->updateProcedure($xmlObject),*/
+            XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value
+            => $this->kommunaleProcedureUpdater->updateProcedure($xmlObject),
             default
             => throw new Exception("Unsupported message type for processing: {$this->currentMessageType}")
         };

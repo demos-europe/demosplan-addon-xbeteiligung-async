@@ -103,15 +103,15 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         BeteiligungKommunalType $beteiligungKommunal
     ): void {
         // Update procedure phases
-        //$procedurePhaseData = $this->procedurePhaseExtractor->extract($beteiligungKommunal);
-        //$this->setProcedurePhase($procedure, $procedurePhaseData);
+        $procedurePhaseData = $this->procedurePhaseExtractor->extract($beteiligungKommunal);
+        $this->setProcedurePhase($procedure, $procedurePhaseData);
 
         // Update procedure description and external description
         $description = $beteiligungKommunal->getBeschreibungPlanungsanlass() ?? '';
         $procedure->setDesc($description);
         $procedure->setExternalDesc($description);
 
-        // Update procedure documents will implemented later
+        // Note: Document updates will be implemented in DPLAN-17308
     }
 
     private function saveProcedureWithTransaction(ProcedureInterface $procedure): ProcedureInterface
