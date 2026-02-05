@@ -67,4 +67,30 @@ class PhaseCodeMapper {
 
 
     }
+
+    public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): string {
+        /**
+         * @var XBeteiligungProcedureMapping $mapping
+         */
+        $planId = $statementCreated->getPlanId();
+        $mapping = $this->repository->findOneBy(['planId' => $planId]);
+        //@todo what happens when no mapping is found?
+        //@todo it hapens with the existing statements
+
+        if (!$mapping) {
+
+            $code = '' === $this->xbeteiligungConfiguration->verfahrensteilschrittCode
+                ? self::DEFAULT_PROCEDURE_PHASE_CODE
+                : $this->xbeteiligungConfiguration->verfahrensteilschrittCode;
+            return $code;
+        }
+
+        if($this->verfasserBuilder->getTypeOfPerson($statementCreated)) {
+
+            return $mapping->getPublicParticipationSubPhaseCode();
+        }
+        return $mapping->getInstitutionParticipationSubPhaseCode();
+
+
+    }
 }
