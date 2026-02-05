@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.33.1 (2026-02-05)
 - Add X-Addon-XBeteiligung-RoutingKey header for REST API requests
 
 ## v0.33 (2025-09-12)
