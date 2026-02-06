@@ -199,26 +199,7 @@ class XBeteiligungGisLayerManager
         $oldUrl = $gisLayer->getUrl();
         $oldLayers = $gisLayer->getLayers();
 
-        $gisLayer->setUrl($this->buildCleanLayerUrl($url));
-        $gisLayer->setLayers($layersString);
-
-        try {
-            $params = $this->parseUrlParams($url);
-            $serviceType = $this->getParam($params, self::WMS_PARAM_SERVICE);
-            if ($serviceType) {
-                $gisLayer->setServiceType(strtolower($serviceType));
-            }
-
-            $version = $this->getParam($params, self::WMS_PARAM_VERSION);
-            if ($version) {
-                $gisLayer->setLayerVersion($version);
-            }
-        } catch (InvalidArgumentException $e) {
-            $this->logger->warning(self::LOG_PREFIX . 'Could not parse service parameters from URL during update, keeping existing values', [
-                'url' => $url,
-                'error' => $e->getMessage(),
-            ]);
-        }
+        $this->configureGisLayerFromUrl($gisLayer, $url, $layersString, false);
 
         $this->entityManager->persist($gisLayer);
 
@@ -236,6 +217,47 @@ class XBeteiligungGisLayerManager
     }
 
     /**
+     * Configure GIS layer with URL, layers, and metadata from WMS URL
+     *
+     * @param GisLayerInterface $gisLayer The layer to configure
+     * @param string $url The WMS URL to parse
+     * @param string $layersString Comma-separated list of layer names
+     * @param bool $useDefaultOnError If true, sets default service type on error; if false, keeps existing values
+     */
+    private function configureGisLayerFromUrl(
+        GisLayerInterface $gisLayer,
+        string $url,
+        string $layersString,
+        bool $useDefaultOnError
+    ): void {
+        $gisLayer->setUrl($this->buildCleanLayerUrl($url));
+        $gisLayer->setLayers($layersString);
+
+        try {
+            $params = $this->parseUrlParams($url);
+            $serviceType = $this->getParam($params, self::WMS_PARAM_SERVICE);
+            $gisLayer->setServiceType($serviceType ? strtolower($serviceType) : self::DEFAULT_SERVICE_TYPE);
+
+            $version = $this->getParam($params, self::WMS_PARAM_VERSION);
+            if ($version) {
+                $gisLayer->setLayerVersion($version);
+            }
+        } catch (InvalidArgumentException $e) {
+            $logContext = [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ];
+
+            if ($useDefaultOnError) {
+                $this->logger->warning(self::LOG_PREFIX . 'Could not parse service parameters from URL, using defaults', $logContext);
+                $gisLayer->setServiceType(self::DEFAULT_SERVICE_TYPE);
+            } else {
+                $this->logger->warning(self::LOG_PREFIX . 'Could not parse service parameters from URL during update, keeping existing values', $logContext);
+            }
+        }
+    }
+
+    /**
      * @throws Exception
      */
     private function createGisLayer(string $url, string $layersString, ProcedureInterface $procedure): void
@@ -248,30 +270,12 @@ class XBeteiligungGisLayerManager
         $gisLayer = $this->gisLayerFactory->createGisLayer();
 
         $gisLayer->setName(self::LAYER_NAME);
-        $gisLayer->setUrl($this->buildCleanLayerUrl($url));
-        $gisLayer->setLayers($layersString);
         $gisLayer->setProcedureId($procedure->getId());
         $gisLayer->setBplan(true);
-
         $gisLayer->setType(self::LAYER_TYPE_OVERLAY);
         $gisLayer->setDefaultVisibility(true);
 
-        try {
-            $params = $this->parseUrlParams($url);
-            $serviceType = $this->getParam($params, self::WMS_PARAM_SERVICE);
-            $gisLayer->setServiceType($serviceType ? strtolower($serviceType) : self::DEFAULT_SERVICE_TYPE);
-
-            $version = $this->getParam($params, self::WMS_PARAM_VERSION);
-            if ($version) {
-                $gisLayer->setLayerVersion($version);
-            }
-        } catch (InvalidArgumentException $e) {
-            $this->logger->warning(self::LOG_PREFIX . 'Could not parse service parameters from URL, using defaults', [
-                'url' => $url,
-                'error' => $e->getMessage(),
-            ]);
-            $gisLayer->setServiceType(self::DEFAULT_SERVICE_TYPE);
-        }
+        $this->configureGisLayerFromUrl($gisLayer, $url, $layersString, true);
 
         $rootCategory->addLayer($gisLayer);
 
