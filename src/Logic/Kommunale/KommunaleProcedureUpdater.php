@@ -106,8 +106,7 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         ProcedureInterface $procedure,
         ProcedureDataValueObject $procedureDataValueObject
     ): void {
-        // Update procedure phases
-        $this->setProcedurePhase($procedure, $procedureDataValueObject->getProcedurePhaseData());
+        // Note: Procedure phases are NOT updated to preserve manual changes made by users between 401 and 402 messages
 
         // Update procedure name and external name
         $planName = $procedureDataValueObject->getPlanName();

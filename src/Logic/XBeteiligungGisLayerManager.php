@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
+use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Factory\GisLayerFactoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
@@ -79,7 +80,7 @@ class XBeteiligungGisLayerManager
             $layersString = $this->extractLayersFromUrl($flaechenabgrenzungsUrl);
 
             if ('' !== $layersString) {
-                $this->createGisLayer($flaechenabgrenzungsUrl, $layersString, $procedure);
+                $this->updateOrCreateGisLayer($flaechenabgrenzungsUrl, $layersString, $procedure);
             }
         } catch (Exception $e) {
             $this->logger->error(
@@ -143,6 +144,98 @@ class XBeteiligungGisLayerManager
     }
 
     /**
+     * Update existing "Planzeichnung" overlay or create new one if it doesn't exist
+     * @throws Exception
+     */
+    private function updateOrCreateGisLayer(string $url, string $layersString, ProcedureInterface $procedure): void
+    {
+        $existingLayer = $this->findExistingPlanzeichnungLayer($procedure);
+
+        if (null !== $existingLayer) {
+            $this->updateExistingGisLayer($existingLayer, $url, $layersString);
+        } else {
+            $this->createGisLayer($url, $layersString, $procedure);
+        }
+    }
+
+    /**
+     * Find existing "Planzeichnung" overlay for the procedure
+     *
+     * @throws Exception
+     */
+    private function findExistingPlanzeichnungLayer(ProcedureInterface $procedure): ?GisLayerInterface
+    {
+        $rootCategory = $this->gisLayerCategoryRepository->getRootLayerCategory($procedure->getId());
+        if (null === $rootCategory) {
+            $this->logger->warning(self::LOG_PREFIX . 'No root layer category found for procedure', [
+                'procedureId' => $procedure->getId(),
+            ]);
+            return null;
+        }
+
+        $gisLayers = $rootCategory->getGisLayers();
+        /** @var GisLayerInterface $gisLayer */
+        foreach ($gisLayers as $gisLayer) {
+            if (self::LAYER_NAME === $gisLayer->getName() && !$gisLayer->isDeleted()) {
+                $this->logger->info(self::LOG_PREFIX . 'Found existing Planzeichnung layer', [
+                    'procedureId' => $procedure->getId(),
+                    'layerId' => $gisLayer->getId(),
+                ]);
+                return $gisLayer;
+            }
+        }
+
+        $this->logger->info(self::LOG_PREFIX . 'No existing Planzeichnung layer found, will create new one', [
+            'procedureId' => $procedure->getId(),
+        ]);
+        return null;
+    }
+
+    /**
+     * Update existing GIS layer with new URL and layers
+     */
+    private function updateExistingGisLayer(GisLayerInterface $gisLayer, string $url, string $layersString): void
+    {
+        $oldUrl = $gisLayer->getUrl();
+        $oldLayers = $gisLayer->getLayers();
+
+        $gisLayer->setUrl($this->buildCleanLayerUrl($url));
+        $gisLayer->setLayers($layersString);
+
+        try {
+            $params = $this->parseUrlParams($url);
+            $serviceType = $this->getParam($params, self::WMS_PARAM_SERVICE);
+            if ($serviceType) {
+                $gisLayer->setServiceType(strtolower($serviceType));
+            }
+
+            $version = $this->getParam($params, self::WMS_PARAM_VERSION);
+            if ($version) {
+                $gisLayer->setLayerVersion($version);
+            }
+        } catch (InvalidArgumentException $e) {
+            $this->logger->warning(self::LOG_PREFIX . 'Could not parse service parameters from URL during update, keeping existing values', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+        }
+
+        $this->entityManager->persist($gisLayer);
+
+        $layerCount = substr_count($layersString, ',') + 1;
+
+        $this->logger->info(self::LOG_PREFIX . 'Updated existing Planzeichnung layer', [
+            'layerId' => $gisLayer->getId(),
+            'procedureId' => $gisLayer->getProcedureId(),
+            'oldUrl' => $oldUrl,
+            'newUrl' => $gisLayer->getUrl(),
+            'oldLayers' => $oldLayers,
+            'newLayers' => $layersString,
+            'layerCount' => $layerCount,
+        ]);
+    }
+
+    /**
      * @throws Exception
      */
     private function createGisLayer(string $url, string $layersString, ProcedureInterface $procedure): void
@@ -175,7 +268,7 @@ class XBeteiligungGisLayerManager
         } catch (InvalidArgumentException $e) {
             $this->logger->warning(self::LOG_PREFIX . 'Could not parse service parameters from URL, using defaults', [
                 'url' => $url,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             $gisLayer->setServiceType(self::DEFAULT_SERVICE_TYPE);
         }
@@ -208,7 +301,7 @@ class XBeteiligungGisLayerManager
 
         if (false === $scheme || false === $host || false === $path) {
             $this->logger->warning(self::LOG_PREFIX . 'Unable to parse WMS URL for clean URL generation, using original URL', [
-                'wmsUrl' => $wmsUrl
+                'wmsUrl' => $wmsUrl,
             ]);
             return $wmsUrl;
         }
@@ -217,7 +310,7 @@ class XBeteiligungGisLayerManager
 
         $this->logger->debug(self::LOG_PREFIX . 'Built clean layer URL', [
             'originalUrl' => $wmsUrl,
-            'cleanUrl' => $cleanUrl
+            'cleanUrl' => $cleanUrl,
         ]);
 
         return $cleanUrl;

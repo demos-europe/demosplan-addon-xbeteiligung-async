@@ -5,9 +5,9 @@
 - Enable handling of KOMMUNAL_AKTUALISIEREN (0402) messages for procedure updates
 - Update procedure name and external name from incoming messages
 - Update procedure description from Planungsanlass
-- Update procedure phases (public and institution participation) with iteration numbers
 - Update map data (territory, bounding box, map extent) from Geltungsbereich
-- Update GIS layers from Flaechenabgrenzung URL
+- Update existing "Planzeichnung" GIS overlay (URL and layers) or create new one if missing
+- Procedure phases are intentionally NOT updated to preserve manual changes made by users between 401 and 402 messages
 - Transaction handling with automatic rollback on error
 - Return OK (412) or NOK (422) response messages with proper error details
 - Add comprehensive test coverage for procedure update functionality

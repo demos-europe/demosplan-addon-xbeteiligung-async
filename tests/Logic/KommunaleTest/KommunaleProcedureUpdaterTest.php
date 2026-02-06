@@ -84,7 +84,7 @@ class KommunaleProcedureUpdaterTest extends TestCase
     /**
      * @dataProvider getTestXmlFiles
      */
-    public function testUpdateProcedurePhaseDataCorrectly($filePath): void
+    public function testUpdateProcedureWithoutChangingPhases($filePath): void
     {
         $inputMsgXml = file_get_contents(AddonPath::getRootPath($filePath));
         /** @var KommunalAktualisieren0402 $inputMsgObj */
@@ -96,25 +96,23 @@ class KommunaleProcedureUpdaterTest extends TestCase
         $beteiligungKommunal = $inputMsgObj->getNachrichteninhalt()->getBeteiligung();
         self::assertNotNull($beteiligungKommunal);
 
-        // Verify the message contains phase data that will be extracted
+        // Verify the message contains phase data
         $publicParticipation = $beteiligungKommunal->getBeteiligungOeffentlichkeit();
         $institutionParticipation = $beteiligungKommunal->getBeteiligungTOEB();
 
         self::assertNotNull($publicParticipation, 'Public participation data should exist in test message');
         self::assertNotNull($institutionParticipation, 'Institution participation data should exist in test message');
 
-        // Act - The key test is that phase extraction and update happens without errors
+        // Act - The key test is that the update completes without errors
+        // Note: Procedure phases are intentionally NOT updated to preserve manual changes
         $responseValue = $this->sut->updateProcedure($inputMsgObj);
 
         // Assert
         self::assertNotNull($responseValue);
 
-        // Note: Detailed phase verification requires integration tests with real database
-        // This unit test verifies:
-        // 1. updateProcedure completes successfully (no exceptions)
-        // 2. ProcedurePhaseExtractor.extract() is called (via the real implementation in setUp)
-        // 3. setProcedurePhase() is called (via the real implementation in setUp)
-        // Phase extraction logic itself is tested in ProcedurePhaseExtractorTest
+        // Note: Phase data from 0402 messages is intentionally ignored to preserve manual changes
+        // made by users between 401 (creation) and 402 (update) messages. This prevents
+        // accidentally reverting user-initiated phase changes.
     }
 
     /**
