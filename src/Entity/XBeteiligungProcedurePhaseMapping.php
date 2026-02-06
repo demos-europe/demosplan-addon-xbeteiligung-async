@@ -56,8 +56,17 @@ class XBeteiligungProcedurePhaseMapping implements UuidEntityInterface
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private ?string $publicParticipationSubPhaseCode = null;
 
+
     /**
      * Institution participation phase code
+     * Code representing the current phase for institutional participation
+     * $toebVerfahrensteilschrittCode
+     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $institutionParticipationPhaseCode = null;
+
+    /**
+     * Institution participation sub phase code
      * Code representing the current phase for institutional participation
      * $toebVerfahrensteilschrittCode
      */
