@@ -113,15 +113,19 @@ class PhaseBuilder
 
     }
 
-    public function setVerfahrensteilschritt(StatementCreated $statementCreated, StellungnahmeType $statement)
+    public function setVerfahrensteilschritt(StatementCreated $statementCreated, StellungnahmeType $statement): void
     {
-        $partParticipationType = new CodeVerfahrensteilschrittType();
         $subPhaseCode = $this->phaseCodeMapper->getExternalProcedureSubPhaseCode($statementCreated);
+
+        if (null === $subPhaseCode) {
+            return;
+        }
+
+        $partParticipationType = new CodeVerfahrensteilschrittType();
         $partParticipationType->setCode($subPhaseCode);
         // Note: verfahrensteilschritt does NOT have a name element according to XSD schema
         // $partParticipationType->setName($this->getPhaseName($statementCreated));
         $partParticipationType->setListVersionID(self::LIST_VERSION_ID);
         $statement->setVerfahrensteilschritt($partParticipationType);
-
     }
 }

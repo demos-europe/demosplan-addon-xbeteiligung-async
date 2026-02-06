@@ -68,7 +68,7 @@ class PhaseCodeMapper {
 
     }
 
-    public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): string {
+    public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): ?string {
         /**
          * @var XBeteiligungProcedureMapping $mapping
          */
