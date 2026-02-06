@@ -164,9 +164,15 @@ class XBeteiligungResponseMessageFactory
     ): ResponseValue {
         $messageClass = $this->reusableMessageBlocks->setProductInfo($messageClass);
         $header = $this->reusableMessageBlocks->createMessageHeadFor($messageClass);
-        $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligung());
+
+        // Extract BeteiligungsID from the appropriate participation type
+        $beteiligung = $xmlObject->getNachrichteninhalt()?->getBeteiligung();
+        $beteiligungsID = $beteiligung?->getBeteiligungOeffentlichkeit()?->getBeteiligungsID()
+            ?? $beteiligung?->getBeteiligungTOEB()?->getBeteiligungsID();
+
+        $contentClass->setBeteiligungsID($beteiligungsID);
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
-        $contentClass->setPlanID($xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID());
+        $contentClass->setPlanID($beteiligung?->getPlanID());
         foreach ($errorTypes as $errorType) {
             $contentClass->addToFehler($errorType);
         }
