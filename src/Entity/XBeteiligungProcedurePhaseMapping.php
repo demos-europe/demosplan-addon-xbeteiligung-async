@@ -7,20 +7,20 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Entity;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UuidEntityInterface;
 use DemosEurope\DemosplanAddon\Doctrine\Generator\UuidV4Generator;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureMappingRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseMappingRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * ProcedureXBeteiligungMapping - Stores XBeteiligung-specific procedure data
+ * XBeteiligungProcedurePhaseMapping - Stores XBeteiligung-specific procedure data
  *
  * This entity stores the external planId and phase codes needed for XBeteiligung
  * message generation. It maps demosplan procedures to their external identifiers
  * and participation phase codes.
  */
-#[ORM\Entity(repositoryClass: XBeteiligungProcedureMappingRepository::class)]
-#[ORM\Table(name: 'xbeteiligung_procedure_mapping')]
-class XBeteiligungProcedureMapping implements UuidEntityInterface
+#[ORM\Entity(repositoryClass: XBeteiligungProcedurePhaseMappingRepository::class)]
+#[ORM\Table(name: 'xbeteiligung_procedure_phase_mapping')]
+class XBeteiligungProcedurePhaseMapping implements UuidEntityInterface
 {
     #[ORM\Column(type: 'string', length: 36, nullable: false, options: ['fixed' => true])]
     #[ORM\Id]
@@ -159,16 +159,5 @@ class XBeteiligungProcedureMapping implements UuidEntityInterface
         return $this->modifiedAt;
     }
 
-    // === Helper Methods ===
-
-    public function hasPublicParticipationPhase(): bool
-    {
-        return $this->publicParticipationPhaseCode !== null;
-    }
-
-    public function hasInstitutionParticipationPhase(): bool
-    {
-        return $this->institutionParticipationSubPhaseCode !== null;
-    }
 }
 

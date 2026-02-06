@@ -3,9 +3,9 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
-use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedureMapping;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedurePhaseMapping;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedureMappingRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseMappingRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 
 /**
@@ -17,9 +17,9 @@ class PhaseCodeMapper {
     private const DEFAULT_PROCEDURE_PHASE_CODE = 'invalid';
 
     public function __construct(
-        private readonly XBeteiligungProcedureMappingRepository $repository,
-        private readonly VerfasserBuilder $verfasserBuilder,
-        private readonly XBeteiligungConfiguration $xbeteiligungConfiguration,
+        private readonly XBeteiligungProcedurePhaseMappingRepository $repository,
+        private readonly VerfasserBuilder                            $verfasserBuilder,
+        private readonly XBeteiligungConfiguration                   $xbeteiligungConfiguration,
     ) {
     }
 
@@ -31,7 +31,7 @@ class PhaseCodeMapper {
         ?string $institutionSubPhaseCode,
     ): void {
         $mapping = $this->repository->findOneBy(['planId' => $planId])
-            ?? (new XBeteiligungProcedureMapping())
+            ?? (new XBeteiligungProcedurePhaseMapping())
                 ->setPlanId($planId);
 
         $mapping
@@ -45,7 +45,7 @@ class PhaseCodeMapper {
 
     public function getExternalProcedurePhaseCode(StatementCreated $statementCreated): string {
         /**
-         * @var XBeteiligungProcedureMapping $mapping
+         * @var XBeteiligungProcedurePhaseMapping $mapping
          */
         $planId = $statementCreated->getPlanId();
         $mapping = $this->repository->findOneBy(['planId' => $planId]);
@@ -70,7 +70,7 @@ class PhaseCodeMapper {
 
     public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): ?string {
         /**
-         * @var XBeteiligungProcedureMapping $mapping
+         * @var XBeteiligungProcedurePhaseMapping $mapping
          */
         $planId = $statementCreated->getPlanId();
         $mapping = $this->repository->findOneBy(['planId' => $planId]);
