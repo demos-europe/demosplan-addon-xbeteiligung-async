@@ -35,7 +35,7 @@ class PhaseBuilder
     public function __construct(
         private readonly PermissionEvaluatorInterface $permissionEvaluator,
         private readonly LoggerInterface $logger,
-        private readonly XBeteiligungConfiguration $xbeteiligungConfiguration,
+        private readonly GlobalConfigInterface $globalConfig,
         private readonly PhaseCodeMapper  $phaseCodeMapper,
     ) {
     }
