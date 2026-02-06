@@ -20,6 +20,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessagePar
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use JMS\Serializer\Serializer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Log\Logger;
@@ -61,9 +62,7 @@ class KommunaleProcedureUpdaterTest extends TestCase
         $this->sut = $procedureHandlerFactory->createProcedureHandler('updater');
     }
 
-    /**
-     * @dataProvider getTestXmlFiles
-     */
+    #[DataProvider('getTestXmlFiles')]
     public function testUpdateProcedureSuccessfully($filePath): void
     {
         $inputMsgXml = file_get_contents(AddonPath::getRootPath($filePath));
@@ -81,9 +80,7 @@ class KommunaleProcedureUpdaterTest extends TestCase
         // The actual response building is tested separately in message factory tests
     }
 
-    /**
-     * @dataProvider getTestXmlFiles
-     */
+    #[DataProvider('getTestXmlFiles')]
     public function testUpdateProcedureWithoutChangingPhases($filePath): void
     {
         $inputMsgXml = file_get_contents(AddonPath::getRootPath($filePath));
@@ -115,9 +112,7 @@ class KommunaleProcedureUpdaterTest extends TestCase
         // accidentally reverting user-initiated phase changes.
     }
 
-    /**
-     * @dataProvider getTestXmlFiles
-     */
+    #[DataProvider('getTestXmlFiles')]
     public function testUpdateMapDataAndGisLayers($filePath): void
     {
         $inputMsgXml = file_get_contents(AddonPath::getRootPath($filePath));
