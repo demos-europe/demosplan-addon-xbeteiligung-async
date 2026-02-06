@@ -45,8 +45,8 @@ class ProcedurePhaseExtractor
         $beteiligungOeffentlichkeit = $beteiligungType->getBeteiligungOeffentlichkeit();
 
         //Phases for the public (citizens)
-        $oeffentlichkeitVerfahrensschrittCode = $this->getOeffentlichkeitVerfahrensschrittCode($beteiligungOeffentlichkeit);
-        $oeffentlichkeitVerfahrensteilschrittCode = $this->getOeffentlichkeitVerfahrensteilschrittCode($beteiligungOeffentlichkeit);
+        $codeOeffentlichkeitVerfahrensschritt = $this->getCodeOeffentlichkeitVerfahrensschritt($beteiligungOeffentlichkeit);
+        $codeOeffentlichkeitVerfahrensteilschritt = $this->getCodeOeffentlichkeitVerfahrensteilschritt($beteiligungOeffentlichkeit);
         $durchgangOeffentlichkeit = $beteiligungOeffentlichkeit?->getDurchgang() ?? 1;
         $zeitraumOeffentlichkeit = $beteiligungOeffentlichkeit?->getZeitraum();
         $beginnOeffentlichkeit = $zeitraumOeffentlichkeit?->getBeginn();
@@ -56,8 +56,8 @@ class ProcedurePhaseExtractor
         $beteiligungTOEB = $beteiligungType->getBeteiligungTOEB();
 
         //Get procedure step code
-        $toebVerfahrensschrittCode = $this->getBeteiligungTOEBVerfahrensschrittCode($beteiligungTOEB);
-        $toebVerfahrensteilschrittCode = $this->getBeteiligungTOEBVerfahrensteilschrittCode($beteiligungTOEB);
+        $codeToebVerfahrensschritt = $this->getCodeBeteiligungTOEBVerfahrensschritt($beteiligungTOEB);
+        $codeToebVerfahrensteilschritt = $this->getCodeBeteiligungTOEBVerfahrensteilschritt($beteiligungTOEB);
         $durchgangTOEB = $beteiligungTOEB?->getDurchgang() ?? 1;
         $zeitraumTOEB = $beteiligungTOEB?->getZeitraum();
         $beginnTOEB = $zeitraumTOEB?->getBeginn();
@@ -65,19 +65,19 @@ class ProcedurePhaseExtractor
 
         $this->phaseCodeMapper->storeExternalProcedurePhaseCodes(
             $beteiligungType->getPlanID(),
-            $oeffentlichkeitVerfahrensschrittCode,
-            $toebVerfahrensschrittCode,
-            $oeffentlichkeitVerfahrensteilschrittCode,
-            $toebVerfahrensteilschrittCode
+            $codeOeffentlichkeitVerfahrensschritt,
+            $codeToebVerfahrensschritt,
+            $codeOeffentlichkeitVerfahrensteilschritt,
+            $codeToebVerfahrensteilschritt
           );
 
 
         $this->logWarningsForMissingCodes(
             $codeVerfahrensschrittType,
-            $oeffentlichkeitVerfahrensschrittCode,
-            $oeffentlichkeitVerfahrensteilschrittCode,
-            $toebVerfahrensschrittCode,
-            $toebVerfahrensteilschrittCode
+            $codeOeffentlichkeitVerfahrensschritt,
+            $codeOeffentlichkeitVerfahrensteilschritt,
+            $codeToebVerfahrensschritt,
+            $codeToebVerfahrensteilschritt
         );
 
         return new ProcedurePhaseData(
@@ -92,14 +92,14 @@ class ProcedurePhaseExtractor
         );
     }
 
-    private function getOeffentlichkeitVerfahrensschrittCode(
+    private function getCodeOeffentlichkeitVerfahrensschritt(
         BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType|null $beteiligungOeffentlichkeit
     ): ?string {
         if (null === $beteiligungOeffentlichkeit) {
             return null;
         }
 
-        $verfahrensteilschrittCode = null;
+        $codeVerfahrensteilschritt = null;
         if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalOeffentlichkeitType ) {
             /** @var BeteiligungKommunalOeffentlichkeitType $beteiligungOeffentlichkeit */
             return $beteiligungOeffentlichkeit->getBeteiligungKommunalOeffentlichkeitArt()->getBeteiligungKommunalFormalOeffentlichkeit()->getCode();
@@ -109,11 +109,11 @@ class ProcedurePhaseExtractor
             return $beteiligungOeffentlichkeit->getBeteiligungPlanfeststellungOeffentlichkeitArt()->getBeteiligungPlanfeststellungFormalOeffentlichkeit()->getCode();
         }
 
-        return $verfahrensteilschrittCode;
+        return $codeVerfahrensteilschritt;
 
     }
 
-    private function getOeffentlichkeitVerfahrensteilschrittCode(
+    private function getCodeOeffentlichkeitVerfahrensteilschritt(
         BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType|null $beteiligungOeffentlichkeit
     ): ?string {
         if (null === $beteiligungOeffentlichkeit) {
@@ -136,7 +136,7 @@ class ProcedurePhaseExtractor
 
     }
 
-    private function getBeteiligungTOEBVerfahrensschrittCode(
+    private function getCodeBeteiligungTOEBVerfahrensschritt(
         BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType|null $beteiligungTOEB
     ): ?string {
         if (null === $beteiligungTOEB) {
@@ -159,7 +159,7 @@ class ProcedurePhaseExtractor
 
     }
 
-    private function getBeteiligungTOEBVerfahrensteilschrittCode(
+    private function getCodeBeteiligungTOEBVerfahrensteilschritt(
         BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType|null $beteiligungTOEB
     ): ?string {
         if (null === $beteiligungTOEB) {
@@ -198,25 +198,25 @@ class ProcedurePhaseExtractor
 
     private function logWarningsForMissingCodes(
         ?string $codeVerfahrensschrittKommunal,
-        ?string $oeffentlichkeitVerfahrensschrittCode,
-        ?string $oeffentlichkeitVerfahrensteilschrittCode,
-        ?string $toebVerfahrensschrittCode,
-        ?string $toebVerfahrensteilschrittCode
+        ?string $codeOeffentlichkeitVerfahrensschritt,
+        ?string $codeOeffentlichkeitVerfahrensteilschritt,
+        ?string $codeToebVerfahrensschritt,
+        ?string $codeToebVerfahrensteilschritt
     ): void {
         if (null === $codeVerfahrensschrittKommunal) {
             $this->logger->warning('Code Verfahrensschritt Kommunal is null');
         }
-        if (null === $oeffentlichkeitVerfahrensschrittCode) {
-            $this->logger->warning('Code Beteiligung Oeffentlichkeit is null');
+        if (null === $codeOeffentlichkeitVerfahrensschritt) {
+            $this->logger->warning('Code Beteiligung OeffentlichkeitArt FormalOeffentlichkeit is null');
         }
-        if (null === $oeffentlichkeitVerfahrensteilschrittCode) {
-            $this->logger->warning('Code Beteiligung Oeffentlichkeit is null');
+        if (null === $codeOeffentlichkeitVerfahrensteilschritt) {
+            $this->logger->warning('Code BeteiligungOeffentlichkeit Verfahrensteilschritt is null');
         }
-        if (null === $toebVerfahrensschrittCode) {
-            $this->logger->warning('Code Beteiligung TOEB is null');
+        if (null === $codeToebVerfahrensschritt) {
+            $this->logger->warning('Code Beteiligung TOEBArt FormalTOEB is null');
         }
-        if (null === $toebVerfahrensteilschrittCode) {
-            $this->logger->warning('Code Beteiligung TOEB is null');
+        if (null === $codeToebVerfahrensteilschritt) {
+            $this->logger->warning('Code Beteiligung TOEB Verfahrensteilschritt is null');
         }
     }
 }
