@@ -96,7 +96,9 @@ class ProcedurePhaseExtractor
         );
     }
 
-    private function getOeffentlichkeitVerfahrensschrittCode($beteiligungOeffentlichkeit) {
+    private function getOeffentlichkeitVerfahrensschrittCode(
+        BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType$beteiligungOeffentlichkeit
+    ): ?string {
         $verfahrensteilschrittCode = null;
         if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalOeffentlichkeitType ) {
             /** @var BeteiligungKommunalOeffentlichkeitType $beteiligungOeffentlichkeit */
@@ -111,7 +113,9 @@ class ProcedurePhaseExtractor
 
     }
 
-    private function getOeffentlichkeitVerfahrensteilschrittCode($beteiligungOeffentlichkeit) {
+    private function getOeffentlichkeitVerfahrensteilschrittCode(
+        BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType $beteiligungOeffentlichkeit
+    ): ?string {
         $verfahrensteilschrittCode = null;
         if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalOeffentlichkeitType ) {
             /** @var BeteiligungKommunalOeffentlichkeitType $beteiligungOeffentlichkeit */
@@ -128,7 +132,9 @@ class ProcedurePhaseExtractor
 
     }
 
-    private function getBeteiligungTOEBVerfahrensschrittCode($beteiligungTOEB) {
+    private function getBeteiligungTOEBVerfahrensschrittCode(
+        BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType $beteiligungTOEB
+    ): ?string {
         $verfahrensteilschrittCode = null;
         if ($beteiligungTOEB instanceof BeteiligungKommunalTOEBType) {
             /** @var BeteiligungKommunalTOEBType $beteiligungOeffentlichkeit */
@@ -145,7 +151,9 @@ class ProcedurePhaseExtractor
 
     }
 
-    private function getBeteiligungTOEBVerfahrensteilschrittCode($beteiligungTOEB) {
+    private function getBeteiligungTOEBVerfahrensteilschrittCode(
+        BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType $beteiligungTOEB
+    ): ?string {
         $verfahrensteilschrittCode = null;
         if ($beteiligungTOEB instanceof BeteiligungKommunalTOEBType) {
             /** @var BeteiligungKommunalTOEBType $beteiligungOeffentlichkeit */
