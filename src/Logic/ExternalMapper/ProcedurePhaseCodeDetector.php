@@ -24,7 +24,7 @@ class ProcedurePhaseCodeDetector {
     ) {
     }
 
-    public function storeCokpitProcedurePhaseCodes(
+    public function storeExternalProcedurePhaseCodes(
         string $procedureId,
         ProcedureDataValueObject $procedureDataValueObject,
     ): void {

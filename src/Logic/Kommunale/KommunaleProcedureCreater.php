@@ -185,7 +185,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
 
         Assert::isInstanceOf($result, ProcedureInterface::class);
         $procedureId = $result->getId();
-        $this->procedurePhaseCodeDetector->storeCokpitProcedurePhaseCodes(
+        $this->procedurePhaseCodeDetector->storeExternalProcedurePhaseCodes(
             $procedureId,
             $procedureDataValueObject
         );
