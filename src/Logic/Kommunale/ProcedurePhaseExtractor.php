@@ -13,9 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
 
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\PhaseCodeMapper;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType;
@@ -30,8 +28,7 @@ class ProcedurePhaseExtractor
 {
     private const CONFIGURATION_PHASE = 'configuration';
     public function __construct(
-        private readonly LoggerInterface $logger,
-        private readonly PhaseCodeMapper $phaseCodeMapper)
+        private readonly LoggerInterface            $logger)
     {
     }
 
@@ -43,8 +40,9 @@ class ProcedurePhaseExtractor
 
         //Phases for the public (citizens)
         $beteiligungOeffentlichkeit = $beteiligungType->getBeteiligungOeffentlichkeit();
+        //@todo $beteiligungOeffentlichkeit->getBeteiligungsID(); //demos procedure id
 
-        //Phases for the public (citizens)
+        //Sub Phases for the public (citizens)
         $codeOeffentlichkeitVerfahrensschritt = $this->getCodeOeffentlichkeitVerfahrensschritt($beteiligungOeffentlichkeit);
         $codeOeffentlichkeitVerfahrensteilschritt = $this->getCodeOeffentlichkeitVerfahrensteilschritt($beteiligungOeffentlichkeit);
         $durchgangOeffentlichkeit = $beteiligungOeffentlichkeit?->getDurchgang() ?? 1;
@@ -54,8 +52,9 @@ class ProcedurePhaseExtractor
 
         //Phases for institutions
         $beteiligungTOEB = $beteiligungType->getBeteiligungTOEB();
+        //@todo $beteiligungTOEB->getBeteiligungsID(); //if $beteiligungOeffentlichkeit->getBeteiligungsID() is null, then get this one
 
-        //Get procedure step code
+        //Sub Phases for institutions
         $codeToebVerfahrensschritt = $this->getCodeBeteiligungTOEBVerfahrensschritt($beteiligungTOEB);
         $codeToebVerfahrensteilschritt = $this->getCodeBeteiligungTOEBVerfahrensteilschritt($beteiligungTOEB);
         $durchgangTOEB = $beteiligungTOEB?->getDurchgang() ?? 1;
@@ -63,13 +62,6 @@ class ProcedurePhaseExtractor
         $beginnTOEB = $zeitraumTOEB?->getBeginn();
         $endeTOEB = $zeitraumTOEB?->getEnde();
 
-        $this->phaseCodeMapper->storeExternalProcedurePhaseCodes(
-            $beteiligungType->getPlanID(),
-            $codeOeffentlichkeitVerfahrensschritt,
-            $codeToebVerfahrensschritt,
-            $codeOeffentlichkeitVerfahrensteilschritt,
-            $codeToebVerfahrensteilschritt
-          );
 
 
         $this->logWarningsForMissingCodes(
@@ -83,6 +75,11 @@ class ProcedurePhaseExtractor
         return new ProcedurePhaseData(
             self::CONFIGURATION_PHASE,
             self::CONFIGURATION_PHASE,
+            $codeVerfahrensschrittType,
+            $codeOeffentlichkeitVerfahrensschritt,
+            $codeOeffentlichkeitVerfahrensteilschritt,
+            $codeToebVerfahrensschritt,
+            $codeToebVerfahrensteilschritt,
             $beginnOeffentlichkeit,
             $endeOeffentlichkeit,
             $beginnTOEB,

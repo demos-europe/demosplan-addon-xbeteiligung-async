@@ -20,6 +20,11 @@ class ProcedurePhaseData extends ValueObject
     public function __construct(
         private ?string $publicParticipationPhaseKey,
         private ?string $institutionParticipationPhaseKey,
+        private ?string $generalPhaseCode,
+        private ?string $publicParticipationPhaseCode,
+        private ?string $publicParticipationSubPhaseCode,
+        private ?string $institutionParticipationPhaseCode,
+        private ?string $institutionParticipationSubPhaseCode,
         private ?DateTime $publicParticipationStartDate,
         private ?DateTime $publicParticipationEndDate,
         private ?DateTime $institutionParticipationStartDate,
@@ -29,6 +34,11 @@ class ProcedurePhaseData extends ValueObject
     ) {
         $this->publicParticipationPhaseKey = $publicParticipationPhaseKey;
         $this->institutionParticipationPhaseKey = $institutionParticipationPhaseKey;
+        $this->generalPhaseCode = $generalPhaseCode;
+        $this->publicParticipationPhaseCode = $publicParticipationPhaseCode;
+        $this->publicParticipationSubPhaseCode = $publicParticipationSubPhaseCode;
+        $this->institutionParticipationPhaseCode = $institutionParticipationPhaseCode;
+        $this->institutionParticipationSubPhaseCode = $institutionParticipationSubPhaseCode;
         $this->publicParticipationStartDate = $publicParticipationStartDate;
         $this->publicParticipationEndDate = $publicParticipationEndDate;
         $this->institutionParticipationStartDate = $institutionParticipationStartDate;
@@ -47,6 +57,31 @@ class ProcedurePhaseData extends ValueObject
     public function getInstitutionParticipationPhaseKey(): ?string
     {
         return $this->institutionParticipationPhaseKey;
+    }
+
+    public function getGeneralPhaseCode(): ?string
+    {
+        return $this->generalPhaseCode;
+    }
+
+    public function getPublicParticipationPhaseCode(): ?string
+    {
+        return $this->publicParticipationPhaseCode;
+    }
+
+    public function getPublicParticipationSubPhaseCode(): ?string
+    {
+        return $this->publicParticipationSubPhaseCode;
+    }
+
+    public function getInstitutionParticipationPhaseCode(): ?string
+    {
+        return $this->institutionParticipationPhaseCode;
+    }
+
+    public function getInstitutionParticipationSubPhaseCode(): ?string
+    {
+        return $this->institutionParticipationSubPhaseCode;
     }
 
     public function getPublicParticipationStartDate(): ?DateTime
