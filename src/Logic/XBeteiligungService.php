@@ -675,7 +675,7 @@ class XBeteiligungService
         if ($participationType instanceof BeteiligungKommunalTOEBType) {
             $participationOeffentlichkeitArtType = new BeteiligungKommunalTOEBArtAnonymousPHPType();
             $participationOeffentlichkeitArtType->setBeteiligungKommunalFormalTOEB(
-                $this->getPublicProcedurePhaseCodeType($procedure)
+                $this->getInstitutionProcedurePhaseCodeType($procedure)
             );
             $participationType->setBeteiligungKommunalTOEBArt($participationOeffentlichkeitArtType);
         }
@@ -1011,6 +1011,26 @@ class XBeteiligungService
 
         $codeProcedurePhase->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
         $codeProcedurePhase->setName($this->getPublicParticipationPhaseNameFromKey($procedure));
+
+        return $codeProcedurePhase;
+    }
+
+    private function getInstitutionProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittKommunalType
+    {
+        $codeProcedurePhase = new CodeVerfahrensschrittKommunalType();
+        $codeProcedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
+        $codeProcedurePhase->setListVersionID('1.0');
+
+        // Get the phase code from the mapping for institution participation
+        $phaseKey = $procedure->getPhaseObject()->getKey();
+        $phaseCode = ProcedurePhaseMapping::getPhaseCode(
+            ProcedureMessageTyp::KOMMUNAL,
+            ParticipationType::INSTITUTION,
+            ProcedurePhaseKey::from($phaseKey)
+        );
+
+        $codeProcedurePhase->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
+        $codeProcedurePhase->setName($this->getInstitutionPhaseNameFromKey($procedure));
 
         return $codeProcedurePhase;
     }
