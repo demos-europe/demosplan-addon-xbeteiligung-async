@@ -1,6 +1,17 @@
 # Changelog
 
 ## UNRELEASED
+**Implement Procedure Phase Mapping System (DPLAN-17231)**
+- Add comprehensive ProcedurePhaseMapping service with hard-coded mappings for K3 integration
+- Create ParticipationType enum to distinguish between public and institution participation
+- Create ProcedurePhaseKey enum with all supported procedure phase identifiers
+- Define complete phase code and name mappings for all procedure types:
+  - Kommunal (Bauleitplanung): institution and public participation phases
+  - Raumordnung: institution and public participation phases
+  - Planfeststellung: institution and public participation phases
+- Integrate phase mapping into XBeteiligungService for consistent phase data in outgoing messages
+- Add comprehensive documentation of complete phase mapping structure
+
 **Enable 0402 Procedure Update (DPLAN-15682)**
 - Enable handling of KOMMUNAL_AKTUALISIEREN (0402) messages for procedure updates
 - Update procedure name and external name from incoming messages
