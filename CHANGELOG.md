@@ -1,6 +1,28 @@
 # Changelog
 
 ## UNRELEASED
+**Enable 0402 Procedure Update (DPLAN-15682)**
+- Enable handling of KOMMUNAL_AKTUALISIEREN (0402) messages for procedure updates
+- Update procedure name and external name from incoming messages
+- Update procedure description from Planungsanlass
+- Update map data (territory, bounding box, map extent) from Geltungsbereich
+- Update existing "Planzeichnung" GIS overlay (URL and layers) or create new one if missing
+- Procedure phases are intentionally NOT updated to preserve manual changes made by users between 401 and 402 messages
+- Transaction handling with automatic rollback on error
+- Return OK (412) or NOK (422) response messages with proper error details
+- Add comprehensive test coverage for procedure update functionality
+- Note: Document updates will be implemented in DPLAN-17308
+
+**XBeteiligung Standard v1.2 Update (DPLAN-17309)**
+- Update XBeteiligung XSD schemas to latest v1.2 release
+- Add verfahrensteilschritt field to additional procedure types:
+  - `verfahrensteilschrittKommunal` in BeteiligungKommunalTOEBType and BeteiligungKommunalOeffentlichkeitType
+  - `verfahrensteilschrittPlanfeststellung` in BeteiligungPlanfeststellungTOEBType and BeteiligungPlanfeststellungOeffentlichkeitType
+  - `verfahrensteilschrittRaumordnung` in BeteiligungRaumordnungType
+- Add `durchgang` field to BeteiligungKommunalType and BeteiligungPlanfeststellungType
+- Regenerate PHP classes and metadata from updated XSD files
+- Remove duplicate metadata sections from base schema files (BehoerdeTypeType, IdentifikationNachrichtTypeType, NachrichtenkopfG2GTypeType, KommunikationTypeType)
+
 ## v0.56 (2026-01-26)
 - bump demosplan-addon version from v0.64 to v0.65
 - Add XBeteiligungAttachmentService to process and save file attachments from XBeteiligung messages (DPLAN-15843)
@@ -137,6 +159,9 @@ with role Institution Koordination with missing user address are not send to coc
 - Resolve PHPUnit test failures with proper dependency injection
 
 - improve rest api documentation
+
+## v0.33.1 (2026-02-05)
+- Add X-Addon-XBeteiligung-RoutingKey header for REST API requests
 
 ## v0.33 (2025-09-12)
 - fix token length check

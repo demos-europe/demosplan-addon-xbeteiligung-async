@@ -53,6 +53,13 @@ class BeteiligungPlanfeststellungType
     private $verfahrensschrittPlanfeststellung = null;
 
     /**
+     * Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.
+     *
+     * @var int $durchgang
+     */
+    private $durchgang = null;
+
+    /**
      * Hier kann die Art des Beteiligungsverfahrens übermittelt werden.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensartPlanfeststellungType $verfahrensartPlanfeststellung
@@ -261,6 +268,32 @@ class BeteiligungPlanfeststellungType
     public function setVerfahrensschrittPlanfeststellung(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType $verfahrensschrittPlanfeststellung)
     {
         $this->verfahrensschrittPlanfeststellung = $verfahrensschrittPlanfeststellung;
+        return $this;
+    }
+
+    /**
+     * Gets as durchgang
+     *
+     * Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.
+     *
+     * @return int
+     */
+    public function getDurchgang()
+    {
+        return $this->durchgang;
+    }
+
+    /**
+     * Sets a new durchgang
+     *
+     * Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.
+     *
+     * @param int $durchgang
+     * @return self
+     */
+    public function setDurchgang($durchgang)
+    {
+        $this->durchgang = $durchgang;
         return $this;
     }
 

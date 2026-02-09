@@ -53,6 +53,13 @@ class BeteiligungKommunalType
     private $verfahrensschrittKommunal = null;
 
     /**
+     * Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.
+     *
+     * @var int $durchgang
+     */
+    private $durchgang = null;
+
+    /**
      * Hier kann die Art des Beteiligungsverfahrens übermittelt werden.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensartKommunalType $verfahrensartKommunal
@@ -261,6 +268,32 @@ class BeteiligungKommunalType
     public function setVerfahrensschrittKommunal(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType $verfahrensschrittKommunal)
     {
         $this->verfahrensschrittKommunal = $verfahrensschrittKommunal;
+        return $this;
+    }
+
+    /**
+     * Gets as durchgang
+     *
+     * Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.
+     *
+     * @return int
+     */
+    public function getDurchgang()
+    {
+        return $this->durchgang;
+    }
+
+    /**
+     * Sets a new durchgang
+     *
+     * Hier kann der Durchgang dieses Verfahrensteilschritts übermittelt werden.
+     *
+     * @param int $durchgang
+     * @return self
+     */
+    public function setDurchgang($durchgang)
+    {
+        $this->durchgang = $durchgang;
         return $this;
     }
 

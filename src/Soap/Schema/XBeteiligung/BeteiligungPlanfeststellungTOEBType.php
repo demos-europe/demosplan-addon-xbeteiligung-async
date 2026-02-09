@@ -18,6 +18,13 @@ class BeteiligungPlanfeststellungTOEBType
     private $beteiligungsID = null;
 
     /**
+     * Hier kann der Verfahrensteilschritt übermittelt werden.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType $verfahrensteilschrittPlanfeststellung
+     */
+    private $verfahrensteilschrittPlanfeststellung = null;
+
+    /**
      * Hier ist die Durchgangsnummer des Verfahrens zu übermitteln.
      *
      * @var int $durchgang
@@ -91,6 +98,32 @@ class BeteiligungPlanfeststellungTOEBType
     public function setBeteiligungsID($beteiligungsID)
     {
         $this->beteiligungsID = $beteiligungsID;
+        return $this;
+    }
+
+    /**
+     * Gets as verfahrensteilschrittPlanfeststellung
+     *
+     * Hier kann der Verfahrensteilschritt übermittelt werden.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType
+     */
+    public function getVerfahrensteilschrittPlanfeststellung()
+    {
+        return $this->verfahrensteilschrittPlanfeststellung;
+    }
+
+    /**
+     * Sets a new verfahrensteilschrittPlanfeststellung
+     *
+     * Hier kann der Verfahrensteilschritt übermittelt werden.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType $verfahrensteilschrittPlanfeststellung
+     * @return self
+     */
+    public function setVerfahrensteilschrittPlanfeststellung(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType $verfahrensteilschrittPlanfeststellung = null)
+    {
+        $this->verfahrensteilschrittPlanfeststellung = $verfahrensteilschrittPlanfeststellung;
         return $this;
     }
 

@@ -80,6 +80,16 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaum
                 getter: getVerfahrensschritt
                 setter: setVerfahrensschritt
             type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType
+        verfahrensteilschrittRaumordnung:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensteilschrittRaumordnung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+            accessor:
+                getter: getVerfahrensteilschrittRaumordnung
+                setter: setVerfahrensteilschrittRaumordnung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType
         durchgang:
             expose: true
             access_type: public_method

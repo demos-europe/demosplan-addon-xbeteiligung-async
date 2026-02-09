@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Repository;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 
 class XBeteiligungMessageAuditRepository extends ServiceEntityRepository
 {
@@ -47,5 +48,40 @@ class XBeteiligungMessageAuditRepository extends ServiceEntityRepository
             'procedureId' => $procedureId,
             'targetSystem' => $targetSystem
         ], ['createdAt' => 'ASC']);
+    }
+
+    /**
+     * Find the latest incoming 402 message that has no response (OK/NOK) linked to it
+     *
+     * @param array<string> $messageTypes List of 402 message types to search for
+     *
+     * @throws NonUniqueResultException
+     */
+    public function findLatestUnrespondedUpdateMessage(
+        string $procedureId,
+        array $messageTypes,
+        string $targetSystem
+    ): ?XBeteiligungMessageAudit {
+        $qb = $this->createQueryBuilder('incoming');
+
+        $qb->leftJoin(
+            XBeteiligungMessageAudit::class,
+            'response',
+            'WITH',
+            'response.responseToMessageId = incoming.id'
+        )
+        ->where('incoming.procedureId = :procedureId')
+        ->andWhere('incoming.messageType IN (:messageTypes)')
+        ->andWhere('incoming.direction = :direction')
+        ->andWhere('incoming.targetSystem = :targetSystem')
+        ->andWhere('response.id IS NULL')
+        ->setParameter('procedureId', $procedureId)
+        ->setParameter('messageTypes', $messageTypes)
+        ->setParameter('direction', 'received')
+        ->setParameter('targetSystem', $targetSystem)
+        ->orderBy('incoming.createdAt', 'DESC')
+        ->setMaxResults(1);
+
+        return $qb->getQuery()->getOneOrNullResult();
     }
 }

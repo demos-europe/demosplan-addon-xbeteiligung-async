@@ -61,18 +61,24 @@ class XBeteiligungResponseMessageFactory
         NachrichteninhaltTemplateOKType|NachrichteninhaltTemplateNOKType $contentClass,
         NachrichtG2GTypeType $messageClass,
         $header,
+        ?string $procedureId = null
     ): ResponseValue {
         $response = new ResponseValue();
         $messageClass->setNachrichtenkopfG2g($header);
         $messageClass->setNachrichteninhalt($contentClass);
         $messageXml = SerializerFactory::serializeData($messageClass, $this->logger);
         $response->setMessageXml($messageXml);
-        
+
+        // Set procedure ID for audit tracking
+        if (null !== $procedureId) {
+            $response->setProcedureId($procedureId);
+        }
+
         // Set message string identifier from class mapping
         $messageClassName = $messageClass::class;
         $messageIdentifier = CommonHelpers::CLASS_TO_MESSAGE_TYPE_MAPPING[$messageClassName]['name'] ?? '';
         $response->setMessageStringIdentifier($messageIdentifier);
-        
+
         $response->lock();
 
         return $response;
@@ -119,7 +125,7 @@ class XBeteiligungResponseMessageFactory
             $contentClass->setPlanID($planId);
             $contentClass->setVorgangsID($instanceId);
 
-            return $this->setResponse($contentClass, $messageClass, $header);
+            return $this->setResponse($contentClass, $messageClass, $header, $procedureId);
         } catch (Exception $e) {
             $this->logger->error(
                 self::ERROR_TEXT.$procedure->getId().
@@ -164,14 +170,21 @@ class XBeteiligungResponseMessageFactory
     ): ResponseValue {
         $messageClass = $this->reusableMessageBlocks->setProductInfo($messageClass);
         $header = $this->reusableMessageBlocks->createMessageHeadFor($messageClass);
-        $contentClass->setBeteiligungsID($xmlObject->getNachrichteninhalt()?->getBeteiligung());
+
+        // Extract BeteiligungsID from the appropriate participation type
+        $beteiligung = $xmlObject->getNachrichteninhalt()?->getBeteiligung();
+        $beteiligungsID = $beteiligung?->getBeteiligungOeffentlichkeit()?->getBeteiligungsID()
+            ?? $beteiligung?->getBeteiligungTOEB()?->getBeteiligungsID();
+
+        $contentClass->setBeteiligungsID($beteiligungsID);
         $contentClass->setVorgangsID($xmlObject->getNachrichteninhalt()?->getVorgangsID());
-        $contentClass->setPlanID($xmlObject->getNachrichteninhalt()->getBeteiligung()->getPlanID());
+        $contentClass->setPlanID($beteiligung?->getPlanID());
         foreach ($errorTypes as $errorType) {
             $contentClass->addToFehler($errorType);
         }
 
-        return $this->setResponse($contentClass, $messageClass, $header);
+        // Note: procedureId is beteiligungsID for NOK responses (procedure lookup by ID)
+        return $this->setResponse($contentClass, $messageClass, $header, $beteiligungsID);
     }
 
     /**

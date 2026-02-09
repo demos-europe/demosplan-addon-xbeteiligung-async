@@ -67,12 +67,22 @@ class XBeteiligungMessageProcessor
             );
             // Audit outgoing response message (OK/NOK)
             if ($this->config->auditEnabled) {
-                // Find the original audit record for the incoming 401 message to link the response
+                // Find the original incoming message to link the response
+                // - For 401 responses (Initiieren OK/NOK): find the original 401 message
+                // - For 402 responses (Aktualisieren OK/NOK): find the latest unresponded 402 message
                 $originalAuditRecord = null;
                 if (null !== $responseObject->getProcedureId()) {
-                    $originalAuditRecord = $this->auditService->findOriginalIncoming401Message(
-                        $responseObject->getProcedureId()
-                    );
+                    $isUpdateResponse = str_contains($responseObject->getMessageStringIdentifier(), 'Aktualisieren');
+
+                    if ($isUpdateResponse) {
+                        $originalAuditRecord = $this->auditService->findLatestUnrespondedIncoming402Message(
+                            $responseObject->getProcedureId()
+                        );
+                    } else {
+                        $originalAuditRecord = $this->auditService->findOriginalIncoming401Message(
+                            $responseObject->getProcedureId()
+                        );
+                    }
                 }
 
                 $auditRecord = $this->auditService->auditSentMessage(

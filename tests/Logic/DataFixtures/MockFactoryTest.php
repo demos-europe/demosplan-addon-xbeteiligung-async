@@ -45,6 +45,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungGisLayerManager;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAttachmentService;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Illuminate\Support\Collection;
@@ -227,6 +228,11 @@ class MockFactoryTest
                 return $this->procedure ?? $this->getProcedureMock();
             }
         );
+        $procedureServiceInterfaceMock->method('updateProcedureObject')->willReturnCallback(
+            function (ProcedureInterface $procedure): ProcedureInterface {
+                return $procedure;
+            }
+        );
 
         return $procedureServiceInterfaceMock;
     }
@@ -235,7 +241,15 @@ class MockFactoryTest
     {
         $entityManagerMock = $this->testCase->createMockObject(EntityManagerInterface::class);
         $repositoryMock = $this->testCase->createMockObject(EntityRepository::class);
+        $connectionMock = $this->testCase->createMockObject(Connection::class);
+
         $entityManagerMock->method('getRepository')->willReturn($repositoryMock);
+        $entityManagerMock->method('getConnection')->willReturn($connectionMock);
+
+        // Mock transaction methods
+        $connectionMock->method('beginTransaction')->willReturn(true);
+        $connectionMock->method('commit')->willReturn(true);
+        $connectionMock->method('rollBack')->willReturn(true);
 
         return $entityManagerMock;
     }
