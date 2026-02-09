@@ -39,6 +39,6 @@ services:
         arguments:
             $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit'
 
-    DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseMappingRepository:
+    DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseCockpitRepository:
         arguments:
-            $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedurePhaseMapping'
+            $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedurePhaseCockpit'

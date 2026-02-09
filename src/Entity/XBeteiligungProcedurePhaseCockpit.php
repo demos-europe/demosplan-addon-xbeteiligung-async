@@ -7,20 +7,20 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Entity;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UuidEntityInterface;
 use DemosEurope\DemosplanAddon\Doctrine\Generator\UuidV4Generator;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseMappingRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseCockpitRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * XBeteiligungProcedurePhaseMapping - Stores XBeteiligung-specific procedure data
+ * XBeteiligungProcedurePhaseCockpit - Stores XBeteiligung-specific procedure data
  *
  * This entity stores the external planId and phase codes needed for XBeteiligung
  * message generation. It maps demosplan procedures to their external identifiers
  * and participation phase codes.
  */
-#[ORM\Entity(repositoryClass: XBeteiligungProcedurePhaseMappingRepository::class)]
-#[ORM\Table(name: 'xbeteiligung_procedure_phase_mapping')]
-class XBeteiligungProcedurePhaseMapping implements UuidEntityInterface
+#[ORM\Entity(repositoryClass: XBeteiligungProcedurePhaseCockpitRepository::class)]
+#[ORM\Table(name: 'xbeteiligung_procedure_phase_cockpit')]
+class XBeteiligungProcedurePhaseCockpit implements UuidEntityInterface
 {
     #[ORM\Column(type: 'string', length: 36, nullable: false, options: ['fixed' => true])]
     #[ORM\Id]
@@ -47,6 +47,13 @@ class XBeteiligungProcedurePhaseMapping implements UuidEntityInterface
      */
     #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private ?string $publicParticipationPhaseCode = null;
+
+    /**
+     * General phase code
+     * Code representing the current phase general phase code which is actually used for the public participation
+     */
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
+    private ?string $generalPhaseCode = null;
 
     /**
      * Public participation sub phase code
@@ -111,6 +118,17 @@ class XBeteiligungProcedurePhaseMapping implements UuidEntityInterface
     public function setPlanId(string $planId): self
     {
         $this->planId = $planId;
+        return $this;
+    }
+
+    public function getGeneralPhaseCode(): ?string
+    {
+        return $this->generalPhaseCode;
+    }
+
+    public function setGeneralPhaseCode(?string $generalPhaseCode): self
+    {
+        $this->generalPhaseCode = $generalPhaseCode;
         return $this;
     }
 
