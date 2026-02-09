@@ -267,13 +267,3 @@ These codes are specific to Bavaria (Bayern) procedures and are not used in stan
 This is why we cannot use a simple backed enum and must use arrays with code/name pairs in `ProcedurePhaseMapping.php`.
 
 ---
-
-## Code List Source
-
-The codes listed above are extracted from:
-- File: `develop_xmls/CodeLists/Verfahensschritte.xml`
-- Standard: XÖV XBeteiligung / XPlanverfahren
-- Version: 1.2
-- Canonical URI: `urn:xoev-de:xplanverfahren:codeliste:verfahrensschritt`
-
-For the most up-to-date codes, always refer to the official XBeteiligung standard documentation.
