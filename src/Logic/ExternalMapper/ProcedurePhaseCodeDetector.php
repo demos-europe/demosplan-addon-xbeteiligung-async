@@ -13,7 +13,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
  * Right now, it does not do that, instead it returns the default ones and store the external codes in the database
  * to be used later when sending back the message
  */
-class PhaseCodeMapper {
+class ProcedurePhaseCodeDetector {
     private const DEFAULT_PROCEDURE_PHASE_CODE = 'invalid';
 
     public function __construct(
