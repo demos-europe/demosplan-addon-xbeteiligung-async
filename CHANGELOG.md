@@ -1,6 +1,18 @@
 # Changelog
 
 ## UNRELEASED
+**Enable 0402 Procedure Update (DPLAN-15682)**
+- Enable handling of KOMMUNAL_AKTUALISIEREN (0402) messages for procedure updates
+- Update procedure name and external name from incoming messages
+- Update procedure description from Planungsanlass
+- Update map data (territory, bounding box, map extent) from Geltungsbereich
+- Update existing "Planzeichnung" GIS overlay (URL and layers) or create new one if missing
+- Procedure phases are intentionally NOT updated to preserve manual changes made by users between 401 and 402 messages
+- Transaction handling with automatic rollback on error
+- Return OK (412) or NOK (422) response messages with proper error details
+- Add comprehensive test coverage for procedure update functionality
+- Note: Document updates will be implemented in DPLAN-17308
+
 **XBeteiligung Standard v1.2 Update (DPLAN-17309)**
 - Update XBeteiligung XSD schemas to latest v1.2 release
 - Add verfahrensteilschritt field to additional procedure types:
