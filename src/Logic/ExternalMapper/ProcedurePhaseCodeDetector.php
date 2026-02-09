@@ -3,9 +3,10 @@
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
-use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedurePhaseMapping;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedurePhaseCockpit;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseMappingRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseCockpitRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure\ProcedureDataValueObject;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 
 /**
@@ -17,35 +18,40 @@ class ProcedurePhaseCodeDetector {
     private const DEFAULT_PROCEDURE_PHASE_CODE = 'invalid';
 
     public function __construct(
-        private readonly XBeteiligungProcedurePhaseMappingRepository $repository,
+        private readonly XBeteiligungProcedurePhaseCockpitRepository $repository,
         private readonly VerfasserBuilder                            $verfasserBuilder,
         private readonly XBeteiligungConfiguration                   $xbeteiligungConfiguration,
     ) {
     }
 
-    public function storeExternalProcedurePhaseCodes(
-        string $planId,
-        ?string $publicPhaseCode,
-        ?string $institutionPhaseCode,
-        ?string $publicSubPhaseCode,
-        ?string $institutionSubPhaseCode,
+    public function storeCokpitProcedurePhaseCodes(
+        string $procedureId,
+        ProcedureDataValueObject $procedureDataValueObject,
     ): void {
-        $mapping = $this->repository->findOneBy(['planId' => $planId])
-            ?? (new XBeteiligungProcedurePhaseMapping())
-                ->setPlanId($planId);
+        $procedurePhaseData = $procedureDataValueObject->getProcedurePhaseData();
 
-        $mapping
-            ->setPublicParticipationPhaseCode($publicPhaseCode)
-            ->setInstitutionParticipationPhaseCode($institutionPhaseCode)
-            ->setPublicParticipationSubPhaseCode($publicSubPhaseCode)
-            ->setInstitutionParticipationSubPhaseCode($institutionSubPhaseCode);
+        if (null === $procedurePhaseData) {
+            return;
+        }
 
-        $this->repository->save($mapping);
+        $procedurePhaseCockpit = $this->repository->findOneBy(['planId' => $procedureId])
+            ?? (new XBeteiligungProcedurePhaseCockpit())
+                ->setProcedureId($procedureId);
+
+        $procedurePhaseCockpit
+            ->setPlanId($procedureDataValueObject->getPlanId())
+            ->setGeneralPhaseCode($procedurePhaseData->getGeneralPhaseCode())
+            ->setPublicParticipationPhaseCode($procedurePhaseData->getPublicParticipationPhaseCode())
+            ->setPublicParticipationSubPhaseCode($procedurePhaseData->getPublicParticipationSubPhaseCode())
+            ->setInstitutionParticipationPhaseCode($procedurePhaseData->getInstitutionParticipationPhaseCode())
+            ->setInstitutionParticipationSubPhaseCode($procedurePhaseData->getInstitutionParticipationSubPhaseCode());
+
+        $this->repository->save($procedurePhaseCockpit);
     }
 
     public function getExternalProcedurePhaseCode(StatementCreated $statementCreated): string {
         /**
-         * @var XBeteiligungProcedurePhaseMapping $mapping
+         * @var XBeteiligungProcedurePhaseCockpit $mapping
          */
         $planId = $statementCreated->getPlanId();
         $mapping = $this->repository->findOneBy(['planId' => $planId]);
@@ -70,7 +76,7 @@ class ProcedurePhaseCodeDetector {
 
     public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): ?string {
         /**
-         * @var XBeteiligungProcedurePhaseMapping $mapping
+         * @var XBeteiligungProcedurePhaseCockpit $mapping
          */
         $planId = $statementCreated->getPlanId();
         $mapping = $this->repository->findOneBy(['planId' => $planId]);

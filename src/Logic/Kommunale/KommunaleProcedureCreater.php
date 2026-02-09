@@ -135,6 +135,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         $procedure = $this->createNewKommunalProcedureFromXBeteiligungMessage($xmlObject, $incomingRoutingKey);
         $response = $this->kommunaleMessageFactory->buildProcedureCreatedResponse411($procedure, $xmlObject);
         $response->setProcedureId($procedure->getId());
+        //store procedureId in the xbet procedure phase cockpit
 
         return $response;
     }
@@ -152,11 +153,10 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     {
         // Get mapped customer before transaction
         $customer = $this->getCustomerFromRoutingKey($incomingRoutingKey);
-
+        $procedureDataValueObject = $this->procedureDataExtractor->extract($xmlObject);
         $result = $this->transactionService->executeAndFlushInTransaction(
-            function () use ($xmlObject, $customer) {
+            function () use ($customer, $procedureDataValueObject) {
 
-                $procedureDataValueObject = $this->procedureDataExtractor->extract($xmlObject);
                 $procedure = $this->createProcedureEntity($procedureDataValueObject, $customer);
                 $procedure->setCustomer($customer);
 
@@ -184,6 +184,11 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         );
 
         Assert::isInstanceOf($result, ProcedureInterface::class);
+        $procedureId = $result->getId();
+        $this->procedurePhaseCodeDetector->storeCokpitProcedurePhaseCodes(
+            $procedureId,
+            $procedureDataValueObject
+        );
 
         return $result;
     }

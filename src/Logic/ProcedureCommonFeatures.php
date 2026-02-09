@@ -21,6 +21,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterfa
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
@@ -62,10 +63,12 @@ abstract class ProcedureCommonFeatures
         protected readonly ProcedureDataExtractor             $procedureDataExtractor,
         protected readonly XBeteiligungGisLayerManager        $gisLayerManager,
         protected readonly XBeteiligungAttachmentService      $xbeteiligungAttachmentService,
+        protected readonly ProcedurePhaseCodeDetector $procedurePhaseCodeDetector,
     )
     {
     }
 
+    //@todo re use this method in the procedure update
     protected function setProcedurePhase(
         ProcedureInterface $procedure,
         ProcedurePhaseData $procedurePhaseData,
