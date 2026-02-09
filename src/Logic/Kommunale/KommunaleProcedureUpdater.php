@@ -19,6 +19,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure\ProcedureDataValueObject;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 
@@ -36,7 +37,10 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         try {
             $beteiligungKommunal = $this->validateAndExtractBeteiligung($message);
             $procedure = $this->findProcedureToUpdate($beteiligungKommunal);
-            $this->updateProcedureData($procedure, $beteiligungKommunal);
+
+            $procedureDataValueObject = $this->procedureDataExtractor->extract($message);
+
+            $this->updateProcedureData($procedure, $procedureDataValueObject);
             $updatedProcedure = $this->saveProcedureWithTransaction($procedure);
 
             return $this->kommunaleMessageFactory->buildProcedureUpdateOKResponse412(
@@ -100,18 +104,41 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
 
     private function updateProcedureData(
         ProcedureInterface $procedure,
-        BeteiligungKommunalType $beteiligungKommunal
+        ProcedureDataValueObject $procedureDataValueObject
     ): void {
-        // Update procedure phases
-        //$procedurePhaseData = $this->procedurePhaseExtractor->extract($beteiligungKommunal);
-        //$this->setProcedurePhase($procedure, $procedurePhaseData);
+        // Note: Procedure phases are NOT updated to preserve manual changes made by users between 401 and 402 messages
+
+        // Update procedure name and external name
+        $planName = $procedureDataValueObject->getPlanName();
+        if (null !== $planName) {
+            $procedure->setName($planName);
+            $procedure->setExternalName($planName);
+        }
 
         // Update procedure description and external description
-        $description = $beteiligungKommunal->getBeschreibungPlanungsanlass() ?? '';
+        $description = $procedureDataValueObject->getPlanDescription() ?? '';
         $procedure->setDesc($description);
         $procedure->setExternalDesc($description);
 
-        // Update procedure documents will implemented later
+        // Update map data (territory, bounding box, map extent)
+        $mapData = $procedureDataValueObject->getMapData();
+        if (null !== $mapData->getTerritory()) {
+            $procedure->getSettings()->setTerritory($mapData->getTerritory());
+        }
+        if (null !== $mapData->getBbox()) {
+            $procedure->getSettings()->setBoundingBox($mapData->getBbox());
+        }
+        if (null !== $mapData->getMapExtent()) {
+            $procedure->getSettings()->setMapExtent($mapData->getMapExtent());
+        }
+
+        // Update GIS layers
+        $flaechenabgrenzungsUrl = $mapData->getFlaechenabgrenzungsUrl();
+        if (null !== $flaechenabgrenzungsUrl) {
+            $this->gisLayerManager->processUrl($flaechenabgrenzungsUrl, $procedure);
+        }
+
+        // Note: Document updates will be implemented in DPLAN-17308
     }
 
     private function saveProcedureWithTransaction(ProcedureInterface $procedure): ProcedureInterface

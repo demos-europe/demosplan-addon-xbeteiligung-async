@@ -333,6 +333,25 @@ class XBeteiligungAuditService
     }
 
     /**
+     * Find the latest incoming 402 update message that has not been responded to yet
+     * This checks for 402 messages that don't have any OK/NOK responses linking to them
+     */
+    public function findLatestUnrespondedIncoming402Message(string $procedureId): ?XBeteiligungMessageAudit
+    {
+        $updateMessageTypes = [
+            XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value,
+            XBeteiligungMessageType::PLANFESTSTELLUNG_AKTUALISIEREN->value,
+            XBeteiligungMessageType::RAUMORDNUNG_AKTUALISIEREN->value,
+        ];
+
+        return $this->auditRepository->findLatestUnrespondedUpdateMessage(
+            $procedureId,
+            $updateMessageTypes,
+            self::TARGET_SYSTEM_COCKPIT
+        );
+    }
+
+    /**
      * Find the original outgoing 701 message for a statement
      */
     public function findOriginalOutgoing701MessageByStatementId(string $statementId): ?XBeteiligungMessageAudit

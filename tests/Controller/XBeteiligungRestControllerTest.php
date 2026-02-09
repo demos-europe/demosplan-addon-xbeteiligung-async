@@ -34,6 +34,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class XBeteiligungRestControllerTest extends TestCase
 {
+    private const VALID_ROUTING_KEY = 'a.cockpit.a.00.01.00000000.a.00.00.00000000.a';
+
     private XBeteiligungRestController $controller;
     private MockObject|MessageHandlerSelector $messageHandlerSelector;
     private MockObject|IncomingMessageHandlerInterface $messageHandler;
@@ -89,7 +91,8 @@ class XBeteiligungRestControllerTest extends TestCase
         string $xmlData,
         string $responsePayload,
         string $authToken,
-        bool $shouldThrowException = false
+        bool $shouldThrowException = false,
+        ?string $routingKey = self::VALID_ROUTING_KEY
     ): Response {
         // Mock the getParameter method to return a valid token
         $this->controller->expects($this->once())
@@ -102,10 +105,13 @@ class XBeteiligungRestControllerTest extends TestCase
         if ($authToken) {
             $request->headers->set('X-Addon-XBeteiligung-Authorization', $authToken);
         }
+        if (null !== $routingKey) {
+            $request->headers->set('X-Addon-XBeteiligung-RoutingKey', $routingKey);
+        }
 
         // Setup service response (only if we expect the service to be called)
-        // For empty payload, the service won't be called due to early validation
-        if (!empty($xmlData)) {
+        // For empty payload or missing routing key, the service won't be called due to early validation
+        if (!empty($xmlData) && null !== $routingKey && '' !== $routingKey) {
             if ($shouldThrowException) {
                 $this->messageHandlerSelector->expects($this->once())
                     ->method('getHandlerForMessageType')
@@ -122,11 +128,11 @@ class XBeteiligungRestControllerTest extends TestCase
                     ->willReturn($this->messageHandler);
                 $this->messageHandler->expects($this->once())
                     ->method('handleIncomingMessage')
-                    ->with($xmlData, false, null)
+                    ->with($xmlData, true, $routingKey)
                     ->willReturn($responseValue);
             }
         } else {
-            // For empty payload, service should never be called
+            // For empty payload or missing routing key, service should never be called
             $this->messageHandlerSelector->expects($this->never())
                 ->method('getHandlerForMessageType');
         }
@@ -300,5 +306,53 @@ class XBeteiligungRestControllerTest extends TestCase
         );
 
         $this->assertSuccessfulResponse($response, $expectedResponse);
+    }
+
+    public function testCreateProcedureWithMissingRoutingKey(): void
+    {
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test</ns5:kommunal.Initiieren.0401>';
+
+        $response = $this->executeProcedureTest(
+            'createProcedure',
+            $xmlData,
+            '',
+            'Bearer valid-token',
+            false,
+            null // No routing key
+        );
+
+        $this->assertBadRequestResponse($response, 'No routing key provided in X-Addon-XBeteiligung-RoutingKey header');
+    }
+
+    public function testCreateProcedureWithEmptyRoutingKey(): void
+    {
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test</ns5:kommunal.Initiieren.0401>';
+
+        $response = $this->executeProcedureTest(
+            'createProcedure',
+            $xmlData,
+            '',
+            'Bearer valid-token',
+            false,
+            '' // Empty routing key
+        );
+
+        $this->assertBadRequestResponse($response, 'No routing key provided in X-Addon-XBeteiligung-RoutingKey header');
+    }
+
+    public function testUpdateProcedureWithMissingRoutingKey(): void
+    {
+        $xmlData = '<ns5:kommunal.Aktualisieren.0402 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test update</ns5:kommunal.Aktualisieren.0402>';
+
+        $response = $this->executeProcedureTest(
+            'updateProcedure',
+            $xmlData,
+            '',
+            'Bearer valid-token',
+            false,
+            null // No routing key
+        );
+
+        $this->assertBadRequestResponse($response, 'No routing key provided in X-Addon-XBeteiligung-RoutingKey header');
     }
 }

@@ -86,6 +86,14 @@ class XBeteiligungRestController extends APIController
                 throw new AccessDeniedException('Unauthorized');
             }
 
+            // Verify that the request has a valid routing key using a custom header specific to XBeteiligung.
+            // Simplest possible value is a.cockpit.a.00.01.00000000.a.00.00.00000000.a, whereas "01" needs to be
+            // changed according to the customer, mapped in XBeteiligungCustomerMappingService::FEDERAL_STATE_TO_SUBDOMAIN_MAP
+            $routingKey = $request->headers->get('X-Addon-XBeteiligung-RoutingKey','');
+            if ('' === $routingKey) {
+                throw new InvalidArgumentException('No routing key provided in X-Addon-XBeteiligung-RoutingKey header');
+            }
+
             // Get the request payload - simply use the raw XML content
             $xmlContent = $request->getContent();
 
@@ -101,7 +109,7 @@ class XBeteiligungRestController extends APIController
             // Process the message using MessageHandlerSelector
             $messageType = XBeteiligungMessageType::fromXmlContent($xmlContent);
             $handler = $messageHandlerSelector->getHandlerForMessageType($messageType);
-            $responseObject = $handler->handleIncomingMessage($xmlContent, false, null);
+            $responseObject = $handler->handleIncomingMessage($xmlContent, true, $routingKey);
 
             // Prepare the XML response
             $xmlPayload = $responseObject->getMessageXml();

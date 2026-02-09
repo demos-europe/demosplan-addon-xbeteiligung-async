@@ -17,6 +17,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure\ProcedureDataValueObject;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\PlanfeststellungInitiieren0201;
@@ -41,7 +42,7 @@ class ProcedureDataExtractor
      * @throws FormatException
      * @throws JsonException
      */
-    public function extract(KommunalInitiieren0401|PlanfeststellungInitiieren0201 $xmlObject): ProcedureDataValueObject
+    public function extract(KommunalInitiieren0401|KommunalAktualisieren0402|PlanfeststellungInitiieren0201 $xmlObject): ProcedureDataValueObject
     {
         $messageContent = $this->getMessageContent($xmlObject);
 
@@ -71,7 +72,7 @@ class ProcedureDataExtractor
     }
 
     private function getMessageContent(
-        KommunalInitiieren0401|PlanfeststellungInitiieren0201 $xmlObject
+        KommunalInitiieren0401|KommunalAktualisieren0402|PlanfeststellungInitiieren0201 $xmlObject
     ): BeteiligungKommunalType|BeteiligungPlanfeststellungType {
         $messageContent = $xmlObject->getNachrichteninhalt()?->getBeteiligung();
         if(null === $messageContent) {
