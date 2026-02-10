@@ -53,14 +53,14 @@ class ProcedurePhaseCodeDetector {
 
     public function getExternalProcedurePhaseCode(StatementCreated $statementCreated): string {
         /**
-         * @var XBeteiligungProcedurePhaseCockpit $mapping
+         * @var XBeteiligungProcedurePhaseCockpit $xBeteiligungProcedurePhaseCockpit
          */
-        $planId = $statementCreated->getPlanId();
-        $mapping = $this->repository->findOneBy(['planId' => $planId]);
+        $procedureId = $statementCreated->getProcedureId();
+        $xBeteiligungProcedurePhaseCockpit = $this->repository->findOneBy(['procedureId' => $procedureId]);
         //@todo what happens when no mapping is found?
         //@todo it hapens with the existing statements
 
-        if (!$mapping) {
+        if (!$xBeteiligungProcedurePhaseCockpit) {
             $code = '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
                 ? self::DEFAULT_PROCEDURE_PHASE_CODE
                 : $this->xbeteiligungConfiguration->verfahrensschrittCode;
@@ -68,24 +68,26 @@ class ProcedurePhaseCodeDetector {
         }
 
         if($this->verfasserBuilder->getTypeOfPerson($statementCreated)) {
-
-            return $mapping->getPublicParticipationPhaseCode();
+            if (null !==  $xBeteiligungProcedurePhaseCockpit->getPublicParticipationPhaseCode()) {
+                return $xBeteiligungProcedurePhaseCockpit->getPublicParticipationPhaseCode();
+            }
+            return $xBeteiligungProcedurePhaseCockpit->getGeneralPhaseCode();
         }
-        return $mapping->getInstitutionParticipationPhaseCode();
+        return $xBeteiligungProcedurePhaseCockpit->getInstitutionParticipationPhaseCode();
 
 
     }
 
     public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): ?string {
         /**
-         * @var XBeteiligungProcedurePhaseCockpit $mapping
+         * @var XBeteiligungProcedurePhaseCockpit $xBeteiligungProcedurePhaseCockpit
          */
-        $planId = $statementCreated->getPlanId();
-        $mapping = $this->repository->findOneBy(['planId' => $planId]);
+        $procedureId = $statementCreated->getProcedureId();
+        $xBeteiligungProcedurePhaseCockpit = $this->repository->findOneBy(['procedureId' => $procedureId]);
         //@todo what happens when no mapping is found?
         //@todo it hapens with the existing statements
 
-        if (!$mapping) {
+        if (!$xBeteiligungProcedurePhaseCockpit) {
 
             $code = '' === $this->xbeteiligungConfiguration->verfahrensteilschrittCode
                 ? self::DEFAULT_PROCEDURE_PHASE_CODE
@@ -95,9 +97,9 @@ class ProcedurePhaseCodeDetector {
 
         if($this->verfasserBuilder->getTypeOfPerson($statementCreated)) {
 
-            return $mapping->getPublicParticipationSubPhaseCode();
+            return $xBeteiligungProcedurePhaseCockpit->getPublicParticipationSubPhaseCode();
         }
-        return $mapping->getInstitutionParticipationSubPhaseCode();
+        return $xBeteiligungProcedurePhaseCockpit->getInstitutionParticipationSubPhaseCode();
 
 
     }
