@@ -31,7 +31,7 @@ class XBeteiligungProcedurePhaseCockpit implements UuidEntityInterface
     /**
      * Internal demosplan procedure ID
      */
-    #[ORM\Column(name: 'procedure_id', type: 'string', length: 36, nullable: true)]
+    #[ORM\Column(name: 'procedure_id', type: 'string', length: 36, nullable: false)]
     private string $procedureId;
 
     /**
