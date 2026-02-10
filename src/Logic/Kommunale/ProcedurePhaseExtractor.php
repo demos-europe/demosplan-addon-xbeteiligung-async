@@ -38,22 +38,26 @@ class ProcedurePhaseExtractor
         $verfahrensschrittType = $this->getSpecificVerfahrensschrittType($beteiligungType);
         $codeVerfahrensschrittType = $verfahrensschrittType?->getCode();
 
-        //Phases for the public (citizens)
+        //General Phase which is used as fallback for the public participation (citizens)
         $beteiligungOeffentlichkeit = $beteiligungType->getBeteiligungOeffentlichkeit();
 
-        //Sub Phases for the public (citizens)
+        //Phases for public participation
         $codeOeffentlichkeitVerfahrensschritt = $this->getCodeOeffentlichkeitVerfahrensschritt($beteiligungOeffentlichkeit);
+
+        //Sub Phases for the public (citizens)
         $codeOeffentlichkeitVerfahrensteilschritt = $this->getCodeOeffentlichkeitVerfahrensteilschritt($beteiligungOeffentlichkeit);
+
         $durchgangOeffentlichkeit = $beteiligungOeffentlichkeit?->getDurchgang() ?? 1;
         $zeitraumOeffentlichkeit = $beteiligungOeffentlichkeit?->getZeitraum();
         $beginnOeffentlichkeit = $zeitraumOeffentlichkeit?->getBeginn();
         $endeOeffentlichkeit = $zeitraumOeffentlichkeit?->getEnde();
 
-        //Phases for institutions
         $beteiligungTOEB = $beteiligungType->getBeteiligungTOEB();
 
-        //Sub Phases for institutions
+        //Phases for institutions
         $codeToebVerfahrensschritt = $this->getCodeBeteiligungTOEBVerfahrensschritt($beteiligungTOEB);
+
+        //Sub Phases for institutions
         $codeToebVerfahrensteilschritt = $this->getCodeBeteiligungTOEBVerfahrensteilschritt($beteiligungTOEB);
         $durchgangTOEB = $beteiligungTOEB?->getDurchgang() ?? 1;
         $zeitraumTOEB = $beteiligungTOEB?->getZeitraum();
