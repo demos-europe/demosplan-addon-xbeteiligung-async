@@ -48,7 +48,9 @@ class PhaseBuilder
         $phaseName = $this->getPhaseName($statementCreated);
         $phaseType = $this->createPhaseType();
         $phaseCode = $this->procedurePhaseCodeDetector->getExternalProcedurePhaseCode($statementCreated);
-        $this->configurePhase($phaseType, $phaseName, $phaseCode);
+        $phaseType->setName($phaseName);
+        $phaseType->setCode($phaseCode);
+        $phaseType->setListVersionID(self::LIST_VERSION_ID);
         $this->setPhaseTypeToStatement($phaseType, $statement);
     }
 
@@ -74,18 +76,6 @@ class PhaseBuilder
 
         $this->logger->error('No valid procedure type found for statement phase setup.');
         throw new ProjectPrefixNotFoundException('No valid procedure type found.');
-    }
-
-    private function configurePhase(
-        CodeVerfahrensschrittKommunalType|
-        CodeVerfahrensschrittRaumordnungType|
-        CodeVerfahrensschrittPlanfeststellungType $phaseType,
-        string $phaseName,
-        string $phaseCode): void
-    {
-        $phaseType->setName($phaseName);
-        $phaseType->setCode($phaseCode);
-        $phaseType->setListVersionID(self::LIST_VERSION_ID);
     }
 
     private function setPhaseTypeToStatement(
