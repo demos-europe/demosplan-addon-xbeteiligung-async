@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.58 (2026-02-10)
 **Implemented Verfahrensschritt and Verfahrensteilschritt creation and update**
 - Added XBeteiligungProcedurePhaseCockpit entity to store external procedure IDs and phase codes from XBeteiligung integration. 
 - Implemented detection of Verfahrensschritt and Verfahrensteilschritt from incoming XBeteiligung messages. 
