@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.57 (2026-02-10)
 **Implement Procedure Phase Mapping System (DPLAN-17231)**
 - Add comprehensive ProcedurePhaseMapping service with hard-coded mappings for K3 integration
 - Create ParticipationType enum to distinguish between public and institution participation
