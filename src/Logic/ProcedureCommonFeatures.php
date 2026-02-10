@@ -68,7 +68,6 @@ abstract class ProcedureCommonFeatures
     {
     }
 
-    //@todo re use this method in the procedure update
     protected function setProcedurePhase(
         ProcedureInterface $procedure,
         ProcedurePhaseData $procedurePhaseData,
