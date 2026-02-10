@@ -4,7 +4,9 @@
 
 This document describes the REST API endpoints for external integrators that enable processing XBeteiligung messages via HTTP requests. The endpoints accept XML payload structure and return XML responses.
 
-## Authentication
+## Required Headers
+
+### Authentication
 
 All requests to the API must include a valid authentication token in the custom **X-Addon-XBeteiligung-Authorization** header:
 
@@ -14,7 +16,17 @@ X-Addon-XBeteiligung-Authorization: Bearer your-token-here
 
 This custom header is used specifically for XBeteiligung addon authentication to avoid interference with the core application's authentication mechanisms.
 
-The token value must match the `addon_xbeteiligung_async_rest_authentication` parameter value configured in the application parameters. The token must be at least 7 characters long.
+The token value must match the `addon_xbeteiligung_async_rest_authentication` parameter value configured in the application parameters. The token must be at least 7 characters long. The `Bearer ` prefix is optional and will be stripped automatically if present.
+
+### Routing Key
+
+All requests must include a routing key in the **X-Addon-XBeteiligung-RoutingKey** header:
+
+```
+X-Addon-XBeteiligung-RoutingKey: a.cockpit.a.00.01.00000000.a.00.00.00000000.a
+```
+
+The routing key identifies which customer (federal state) the message belongs to. The federal state code (e.g. `01` in the example above) is mapped to a customer subdomain via `XBeteiligungCustomerMappingService::FEDERAL_STATE_TO_SUBDOMAIN_MAP`. This header must not be empty.
 
 ## Endpoints
 
@@ -66,7 +78,7 @@ Content-Type: application/xml
 The API returns the following HTTP status codes:
 
 - `200 OK`: The request was successful and processed
-- `400 Bad Request`: The request format is invalid, empty payload, or the message cannot be parsed
+- `400 Bad Request`: The request format is invalid, empty payload, missing routing key, or the message cannot be parsed
 - `401 Unauthorized`: Invalid, missing, or too short authentication token
 - `500 Internal Server Error`: An error occurred while processing the request
 
@@ -79,6 +91,13 @@ Error responses include a descriptive message explaining the error.
 HTTP/1.1 401 Unauthorized
 
 Unauthorized
+```
+
+#### Missing Routing Key
+```
+HTTP/1.1 400 Bad Request
+
+No routing key provided in X-Addon-XBeteiligung-RoutingKey header
 ```
 
 #### Invalid Request
@@ -135,6 +154,7 @@ The API uses pattern matching to automatically identify the message type from th
 POST /addon/xbeteiligung/procedure/create
 Content-Type: application/xml
 X-Addon-XBeteiligung-Authorization: Bearer your-secure-token
+X-Addon-XBeteiligung-RoutingKey: a.cockpit.a.00.01.00000000.a.00.00.00000000.a
 
 <xbeteiligung:planung2Beteiligung.BeteiligungKommunalNeu.0401>
     <xbeteiligung:nachrichtenkopf>
@@ -158,6 +178,7 @@ X-Addon-XBeteiligung-Authorization: Bearer your-secure-token
 PATCH /addon/xbeteiligung/procedure/update
 Content-Type: application/xml
 X-Addon-XBeteiligung-Authorization: your-secure-token
+X-Addon-XBeteiligung-RoutingKey: a.cockpit.a.00.01.00000000.a.00.00.00000000.a
 
 <xbeteiligung:planung2Beteiligung.BeteiligungKommunalAktualisieren.0402>
     <xbeteiligung:nachrichtenkopf>
@@ -180,10 +201,11 @@ X-Addon-XBeteiligung-Authorization: your-secure-token
 ### For External Systems
 
 1. **Configure Authentication**: Obtain the authentication token from your DemosPlan administrator
-2. **Choose Endpoint**: Use `/create` for new procedures (401 messages) or `/update` for modifications (402/302/202 messages)
-3. **Prepare XML**: Send raw XBeteiligung XML directly in request body
-4. **Handle Response**: Process the XML response according to XBeteiligung standard
-5. **Error Handling**: Implement retry logic for 5xx errors, fix request for 4xx errors
+2. **Configure Routing Key**: Determine the correct routing key for your federal state (see `XBeteiligungCustomerMappingService::FEDERAL_STATE_TO_SUBDOMAIN_MAP`)
+3. **Choose Endpoint**: Use `/create` for new procedures (401 messages) or `/update` for modifications (402/302/202 messages)
+4. **Prepare XML**: Send raw XBeteiligung XML directly in request body
+5. **Handle Response**: Process the XML response according to XBeteiligung standard
+6. **Error Handling**: Implement retry logic for 5xx errors, fix request for 4xx errors
 
 ### Testing
 
@@ -194,5 +216,6 @@ curl -X POST \
   http://your-demoplan-host/addon/xbeteiligung/procedure/create \
   -H 'Content-Type: application/xml' \
   -H 'X-Addon-XBeteiligung-Authorization: Bearer your-token' \
+  -H 'X-Addon-XBeteiligung-RoutingKey: a.cockpit.a.00.01.00000000.a.00.00.00000000.a' \
   -d @your-message.xml
 ```
