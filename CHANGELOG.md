@@ -1,6 +1,11 @@
 # Changelog
 
 ## UNRELEASED
+**Implemented Verfahrensschritt and Verfahrensteilschritt creation and update**
+- Added XBeteiligungProcedurePhaseCockpit entity to store external procedure IDs and phase codes from XBeteiligung integration. 
+- Implemented detection of Verfahrensschritt and Verfahrensteilschritt from incoming XBeteiligung messages. 
+- The detected phase code is now automatically included in STN messages when creating procedures.
+
 ## v0.57 (2026-02-10)
 **Implement Procedure Phase Mapping System (DPLAN-17231)**
 - Add comprehensive ProcedurePhaseMapping service with hard-coded mappings for K3 integration
