@@ -10,14 +10,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure\ProcedureDataV
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 
-/**
- * It will detect the corresponding phase in demos related to the corresponding external phase code
- * Right now, it does not do that, instead it returns the default ones and store the external codes in the database
- * to be used later when sending back the message
- */
 class ProcedurePhaseCodeDetector {
     private const DEFAULT_PROCEDURE_PHASE_CODE = 'invalid';
-    private const CONFIGURATION_PHASE = 'configuration';
 
     public function __construct(
         private readonly XBeteiligungProcedurePhaseCockpitRepository $repository,
