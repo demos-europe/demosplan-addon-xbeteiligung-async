@@ -18,7 +18,7 @@ use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\PhaseCodeMapper;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType;
@@ -34,9 +34,9 @@ class PhaseBuilder
 
     public function __construct(
         private readonly PermissionEvaluatorInterface $permissionEvaluator,
-        private readonly LoggerInterface $logger,
-        private readonly GlobalConfigInterface $globalConfig,
-        private readonly PhaseCodeMapper  $phaseCodeMapper,
+        private readonly LoggerInterface              $logger,
+        private readonly GlobalConfigInterface        $globalConfig,
+        private readonly ProcedurePhaseCodeDetector   $procedurePhaseCodeDetector,
     ) {
     }
 
@@ -47,7 +47,7 @@ class PhaseBuilder
     {
         $phaseName = $this->getPhaseName($statementCreated);
         $phaseType = $this->createPhaseType();
-        $phaseCode = $this->phaseCodeMapper->getExternalProcedurePhaseCode($statementCreated);
+        $phaseCode = $this->procedurePhaseCodeDetector->getExternalProcedurePhaseCode($statementCreated);
         $this->configurePhase($phaseType, $phaseName, $phaseCode);
         $this->setPhaseTypeToStatement($phaseType, $statement);
     }
@@ -115,7 +115,7 @@ class PhaseBuilder
 
     public function setVerfahrensteilschritt(StatementCreated $statementCreated, StellungnahmeType $statement): void
     {
-        $subPhaseCode = $this->phaseCodeMapper->getExternalProcedureSubPhaseCode($statementCreated);
+        $subPhaseCode = $this->procedurePhaseCodeDetector->getExternalProcedureSubPhaseCode($statementCreated);
 
         if (null === $subPhaseCode) {
             return;

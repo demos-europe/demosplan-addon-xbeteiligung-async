@@ -73,10 +73,10 @@ abstract class ProcedureCommonFeatures
         ProcedureInterface $procedure,
         ProcedurePhaseData $procedurePhaseData,
     ): void {
-        if (null !== $procedurePhaseData->getPublicParticipationPhaseKey()) {
+        if (null !== $this->procedurePhaseCodeDetector->getPublicParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
             $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhaseKey());
         }
-        if (null !== $procedurePhaseData->getInstitutionParticipationPhaseKey()) {
+        if (null !== $this->procedurePhaseCodeDetector->getInstitutionParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
             $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhaseKey());
         }
         if (null !== $procedurePhaseData->getPublicParticipationStartDate()) {

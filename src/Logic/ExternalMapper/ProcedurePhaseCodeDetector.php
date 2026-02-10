@@ -7,6 +7,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedurePhaseCoc
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseCockpitRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure\ProcedureDataValueObject;
+use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\ProcedurePhaseData;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
 
 /**
@@ -16,6 +17,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
  */
 class ProcedurePhaseCodeDetector {
     private const DEFAULT_PROCEDURE_PHASE_CODE = 'invalid';
+    private const CONFIGURATION_PHASE = 'configuration';
 
     public function __construct(
         private readonly XBeteiligungProcedurePhaseCockpitRepository $repository,
@@ -99,4 +101,39 @@ class ProcedurePhaseCodeDetector {
 
 
     }
+
+    public function getInstitutionParticipationPhaseKey(
+        string $procedureId,
+        ProcedurePhaseData $procedurePhaseData) {
+        // Get existing codes from database
+        /** @var XBeteiligungProcedurePhaseCockpit $existingProcedurePhaseCodes */
+        $existingProcedurePhaseCodes = $this->repository->findOneBy(['procedureId' => $procedureId]);
+
+        if (!$existingProcedurePhaseCodes) {
+            return $procedurePhaseData->getInstitutionParticipationPhaseKey();
+            //@todo is it needed to handle the case of procedure phases that are updatead and did not have this table
+        }
+
+        if ($existingProcedurePhaseCodes->getInstitutionParticipationPhaseCode() !== $procedurePhaseData->getInstitutionParticipationPhaseCode()) {
+            return self::CONFIGURATION_PHASE;
+        }
+        return null;
+    }
+
+    public function getPublicParticipationPhaseKey(
+        string $procedureId,
+        ProcedurePhaseData $procedurePhaseData) {
+        // Get existing codes from database
+        /** @var XBeteiligungProcedurePhaseCockpit $existingProcedurePhaseCodes */
+        $existingProcedurePhaseCodes = $this->repository->findOneBy(['procedureId' => $procedureId]);
+        if (!$existingProcedurePhaseCodes) {
+            return $procedurePhaseData->getPublicParticipationPhaseKey();
+            //@todo is it needed to handle the case of procedure phases that are updatead and did not have this table
+        }
+        if ($existingProcedurePhaseCodes->getPublicParticipationPhaseCode() !== $procedurePhaseData->getInstitutionParticipationPhaseCode()) {
+            return self::CONFIGURATION_PHASE;
+        }
+        return null;
+    }
+
 }

@@ -72,6 +72,10 @@ class ProcedurePhaseExtractor
             $codeToebVerfahrensteilschritt
         );
 
+        // check here if the is an existing code: actually return what it has to be
+        //for public participation and for instutiuon participation
+
+
         return new ProcedurePhaseData(
             self::CONFIGURATION_PHASE,
             self::CONFIGURATION_PHASE,

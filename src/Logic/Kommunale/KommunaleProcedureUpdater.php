@@ -42,7 +42,9 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
 
             $this->updateProcedureData($procedure, $procedureDataValueObject);
             $updatedProcedure = $this->saveProcedureWithTransaction($procedure);
-
+            $this->procedurePhaseCodeDetector->storeExternalProcedurePhaseCodes(
+                $updatedProcedure->getId(),
+                $procedureDataValueObject->getProcedurePhaseData());
             return $this->kommunaleMessageFactory->buildProcedureUpdateOKResponse412(
                 $message,
                 $updatedProcedure
@@ -106,7 +108,9 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         ProcedureInterface $procedure,
         ProcedureDataValueObject $procedureDataValueObject
     ): void {
-        // Note: Procedure phases are NOT updated to preserve manual changes made by users between 401 and 402 messages
+        // Note: Procedure phases are updated
+
+        $this->setProcedurePhase($procedure, $procedureDataValueObject->getProcedurePhaseData());
 
         // Update procedure name and external name
         $planName = $procedureDataValueObject->getPlanName();
@@ -114,6 +118,7 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
             $procedure->setName($planName);
             $procedure->setExternalName($planName);
         }
+        //logic to compare existing code withthe $procedureDataValueObject->getPahse
 
         // Update procedure description and external description
         $description = $procedureDataValueObject->getPlanDescription() ?? '';
