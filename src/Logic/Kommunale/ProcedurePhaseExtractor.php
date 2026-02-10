@@ -107,8 +107,8 @@ class ProcedurePhaseExtractor
             return $beteiligungOeffentlichkeit->getBeteiligungPlanfeststellungOeffentlichkeitArt()->getBeteiligungPlanfeststellungFormalOeffentlichkeit()->getCode();
         }
 
-        return $codeVerfahrensschritt;
 
+        return $codeVerfahrensschritt;
     }
 
     private function getCodeOeffentlichkeitVerfahrensteilschritt(
@@ -129,9 +129,8 @@ class ProcedurePhaseExtractor
             return $beteiligungOeffentlichkeit->getVerfahrensteilschrittPlanfeststellung()?->getCode();
         }
 
+
         return $verfahrensteilschrittCode;
-
-
     }
 
     private function getCodeBeteiligungTOEBVerfahrensschritt(
@@ -152,9 +151,8 @@ class ProcedurePhaseExtractor
             return $beteiligungTOEB->getBeteiligungPlanfeststellungTOEBArt()?->getBeteiligungPlanfeststellungFormalTOEB()?->getCode();
         }
 
+
         return $verfahrensschrittCode;
-
-
     }
 
     private function getCodeBeteiligungTOEBVerfahrensteilschritt(
@@ -174,9 +172,8 @@ class ProcedurePhaseExtractor
             return $beteiligungTOEB->getVerfahrensteilschrittPlanfeststellung()?->getCode();
         }
 
+
         return $verfahrensteilschrittCode;
-
-
     }
 
     private function getSpecificVerfahrensschrittType(
