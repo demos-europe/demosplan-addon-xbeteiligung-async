@@ -108,7 +108,6 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         ProcedureInterface $procedure,
         ProcedureDataValueObject $procedureDataValueObject
     ): void {
-        // Note: Procedure phases are updated
 
         $this->setProcedurePhase($procedure, $procedureDataValueObject->getProcedurePhaseData());
 
@@ -118,7 +117,6 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
             $procedure->setName($planName);
             $procedure->setExternalName($planName);
         }
-        //logic to compare existing code withthe $procedureDataValueObject->getPahse
 
         // Update procedure description and external description
         $description = $procedureDataValueObject->getPlanDescription() ?? '';
