@@ -72,7 +72,7 @@ class ProcedurePhaseCodeDetector {
         return $xBeteiligungProcedurePhaseCockpit->getInstitutionParticipationPhaseCode();
     }
 
-    public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): ?string {
+    public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): string {
         /**
          * @var XBeteiligungProcedurePhaseCockpit $xBeteiligungProcedurePhaseCockpit
          */
@@ -96,9 +96,9 @@ class ProcedurePhaseCodeDetector {
     }
 
     private function getFallbackSubPhaseCode(): string {
-        return $this->xbeteiligungConfiguration->verfahrensteilschrittCode
+        return '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
             ? self::DEFAULT_PROCEDURE_PHASE_CODE
-            : $this->xbeteiligungConfiguration->verfahrensteilschrittCode;
+            : $this->xbeteiligungConfiguration->verfahrensschrittCode;
     }
 
     public function getInstitutionParticipationPhaseKey(
