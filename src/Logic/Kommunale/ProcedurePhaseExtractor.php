@@ -90,6 +90,21 @@ class ProcedurePhaseExtractor
         );
     }
 
+    private function getSpecificVerfahrensschrittType(
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType $beteiligungType
+    ): null| CodeVerfahrensschrittKommunalType|CodeVerfahrensschrittPlanfeststellungType {
+        $verfahrensschrittType = null;
+        if ($beteiligungType instanceof BeteiligungKommunalType) {
+            $verfahrensschrittType = $beteiligungType->getVerfahrensschrittKommunal();
+        }
+        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
+            $verfahrensschrittType = $beteiligungType->getVerfahrensschrittPlanfeststellung();
+        }
+
+
+        return $verfahrensschrittType;
+    }
+
     private function getCodeOeffentlichkeitVerfahrensschritt(
         BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType|null $beteiligungOeffentlichkeit
     ): ?string {
@@ -174,21 +189,6 @@ class ProcedurePhaseExtractor
 
 
         return $verfahrensteilschrittCode;
-    }
-
-    private function getSpecificVerfahrensschrittType(
-        BeteiligungKommunalType|BeteiligungPlanfeststellungType $beteiligungType
-    ): null| CodeVerfahrensschrittKommunalType|CodeVerfahrensschrittPlanfeststellungType {
-        $verfahrensschrittType = null;
-        if ($beteiligungType instanceof BeteiligungKommunalType) {
-            $verfahrensschrittType = $beteiligungType->getVerfahrensschrittKommunal();
-        }
-        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
-            $verfahrensschrittType = $beteiligungType->getVerfahrensschrittPlanfeststellung();
-        }
-
-
-        return $verfahrensschrittType;
     }
 
     private function logWarningsForMissingCodes(
