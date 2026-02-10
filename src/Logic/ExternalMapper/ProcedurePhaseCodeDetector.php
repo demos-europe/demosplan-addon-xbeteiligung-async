@@ -36,7 +36,7 @@ class ProcedurePhaseCodeDetector {
             return;
         }
 
-        $procedurePhaseCockpit = $this->repository->findOneBy(['planId' => $procedureId])
+        $procedurePhaseCockpit = $this->repository->findOneBy(['procedureId' => $procedureId])
             ?? (new XBeteiligungProcedurePhaseCockpit())
                 ->setProcedureId($procedureId);
 
