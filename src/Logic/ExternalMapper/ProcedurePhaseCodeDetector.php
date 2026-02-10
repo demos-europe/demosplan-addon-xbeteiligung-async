@@ -116,7 +116,7 @@ class ProcedurePhaseCodeDetector {
         }
 
         if ($existingProcedurePhaseCodes->getInstitutionParticipationPhaseCode() !== $procedurePhaseData->getInstitutionParticipationPhaseCode()) {
-            return self::CONFIGURATION_PHASE;
+            return $procedurePhaseData->getPublicParticipationPhaseKey();
         }
         return null;
     }
@@ -131,7 +131,7 @@ class ProcedurePhaseCodeDetector {
             return $procedurePhaseData->getPublicParticipationPhaseKey();
         }
         if ($existingProcedurePhaseCodes->getPublicParticipationPhaseCode() !== $procedurePhaseData->getPublicParticipationPhaseKey()) {
-            return self::CONFIGURATION_PHASE;
+            return $procedurePhaseData->getPublicParticipationPhaseKey();
         }
         return null;
     }
