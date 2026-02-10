@@ -44,7 +44,7 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
             $updatedProcedure = $this->saveProcedureWithTransaction($procedure);
             $this->procedurePhaseCodeDetector->storeExternalProcedurePhaseCodes(
                 $updatedProcedure->getId(),
-                $procedureDataValueObject->getProcedurePhaseData());
+                $procedureDataValueObject);
             return $this->kommunaleMessageFactory->buildProcedureUpdateOKResponse412(
                 $message,
                 $updatedProcedure
