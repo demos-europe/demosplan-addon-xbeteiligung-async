@@ -106,8 +106,8 @@ class ProcedurePhaseCodeDetector {
 
     public function getInstitutionParticipationPhaseKey(
         string $procedureId,
-        ProcedurePhaseData $procedurePhaseData) {
-        // Get existing codes from database
+        ProcedurePhaseData $procedurePhaseData): ?string {
+
         /** @var XBeteiligungProcedurePhaseCockpit $existingProcedurePhaseCodes */
         $existingProcedurePhaseCodes = $this->repository->findOneBy(['procedureId' => $procedureId]);
 
@@ -118,13 +118,15 @@ class ProcedurePhaseCodeDetector {
         if ($existingProcedurePhaseCodes->getInstitutionParticipationPhaseCode() !== $procedurePhaseData->getInstitutionParticipationPhaseCode()) {
             return $procedurePhaseData->getPublicParticipationPhaseKey();
         }
+
+
         return null;
     }
 
     public function getPublicParticipationPhaseKey(
         string $procedureId,
-        ProcedurePhaseData $procedurePhaseData) {
-        // Get existing codes from database
+        ProcedurePhaseData $procedurePhaseData): ?string {
+
         /** @var XBeteiligungProcedurePhaseCockpit $existingProcedurePhaseCodes */
         $existingProcedurePhaseCodes = $this->repository->findOneBy(['procedureId' => $procedureId]);
         if (!$existingProcedurePhaseCodes) {
@@ -133,6 +135,8 @@ class ProcedurePhaseCodeDetector {
         if ($existingProcedurePhaseCodes->getPublicParticipationPhaseCode() !== $procedurePhaseData->getPublicParticipationPhaseKey()) {
             return $procedurePhaseData->getPublicParticipationPhaseKey();
         }
+
+
         return null;
     }
 
