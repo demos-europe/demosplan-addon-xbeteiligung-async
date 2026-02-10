@@ -19,10 +19,10 @@ class XBeteiligungProcedurePhaseCockpitRepository extends ServiceEntityRepositor
         return $this->find($id);
     }
 
-    public function save(XBeteiligungProcedurePhaseCockpit $mapping): void
+    public function save(XBeteiligungProcedurePhaseCockpit $xBeteiligungProcedurePhaseCockpit): void
     {
-        $this->getEntityManager()->persist($mapping);
-        $this->getEntityManager()->flush($mapping);
+        $this->getEntityManager()->persist($xBeteiligungProcedurePhaseCockpit);
+        $this->getEntityManager()->flush($xBeteiligungProcedurePhaseCockpit);
     }
 
 }
