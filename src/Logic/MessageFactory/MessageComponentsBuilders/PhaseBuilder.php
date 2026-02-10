@@ -106,11 +106,6 @@ class PhaseBuilder
     public function setVerfahrensteilschritt(StatementCreated $statementCreated, StellungnahmeType $statement): void
     {
         $subPhaseCode = $this->procedurePhaseCodeDetector->getExternalProcedureSubPhaseCode($statementCreated);
-
-        if (null === $subPhaseCode) {
-            return;
-        }
-
         $partParticipationType = new CodeVerfahrensteilschrittType();
         $partParticipationType->setCode($subPhaseCode);
         // Note: verfahrensteilschritt does NOT have a name element according to XSD schema
