@@ -45,7 +45,7 @@ class VerfasserBuilder
 
     private function setVerfasserType(VerfasserType $verfasser, StatementCreated $statementCreated): void
     {
-        if ($this->getTypeOfPerson($statementCreated)) {
+        if ($this->isPrivatePerson($statementCreated)) {
             $verfasser->setPrivatperson(true);
         } else {
             $organisation = new OrganisationType();
@@ -174,8 +174,9 @@ class VerfasserBuilder
         }
     }
 
-    private function getTypeOfPerson(StatementCreated $statementCreated): bool
+    public function isPrivatePerson(StatementCreated $statementCreated): bool
     {
         return self::PRIVATE_PERSON === $statementCreated->getMeta()->getOrgaName();
     }
 }
+

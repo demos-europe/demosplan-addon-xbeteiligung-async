@@ -13,7 +13,11 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
 
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
@@ -23,7 +27,8 @@ use Psr\Log\LoggerInterface;
 class ProcedurePhaseExtractor
 {
     private const CONFIGURATION_PHASE = 'configuration';
-    public function __construct(private readonly LoggerInterface $logger)
+    public function __construct(
+        private readonly LoggerInterface            $logger)
     {
     }
 
@@ -31,35 +36,51 @@ class ProcedurePhaseExtractor
         BeteiligungKommunalType|BeteiligungPlanfeststellungType $beteiligungType
     ): ProcedurePhaseData {
         $verfahrensschrittType = $this->getSpecificVerfahrensschrittType($beteiligungType);
+
+        //General Phase which is used as fallback for the public participation (citizens)
         $codeVerfahrensschrittType = $verfahrensschrittType?->getCode();
 
         $beteiligungOeffentlichkeit = $beteiligungType->getBeteiligungOeffentlichkeit();
+
+        //Phase for public participation
+        $codeOeffentlichkeitVerfahrensschritt = $this->getCodeOeffentlichkeitVerfahrensschritt($beteiligungOeffentlichkeit);
+
+        //Sub Phase for the public (citizens)
+        $codeOeffentlichkeitVerfahrensteilschritt = $this->getCodeOeffentlichkeitVerfahrensteilschritt($beteiligungOeffentlichkeit);
+
         $durchgangOeffentlichkeit = $beteiligungOeffentlichkeit?->getDurchgang() ?? 1;
         $zeitraumOeffentlichkeit = $beteiligungOeffentlichkeit?->getZeitraum();
         $beginnOeffentlichkeit = $zeitraumOeffentlichkeit?->getBeginn();
         $endeOeffentlichkeit = $zeitraumOeffentlichkeit?->getEnde();
-        $beteiligungOeffentlichkeitArt = $this->getBeteiligungOeffentlichkeitArt($beteiligungOeffentlichkeit, $beteiligungType);
-        $beteiligungFormalOeffentlichkeit = $this->getBeteiligungFormalOeffentlichkeit($beteiligungOeffentlichkeitArt, $beteiligungType);
-        $codeBeteiligungOeffentlichkeit = $beteiligungFormalOeffentlichkeit?->getCode();
 
         $beteiligungTOEB = $beteiligungType->getBeteiligungTOEB();
+
+        //Phase for institutions
+        $codeToebVerfahrensschritt = $this->getCodeBeteiligungTOEBVerfahrensschritt($beteiligungTOEB);
+
+        //Sub Phase for institutions
+        $codeToebVerfahrensteilschritt = $this->getCodeBeteiligungTOEBVerfahrensteilschritt($beteiligungTOEB);
         $durchgangTOEB = $beteiligungTOEB?->getDurchgang() ?? 1;
         $zeitraumTOEB = $beteiligungTOEB?->getZeitraum();
         $beginnTOEB = $zeitraumTOEB?->getBeginn();
         $endeTOEB = $zeitraumTOEB?->getEnde();
-        $beteiligungTOEBArt = $this->getBeteiligungTOEBArt($beteiligungTOEB, $beteiligungType);
-        $beteiligungFormalTOEB = $this->getBeteiligungFormalTOEB($beteiligungTOEBArt, $beteiligungType);
-        $codeBeteiligungTOEB = $beteiligungFormalTOEB?->getCode();
 
         $this->logWarningsForMissingCodes(
             $codeVerfahrensschrittType,
-            $codeBeteiligungOeffentlichkeit,
-            $codeBeteiligungTOEB
+            $codeOeffentlichkeitVerfahrensschritt,
+            $codeOeffentlichkeitVerfahrensteilschritt,
+            $codeToebVerfahrensschritt,
+            $codeToebVerfahrensteilschritt
         );
 
         return new ProcedurePhaseData(
             self::CONFIGURATION_PHASE,
             self::CONFIGURATION_PHASE,
+            $codeVerfahrensschrittType,
+            $codeOeffentlichkeitVerfahrensschritt,
+            $codeOeffentlichkeitVerfahrensteilschritt,
+            $codeToebVerfahrensschritt,
+            $codeToebVerfahrensteilschritt,
             $beginnOeffentlichkeit,
             $endeOeffentlichkeit,
             $beginnTOEB,
@@ -84,83 +105,113 @@ class ProcedurePhaseExtractor
         return $verfahrensschrittType;
     }
 
-    private function getBeteiligungOeffentlichkeitArt($beteiligungOeffentlichkeit, $beteiligungType) {
+    private function getCodeOeffentlichkeitVerfahrensschritt(
+        BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType|null $beteiligungOeffentlichkeit
+    ): ?string {
         if (null === $beteiligungOeffentlichkeit) {
             return null;
         }
 
-        if ($beteiligungType instanceof BeteiligungKommunalType) {
-            return $beteiligungOeffentlichkeit->getBeteiligungKommunalOeffentlichkeitArt();
+        $codeVerfahrensschritt = null;
+        if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalOeffentlichkeitType ) {
+            /** @var BeteiligungKommunalOeffentlichkeitType $beteiligungOeffentlichkeit */
+            return $beteiligungOeffentlichkeit->getBeteiligungKommunalOeffentlichkeitArt()->getBeteiligungKommunalFormalOeffentlichkeit()->getCode();
+        }
+        if ($beteiligungOeffentlichkeit instanceof BeteiligungPlanfeststellungOeffentlichkeitType ) {
+            /** @var BeteiligungPlanfeststellungOeffentlichkeitType $beteiligungOeffentlichkeit */
+            return $beteiligungOeffentlichkeit->getBeteiligungPlanfeststellungOeffentlichkeitArt()->getBeteiligungPlanfeststellungFormalOeffentlichkeit()->getCode();
         }
 
-        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
-            return $beteiligungOeffentlichkeit->getBeteiligungPlanfeststellungOeffentlichkeitArt();
-        }
 
-        return null;
+        return $codeVerfahrensschritt;
     }
 
-    private function getBeteiligungFormalOeffentlichkeit($beteiligungOeffentlichkeitArt, $beteiligungType) {
-        if (null === $beteiligungOeffentlichkeitArt) {
+    private function getCodeOeffentlichkeitVerfahrensteilschritt(
+        BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType|null $beteiligungOeffentlichkeit
+    ): ?string {
+        if (null === $beteiligungOeffentlichkeit) {
             return null;
         }
 
-        if ($beteiligungType instanceof BeteiligungKommunalType) {
-            return $beteiligungOeffentlichkeitArt->getBeteiligungKommunalFormalOeffentlichkeit();
+        $verfahrensteilschrittCode = null;
+        if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalOeffentlichkeitType ) {
+            /** @var BeteiligungKommunalOeffentlichkeitType $beteiligungOeffentlichkeit */
+            return $beteiligungOeffentlichkeit->getVerfahrensteilschrittKommunal()?->getCode();
         }
 
-        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
-            return $beteiligungOeffentlichkeitArt->getBeteiligungPlanfeststellungFormalOeffentlichkeit();
+        if ($beteiligungOeffentlichkeit instanceof BeteiligungPlanfeststellungOeffentlichkeitType ) {
+            /** @var BeteiligungPlanfeststellungOeffentlichkeitType $beteiligungOeffentlichkeit */
+            return $beteiligungOeffentlichkeit->getVerfahrensteilschrittPlanfeststellung()?->getCode();
         }
 
-        return null;
+
+        return $verfahrensteilschrittCode;
     }
 
-    private function getBeteiligungTOEBArt($beteiligungTOEB, $beteiligungType) {
+    private function getCodeBeteiligungTOEBVerfahrensschritt(
+        BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType|null $beteiligungTOEB
+    ): ?string {
         if (null === $beteiligungTOEB) {
             return null;
         }
 
-        if ($beteiligungType instanceof BeteiligungKommunalType) {
-            return $beteiligungTOEB->getBeteiligungKommunalTOEBArt();
+        $verfahrensschrittCode = null;
+        if ($beteiligungTOEB instanceof BeteiligungKommunalTOEBType) {
+            /** @var BeteiligungKommunalTOEBType $beteiligungOeffentlichkeit */
+            return $beteiligungTOEB->getBeteiligungKommunalTOEBArt()->getBeteiligungKommunalFormalTOEB()->getCode();
         }
 
-        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
-            return $beteiligungTOEB->getBeteiligungPlanfeststellungTOEBArt();
+        if ($beteiligungTOEB instanceof BeteiligungPlanfeststellungTOEBType ) {
+            /** @var BeteiligungPlanfeststellungTOEBType $beteiligungOeffentlichkeit */
+            return $beteiligungTOEB->getBeteiligungPlanfeststellungTOEBArt()?->getBeteiligungPlanfeststellungFormalTOEB()?->getCode();
         }
 
-        return null;
+
+        return $verfahrensschrittCode;
     }
 
-    private function getBeteiligungFormalTOEB($beteiligungTOEBArt, $beteiligungType) {
-        if (null === $beteiligungTOEBArt) {
+    private function getCodeBeteiligungTOEBVerfahrensteilschritt(
+        BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType|null $beteiligungTOEB
+    ): ?string {
+        if (null === $beteiligungTOEB) {
             return null;
         }
-
-        if ($beteiligungType instanceof BeteiligungKommunalType) {
-            return $beteiligungTOEBArt->getBeteiligungKommunalFormalTOEB();
+        $verfahrensteilschrittCode = null;
+        if ($beteiligungTOEB instanceof BeteiligungKommunalTOEBType) {
+            /** @var BeteiligungKommunalTOEBType $beteiligungOeffentlichkeit */
+            return $beteiligungTOEB->getVerfahrensteilschrittKommunal()?->getCode();
         }
 
-        if ($beteiligungType instanceof BeteiligungPlanfeststellungType) {
-            return $beteiligungTOEBArt->getBeteiligungPlanfeststellungFormalTOEB();
+        if ($beteiligungTOEB instanceof BeteiligungPlanfeststellungTOEBType ) {
+            /** @var BeteiligungPlanfeststellungTOEBType $beteiligungOeffentlichkeit */
+            return $beteiligungTOEB->getVerfahrensteilschrittPlanfeststellung()?->getCode();
         }
 
-        return null;
+
+        return $verfahrensteilschrittCode;
     }
 
     private function logWarningsForMissingCodes(
         ?string $codeVerfahrensschrittKommunal,
-        ?string $codeBeteiligungOeffentlichkeit,
-        ?string $codeBeteiligungTOEB
+        ?string $codeOeffentlichkeitVerfahrensschritt,
+        ?string $codeOeffentlichkeitVerfahrensteilschritt,
+        ?string $codeToebVerfahrensschritt,
+        ?string $codeToebVerfahrensteilschritt
     ): void {
         if (null === $codeVerfahrensschrittKommunal) {
             $this->logger->warning('Code Verfahrensschritt Kommunal is null');
         }
-        if (null === $codeBeteiligungOeffentlichkeit) {
-            $this->logger->warning('Code Beteiligung Oeffentlichkeit is null');
+        if (null === $codeOeffentlichkeitVerfahrensschritt) {
+            $this->logger->warning('Code Beteiligung OeffentlichkeitArt FormalOeffentlichkeit is null');
         }
-        if (null === $codeBeteiligungTOEB) {
-            $this->logger->warning('Code Beteiligung TOEB is null');
+        if (null === $codeOeffentlichkeitVerfahrensteilschritt) {
+            $this->logger->warning('Code BeteiligungOeffentlichkeit Verfahrensteilschritt is null');
+        }
+        if (null === $codeToebVerfahrensschritt) {
+            $this->logger->warning('Code Beteiligung TOEBArt FormalTOEB is null');
+        }
+        if (null === $codeToebVerfahrensteilschritt) {
+            $this->logger->warning('Code Beteiligung TOEB Verfahrensteilschritt is null');
         }
     }
 }

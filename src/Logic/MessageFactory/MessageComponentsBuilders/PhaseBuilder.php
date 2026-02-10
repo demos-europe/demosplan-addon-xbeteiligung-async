@@ -18,6 +18,7 @@ use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType;
@@ -33,9 +34,9 @@ class PhaseBuilder
 
     public function __construct(
         private readonly PermissionEvaluatorInterface $permissionEvaluator,
-        private readonly LoggerInterface $logger,
-        private readonly GlobalConfigInterface $globalConfig,
-        private readonly XBeteiligungConfiguration $xbeteiligungConfiguration,
+        private readonly LoggerInterface              $logger,
+        private readonly GlobalConfigInterface        $globalConfig,
+        private readonly ProcedurePhaseCodeDetector   $procedurePhaseCodeDetector,
     ) {
     }
 
@@ -46,7 +47,10 @@ class PhaseBuilder
     {
         $phaseName = $this->getPhaseName($statementCreated);
         $phaseType = $this->createPhaseType();
-        $this->configurePhase($phaseType, $phaseName);
+        $phaseCode = $this->procedurePhaseCodeDetector->getExternalProcedurePhaseCode($statementCreated);
+        $phaseType->setName($phaseName);
+        $phaseType->setCode($phaseCode);
+        $phaseType->setListVersionID(self::LIST_VERSION_ID);
         $this->setPhaseTypeToStatement($phaseType, $statement);
     }
 
@@ -74,20 +78,6 @@ class PhaseBuilder
         throw new ProjectPrefixNotFoundException('No valid procedure type found.');
     }
 
-    private function configurePhase(
-        CodeVerfahrensschrittKommunalType|
-        CodeVerfahrensschrittRaumordnungType|
-        CodeVerfahrensschrittPlanfeststellungType $phaseType,
-        string $phaseName): void
-    {
-        $phaseType->setName($phaseName);
-        $code = '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
-            ? self::DEFAULT_PROCEDURE_PHASE_CODE
-            : $this->xbeteiligungConfiguration->verfahrensschrittCode;
-        $phaseType->setCode($code);
-        $phaseType->setListVersionID(self::LIST_VERSION_ID);
-    }
-
     private function setPhaseTypeToStatement(
         CodeVerfahrensschrittKommunalType|
         CodeVerfahrensschrittRaumordnungType|
@@ -113,17 +103,14 @@ class PhaseBuilder
 
     }
 
-    public function setVerfahrensteilschritt(StatementCreated $statementCreated, StellungnahmeType $statement)
+    public function setVerfahrensteilschritt(StatementCreated $statementCreated, StellungnahmeType $statement): void
     {
+        $subPhaseCode = $this->procedurePhaseCodeDetector->getExternalProcedureSubPhaseCode($statementCreated);
         $partParticipationType = new CodeVerfahrensteilschrittType();
-        $code = '' === $this->xbeteiligungConfiguration->verfahrensteilschrittCode
-            ? self::DEFAULT_PROCEDURE_PHASE_CODE
-            : $this->xbeteiligungConfiguration->verfahrensteilschrittCode;
-        $partParticipationType->setCode($code);
+        $partParticipationType->setCode($subPhaseCode);
         // Note: verfahrensteilschritt does NOT have a name element according to XSD schema
         // $partParticipationType->setName($this->getPhaseName($statementCreated));
         $partParticipationType->setListVersionID(self::LIST_VERSION_ID);
         $statement->setVerfahrensteilschritt($partParticipationType);
-
     }
 }
