@@ -91,9 +91,9 @@ class ProcedurePhaseCodeDetector {
     }
 
     private function getFallbackSubPhaseCode(): string {
-        return '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
+        return '' === $this->xbeteiligungConfiguration->verfahrensteilschrittCode
             ? self::DEFAULT_PROCEDURE_PHASE_CODE
-            : $this->xbeteiligungConfiguration->verfahrensschrittCode;
+            : $this->xbeteiligungConfiguration->verfahrensteilschrittCode;
     }
 
     private function getFallbackPhaseCode(): string {
