@@ -80,18 +80,25 @@ class ProcedurePhaseCodeDetector {
         $xBeteiligungProcedurePhaseCockpit = $this->repository->findOneBy(['procedureId' => $procedureId]);
 
         if (null === $xBeteiligungProcedurePhaseCockpit) {
-            $code = '' === $this->xbeteiligungConfiguration->verfahrensteilschrittCode
-                ? self::DEFAULT_PROCEDURE_PHASE_CODE
-                : $this->xbeteiligungConfiguration->verfahrensteilschrittCode;
-            return $code;
+            return $this->getFallbackSubPhaseCode();
         }
 
-        if($this->verfasserBuilder->isPrivatePerson($statementCreated)) {
-            return $xBeteiligungProcedurePhaseCockpit->getPublicParticipationSubPhaseCode();
+        $subPhaseCode = $this->verfasserBuilder->isPrivatePerson($statementCreated)
+            ? $xBeteiligungProcedurePhaseCockpit->getPublicParticipationSubPhaseCode()
+            : $xBeteiligungProcedurePhaseCockpit->getInstitutionParticipationSubPhaseCode();
+
+        if (null === $subPhaseCode) {
+            return $this->getFallbackSubPhaseCode();
         }
 
 
-        return $xBeteiligungProcedurePhaseCockpit->getInstitutionParticipationSubPhaseCode();
+        return $subPhaseCode;
+    }
+
+    private function getFallbackSubPhaseCode(): string {
+        return $this->xbeteiligungConfiguration->verfahrensteilschrittCode
+            ? self::DEFAULT_PROCEDURE_PHASE_CODE
+            : $this->xbeteiligungConfiguration->verfahrensteilschrittCode;
     }
 
     public function getInstitutionParticipationPhaseKey(
