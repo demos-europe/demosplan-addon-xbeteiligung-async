@@ -97,7 +97,7 @@ class ProcedurePhaseExtractor
             return null;
         }
 
-        $codeVerfahrensteilschritt = null;
+        $codeVerfahrensschritt = null;
         if ($beteiligungOeffentlichkeit instanceof BeteiligungKommunalOeffentlichkeitType ) {
             /** @var BeteiligungKommunalOeffentlichkeitType $beteiligungOeffentlichkeit */
             return $beteiligungOeffentlichkeit->getBeteiligungKommunalOeffentlichkeitArt()->getBeteiligungKommunalFormalOeffentlichkeit()->getCode();
@@ -107,7 +107,7 @@ class ProcedurePhaseExtractor
             return $beteiligungOeffentlichkeit->getBeteiligungPlanfeststellungOeffentlichkeitArt()->getBeteiligungPlanfeststellungFormalOeffentlichkeit()->getCode();
         }
 
-        return $codeVerfahrensteilschritt;
+        return $codeVerfahrensschritt;
 
     }
 
@@ -141,7 +141,7 @@ class ProcedurePhaseExtractor
             return null;
         }
 
-        $verfahrensteilschrittCode = null;
+        $verfahrensschrittCode = null;
         if ($beteiligungTOEB instanceof BeteiligungKommunalTOEBType) {
             /** @var BeteiligungKommunalTOEBType $beteiligungOeffentlichkeit */
             return $beteiligungTOEB->getBeteiligungKommunalTOEBArt()->getBeteiligungKommunalFormalTOEB()->getCode();
@@ -152,7 +152,7 @@ class ProcedurePhaseExtractor
             return $beteiligungTOEB->getBeteiligungPlanfeststellungTOEBArt()?->getBeteiligungPlanfeststellungFormalTOEB()?->getCode();
         }
 
-        return $verfahrensteilschrittCode;
+        return $verfahrensschrittCode;
 
 
     }
