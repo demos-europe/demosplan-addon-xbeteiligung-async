@@ -113,7 +113,6 @@ class ProcedurePhaseCodeDetector {
 
         if (!$existingProcedurePhaseCodes) {
             return $procedurePhaseData->getInstitutionParticipationPhaseKey();
-            //@todo is it needed to handle the case of procedure phases that are updatead and did not have this table
         }
 
         if ($existingProcedurePhaseCodes->getInstitutionParticipationPhaseCode() !== $procedurePhaseData->getInstitutionParticipationPhaseCode()) {
@@ -130,9 +129,8 @@ class ProcedurePhaseCodeDetector {
         $existingProcedurePhaseCodes = $this->repository->findOneBy(['procedureId' => $procedureId]);
         if (!$existingProcedurePhaseCodes) {
             return $procedurePhaseData->getPublicParticipationPhaseKey();
-            //@todo is it needed to handle the case of procedure phases that are updatead and did not have this table
         }
-        if ($existingProcedurePhaseCodes->getPublicParticipationPhaseCode() !== $procedurePhaseData->getInstitutionParticipationPhaseCode()) {
+        if ($existingProcedurePhaseCodes->getPublicParticipationPhaseCode() !== $procedurePhaseData->getPublicParticipationPhaseKey()) {
             return self::CONFIGURATION_PHASE;
         }
         return null;
