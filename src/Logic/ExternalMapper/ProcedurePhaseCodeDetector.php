@@ -55,21 +55,22 @@ class ProcedurePhaseCodeDetector {
         $xBeteiligungProcedurePhaseCockpit = $this->repository->findOneBy(['procedureId' => $procedureId]);
 
         if (null === $xBeteiligungProcedurePhaseCockpit) {
-            $code = '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
-                ? self::DEFAULT_PROCEDURE_PHASE_CODE
-                : $this->xbeteiligungConfiguration->verfahrensschrittCode;
-            return $code;
+            return $this->getFallbackPhaseCode();
         }
 
-        if($this->verfasserBuilder->isPrivatePerson($statementCreated)) {
-            if (null !== $xBeteiligungProcedurePhaseCockpit->getPublicParticipationPhaseCode()) {
-                return $xBeteiligungProcedurePhaseCockpit->getPublicParticipationPhaseCode();
-            }
-            return $xBeteiligungProcedurePhaseCockpit->getGeneralPhaseCode();
+        if ($this->verfasserBuilder->isPrivatePerson($statementCreated)) {
+            $phaseCode = $xBeteiligungProcedurePhaseCockpit->getPublicParticipationPhaseCode()
+                ?? $xBeteiligungProcedurePhaseCockpit->getGeneralPhaseCode();
+        } else {
+            $phaseCode = $xBeteiligungProcedurePhaseCockpit->getInstitutionParticipationPhaseCode();
         }
 
+        if (null === $phaseCode) {
+            return $this->getFallbackPhaseCode();
+        }
 
-        return $xBeteiligungProcedurePhaseCockpit->getInstitutionParticipationPhaseCode();
+        return $phaseCode;
+
     }
 
     public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): string {
@@ -96,6 +97,12 @@ class ProcedurePhaseCodeDetector {
     }
 
     private function getFallbackSubPhaseCode(): string {
+        return '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
+            ? self::DEFAULT_PROCEDURE_PHASE_CODE
+            : $this->xbeteiligungConfiguration->verfahrensschrittCode;
+    }
+
+    private function getFallbackPhaseCode(): string {
         return '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
             ? self::DEFAULT_PROCEDURE_PHASE_CODE
             : $this->xbeteiligungConfiguration->verfahrensschrittCode;
