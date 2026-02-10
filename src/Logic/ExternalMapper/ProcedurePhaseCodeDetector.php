@@ -129,15 +129,31 @@ class ProcedurePhaseCodeDetector {
 
         /** @var XBeteiligungProcedurePhaseCockpit $existingProcedurePhaseCodes */
         $existingProcedurePhaseCodes = $this->repository->findOneBy(['procedureId' => $procedureId]);
+
+        // If no existing codes, return the new public participation phase key
         if (!$existingProcedurePhaseCodes) {
             return $procedurePhaseData->getPublicParticipationPhaseKey();
         }
-        if ($existingProcedurePhaseCodes->getPublicParticipationPhaseCode() !== $procedurePhaseData->getPublicParticipationPhaseKey()) {
-            return $procedurePhaseData->getPublicParticipationPhaseKey();
+
+        // First check if we have an existing public participation phase code
+        if (null !== $existingProcedurePhaseCodes->getPublicParticipationPhaseCode()) {
+            // We have a public one, check if there is a new public one (compare them)
+            if ($existingProcedurePhaseCodes->getPublicParticipationPhaseCode() !== $procedurePhaseData->getPublicParticipationPhaseCode()) {
+                return $procedurePhaseData->getPublicParticipationPhaseKey();
+            }
+        } else {
+            // If there is no public one, check if there is a generic one
+            if (null !== $existingProcedurePhaseCodes->getGeneralPhaseCode()) {
+                // We have a generic one, compare with the new generic one
+                if ($existingProcedurePhaseCodes->getGeneralPhaseCode() !== $procedurePhaseData->getGeneralPhaseCode()) {
+                    return $procedurePhaseData->getPublicParticipationPhaseKey();
+                }
+            }
         }
 
-
+        // No changes detected
         return null;
     }
+
 
 }
