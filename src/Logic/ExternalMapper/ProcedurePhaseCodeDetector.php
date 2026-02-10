@@ -53,25 +53,23 @@ class ProcedurePhaseCodeDetector {
          */
         $procedureId = $statementCreated->getProcedureId();
         $xBeteiligungProcedurePhaseCockpit = $this->repository->findOneBy(['procedureId' => $procedureId]);
-        //@todo what happens when no mapping is found?
-        //@todo it hapens with the existing statements
 
-        if (!$xBeteiligungProcedurePhaseCockpit) {
+        if (null === $xBeteiligungProcedurePhaseCockpit) {
             $code = '' === $this->xbeteiligungConfiguration->verfahrensschrittCode
                 ? self::DEFAULT_PROCEDURE_PHASE_CODE
                 : $this->xbeteiligungConfiguration->verfahrensschrittCode;
             return $code;
         }
 
-        if($this->verfasserBuilder->getTypeOfPerson($statementCreated)) {
-            if (null !==  $xBeteiligungProcedurePhaseCockpit->getPublicParticipationPhaseCode()) {
+        if($this->verfasserBuilder->isPrivatePerson($statementCreated)) {
+            if (null !== $xBeteiligungProcedurePhaseCockpit->getPublicParticipationPhaseCode()) {
                 return $xBeteiligungProcedurePhaseCockpit->getPublicParticipationPhaseCode();
             }
             return $xBeteiligungProcedurePhaseCockpit->getGeneralPhaseCode();
         }
+
+
         return $xBeteiligungProcedurePhaseCockpit->getInstitutionParticipationPhaseCode();
-
-
     }
 
     public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): ?string {
@@ -91,7 +89,7 @@ class ProcedurePhaseCodeDetector {
             return $code;
         }
 
-        if($this->verfasserBuilder->getTypeOfPerson($statementCreated)) {
+        if($this->verfasserBuilder->isPrivatePerson($statementCreated)) {
 
             return $xBeteiligungProcedurePhaseCockpit->getPublicParticipationSubPhaseCode();
         }
