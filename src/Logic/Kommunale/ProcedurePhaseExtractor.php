@@ -40,7 +40,6 @@ class ProcedurePhaseExtractor
 
         //Phases for the public (citizens)
         $beteiligungOeffentlichkeit = $beteiligungType->getBeteiligungOeffentlichkeit();
-        //@todo $beteiligungOeffentlichkeit->getBeteiligungsID(); //demos procedure id
 
         //Sub Phases for the public (citizens)
         $codeOeffentlichkeitVerfahrensschritt = $this->getCodeOeffentlichkeitVerfahrensschritt($beteiligungOeffentlichkeit);
@@ -52,7 +51,6 @@ class ProcedurePhaseExtractor
 
         //Phases for institutions
         $beteiligungTOEB = $beteiligungType->getBeteiligungTOEB();
-        //@todo $beteiligungTOEB->getBeteiligungsID(); //if $beteiligungOeffentlichkeit->getBeteiligungsID() is null, then get this one
 
         //Sub Phases for institutions
         $codeToebVerfahrensschritt = $this->getCodeBeteiligungTOEBVerfahrensschritt($beteiligungTOEB);
@@ -62,8 +60,6 @@ class ProcedurePhaseExtractor
         $beginnTOEB = $zeitraumTOEB?->getBeginn();
         $endeTOEB = $zeitraumTOEB?->getEnde();
 
-
-
         $this->logWarningsForMissingCodes(
             $codeVerfahrensschrittType,
             $codeOeffentlichkeitVerfahrensschritt,
@@ -71,10 +67,6 @@ class ProcedurePhaseExtractor
             $codeToebVerfahrensschritt,
             $codeToebVerfahrensteilschritt
         );
-
-        // check here if the is an existing code: actually return what it has to be
-        //for public participation and for instutiuon participation
-
 
         return new ProcedurePhaseData(
             self::CONFIGURATION_PHASE,
