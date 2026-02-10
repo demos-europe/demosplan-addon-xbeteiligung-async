@@ -32,10 +32,6 @@ class ProcedurePhaseCodeDetector {
     ): void {
         $procedurePhaseData = $procedureDataValueObject->getProcedurePhaseData();
 
-        if (null === $procedurePhaseData) {
-            return;
-        }
-
         $procedurePhaseCockpit = $this->repository->findOneBy(['procedureId' => $procedureId])
             ?? (new XBeteiligungProcedurePhaseCockpit())
                 ->setProcedureId($procedureId)
