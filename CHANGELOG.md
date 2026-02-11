@@ -1,6 +1,9 @@
 # Changelog
 
 ## UNRELEASED
+**Add demo cockpit environment mapping (DPLAN-17135)**
+- Add federal state code '97' mapping to 'demo' subdomain for demo.cockpit environment support
+
 ## v0.58 (2026-02-10)
 **Implemented Verfahrensschritt and Verfahrensteilschritt creation and update**
 - Added XBeteiligungProcedurePhaseCockpit entity to store external procedure IDs and phase codes from XBeteiligung integration. 

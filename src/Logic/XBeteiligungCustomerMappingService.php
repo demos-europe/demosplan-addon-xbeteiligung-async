@@ -50,7 +50,7 @@ class XBeteiligungCustomerMappingService
         '94' => 'hh',  // test cockpit environment
         '95' => 'hh',  // test cockpit environment
         '96' => 'hh',  // test cockpit environment
-        '97' => 'hh',  // test cockpit environment
+        '97' => 'demo',  // demo.cockpit environment
         '98' => 'hh',  // init develop environment
         '99' => 'hh',  // integration environment
     ];
