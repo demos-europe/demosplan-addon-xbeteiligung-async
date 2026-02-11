@@ -116,7 +116,11 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         // set beschreibung (sanitize for DIN 91379 datatypeC compliance)
         $statement->setBeschreibung($this->textSanitizer->sanitize($statementCreated->getDescription()));
         //set durchgang
-        $statement->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
+        if ($this->verfasserBuilder->isPrivatePerson($statementCreated)) {
+            $statement->setDurchgang($statementCreated->getProcedure()->getPublicParticipationPhaseObject()->getIteration());
+        } else {
+            $statement->setDurchgang($statementCreated->getProcedure()->getPhaseObject()->getIteration());
+        }
         // set datum
         $statement->setDatum($statementCreated->getCreatedAt());
         // set art der rueckmeldung
