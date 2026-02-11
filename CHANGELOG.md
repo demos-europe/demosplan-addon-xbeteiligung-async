@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.59 (2026-02-11)
 **Add demo cockpit environment mapping (DPLAN-17135)**
 - Add federal state code '97' mapping to 'demo' subdomain for demo.cockpit environment support
 
