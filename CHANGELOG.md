@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.60 (2026-02-11)
 **Fix durchgang value for private person statements (DPLAN-17248)**
 - Fix bug where durchgang (iteration number) was always set from institution phase
 - Now correctly uses public participation phase iteration for private person statements
