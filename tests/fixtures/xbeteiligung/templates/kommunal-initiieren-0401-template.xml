@@ -94,6 +94,7 @@
                                <dateiname>{{ANLAGE_DATEINAME_OEFFENTLICHKEIT}}</dateiname>
                            </xbeteiligung:anhang>
                        </anhangOderVerlinkung>
+                       <xbeteiligung:dokument>{{ANLAGE_CONTENT_BASE64_OEFFENTLICHKEIT}}</xbeteiligung:dokument>
                    </anlage>
                </xbeteiligung:anlagen>
                {{/INCLUDE_ANLAGEN_OEFFENTLICHKEIT}}
@@ -136,6 +137,7 @@
                                <dateiname>{{ANLAGE_DATEINAME_TOEB}}</dateiname>
                            </xbeteiligung:anhang>
                        </anhangOderVerlinkung>
+                       <xbeteiligung:dokument>{{ANLAGE_CONTENT_BASE64_TOEB}}</xbeteiligung:dokument>
                    </anlage>
                </xbeteiligung:anlagen>
                {{/INCLUDE_ANLAGEN_TOEB}}

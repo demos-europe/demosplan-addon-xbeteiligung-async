@@ -33,17 +33,20 @@ class XBeteiligung401TestFactory
     private const SCENARIOS_BASE_DIR = 'tests/fixtures/xbeteiligung/test-data/401';
     private const DEFAULTS_FILE = 'defaults.yml';
     private const GEOJSON_DIR = 'geojson';
+    private const ANLAGEN_DIR = 'anlagen';
     private const VALID_SCENARIOS_DIR = 'scenarios/valid';
     private const INVALID_SCENARIOS_DIR = 'scenarios/invalid';
 
     private string $templateContent;
     private array $scenariosConfig;
     private array $defaults;
+    private string $anlagenBasePath;
 
     public function __construct(
         private readonly string $addonRootPath,
         private readonly CommonHelpers $commonHelpers
     ) {
+        $this->anlagenBasePath = $this->addonRootPath . '/' . self::SCENARIOS_BASE_DIR . '/' . self::ANLAGEN_DIR;
         $this->loadTemplate();
         $this->loadScenarios();
     }
@@ -209,6 +212,9 @@ class XBeteiligung401TestFactory
             if (file_exists($geoJsonPath)) {
                 $geoJsonContent = file_get_contents($geoJsonPath);
                 if ($geoJsonContent !== false) {
+                    // Minify JSON to remove line breaks and unnecessary whitespace
+                    $geoJsonContent = $this->minifyJson($geoJsonContent);
+
                     // Replace the file reference with the actual GeoJSON content
                     $scenarioData['geltungsbereich_json'] = $geoJsonContent;
                     unset($scenarioData['geltungsbereich_geojson_file']);
@@ -217,6 +223,24 @@ class XBeteiligung401TestFactory
         }
 
         return $scenarioData;
+    }
+
+    /**
+     * Minify JSON string by removing whitespace and line breaks.
+     *
+     * @param string $json JSON string (possibly formatted)
+     * @return string Minified JSON on single line
+     */
+    private function minifyJson(string $json): string
+    {
+        $decoded = json_decode($json);
+        if ($decoded === null) {
+            // If JSON is invalid, return as-is
+            return $json;
+        }
+
+        // Re-encode without whitespace
+        return json_encode($decoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -266,6 +290,10 @@ class XBeteiligung401TestFactory
         // Generate timestamp if not provided
         $parameters['erstellungszeitpunkt'] = $parameters['erstellungszeitpunkt'] ??
             (new DateTime())->format('Y-m-d\TH:i:s.v\Z');
+
+        // Process file attachments if referenced
+        $parameters = $this->processFileAttachments($parameters, 'oeffentlichkeit');
+        $parameters = $this->processFileAttachments($parameters, 'toeb');
 
         return $parameters;
     }
@@ -369,5 +397,109 @@ class XBeteiligung401TestFactory
         }
 
         return $xml;
+    }
+
+    /**
+     * Process file attachments for a participation type (oeffentlichkeit or toeb).
+     * If anlage_file_{type} is present, loads the file and generates all related parameters.
+     *
+     * @param array $parameters Current parameters
+     * @param string $type Participation type ('oeffentlichkeit' or 'toeb')
+     * @return array Parameters with file data added
+     */
+    private function processFileAttachments(array $parameters, string $type): array
+    {
+        $fileKey = 'anlage_file_' . $type;
+
+        // Check if file reference exists
+        if (!isset($parameters[$fileKey]) || empty($parameters[$fileKey])) {
+            return $parameters;
+        }
+
+        $filePath = $this->anlagenBasePath . '/' . $parameters[$fileKey];
+
+        if (!file_exists($filePath)) {
+            throw new RuntimeException("Anlage file not found: {$filePath}");
+        }
+
+        // Load and encode file
+        $fileData = $this->loadAndEncodeFile($filePath);
+
+        // Extract filename from path
+        $filename = basename($filePath);
+
+        // Generate or use existing document ID
+        $dokumentIdKey = 'anlage_dokument_id_' . $type;
+        $documentId = $parameters[$dokumentIdKey] ?? 'ID_' . $this->commonHelpers->uuid();
+
+        // Add all file-related parameters
+        $parameters['anlage_filesize_' . $type] = $fileData['filesize'];
+        $parameters['anlage_hash_' . $type] = $fileData['hash'];
+        $parameters['anlage_content_base64_' . $type] = $fileData['base64'];
+        $parameters['anlage_dateiname_' . $type] = $filename;
+        $parameters['anlage_dokument_id_' . $type] = $documentId;
+
+        // Auto-detect MIME type if not provided
+        if (!isset($parameters['anlage_mime_type_' . $type])) {
+            $parameters['anlage_mime_type_' . $type] = $this->detectMimeType($filePath);
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * Load file, calculate hash and filesize, and encode as base64.
+     *
+     * @param string $filePath Absolute path to file
+     * @return array Array with keys: base64, hash, filesize
+     */
+    private function loadAndEncodeFile(string $filePath): array
+    {
+        $fileContent = file_get_contents($filePath);
+
+        if (false === $fileContent) {
+            throw new RuntimeException("Failed to read file: {$filePath}");
+        }
+
+        return [
+            'base64' => base64_encode($fileContent),
+            'hash' => $this->calculateFileHash($fileContent),
+            'filesize' => strlen($fileContent),
+        ];
+    }
+
+    /**
+     * Calculate SHA-256 hash of file content.
+     *
+     * @param string $content File content
+     * @return string Hexadecimal hash string
+     */
+    private function calculateFileHash(string $content): string
+    {
+        return hash('sha256', $content);
+    }
+
+    /**
+     * Detect MIME type from file extension.
+     *
+     * @param string $filePath File path
+     * @return string MIME type code for XBeteiligung
+     */
+    private function detectMimeType(string $filePath): string
+    {
+        $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+
+        return match ($extension) {
+            'pdf' => 'application/pdf',
+            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'doc' => 'application/msword',
+            'xml' => 'text/xml',
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'tif', 'tiff' => 'image/tiff',
+            'zip' => 'application/zip',
+            'txt' => 'text/plain',
+            default => throw new RuntimeException("Unsupported file extension: {$extension}"),
+        };
     }
 }
