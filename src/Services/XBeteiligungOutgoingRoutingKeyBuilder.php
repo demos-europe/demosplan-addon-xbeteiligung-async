@@ -51,15 +51,6 @@ class XBeteiligungOutgoingRoutingKeyBuilder
             'outgoingMessageIdentifier' => $outgoingMessageIdentifier
         ]);
 
-        if (str_contains($incomingRoutingKey, XBeteiligungRoutingService::TEST_ENVIRONMENT_AGS_CODE)){
-            return implode('.', [
-                $this->config->getProjectTypePrefix(),        // e.g., 'bau'
-                self::OUTGOING_DIRECTION,   // direction
-                XBeteiligungRoutingService::TEST_ENVIRONMENT_ROUTING_PART,
-                $outgoingMessageIdentifier // message identifier
-            ]);
-        }
-
         // Parse the incoming routing key
         $incomingComponents = $this->routingKeyParser->parseRoutingKey($incomingRoutingKey);
 
@@ -98,7 +89,7 @@ class XBeteiligungOutgoingRoutingKeyBuilder
         $senderAgs = $incomingComponents->agsCode2;    // demosplan AGS (was receiver)
         $receiverAgs = $incomingComponents->agsCode1;  // cockpit AGS (was sender)
 
-        $senderDvdvOrg = $this->config->xoevAddressPrefixKommunal;  // demosplan DVDV
+        $senderDvdvOrg = $this->config->getProjectSpecificXoevAddressPrefixForBeteiligung();  // demosplan DVDV
         $receiverDvdvOrg = $this->config->xoevAddressPrefixCockpit; // cockpit DVDV
 
         return implode('.', [

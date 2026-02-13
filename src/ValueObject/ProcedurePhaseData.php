@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  */
@@ -14,14 +14,17 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\ValueObject;
 
 use DateTime;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 
 class ProcedurePhaseData extends ValueObject
 {
     public function __construct(
-        private ?PublicParticipationPhase $publicParticipationPhase,
-        private ?InstitutionParticipationPhase $institutionParticipationPhase,
+        private ?string $publicParticipationPhaseKey,
+        private ?string $institutionParticipationPhaseKey,
+        private ?string $generalPhaseCode,
+        private ?string $publicParticipationPhaseCode,
+        private ?string $publicParticipationSubPhaseCode,
+        private ?string $institutionParticipationPhaseCode,
+        private ?string $institutionParticipationSubPhaseCode,
         private ?DateTime $publicParticipationStartDate,
         private ?DateTime $publicParticipationEndDate,
         private ?DateTime $institutionParticipationStartDate,
@@ -29,8 +32,13 @@ class ProcedurePhaseData extends ValueObject
         private ?int $publicParticipationIteration,
         private ?int $institutionParticipationIteration
     ) {
-        $this->publicParticipationPhase = $publicParticipationPhase;
-        $this->institutionParticipationPhase = $institutionParticipationPhase;
+        $this->publicParticipationPhaseKey = $publicParticipationPhaseKey;
+        $this->institutionParticipationPhaseKey = $institutionParticipationPhaseKey;
+        $this->generalPhaseCode = $generalPhaseCode;
+        $this->publicParticipationPhaseCode = $publicParticipationPhaseCode;
+        $this->publicParticipationSubPhaseCode = $publicParticipationSubPhaseCode;
+        $this->institutionParticipationPhaseCode = $institutionParticipationPhaseCode;
+        $this->institutionParticipationSubPhaseCode = $institutionParticipationSubPhaseCode;
         $this->publicParticipationStartDate = $publicParticipationStartDate;
         $this->publicParticipationEndDate = $publicParticipationEndDate;
         $this->institutionParticipationStartDate = $institutionParticipationStartDate;
@@ -41,14 +49,39 @@ class ProcedurePhaseData extends ValueObject
         $this->lock();
     }
 
-    public function getPublicParticipationPhase(): ?PublicParticipationPhase
+    public function getPublicParticipationPhaseKey(): ?string
     {
-        return $this->publicParticipationPhase;
+        return $this->publicParticipationPhaseKey;
     }
 
-    public function getInstitutionParticipationPhase(): ?InstitutionParticipationPhase
+    public function getInstitutionParticipationPhaseKey(): ?string
     {
-        return $this->institutionParticipationPhase;
+        return $this->institutionParticipationPhaseKey;
+    }
+
+    public function getGeneralPhaseCode(): ?string
+    {
+        return $this->generalPhaseCode;
+    }
+
+    public function getPublicParticipationPhaseCode(): ?string
+    {
+        return $this->publicParticipationPhaseCode;
+    }
+
+    public function getPublicParticipationSubPhaseCode(): ?string
+    {
+        return $this->publicParticipationSubPhaseCode;
+    }
+
+    public function getInstitutionParticipationPhaseCode(): ?string
+    {
+        return $this->institutionParticipationPhaseCode;
+    }
+
+    public function getInstitutionParticipationSubPhaseCode(): ?string
+    {
+        return $this->institutionParticipationSubPhaseCode;
     }
 
     public function getPublicParticipationStartDate(): ?DateTime

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  */
@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DateTime;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungMessageAudit;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungMessageAuditRepository;
 use Psr\Log\LoggerInterface;
 
@@ -317,8 +318,11 @@ class XBeteiligungAuditService
         );
 
         foreach ($auditRecords as $record) {
-            if ($record->isReceived() &&
-                XBeteiligungService::NEW_KOMMUNALE_PROCEDURE_XML_MESSAGE_IDENTIFIER === $record->getMessageType() &&
+            $initialMessageType =
+                XBeteiligungMessageType::KOMMUNAL_INITIIEREN->value  === $record->getMessageType() ||
+                XBeteiligungMessageType::PLANFESTSTELLUNG_INITIIEREN->value === $record->getMessageType();
+            if ($initialMessageType &&
+                $record->isReceived() &&
                 $record->getProcedureId() === $procedureId &&
                 $record->getTargetSystem() === self::TARGET_SYSTEM_COCKPIT) {
                 return $record;
@@ -329,13 +333,32 @@ class XBeteiligungAuditService
     }
 
     /**
+     * Find the latest incoming 402 update message that has not been responded to yet
+     * This checks for 402 messages that don't have any OK/NOK responses linking to them
+     */
+    public function findLatestUnrespondedIncoming402Message(string $procedureId): ?XBeteiligungMessageAudit
+    {
+        $updateMessageTypes = [
+            XBeteiligungMessageType::KOMMUNAL_AKTUALISIEREN->value,
+            XBeteiligungMessageType::PLANFESTSTELLUNG_AKTUALISIEREN->value,
+            XBeteiligungMessageType::RAUMORDNUNG_AKTUALISIEREN->value,
+        ];
+
+        return $this->auditRepository->findLatestUnrespondedUpdateMessage(
+            $procedureId,
+            $updateMessageTypes,
+            self::TARGET_SYSTEM_COCKPIT
+        );
+    }
+
+    /**
      * Find the original outgoing 701 message for a statement
      */
     public function findOriginalOutgoing701MessageByStatementId(string $statementId): ?XBeteiligungMessageAudit
     {
         $auditRecords = $this->auditRepository->findBy([
             'statementId' => $statementId,
-            'messageType' => XBeteiligungService::NEW_STATEMENT_MESSAGE_IDENTIFIER,
+            'messageType' => XBeteiligungMessageType::STELLUNGNAHME_NEUABGEGEBEN->value,
             'direction' => self::DIRECTION_SENT
         ]);
 

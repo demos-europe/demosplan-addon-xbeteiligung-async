@@ -34,12 +34,12 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
             300,            // communicationDelay
             'Kommunal',     // procedureMessageType
             true,           // auditEnabled
-            'test.exchange', // rabbitMqExchange
-            'bdp',          // xoevAddressPrefixKommunal
             'bap',          // xoevAddressPrefixCockpit
             10,             // maxMessagesPerCycle
             5,              // consumerTimeout
-            'Test Procedure Type' // procedureTypeName
+            'Test Procedure Type', // procedureTypeName
+            '1234',         // verfahrensschrittCode
+            '5678'          // verfahrensteilschrittCode
         );
 
         $this->logger = $this->createMock(LoggerInterface::class);
@@ -172,12 +172,12 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
             300,            // communicationDelay
             'Raumordnung',  // procedureMessageType (gives 'rog' prefix)
             true,           // auditEnabled
-            'test.exchange', // rabbitMqExchange
-            'custom_kommunal', // xoevAddressPrefixKommunal
             'custom_cockpit', // xoevAddressPrefixCockpit
             10,             // maxMessagesPerCycle
             5,              // consumerTimeout
-            'Test Procedure Type' // procedureTypeName
+            'Test Procedure Type', // procedureTypeName
+            '9999',         // verfahrensschrittCode
+            '8888'          // verfahrensteilschrittCode
         );
 
         $customBuilder = new XBeteiligungOutgoingRoutingKeyBuilder(
@@ -192,7 +192,7 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
         $result = $customBuilder->buildFromIncomingRoutingKey($incomingRoutingKey, $outgoingMessageIdentifier);
 
         self::assertSame(
-            'rog.beteiligung.custom_kommunal.02.05.00200099.custom_cockpit.02.05.00200099.kommunal.Initiieren.OK.0411',
+            'rog.beteiligung.rog.02.05.00200099.custom_cockpit.02.05.00200099.kommunal.Initiieren.OK.0411',
             $result
         );
     }

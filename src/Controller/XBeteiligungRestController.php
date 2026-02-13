@@ -12,17 +12,10 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Controller;
 
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
-use DemosEurope\DemosplanAddon\Contracts\Logger\ApiLoggerInterface;
-use DemosEurope\DemosplanAddon\Contracts\MessageBagInterface;
 use DemosEurope\DemosplanAddon\Controller\APIController;
 use DemosEurope\DemosplanAddon\Exception\JsonException;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use EDT\JsonApi\RequestHandling\MessageFormatter;
-use EDT\JsonApi\Validation\FieldsValidator;
-use EDT\Wrapping\TypeProviders\PrefilledTypeProvider;
-use EDT\Wrapping\Utilities\SchemaPathProcessor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\MessageHandlerSelector;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
 use InvalidArgumentException;
@@ -31,7 +24,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * REST API controller for XBeteiligung requests that were previously handled by RabbitMQ.
@@ -52,10 +44,10 @@ class XBeteiligungRestController extends APIController
     )]
     public function createProcedure(
         Request $request,
-        XBeteiligungService $xBeteiligungService,
+        MessageHandlerSelector $messageHandlerSelector,
         LoggerInterface $logger
     ): Response {
-        return $this->processProcedureRequest($request, $xBeteiligungService, $logger, 'creation');
+        return $this->processProcedureRequest($request, $messageHandlerSelector, $logger, 'creation');
     }
 
     /**
@@ -71,10 +63,10 @@ class XBeteiligungRestController extends APIController
     )]
     public function updateProcedure(
         Request $request,
-        XBeteiligungService $xBeteiligungService,
+        MessageHandlerSelector $messageHandlerSelector,
         LoggerInterface $logger
     ): Response {
-        return $this->processProcedureRequest($request, $xBeteiligungService, $logger, 'update');
+        return $this->processProcedureRequest($request, $messageHandlerSelector, $logger, 'update');
     }
 
     /**
@@ -84,7 +76,7 @@ class XBeteiligungRestController extends APIController
      */
     private function processProcedureRequest(
         Request $request,
-        XBeteiligungService $xBeteiligungService,
+        MessageHandlerSelector $messageHandlerSelector,
         LoggerInterface $logger,
         string $operationType
     ): Response {
@@ -92,6 +84,14 @@ class XBeteiligungRestController extends APIController
             // Verify that the request has a valid API token using a custom header specific to XBeteiligung
             if ($this->hasNoValidAuthToken($request->headers->get('X-Addon-XBeteiligung-Authorization'))) {
                 throw new AccessDeniedException('Unauthorized');
+            }
+
+            // Verify that the request has a valid routing key using a custom header specific to XBeteiligung.
+            // Simplest possible value is a.cockpit.a.00.01.00000000.a.00.00.00000000.a, whereas "01" needs to be
+            // changed according to the customer, mapped in XBeteiligungCustomerMappingService::FEDERAL_STATE_TO_SUBDOMAIN_MAP
+            $routingKey = $request->headers->get('X-Addon-XBeteiligung-RoutingKey','');
+            if ('' === $routingKey) {
+                throw new InvalidArgumentException('No routing key provided in X-Addon-XBeteiligung-RoutingKey header');
             }
 
             // Get the request payload - simply use the raw XML content
@@ -106,8 +106,10 @@ class XBeteiligungRestController extends APIController
                 'content_length' => strlen($xmlContent)
             ]);
 
-            // Process the message using the same service that RabbitMQ would use
-            $responseObject = $xBeteiligungService->processXmlMessage($xmlContent);
+            // Process the message using MessageHandlerSelector
+            $messageType = XBeteiligungMessageType::fromXmlContent($xmlContent);
+            $handler = $messageHandlerSelector->getHandlerForMessageType($messageType);
+            $responseObject = $handler->handleIncomingMessage($xmlContent, true, $routingKey);
 
             // Prepare the XML response
             $xmlPayload = $responseObject->getMessageXml();
@@ -169,74 +171,5 @@ class XBeteiligungRestController extends APIController
         }
 
         return $authToken !== $authString;
-    }
-
-    /**
-     * Extracts the message type from XML content.
-     * This helps identify the type of XBeteiligung message for logging purposes.
-     */
-    private function extractMessageTypeFromXml(string $xmlContent): string
-    {
-        // Default message type if we can't extract it
-        $defaultType = 'unknown';
-
-        try {
-            // Check for common message types in the XML
-            $patterns = [
-                'kommunal.Initiieren.0401' => '/<.*?:?planung2Beteiligung\.BeteiligungKommunalNeu\.0401/i',
-                'kommunal.Aktualisieren.0402' => '/<.*?:?planung2Beteiligung\.BeteiligungKommunalAktualisieren\.0402/i',
-                'kommunal.Loeschen.0409' => '/<.*?:?planung2Beteiligung\.BeteiligungKommunalLoeschen\.0409/i',
-                'raumordnung.Initiieren.0301' => '/<.*?:?planung2Beteiligung\.BeteiligungRaumordnungNeu\.0301/i',
-                'raumordnung.Aktualisieren.0302' => '/<.*?:?planung2Beteiligung\.BeteiligungRaumordnungAktualisieren\.0302/i',
-                'raumordnung.Loeschen.0309' => '/<.*?:?planung2Beteiligung\.BeteiligungRaumordnungLoeschen\.0309/i',
-                'planfeststellung.Initiieren.0201' => '/<.*?:?planung2Beteiligung\.BeteiligungPlanfeststellungNeu\.0201/i',
-                'planfeststellung.Aktualisieren.0202' => '/<.*?:?planung2Beteiligung\.BeteiligungPlanfeststellungAktualisieren\.0202/i',
-                'planfeststellung.Loeschen.0209' => '/<.*?:?planung2Beteiligung\.BeteiligungPlanfeststellungLoeschen\.0209/i',
-            ];
-
-            // If we can't match the expected pattern, try to identify the message by code number
-            $codePatterns = [
-                'kommunal.Initiieren.0401' => '/0401/i',
-                'kommunal.Aktualisieren.0402' => '/0402/i',
-                'kommunal.Loeschen.0409' => '/0409/i',
-                'raumordnung.Initiieren.0301' => '/0301/i',
-                'raumordnung.Aktualisieren.0302' => '/0302/i',
-                'raumordnung.Loeschen.0309' => '/0309/i',
-                'planfeststellung.Initiieren.0201' => '/0201/i',
-                'planfeststellung.Aktualisieren.0202' => '/0202/i',
-                'planfeststellung.Loeschen.0209' => '/0209/i',
-            ];
-
-            // First try with the specific patterns
-            foreach ($patterns as $type => $pattern) {
-                if (preg_match($pattern, $xmlContent)) {
-                    return $type;
-                }
-            }
-
-            // Extract the root element to make a better guess
-            if (preg_match('/<([^:\s>]+:)?([^:\s>]+)/', $xmlContent, $matches)) {
-                $rootElement = $matches[2] ?? '';
-
-                // If we found a root element, try to match it against code patterns
-                foreach ($codePatterns as $type => $pattern) {
-                    if (preg_match($pattern, $rootElement)) {
-                        return $type;
-                    }
-                }
-            }
-
-            // As a last resort, check if any of the codes appear in the XML
-            foreach ($codePatterns as $type => $pattern) {
-                if (preg_match($pattern, $xmlContent)) {
-                    return $type;
-                }
-            }
-
-            return $defaultType;
-        } catch (Exception $e) {
-            // If something goes wrong, return the default type
-            return $defaultType;
-        }
     }
 }

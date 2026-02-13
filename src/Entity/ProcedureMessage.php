@@ -1,5 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
+/**
+ * This file is part of the package demosplan.
+ *
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
+ *
+ * All rights reserved
+ */
+
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Entity;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UuidEntityInterface;
@@ -51,7 +61,7 @@ class ProcedureMessage implements UuidEntityInterface
         string $message,
         bool $deleted,
         bool $error,
-        bool $requestCount,
+        int $requestCount,
         string $procedureId
     ) {
         $this->message = $message;

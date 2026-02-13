@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  */
@@ -21,7 +21,9 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterfa
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
@@ -44,6 +46,7 @@ abstract class ProcedureCommonFeatures
         protected readonly LoggerInterface                    $logger,
         protected readonly PlanfeststellungMessageFactory     $planfeststellungMessageFactory,
         protected readonly ProcedurePhaseExtractor            $procedurePhaseExtractor,
+        protected readonly AnlagenExtractor                   $anlagenExtractor,
         protected readonly ProcedureServiceInterface          $procedureService,
         protected readonly ProcedureServiceStorageInterface   $procedureServiceStorage,
         protected readonly ProcedureTypeServiceInterface      $procedureTypeService,
@@ -57,6 +60,10 @@ abstract class ProcedureCommonFeatures
         protected readonly XBeteiligungMapService             $xbeteiligungMapService,
         protected readonly XBeteiligungConfiguration          $xbeteiligungConfiguration,
         protected readonly XBeteiligungRoutingKeyParser       $routingKeyParser,
+        protected readonly ProcedureDataExtractor             $procedureDataExtractor,
+        protected readonly XBeteiligungGisLayerManager        $gisLayerManager,
+        protected readonly XBeteiligungAttachmentService      $xbeteiligungAttachmentService,
+        protected readonly ProcedurePhaseCodeDetector $procedurePhaseCodeDetector,
     )
     {
     }
@@ -65,11 +72,11 @@ abstract class ProcedureCommonFeatures
         ProcedureInterface $procedure,
         ProcedurePhaseData $procedurePhaseData,
     ): void {
-        if (null !== $procedurePhaseData->getPublicParticipationPhase()) {
-            $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhase()->getKey());
+        if (null !== $this->procedurePhaseCodeDetector->getPublicParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
+            $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhaseKey());
         }
-        if (null !== $procedurePhaseData->getInstitutionParticipationPhase()) {
-            $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhase()->getKey());
+        if (null !== $this->procedurePhaseCodeDetector->getInstitutionParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
+            $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhaseKey());
         }
         if (null !== $procedurePhaseData->getPublicParticipationStartDate()) {
             $procedure->setPublicParticipationStartDate($procedurePhaseData->getPublicParticipationStartDate());
@@ -99,6 +106,8 @@ abstract class ProcedureCommonFeatures
     {
         $errorCodeType = new CodeFehlerartType();
         $errorCodeType->setCode($errorCode);
+        $errorCodeType->setListURI('urn:xoev-de:xleitstelle:codeliste:fehlerart');
+        $errorCodeType->setListVersionID('1.0');
         $errorType = new FehlerType();
         $errorType->setBeschreibung($errorDescription);
         $errorType->setArt($errorCodeType);

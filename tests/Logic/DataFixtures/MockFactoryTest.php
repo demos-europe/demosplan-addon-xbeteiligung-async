@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  *
@@ -16,6 +16,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures;
 
 use DateTime;
+use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
@@ -24,7 +25,6 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Form\Procedure\AbstractProcedureFormTypeInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CustomerServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
@@ -33,6 +33,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\PlanfeststellungMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\RaumordnungMessageFactory;
@@ -41,7 +42,10 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungCustomerMappingSer
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingKeyParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\RoutingKeyComponents;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungGisLayerManager;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAttachmentService;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Illuminate\Support\Collection;
@@ -133,6 +137,7 @@ class MockFactoryTest
         $userMock->method('getId')->willReturn('a2780f23-160b-4a8b-a48b-f9448dc1bc24');
         $userMock->method('getName')->willReturn('Admin User');
         $userMock->method('isPlanner')->willReturn(true);
+        $userMock->method('hasAnyOfRoles')->willReturn(true);
 
         return $userMock;
     }
@@ -223,6 +228,11 @@ class MockFactoryTest
                 return $this->procedure ?? $this->getProcedureMock();
             }
         );
+        $procedureServiceInterfaceMock->method('updateProcedureObject')->willReturnCallback(
+            function (ProcedureInterface $procedure): ProcedureInterface {
+                return $procedure;
+            }
+        );
 
         return $procedureServiceInterfaceMock;
     }
@@ -231,7 +241,15 @@ class MockFactoryTest
     {
         $entityManagerMock = $this->testCase->createMockObject(EntityManagerInterface::class);
         $repositoryMock = $this->testCase->createMockObject(EntityRepository::class);
+        $connectionMock = $this->testCase->createMockObject(Connection::class);
+
         $entityManagerMock->method('getRepository')->willReturn($repositoryMock);
+        $entityManagerMock->method('getConnection')->willReturn($connectionMock);
+
+        // Mock transaction methods
+        $connectionMock->method('beginTransaction')->willReturn(true);
+        $connectionMock->method('commit')->willReturn(true);
+        $connectionMock->method('rollBack')->willReturn(true);
 
         return $entityManagerMock;
     }
@@ -262,32 +280,27 @@ class MockFactoryTest
     public function getXBeteiligungCustomerMappingServiceMock(): XBeteiligungCustomerMappingService|MockObject
     {
         $mock = $this->testCase->createMockObject(XBeteiligungCustomerMappingService::class);
-        $mock->method('getCustomerByAgsCode')->willReturnCallback(function () {
-            $customerMock = $this->testCase->createMockObject(\DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface::class);
-            $customerMock->method('getId')->willReturn('test-customer-id');
-            return $customerMock;
-        });
-        
-        // Mock the new getCustomerByFederalStateCode method
+
+        // Mock the getCustomerByFederalStateCode method
         $mock->method('getCustomerByFederalStateCode')->willReturnCallback(function () {
             $customerMock = $this->testCase->createMockObject(\DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface::class);
             $customerMock->method('getId')->willReturn('test-customer-id');
             return $customerMock;
         });
-        
+
         return $mock;
     }
 
     public function getXBeteiligungRoutingKeyParserMock(): XBeteiligungRoutingKeyParser|MockObject
     {
         $mock = $this->testCase->createMockObject(XBeteiligungRoutingKeyParser::class);
-        
+
         // Mock parseRoutingKey to return test routing components
         $mock->method('parseRoutingKey')->willReturnCallback(function (string $routingKey) {
             // Parse a test routing key: nrw.cockpit.bap.02.05.00200099.bdp.02.05.00200099.kommunal.initiieren.0401
             return new RoutingKeyComponents(
                 mandant: 'nrw',
-                direction: 'cockpit', 
+                direction: 'cockpit',
                 dvdvOrg1: 'bap',
                 agsCode1: '02.05.00200099',
                 dvdvOrg2: 'bdp',
@@ -295,10 +308,10 @@ class MockFactoryTest
                 messageIdentifier: 'kommunal.initiieren.0401'
             );
         });
-        
+
         // Mock extractFederalStateCodeFromRoutingKey to return test federal state
         $mock->method('extractFederalStateCodeFromRoutingKey')->willReturn('05');
-        
+
         return $mock;
     }
 
@@ -310,5 +323,46 @@ class MockFactoryTest
             'receiver' => '020100000099'  // Valid Schleswig-Holstein AGS code (Stage)
         ]);
         return $mock;
+    }
+
+    public function getAnlagenExtractor(): AnlagenExtractor|MockObject
+    {
+        return $this->testCase->createMockObject(AnlagenExtractor::class);
+    }
+
+    public function getGlobalConfigInterfaceMock(): GlobalConfigInterface|MockObject
+    {
+        $mock = $this->testCase->createMockObject(GlobalConfigInterface::class);
+        $mock->method('getPhaseNameWithPriorityExternal')->willReturnCallback(function($phase) {
+            return match($phase) {
+                'earlyparticipation' => 'Frühzeitige Bürgerbeteiligung',
+                'participation' => 'Öffentlichkeitsbeteiligung',
+                'configuration' => 'Konfiguration',
+                default => 'Unbekannte Phase'
+            };
+        });
+        $mock->method('getPhaseNameWithPriorityInternal')->willReturnCallback(function($phase) {
+            return match($phase) {
+                'earlyparticipation' => 'Frühzeitige interne Beteiligung',
+                'participation' => 'Interne Beteiligung',
+                'configuration' => 'Konfiguration intern',
+                default => 'Unbekannte interne Phase'
+            };
+        });
+
+        return $mock;
+    }
+
+    public function getXBeteiligungGisLayerManagerMock(): XBeteiligungGisLayerManager|MockObject
+    {
+        $mock = $this->testCase->createMockObject(XBeteiligungGisLayerManager::class);
+        // Note: processWmsUrl is private and cannot be mocked
+
+        return $mock;
+    }
+
+    public function getXBeteiligungAttachmentServiceMock(): XBeteiligungAttachmentService|MockObject
+    {
+        return $this->testCase->createMockObject(XBeteiligungAttachmentService::class);
     }
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  */
@@ -25,8 +25,6 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType;
@@ -77,8 +75,6 @@ abstract class XBeteiligungServiceTest extends TestCase
         $this->sut = new XBeteiligungService(
             $this->gisLayerCategoryRepository,
             $globalConfigMock,
-            $this->createMock(KommunaleProcedureCreater::class),
-            $this->createMock(KommunaleProcedureUpdater::class),
             $this->createMock(LoggerInterface::class),
             $this->createMock(ParameterBagInterface::class),
             $this->createMockedPlanningDocumentsLinkCreator(),
@@ -127,6 +123,8 @@ abstract class XBeteiligungServiceTest extends TestCase
         $procedure->method('getPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
+        $procedure->method('getPublicParticipationPhaseName')->willReturn('configuration');
+        $procedure->method('getPhaseName')->willReturn('configuration');
         $procedure->method('getPhase')->willReturn('earlyparticipation');
         $procedure->method('getSettings')->willReturn($procedureSettingsMock);
         $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(
@@ -206,6 +204,7 @@ abstract class XBeteiligungServiceTest extends TestCase
             '',
             $messageClass,
         );
+
         self::assertTrue($isValid);
     }
 

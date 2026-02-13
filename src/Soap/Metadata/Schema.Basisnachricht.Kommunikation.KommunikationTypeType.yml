@@ -30,12 +30,3 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Kommunikation
                 getter: getZusatz
                 setter: setZusatz
             type: string
-kanal:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
-kennung:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
-zusatz:
-    xml_element:
-        namespace: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'

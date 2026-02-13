@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  */
@@ -17,18 +17,20 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class XBeteiligungConfiguration
 {
+    private const RABBIT_MQ_EXCHANGE = '.beteiligung';
+    private const UNKOWN_PROCEDURE_MESSAGE_TYPE = 'Unknown procedure message type "%s"';
     public function __construct(
         public readonly bool $rabbitMqEnabled,
         public readonly int $requestTimeout,
         public readonly int $communicationDelay,
         public readonly string $procedureMessageType,
         public readonly bool $auditEnabled,
-        public readonly string $rabbitMqExchange,
-        public readonly string $xoevAddressPrefixKommunal,
         public readonly string $xoevAddressPrefixCockpit,
         public readonly int $maxMessagesPerCycle,
         public readonly int $consumerTimeout,
         public readonly string $procedureTypeName,
+        public readonly string $verfahrensschrittCode,
+        public readonly string $verfahrensteilschrittCode,
     ) {
         if ($this->requestTimeout <= 0) {
             throw new InvalidArgumentException('Request timeout must be positive');
@@ -65,12 +67,12 @@ class XBeteiligungConfiguration
             $params->get('addon_xbeteiligung_async_rabbitmq_communication_delay'),
             $params->get('addon_xbeteiligung_async_procedure_message_type'),
             $params->get('addon_xbeteiligung_async_enable_audit'),
-            'bau.beteiligung',
-            'bdp',
             'bap',
             $params->get('addon_xbeteiligung_async_max_messages_per_cycle'),
             $params->get('addon_xbeteiligung_async_consumer_timeout'),
             $params->get('addon_xbeteiligung_async_procedure_type_name'),
+            $params->get('addon_xbeteiligung_async_verfahrensschritt_code'),
+            $params->get('addon_xbeteiligung_async_verfahrensteilschritt_code'),
         );
     }
 
@@ -81,9 +83,27 @@ class XBeteiligungConfiguration
             'raumordnung' => 'rog',
             'planfeststellung' => 'pfv',
             default => throw new InvalidArgumentException(
-                sprintf('Unknown procedure message type "%s"', $this->procedureMessageType)
+                sprintf(self::UNKOWN_PROCEDURE_MESSAGE_TYPE, $this->procedureMessageType)
             )
         };
+    }
+
+    public function getProjectSpecificXoevAddressPrefixForBeteiligung(): string
+    {
+        return match (strtolower($this->procedureMessageType)) {
+            'kommunal' => 'bdp',
+            'raumordnung' => 'rog',
+            'planfeststellung' => 'pfv',
+            default => throw new InvalidArgumentException(
+                sprintf(self::UNKOWN_PROCEDURE_MESSAGE_TYPE, $this->procedureMessageType)
+            )
+        };
+    }
+
+    public function getRabbitMqExchange(): string
+    {
+        $projectPrefix = $this->getProjectTypePrefix();
+        return $projectPrefix . self::RABBIT_MQ_EXCHANGE;
     }
 
     /**

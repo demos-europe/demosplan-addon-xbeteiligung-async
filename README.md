@@ -207,8 +207,18 @@ comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungRaumordnungType
 for the fields: `anlagen.xml_list` (specifically the `entry_name: anlage` namespace configuration)
 comment out `namespace: ...` in [`Schema.XBeteiligung.MetadatenAnlageType.yml`](src/Soap/Metadata/Schema.XBeteiligung.MetadatenAnlageType.yml)
 for the fields: `bezeichnung`, `versionsnummer`, `datum`, `anlageart`, `mimeType` and `anhangOderVerlinkung`
+comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungPlanfeststellungOeffentlichkeitType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungOeffentlichkeitType.yml)
+for the field: `anlagen.xml_list` (specifically the `entry_name: anlage` namespace configuration)
+comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungPlanfeststellungTOEBType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungTOEBType.yml)
+for the field: `anlagen.xml_list` (specifically the `entry_name: anlage` namespace configuration)
+comment out `namespace: ...` in [`Schema.XBeteiligung.AnlagenType.yml`](src/Soap/Metadata/Schema.XBeteiligung.AnlagenType.yml)
+for both `xml_element` and `xml_list` namespace entries for the `anlage` field
+comment out `namespace: ...` in [`Schema.XBeteiligung.AnlagenLinkType.yml`](src/Soap/Metadata/Schema.XBeteiligung.AnlagenLinkType.yml)
+for both `xml_element` and `xml_list` namespace entries for the `anlage` field
 
 **Important:** The `anlage` elements within `anlagen` collections must NOT have namespace prefixes according to the XBeteiligung XSD schema specification. These elements are defined with `form="unqualified"` in the schema, which means they should appear as `<anlage>` rather than `<xbeteiligung:anlage>`. Failure to comment out the namespace configuration will result in XSD validation errors.
+
+**Note:** The container `anlagen` element itself SHOULD keep its namespace configuration (for the element, not the list entries), as it appears as `<xbeteiligung:anlagen>` in the XML. Only the individual `<anlage>` entries within the collection should be unqualified.
 
 When updating to a new xBeteiligung standard version, update the hardcoded 
 namespace version in `XBeteiligungIncomingMessageParser::validateRequiredNamespace()` 

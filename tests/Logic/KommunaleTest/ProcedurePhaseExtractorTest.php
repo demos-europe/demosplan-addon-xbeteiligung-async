@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  */
@@ -13,8 +13,6 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 
 use DateTime;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\InstitutionParticipationPhase;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\PublicParticipationPhase;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalOeffentlichkeitType\BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType;
@@ -49,8 +47,8 @@ class ProcedurePhaseExtractorTest extends TestCase
 
         // create expected procedure phase data object
         $expectedProcedurePhaseData = new ProcedurePhaseData(
-            PublicParticipationPhase::EARLY_PARTICIPATION,
-            InstitutionParticipationPhase::EARLY_PARTICIPATION,
+            'configuration', // public participation phase is now hardcoded to 'configuration'
+            'configuration', // institution participation phase is now hardcoded to 'configuration'
             new DateTime('2025-01-01'), // start date for public participation
             new DateTime('2025-01-31'), // end date for public participation
             new DateTime('2025-02-01'), // start date for institution participation
@@ -64,12 +62,12 @@ class ProcedurePhaseExtractorTest extends TestCase
 
         self::assertInstanceOf(ProcedurePhaseData::class, $procedurePhaseData);
         self::assertSame(
-            $expectedProcedurePhaseData->getPublicParticipationPhase(),
-            $procedurePhaseData->getPublicParticipationPhase()
+            $expectedProcedurePhaseData->getPublicParticipationPhaseKey(),
+            $procedurePhaseData->getPublicParticipationPhaseKey()
         );
         self::assertSame(
-            $expectedProcedurePhaseData->getInstitutionParticipationPhase(),
-            $procedurePhaseData->getInstitutionParticipationPhase()
+            $expectedProcedurePhaseData->getInstitutionParticipationPhaseKey(),
+            $procedurePhaseData->getInstitutionParticipationPhaseKey()
         );
         self::assertSame(
             $expectedProcedurePhaseData->getPublicParticipationStartDate()->format('Y-m-d'),
@@ -100,7 +98,7 @@ class ProcedurePhaseExtractorTest extends TestCase
     private function createMockVerfahrensschrittKommunal()
     {
         $verfahrensschrittKommunal = $this->createMock(CodeVerfahrensschrittKommunalType::class);
-        $verfahrensschrittKommunal->method('getCode')->willReturn(PublicParticipationPhase::EARLY_PARTICIPATION->getCode());
+        $verfahrensschrittKommunal->method('getCode')->willReturn('5300');
         return $verfahrensschrittKommunal;
     }
 
@@ -165,18 +163,14 @@ class ProcedurePhaseExtractorTest extends TestCase
     private function createMockFormalOeffentlichkeit()
     {
         $formalOeffentlichkeit = $this->createMock(CodeVerfahrensschrittKommunalType::class);
-        $formalOeffentlichkeit->method('getCode')->willReturn(
-            PublicParticipationPhase::EARLY_PARTICIPATION->getCode()
-        );
+        $formalOeffentlichkeit->method('getCode')->willReturn('5300');
         return $formalOeffentlichkeit;
     }
 
     private function createMockFormalTOEB()
     {
         $formalTOEB = $this->createMock(CodeVerfahrensschrittKommunalType::class);
-        $formalTOEB->method('getCode')->willReturn(
-            InstitutionParticipationPhase::EARLY_PARTICIPATION->getCode()
-        );
+        $formalTOEB->method('getCode')->willReturn('4300');
         return $formalTOEB;
     }
 }

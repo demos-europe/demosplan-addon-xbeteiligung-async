@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * This file is part of the package demosplan.
  *
- * (c) 2010-present DEMOS E-Partizipation GmbH, for more information see the license file.
+ * (c) 2010-present DEMOS plan GmbH, for more information see the license file.
  *
  * All rights reserved
  */
@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tools;
 
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\StatementMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\StatementsActions\StatementCreator;
@@ -101,7 +102,7 @@ class RabbitMQMessageBroker
         if ($this->config->auditEnabled) {
             $auditRecord = $this->auditService->auditSentMessage(
                 $xmlString,
-                XBeteiligungService::NEW_STATEMENT_MESSAGE_IDENTIFIER, // Statement message type
+                XBeteiligungMessageType::STELLUNGNAHME_NEUABGEGEBEN->value, // Statement message type
                 $statementCreated->getProcedureId(),
                 $statementCreated->getPlanId(),
                 null, // responseToMessageId
@@ -112,6 +113,14 @@ class RabbitMQMessageBroker
         // Get original incoming routing key from audit for routing key-based outgoing message
         $originalAuditRecord = $this->auditService->findOriginalIncoming401Message($statementCreated->getProcedureId());
         $incomingRoutingKey = $originalAuditRecord?->getRoutingKey();
+
+        if (null === $incomingRoutingKey) {
+            $this->logger->warning('No original incoming routing key found for procedure', [
+                'procedureId' => $statementCreated->getProcedureId()
+            ]);
+
+            return $event;
+        }
 
         $this->sendResponseToRabbitMq(
             $xmlString,
@@ -128,7 +137,7 @@ class RabbitMQMessageBroker
      *
      * @throws Exception
      */
-    public function processMessages(string $queueName, int $maxMessages = null): void
+    public function processMessages(string $queueName, ?int $maxMessages = null): void
     {
         $maxMessages ??= $this->config->maxMessagesPerCycle;
 

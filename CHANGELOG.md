@@ -1,6 +1,196 @@
 # Changelog
 
 ## UNRELEASED
+## v0.60 (2026-02-11)
+**Fix durchgang value for private person statements (DPLAN-17248)**
+- Fix bug where durchgang (iteration number) was always set from institution phase
+- Now correctly uses public participation phase iteration for private person statements
+- Institution statements continue to use institution phase iteration
+
+## v0.59 (2026-02-11)
+**Add demo cockpit environment mapping (DPLAN-17135)**
+- Add federal state code '97' mapping to 'demo' subdomain for demo.cockpit environment support
+
+## v0.58 (2026-02-10)
+**Implemented Verfahrensschritt and Verfahrensteilschritt creation and update**
+- Added XBeteiligungProcedurePhaseCockpit entity to store external procedure IDs and phase codes from XBeteiligung integration. 
+- Implemented detection of Verfahrensschritt and Verfahrensteilschritt from incoming XBeteiligung messages. 
+- The detected phase code is now automatically included in STN messages when creating procedures.
+
+## v0.57 (2026-02-10)
+**Implement Procedure Phase Mapping System (DPLAN-17231)**
+- Add comprehensive ProcedurePhaseMapping service with hard-coded mappings for K3 integration
+- Create ParticipationType enum to distinguish between public and institution participation
+- Create ProcedurePhaseKey enum with all supported procedure phase identifiers
+- Define complete phase code and name mappings for all procedure types:
+  - Kommunal (Bauleitplanung): institution and public participation phases
+  - Raumordnung: institution and public participation phases
+  - Planfeststellung: institution and public participation phases
+- Integrate phase mapping into XBeteiligungService for consistent phase data in outgoing messages
+- Add comprehensive documentation of complete phase mapping structure
+
+**Enable 0402 Procedure Update (DPLAN-15682)**
+- Enable handling of KOMMUNAL_AKTUALISIEREN (0402) messages for procedure updates
+- Update procedure name and external name from incoming messages
+- Update procedure description from Planungsanlass
+- Update map data (territory, bounding box, map extent) from Geltungsbereich
+- Update existing "Planzeichnung" GIS overlay (URL and layers) or create new one if missing
+- Procedure phases are intentionally NOT updated to preserve manual changes made by users between 401 and 402 messages
+- Transaction handling with automatic rollback on error
+- Return OK (412) or NOK (422) response messages with proper error details
+- Add comprehensive test coverage for procedure update functionality
+- Note: Document updates will be implemented in DPLAN-17308
+
+**XBeteiligung Standard v1.2 Update (DPLAN-17309)**
+- Update XBeteiligung XSD schemas to latest v1.2 release
+- Add verfahrensteilschritt field to additional procedure types:
+  - `verfahrensteilschrittKommunal` in BeteiligungKommunalTOEBType and BeteiligungKommunalOeffentlichkeitType
+  - `verfahrensteilschrittPlanfeststellung` in BeteiligungPlanfeststellungTOEBType and BeteiligungPlanfeststellungOeffentlichkeitType
+  - `verfahrensteilschrittRaumordnung` in BeteiligungRaumordnungType
+- Add `durchgang` field to BeteiligungKommunalType and BeteiligungPlanfeststellungType
+- Regenerate PHP classes and metadata from updated XSD files
+- Remove duplicate metadata sections from base schema files (BehoerdeTypeType, IdentifikationNachrichtTypeType, NachrichtenkopfG2GTypeType, KommunikationTypeType)
+
+## v0.56 (2026-01-26)
+- bump demosplan-addon version from v0.64 to v0.65
+- Add XBeteiligungAttachmentService to process and save file attachments from XBeteiligung messages (DPLAN-15843)
+  - Process base64-encoded documents from XML messages
+  - Validate attachments (filename, content, encoding)
+  - Create/find document categories and SingleDocument entries
+  - Integrate into procedure creation workflow
+
+## v0.55 (2026-01-02)
+- require demos-europe/demosplan-addon version ^0.64
+
+## v0.54 (2025-11-10)
+- fix organization validation to check for procedure creation permissions in the correct customer context (DPLAN-16969)
+
+## v0.53 (2025-11-07)
+- fix XSD validation for missing vorname/familienname in verfasser data (DPP-560)
+
+## v0.52 (2025-11-06)
+- fix duplicate name in xbeteiligung message
+
+## v0.51 (2025-11-04)
+- fix statement text 500 character limit in cockpit transmission (DPLAN-16941)
+- add comprehensive DIN SPEC 91379 datatypeC text sanitization for XBeteiligung statement messages to ensure character set compliance (DPLAN-16940)
+  - implement Din91379TextSanitizerService with character replacement patterns for smart quotes, mathematical symbols, and prohibited Unicode scripts
+  - sanitize statement text, recommendation, and consideration fields before XML transmission
+  - add proper warning logs for character replacements to aid debugging
+
+## v0.50 (2025-10-30)
+- fix geodata transmission to K3 portal by using BPlan layer instead of base layer for flaechenabgrenzungUrl (ADO-45461)
+
+## v0.49 (2025-10-30)
+- ensure XBeteiligung messages use current phase data, not stale enriched fields
+
+## v0.48 (2025-10-28)
+- fix function call on null in VerfasserBuilder causing that created statements from users
+with role Institution Koordination with missing user address are not send to cockpit
+
+## v0.47 (2025-10-21)
+- Add support for oaf format for Gis layer
+
+## v0.46 (2025-10-16)
+- Fixed maps displaying polygons by not storing the original coordinate
+- Add test cockpit environment mappings (AGS codes 94-97) to XBeteiligungCustomerMappingService
+- Update develop environment mapping description for AGS code 98
+- Disable procedure phase update
+- Fix ProcedureMessage requestCount parameter type from bool to int
+- Standardize license headers and strict types across codebase (105 PHP files)
+
+## v0.45 (2025-10-08)
+- Add support for AGS codes 98 and 99 in customer mapping for test environments
+
+## v0.44 (2025-10-07)
+**Message Processing Architecture Refactoring (DPLAN-16438)**
+- Refactor XBeteiligung message processing to eliminate code duplication
+- Create generic message handlers to replace duplicated logic
+- Extract reusable services following Single Responsibility Principle
+
+## v0.43 (2025-10-07)
+**Configurable Procedure Step Codes**
+- Add configurable verfahrensschrittCode and verfahrensteilschrittCode parameters
+- Replace hardcoded '0815' codes with configurable values, fallback to '0815' if empty
+
+## v0.42 (2025-10-07)
+**Fix Routing Key Customer Mapping (DPLAN-16438)**
+- Fix incorrect customer mapping using receiver AGS instead of sender AGS from routing key
+- Remove obsolete XBeteiligungRoutingService and test environment specific code
+- Update federal state code extraction to use receiver AGS for correct customer resolution
+
+## v0.41 (2025-10-06)
+**Error Code List Fix for NOK Messages (DPLAN-16732)**
+- Fix incorrect error type (Fehlerart) codes in NOK messages according to XBeteiligung XSD schema
+- Update error codes from invalid values (0200, 0300) to correct XSD-compliant value '3000' (Fehler)
+- Add proper listURI and listVersionID attributes to CodeFehlerartType in error responses
+
+## v0.40 (2025-10-06)
+**GIS Layer Management Improvements**
+- Consolidate multiple GIS layers into single "Planzeichnung" overlay for better map organization
+- Change XBeteiligungGisLayerManager to create one overlay containing all layers as comma-separated string instead of individual overlays per layer
+- Update comprehensive test suite to reflect single layer creation pattern
+
+## v0.39 (2025-10-06)
+**Customer Mapping and Routing Configuration (DPLAN-16733)**
+- Add support for AGS codes 98 and 99 in customer mapping for test environments
+- Replace hardcoded XÖEV address prefixes with dynamic project-specific prefixes
+- Update routing key builder to use project-specific prefixes (bdp/rog/pfv) based on procedure type
+
+## v0.38 (2025-10-06)
+**Statement Message Factory Refactoring (DPLAN-15365)**
+- Extract phase handling logic to new `PhaseBuilder` class with project-specific phase type detection
+- Extract statement author (Verfasser) creation to new `VerfasserBuilder` class with improved personal data handling
+- Refactor `StatementMessageFactory` by extracting complex logic into specialized builder classes
+- Improve statement text processing by properly handling HTML content (replace line breaks with spaces before stripping tags)
+- Add comprehensive unit tests for PhaseBuilder and VerfasserBuilder components
+- Remove unused methods from StatementAction value object to simplify codebase
+
+## v0.37 (2025-10-02)
+- Remove enum-based procedure phase mapping system (DPLAN-16438)
+- Delete InstitutionParticipationPhase, PublicParticipationPhase, and ProcedurePhaseKey enums
+- Simplify procedure phase handling by using hardcoded 'configuration' phase for all procedures
+
+## v0.36 (2025-09-30)
+- Territory display fix for XML-processed geltungsbereich
+- Automatic GIS layer creation from flaechenabgrenzungsUrl in XBeteiligung messages
+- Support for MultiPolygon geometries
+
+## v0.35 (2025-09-25)
+- fix rabbitMQ message send error for unbound procedures
+
+## v0.34 (2025-09-23)
+**Planfeststellung Message Support (DPLAN-16438)**
+- Add support for Planfeststellung 0201 message creation in XBeteiligungEventSubscriber
+- Enable automatic 201 message generation for new procedures when `feature_procedure_message_pln_create` permission is enabled
+- Extend KommunaleProcedureCreater to handle both Kommunal and Planfeststellung message types with union type support
+- Add PlanfeststellungInitiieren0201 class integration for K3 system communication
+
+**RabbitMQ Exchange Configuration**
+- Refactor exchange configuration from hardcoded parameter to dynamic generation based on project type
+- Add getRabbitMqExchange() method for project-specific exchange naming (bau.beteiligung, rog.beteiligung, pfv.beteiligung)
+- Remove hardcoded 'bau.beteiligung' exchange in favor of configurable project-based exchanges
+
+**XML Namespace Fixes**
+- Fix XML validation failures for Planfeststellung messages by correcting YAML namespace configurations
+- Comment out namespace entries for anlage elements to ensure XSD compliance with form="unqualified" specification
+- Update README documentation with comprehensive namespace configuration guidance
+
+**Attachment Data Extraction Foundation**
+- Add AnlagenExtractor service for extracting attachment metadata from XBeteiligung messages
+- Implement AnlageValueObject for structured attachment data representation
+- Note: This provides the foundation for attachment handling - actual processing implementation pending
+
+**Test Infrastructure**
+- Fix KommunaleProcedureHandlerFactory constructor dependency issues
+- Add AnlagenExtractor mock support to test factory
+- Resolve PHPUnit test failures with proper dependency injection
+
+- improve rest api documentation
+
+## v0.33.1 (2026-02-05)
+- Add X-Addon-XBeteiligung-RoutingKey header for REST API requests
+
 ## v0.33 (2025-09-12)
 - fix token length check
 - improve logging
