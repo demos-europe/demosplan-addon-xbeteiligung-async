@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.61 (2026-02-17)
 **Fix test failures (DPLAN-17308)**
 - Update test mocks after PhaseBuilder refactoring
 
