@@ -156,11 +156,23 @@ class XBeteiligungGisLayerManagerTest extends TestCase
             ->method('setLayers')
             ->with('vektordaten');
 
-        $this->logger->expects($this->any())
-            ->method('info');
+        $this->logger->expects($this->exactly(4))
+            ->method('info')
+            ->with(
+                static::logicalOr(
+                self::stringContains('Processing WMS URL'),
+                self::stringContains('Extracted layers from WMS URL'),
+                self::stringContains('No existing Planzeichnung layer found'),
+                self::stringContains('Created single GIS layer with all layers')
+            ));
 
-        $this->logger->expects($this->any())
-            ->method('debug');
+        $this->logger->expects($this->atLeastOnce())
+            ->method('debug')
+            ->with(
+                static::logicalOr(
+                self::stringContains('WMS URL validation successful'),
+                self::stringContains('Built clean layer URL')
+            ));
 
         $this->sut->processUrl($validUrl, $this->procedure);
     }
@@ -182,8 +194,15 @@ class XBeteiligungGisLayerManagerTest extends TestCase
             ->method('setLayers')
             ->with('vektordaten,bp_raster');
 
-        $this->logger->expects($this->any())
-            ->method('info');
+        $this->logger->expects($this->exactly(4))
+            ->method('info')
+            ->with(
+                static::logicalOr(
+                self::stringContains('Processing WMS URL'),
+                self::stringContains('Extracted layers from WMS URL'),
+                self::stringContains('No existing Planzeichnung layer found'),
+                self::stringContains('Created single GIS layer with all layers')
+            ));
 
         $this->sut->processUrl($validUrl, $this->procedure);
     }
@@ -262,7 +281,9 @@ class XBeteiligungGisLayerManagerTest extends TestCase
     {
         $validUrl = self::WMS_BASE_URL . '?LAYERS=testlayer&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
 
-        $this->gisLayerCategoryRepository->expects($this->any())
+        // getRootLayerCategory is called twice: once in findExistingPlanzeichnungLayer()
+        // and once in createGisLayer() where it throws the exception
+        $this->gisLayerCategoryRepository->expects($this->exactly(2))
             ->method('getRootLayerCategory')
             ->with(self::PROCEDURE_ID)
             ->willReturn(null);
@@ -525,7 +546,9 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
     private function setupMocksForValidUrl($mockGisLayer, $mockRootCategory, int $expectedLayerCount = 1): void
     {
-        $this->gisLayerCategoryRepository->expects($this->any())
+        // getRootLayerCategory is called twice when creating a new layer:
+        // once in findExistingPlanzeichnungLayer() and once in createGisLayer()
+        $this->gisLayerCategoryRepository->expects($this->exactly($expectedLayerCount + 1))
             ->method('getRootLayerCategory')
             ->with(self::PROCEDURE_ID)
             ->willReturn($mockRootCategory);
