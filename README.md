@@ -203,6 +203,8 @@ comment out `namespace: ...` in [`Schema.Code.CodeType.yml`](src/Soap/Metadata/S
 for the fields `code` and `name`.
 comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml)
 for the fields: `anlagen.xml_list`
+comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungKommunalTOEBType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalTOEBType.yml)
+for the field: `anlagen.xml_list` (specifically the `entry_name: anlage` namespace configuration)
 comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungRaumordnungType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungType.yml)
 for the fields: `anlagen.xml_list` (specifically the `entry_name: anlage` namespace configuration)
 comment out `namespace: ...` in [`Schema.XBeteiligung.MetadatenAnlageType.yml`](src/Soap/Metadata/Schema.XBeteiligung.MetadatenAnlageType.yml)
