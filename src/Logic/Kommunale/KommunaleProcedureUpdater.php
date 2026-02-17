@@ -141,7 +141,14 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
             $this->gisLayerManager->processUrl($flaechenabgrenzungsUrl, $procedure);
         }
 
-        // Note: Document updates will be implemented in DPLAN-17308
+        // Process attachment updates (replaces existing files based on dokumentId)
+        $anlagen = $procedureDataValueObject->getAnlagen();
+        if (!empty($anlagen)) {
+            $this->xbeteiligungAttachmentService->saveOrUpdateAnlagenToProcedureCategories(
+                $procedure,
+                $anlagen
+            );
+        }
     }
 
     private function saveProcedureWithTransaction(ProcedureInterface $procedure): ProcedureInterface

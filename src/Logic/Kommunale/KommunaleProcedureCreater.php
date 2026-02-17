@@ -171,7 +171,8 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                 $procedure->getSettings()->setBoundingBox($procedureDataValueObject->getMapData()->getBbox());
                 $procedure->getSettings()->setMapExtent($procedureDataValueObject->getMapData()->getMapExtent());
 
-                $this->xbeteiligungAttachmentService->saveAnlagenToProcedureCategories($procedure, $procedureDataValueObject->getAnlagen());
+                // Save attachments and track file mappings for future 402 updates
+                $this->xbeteiligungAttachmentService->saveOrUpdateAnlagenToProcedureCategories($procedure, $procedureDataValueObject->getAnlagen());
 
                 // Process flaechenabgrenzungsUrl for GIS layer creation
                 $this->gisLayerManager->processUrl(

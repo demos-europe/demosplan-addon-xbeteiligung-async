@@ -17,6 +17,8 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\FileServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Handler\SingleDocumentHandlerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ElementsServiceInterface;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungFileMapping;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungFileMappingRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\AnlageValueObject;
 use Exception;
 use InvalidArgumentException;
@@ -63,7 +65,8 @@ class XBeteiligungAttachmentService
         private readonly FileServiceInterface $fileService,
         private readonly ElementsServiceInterface $elementsService,
         private readonly SingleDocumentHandlerInterface $singleDocumentHandler,
-        private readonly LoggerInterface $logger
+        private readonly LoggerInterface $logger,
+        private readonly XBeteiligungFileMappingRepository $fileMappingRepository
     ) {
     }
 
@@ -84,6 +87,67 @@ class XBeteiligungAttachmentService
                 }
 
                 $this->processSingleAttachment($anlage, $procedure);
+            } catch (Exception $e) {
+                $this->logAttachmentProcessingError($e, $anlage, $procedure);
+            }
+        }
+    }
+
+    /**
+     * Save or update attachments with file tracking for 402 message handling.
+     *
+     * This method extends saveAnlagenToProcedureCategories with file replacement logic:
+     * - If dokumentId exists and file mapping found: replaces existing file
+     * - If dokumentId exists but no mapping: creates new file and tracks it
+     * - If no dokumentId: creates new file without tracking (backward compatibility)
+     *
+     * @param ProcedureInterface   $procedure          The target procedure
+     * @param AnlageValueObject[] $anlagenValueObject Array of attachment value objects
+     */
+    public function saveOrUpdateAnlagenToProcedureCategories(
+        ProcedureInterface $procedure,
+        array $anlagenValueObject
+    ): void {
+        foreach ($anlagenValueObject as $anlage) {
+            try {
+                if (false === $this->isAttachmentValid($anlage, $procedure)) {
+                    continue;
+                }
+
+                $dokumentId = $anlage->getDocumentId();
+
+                // Check if dokumentId exists and if we have a mapping for it
+                if (null !== $dokumentId && '' !== $dokumentId) {
+                    $existingMapping = $this->fileMappingRepository->findByXmlFileIdAndProcedure(
+                        $dokumentId,
+                        $procedure->getId()
+                    );
+
+                    if (null !== $existingMapping) {
+                        // Replace existing file
+                        $this->replaceExistingAttachment($anlage, $procedure, $existingMapping);
+                        continue;
+                    }
+                }
+
+                // Create new file (either no dokumentId or no existing mapping)
+                // This saves the attachment and creates the single document
+                $element = $this->ensureDocumentCategory($procedure, $anlage->getDocumentCategoryName());
+                $fileString = $this->saveAttachment($anlage, $procedure->getId());
+                $singleDocumentId = $this->createSingleDocument($procedure, $element, $anlage->getFileName(), $fileString);
+
+                $this->logger->info(self::LOG_PREFIX.'Successfully saved Anlage to procedure', [
+                    'filename' => $anlage->getFileName(),
+                    'procedureId' => $procedure->getId(),
+                    'categoryName' => $element->getTitle(),
+                    'singleDocumentId' => $singleDocumentId,
+                ]);
+
+                // Track mapping if dokumentId exists
+                if (null !== $dokumentId && '' !== $dokumentId && null !== $singleDocumentId) {
+                    $fileId = $this->extractFileIdFromFileString($fileString);
+                    $this->trackFileMapping($dokumentId, $procedure->getId(), $fileId, $singleDocumentId);
+                }
             } catch (Exception $e) {
                 $this->logAttachmentProcessingError($e, $anlage, $procedure);
             }
@@ -135,21 +199,26 @@ class XBeteiligungAttachmentService
      * @param AnlageValueObject  $anlage    The attachment to process
      * @param ProcedureInterface $procedure The target procedure
      *
+     * @return string|null The created SingleDocument ID, or null if creation failed
+     *
      * @throws ReflectionException
      */
     private function processSingleAttachment(
         AnlageValueObject $anlage,
         ProcedureInterface $procedure
-    ): void {
+    ): ?string {
         $element = $this->ensureDocumentCategory($procedure, $anlage->getDocumentCategoryName());
         $fileString = $this->saveAttachment($anlage, $procedure->getId());
-        $this->createSingleDocument($procedure, $element, $anlage->getFileName(), $fileString);
+        $singleDocumentId = $this->createSingleDocument($procedure, $element, $anlage->getFileName(), $fileString);
 
         $this->logger->info(self::LOG_PREFIX.'Successfully saved Anlage to procedure', [
             'filename' => $anlage->getFileName(),
             'procedureId' => $procedure->getId(),
             'categoryName' => $element->getTitle(),
+            'singleDocumentId' => $singleDocumentId,
         ]);
+
+        return $singleDocumentId;
     }
 
     /**
@@ -298,6 +367,8 @@ class XBeteiligungAttachmentService
      * @param string             $filename  The filename
      * @param string             $fileString The file string (filename:file_id:size:mimetype)
      *
+     * @return string|null The created SingleDocument ID, or null if not found in result
+     *
      * @throws ReflectionException
      */
     private function createSingleDocument(
@@ -305,7 +376,7 @@ class XBeteiligungAttachmentService
         ElementsInterface $element,
         string $filename,
         string $fileString
-    ): void {
+    ): ?string {
         // Use SingleDocumentHandler which has a contract interface
         $data = [
             self::KEY_ACTION => self::ACTION_SINGLE_DOCUMENT_NEW,
@@ -315,11 +386,140 @@ class XBeteiligungAttachmentService
             self::KEY_STATEMENT_ENABLED => self::STATEMENT_ENABLED, // Required field
         ];
 
-        $this->singleDocumentHandler->administrationDocumentNewHandler(
+        $result = $this->singleDocumentHandler->administrationDocumentNewHandler(
             $procedure->getId(),
             $element->getId(),
             $element->getId(),
             $data
         );
+
+        // Extract document ID from result
+        return $result[self::KEY_IDENT] ?? null;
+    }
+
+    /**
+     * Replace an existing attachment with new content from 402 update message.
+     *
+     * @param AnlageValueObject        $anlage          The new attachment data
+     * @param ProcedureInterface       $procedure       The procedure
+     * @param XBeteiligungFileMapping $existingMapping The existing file mapping
+     *
+     * @throws ReflectionException
+     */
+    private function replaceExistingAttachment(
+        AnlageValueObject $anlage,
+        ProcedureInterface $procedure,
+        XBeteiligungFileMapping $existingMapping
+    ): void {
+        // Save new file version
+        $fileString = $this->saveAttachment($anlage, $procedure->getId());
+        $newFileId = $this->extractFileIdFromFileString($fileString);
+
+        // Update the SingleDocument with new file
+        $updateData = [
+            'action' => 'singledocumentedit',
+            self::KEY_DOCUMENT_TITLE => $anlage->getFileName(),
+            self::KEY_DOCUMENT_FILE => $fileString,
+        ];
+
+        $result = $this->singleDocumentHandler->administrationDocumentEditHandler(
+            $existingMapping->getSingleDocumentId(),
+            $updateData
+        );
+
+        $newSingleDocumentId = $result[self::KEY_IDENT] ?? $existingMapping->getSingleDocumentId();
+
+        // Update mapping with new file IDs
+        $existingMapping->setFileId($newFileId);
+        $existingMapping->setSingleDocumentId($newSingleDocumentId);
+        $this->fileMappingRepository->save($existingMapping);
+
+        $this->logger->info(self::LOG_PREFIX.'Successfully replaced existing attachment', [
+            'filename' => $anlage->getFileName(),
+            'procedureId' => $procedure->getId(),
+            'xmlFileId' => $anlage->getDocumentId(),
+            'oldFileId' => $existingMapping->getFileId(),
+            'newFileId' => $newFileId,
+            'singleDocumentId' => $newSingleDocumentId,
+        ]);
+    }
+
+    /**
+     * Track or update file mapping between XML dokumentId and demosplan file entities.
+     *
+     * @param string $xmlFileId        The dokumentId from XML
+     * @param string $procedureId      The procedure ID
+     * @param string $fileId           The File entity ID (_f_ident)
+     * @param string $singleDocumentId The SingleDocument ID (_sd_id)
+     */
+    private function trackFileMapping(
+        string $xmlFileId,
+        string $procedureId,
+        string $fileId,
+        string $singleDocumentId
+    ): void {
+        try {
+            $mapping = $this->fileMappingRepository->findByXmlFileIdAndProcedure($xmlFileId, $procedureId);
+
+            if (null === $mapping) {
+                // Create new mapping
+                $mapping = new XBeteiligungFileMapping();
+                $mapping->setXmlFileId($xmlFileId);
+                $mapping->setProcedureId($procedureId);
+                $mapping->setFileId($fileId);
+                $mapping->setSingleDocumentId($singleDocumentId);
+
+                $this->logger->info(self::LOG_PREFIX.'Created file mapping', [
+                    'xmlFileId' => $xmlFileId,
+                    'procedureId' => $procedureId,
+                    'fileId' => $fileId,
+                    'singleDocumentId' => $singleDocumentId,
+                ]);
+            } else {
+                // Update existing mapping
+                $mapping->setFileId($fileId);
+                $mapping->setSingleDocumentId($singleDocumentId);
+
+                $this->logger->info(self::LOG_PREFIX.'Updated file mapping', [
+                    'xmlFileId' => $xmlFileId,
+                    'procedureId' => $procedureId,
+                    'fileId' => $fileId,
+                    'singleDocumentId' => $singleDocumentId,
+                ]);
+            }
+
+            $this->fileMappingRepository->save($mapping);
+        } catch (Exception $e) {
+            $this->logger->error(self::LOG_PREFIX.'Failed to track file mapping', [
+                'xmlFileId' => $xmlFileId,
+                'procedureId' => $procedureId,
+                'fileId' => $fileId,
+                'singleDocumentId' => $singleDocumentId,
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
+
+    /**
+     * Extract file ID from fileString format: filename:file_id:size:mimetype.
+     *
+     * @param string $fileString The file string from FileService
+     *
+     * @return string The extracted file ID
+     *
+     * @throws RuntimeException If fileString format is invalid
+     */
+    private function extractFileIdFromFileString(string $fileString): string
+    {
+        $parts = explode(':', $fileString);
+
+        if (count($parts) < 2) {
+            throw new RuntimeException(
+                'Invalid fileString format. Expected "filename:file_id:size:mimetype", got: '.$fileString
+            );
+        }
+
+        return $parts[1];
     }
 }
