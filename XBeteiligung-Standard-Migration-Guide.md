@@ -133,11 +133,16 @@ xml_element:
     # namespace: 'http://xoev.de/schemata/code/1_0'
 ```
 
-#### 5.3 Comment Out Namespace in BeteiligungKommunalOeffentlichkeitType
+#### 5.3 Comment Out Namespace in Beteiligung Types with Anlagen
 
-**File:** `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml`
+**Files:**
+- `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml`
+- `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalTOEBType.yml`
+- `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungOeffentlichkeitType.yml`
+- `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungTOEBType.yml`
+- `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungType.yml`
 
-Comment out namespace for `anlagen.xml_list`:
+Comment out namespace for `anlagen.xml_list` in all these files:
 
 ```yaml
 # In the anlagen property xml_list section, comment out namespace
