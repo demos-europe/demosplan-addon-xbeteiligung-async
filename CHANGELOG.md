@@ -1,6 +1,15 @@
 # Changelog
 
 ## UNRELEASED
+## v0.61 (2026-02-17)
+**Fix test failures (DPLAN-17308)**
+- Update test mocks after PhaseBuilder refactoring
+
+**Fix TOEB anlagen deserialization (DPLAN-17345)**
+- Fix JMS Serializer metadata configuration for BeteiligungKommunalTOEBType anlagen property
+- Comment out namespace specification in xml_list to match working Oeffentlichkeit configuration
+- TOEB attachments now properly deserialize from incoming 401 messages
+
 ## v0.60 (2026-02-11)
 **Fix durchgang value for private person statements (DPLAN-17248)**
 - Fix bug where durchgang (iteration number) was always set from institution phase
