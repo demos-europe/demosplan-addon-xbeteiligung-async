@@ -1,16 +1,16 @@
 # Test procedure update (402) with real file attachments
 description: "Test 402 Aktualisieren message with real PDF and DOCX files"
-org_name: "Stadt München"
-plan_name: "Bebauungsplan Update Test"
+org_name: "Amt Nordwest"
+plan_name: "Verfahren Integration Test Update 12"
 arbeitstitel: "Aktualisierung mit Dokumenten"
 planart_code: "6_Bebauungsplan"
 beschreibung_planungsanlass: "Aktualisierung eines bestehenden Verfahrens mit neuen Unterlagen"
-flaechen_url: "https://muenchen.test.local/api/verfahren/karten"
+flaechen_url: "https://init.xplan.develop.diplanung.de/xplan-wms/services/planwerkwmspre/internalid/6004_TA_Base_318ec5c1-da2f-4670-ade9-867af2efdae5?request=GetMap&amp;service=WMS&amp;version=1.3.0&amp;format=image/png&amp;transparent=true&amp;exceptions=application/vnd.ogc.se_inimage&amp;crs=epsg:25832&amp;layers=vektordaten,bp_raster&amp;bbox=564984.128,5940442.486,565072.441,5940522.63&amp;width=89&amp;height=81"
 raeumliche_beschreibung: "Testgebiet München mit aktualisierten Anlagen"
 
 # Enable public participation with attachments
 include_beteiligung_oeffentlichkeit: true
-beteiligung_oeffentlichkeit_id: "bet_oeffentlich_update_402"
+beteiligung_oeffentlichkeit_id: "abc4becb-c0aa-4a87-acea-c9f61eebdd98"
 durchgang_oeffentlichkeit: 2
 bekanntmachung_oeffentlichkeit: "2026-03-01"
 zeitraum_beginn_oeffentlichkeit: "2026-03-15+02:00"
@@ -41,7 +41,7 @@ anlagen_oeffentlichkeit:
 
 # Enable TOEB participation with attachments
 include_beteiligung_toeb: true
-beteiligung_toeb_id: "bet_toeb_update_402"
+beteiligung_toeb_id: "abc4becb-c0aa-4a87-acea-c9f61eebdd98"
 durchgang_toeb: 2
 bekanntmachung_toeb: "2026-03-01"
 zeitraum_beginn_toeb: "2026-03-15+02:00"

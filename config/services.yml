@@ -26,6 +26,10 @@ services:
         factory: [ 'DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration', 'fromParameterBag' ]
         arguments: [ '@parameter_bag' ]
 
+    DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungMessageTransport:
+        calls:
+            - [ 'setClient', [ '@old_sound_rabbit_mq.demos_plan_import_rpc' ] ]
+
     DemosEurope\DemosplanAddon\XBeteiligung\Tools\RabbitMQMessageBroker:
         calls:
             - [ 'setClient', [ '@old_sound_rabbit_mq.demos_plan_import_rpc' ] ]
