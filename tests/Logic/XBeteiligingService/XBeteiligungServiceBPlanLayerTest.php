@@ -373,6 +373,7 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
         $phase->method('getStartDate')->willReturn(new \DateTime('2025-01-01'));
         $phase->method('getEndDate')->willReturn(new \DateTime('2025-02-01'));
         $phase->method('getIteration')->willReturn(1);
+        $phase->method('getKey')->willReturn('configuration');
 
         // Setup organization
         $orga = $this->createMock(OrgaInterface::class);

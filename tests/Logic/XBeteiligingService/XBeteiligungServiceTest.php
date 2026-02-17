@@ -120,6 +120,7 @@ abstract class XBeteiligungServiceTest extends TestCase
         $procedurePhaseMock->method('getStartDate')->willReturn($startDate);
         $procedurePhaseMock->method('getEndDate')->willReturn($endDate);
         $procedurePhaseMock->method('getIteration')->willReturn(1);
+        $procedurePhaseMock->method('getKey')->willReturn('configuration');
         $procedure->method('getPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhase')->willReturn('configuration');

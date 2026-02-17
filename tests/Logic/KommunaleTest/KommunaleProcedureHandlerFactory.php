@@ -78,7 +78,8 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getXBeteiligungRoutingKeyParserMock(),
             $procedureDataExtractor,
             $this->mockFactory->getXBeteiligungGisLayerManagerMock(),
-            $this->mockFactory->getXBeteiligungAttachmentServiceMock()
+            $this->mockFactory->getXBeteiligungAttachmentServiceMock(),
+            $this->mockFactory->getProcedurePhaseCodeDetectorMock()
         ];
 
         switch ($handlerType) {
