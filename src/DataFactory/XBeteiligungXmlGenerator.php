@@ -10,7 +10,7 @@ declare(strict_types=1);
  * All rights reserved
  */
 
-namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory;
+namespace DemosEurope\DemosplanAddon\XBeteiligung\DataFactory;
 
 use DateTime;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
@@ -19,18 +19,20 @@ use RuntimeException;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Factory for generating dynamic XBeteiligung 401 test XML messages.
+ * Generator for creating dynamic XBeteiligung test XML messages.
  *
  * This class provides a dynamic approach to XML test generation by:
  * - Loading XML templates with placeholders
  * - Reading test scenario configurations from YAML
  * - Generating XML with injected test data
+ * - Supporting multiple message types (401, 201, 402, 202, 701, etc.)
  * - Supporting both valid and invalid test scenarios
  */
-class XBeteiligung401TestFactory
+class XBeteiligungXmlGenerator
 {
-    private const TEMPLATE_FILE = 'tests/fixtures/xbeteiligung/templates/kommunal-initiieren-0401-template.xml';
-    private const SCENARIOS_BASE_DIR = 'tests/fixtures/xbeteiligung/test-data/401';
+    private const TEMPLATES_BASE_DIR = 'tests/fixtures/xbeteiligung/templates';
+    private const TEST_DATA_BASE_DIR = 'tests/fixtures/xbeteiligung/test-data';
+    private const ANLAGE_TEMPLATE_FILE = 'tests/fixtures/xbeteiligung/templates/anlage-template.xml';
     private const DEFAULTS_FILE = 'defaults.yml';
     private const GEOJSON_DIR = 'geojson';
     private const ANLAGEN_DIR = 'anlagen';
@@ -38,16 +40,21 @@ class XBeteiligung401TestFactory
     private const INVALID_SCENARIOS_DIR = 'scenarios/invalid';
 
     private string $templateContent;
+    private string $anlageTemplateContent;
     private array $scenariosConfig;
     private array $defaults;
     private string $anlagenBasePath;
+    private string $scenariosBaseDir;
 
     public function __construct(
         private readonly string $addonRootPath,
-        private readonly CommonHelpers $commonHelpers
+        private readonly CommonHelpers $commonHelpers,
+        private readonly string $messageType
     ) {
-        $this->anlagenBasePath = $this->addonRootPath . '/' . self::SCENARIOS_BASE_DIR . '/' . self::ANLAGEN_DIR;
+        $this->scenariosBaseDir = self::TEST_DATA_BASE_DIR . '/' . $messageType;
+        $this->anlagenBasePath = $this->addonRootPath . '/' . $this->scenariosBaseDir . '/' . self::ANLAGEN_DIR;
         $this->loadTemplate();
+        $this->loadAnlageTemplate();
         $this->loadScenarios();
     }
 
@@ -101,6 +108,39 @@ class XBeteiligung401TestFactory
     }
 
     /**
+     * Get all available message types from the test-data directory.
+     *
+     * @param string $addonRootPath Root path of the addon
+     * @return array List of available message types (e.g., ['401', '201', '402'])
+     */
+    public static function getAvailableMessageTypes(string $addonRootPath): array
+    {
+        $testDataDir = $addonRootPath . '/' . self::TEST_DATA_BASE_DIR;
+
+        if (!is_dir($testDataDir)) {
+            return [];
+        }
+
+        $messageTypes = [];
+        $directories = scandir($testDataDir);
+
+        foreach ($directories as $dir) {
+            if ($dir === '.' || $dir === '..') {
+                continue;
+            }
+
+            $fullPath = $testDataDir . '/' . $dir;
+            if (is_dir($fullPath)) {
+                $messageTypes[] = $dir;
+            }
+        }
+
+        sort($messageTypes);
+
+        return $messageTypes;
+    }
+
+    /**
      * Generate XML for all scenarios of a given type.
      *
      * @param bool $isValid Whether to generate valid or invalid scenarios
@@ -121,16 +161,38 @@ class XBeteiligung401TestFactory
     }
 
     /**
-     * Load the XML template from file.
+     * Load the XML template from file based on message type.
+     * Searches for template files matching the pattern: *-{messageType}-template.xml or *-0{messageType}-template.xml
      */
     private function loadTemplate(): void
     {
-        $templatePath = $this->addonRootPath . '/' . self::TEMPLATE_FILE;
+        $templatesDir = $this->addonRootPath . '/' . self::TEMPLATES_BASE_DIR;
 
-        if (!file_exists($templatePath)) {
-            throw new RuntimeException("Template file not found: {$templatePath}");
+        // Try with message type as-is first
+        $pattern = $templatesDir . '/*-' . $this->messageType . '-template.xml';
+        $matchingFiles = glob($pattern);
+
+        // If not found and message type is 3 digits, try with leading zero (e.g., 401 -> 0401)
+        if (empty($matchingFiles) && strlen($this->messageType) === 3 && ctype_digit($this->messageType)) {
+            $pattern = $templatesDir . '/*-0' . $this->messageType . '-template.xml';
+            $matchingFiles = glob($pattern);
         }
 
+        if (empty($matchingFiles)) {
+            throw new RuntimeException(
+                "No template file found for message type '{$this->messageType}' in {$templatesDir}. " .
+                "Tried patterns: *-{$this->messageType}-template.xml and *-0{$this->messageType}-template.xml"
+            );
+        }
+
+        if (count($matchingFiles) > 1) {
+            throw new RuntimeException(
+                "Multiple template files found for message type '{$this->messageType}': " .
+                implode(', ', $matchingFiles)
+            );
+        }
+
+        $templatePath = $matchingFiles[0];
         $this->templateContent = file_get_contents($templatePath);
 
         if (false === $this->templateContent) {
@@ -139,14 +201,34 @@ class XBeteiligung401TestFactory
     }
 
     /**
+     * Load the anlage template.
+     */
+    private function loadAnlageTemplate(): void
+    {
+        $templatePath = $this->addonRootPath . '/' . self::ANLAGE_TEMPLATE_FILE;
+
+        if (!file_exists($templatePath)) {
+            throw new RuntimeException("Anlage template file not found: {$templatePath}");
+        }
+
+        $this->anlageTemplateContent = file_get_contents($templatePath);
+
+        if (false === $this->anlageTemplateContent) {
+            throw new RuntimeException("Failed to read anlage template file: {$templatePath}");
+        }
+    }
+
+    /**
      * Load scenario configurations from individual YAML files and shared defaults.
      */
     private function loadScenarios(): void
     {
-        $baseDir = $this->addonRootPath . '/' . self::SCENARIOS_BASE_DIR;
+        $baseDir = $this->addonRootPath . '/' . $this->scenariosBaseDir;
 
         if (!is_dir($baseDir)) {
-            throw new RuntimeException("Scenarios base directory not found: {$baseDir}");
+            throw new RuntimeException(
+                "Scenarios base directory not found for message type '{$this->messageType}': {$baseDir}"
+            );
         }
 
         // Load defaults
@@ -388,10 +470,16 @@ class XBeteiligung401TestFactory
 
     /**
      * Replace simple {{PLACEHOLDER}} patterns with actual values.
+     * Skips array values as they should be processed separately.
      */
     private function replacePlaceholders(string $xml, array $parameters): string
     {
         foreach ($parameters as $key => $value) {
+            // Skip array values - they should be processed separately
+            if (is_array($value)) {
+                continue;
+            }
+
             $placeholder = '{{' . $key . '}}';
             $xml = str_replace($placeholder, (string) $value, $xml);
         }
@@ -401,50 +489,96 @@ class XBeteiligung401TestFactory
 
     /**
      * Process file attachments for a participation type (oeffentlichkeit or toeb).
-     * If anlage_file_{type} is present, loads the file and generates all related parameters.
+     * Expects anlagen_{type} as array of anlage definitions.
      *
      * @param array $parameters Current parameters
      * @param string $type Participation type ('oeffentlichkeit' or 'toeb')
-     * @return array Parameters with file data added
+     * @return array Parameters with generated XML
      */
     private function processFileAttachments(array $parameters, string $type): array
     {
-        $fileKey = 'anlage_file_' . $type;
+        $anlagenKey = 'anlagen_' . $type;
 
-        // Check if file reference exists
-        if (!isset($parameters[$fileKey]) || empty($parameters[$fileKey])) {
+        // Check if anlagen array exists
+        if (!isset($parameters[$anlagenKey]) || !is_array($parameters[$anlagenKey])) {
             return $parameters;
         }
 
-        $filePath = $this->anlagenBasePath . '/' . $parameters[$fileKey];
+        // Generate XML for all Anlagen
+        $anlagenXml = $this->generateAnlagenXml($parameters[$anlagenKey]);
+        $parameters['anlagen_' . $type . '_xml'] = $anlagenXml;
 
-        if (!file_exists($filePath)) {
-            throw new RuntimeException("Anlage file not found: {$filePath}");
-        }
-
-        // Load and encode file
-        $fileData = $this->loadAndEncodeFile($filePath);
-
-        // Extract filename from path
-        $filename = basename($filePath);
-
-        // Generate or use existing document ID
-        $dokumentIdKey = 'anlage_dokument_id_' . $type;
-        $documentId = $parameters[$dokumentIdKey] ?? 'ID_' . $this->commonHelpers->uuid();
-
-        // Add all file-related parameters
-        $parameters['anlage_filesize_' . $type] = $fileData['filesize'];
-        $parameters['anlage_hash_' . $type] = $fileData['hash'];
-        $parameters['anlage_content_base64_' . $type] = $fileData['base64'];
-        $parameters['anlage_dateiname_' . $type] = $filename;
-        $parameters['anlage_dokument_id_' . $type] = $documentId;
-
-        // Auto-detect MIME type if not provided
-        if (!isset($parameters['anlage_mime_type_' . $type])) {
-            $parameters['anlage_mime_type_' . $type] = $this->detectMimeType($filePath);
+        // Set flag to include anlagen section if not already set
+        if (!isset($parameters['include_anlagen_' . $type])) {
+            $parameters['include_anlagen_' . $type] = true;
         }
 
         return $parameters;
+    }
+
+    /**
+     * Generate XML for multiple Anlagen from array definition.
+     *
+     * @param array $anlagen Array of anlage definitions
+     * @return string Generated XML for all anlagen
+     */
+    private function generateAnlagenXml(array $anlagen): string
+    {
+        $xmlParts = [];
+
+        foreach ($anlagen as $anlageIndex => $anlage) {
+            if (!isset($anlage['file'])) {
+                throw new RuntimeException("Missing 'file' key in anlage definition (index: {$anlageIndex})");
+            }
+
+            $filePath = $this->anlagenBasePath . '/' . $anlage['file'];
+
+            if (!file_exists($filePath)) {
+                throw new RuntimeException("Anlage file not found: {$filePath}");
+            }
+
+            // Load and encode file
+            $fileData = $this->loadAndEncodeFile($filePath);
+            $filename = basename($filePath);
+
+            // Get or generate values
+            $version = $anlage['version'] ?? '1.0';
+            $datum = $anlage['datum'] ?? (new \DateTime())->format('Y-m-d\TH:i:sP');
+            $artCode = $anlage['art_code'] ?? '1000';
+            $mimeType = $anlage['mime_type'] ?? $this->detectMimeType($filePath);
+            $dokumentId = $anlage['dokument_id'] ?? 'ID_' . $this->commonHelpers->uuid();
+
+            // Replace placeholders in anlage template
+            $anlageXml = str_replace(
+                [
+                    '{{VERSION}}',
+                    '{{DATUM}}',
+                    '{{ART_CODE}}',
+                    '{{MIME_TYPE}}',
+                    '{{FILESIZE}}',
+                    '{{HASH}}',
+                    '{{DOKUMENT_ID}}',
+                    '{{DATEINAME}}',
+                    '{{CONTENT_BASE64}}',
+                ],
+                [
+                    htmlspecialchars($version, ENT_XML1, 'UTF-8'),
+                    htmlspecialchars($datum, ENT_XML1, 'UTF-8'),
+                    htmlspecialchars($artCode, ENT_XML1, 'UTF-8'),
+                    htmlspecialchars($mimeType, ENT_XML1, 'UTF-8'),
+                    $fileData['filesize'],
+                    $fileData['hash'],
+                    htmlspecialchars($dokumentId, ENT_XML1, 'UTF-8'),
+                    htmlspecialchars($filename, ENT_XML1, 'UTF-8'),
+                    $fileData['base64'],
+                ],
+                $this->anlageTemplateContent
+            );
+
+            $xmlParts[] = $anlageXml;
+        }
+
+        return implode("\n", $xmlParts);
     }
 
     /**

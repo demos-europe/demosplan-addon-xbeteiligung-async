@@ -18,7 +18,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
-use DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\DataFactory\XBeteiligungXmlGenerator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use JMS\Serializer\Serializer;
@@ -49,7 +49,7 @@ class KommunaleProcedureCreatorTest extends TestCase
     protected $messageParser;
 
     /**
-     * @var XBeteiligung401TestFactory
+     * @var XBeteiligungXmlGenerator
      */
     protected $xmlFactory;
 
@@ -70,9 +70,10 @@ class KommunaleProcedureCreatorTest extends TestCase
 
         // Initialize XML factory for dynamic test data generation
         $commonHelpers = new CommonHelpers($this->logger);
-        $this->xmlFactory = new XBeteiligung401TestFactory(
+        $this->xmlFactory = new XBeteiligungXmlGenerator(
             AddonPath::getRootPath(),
-            $commonHelpers
+            $commonHelpers,
+            '401'
         );
     }
 

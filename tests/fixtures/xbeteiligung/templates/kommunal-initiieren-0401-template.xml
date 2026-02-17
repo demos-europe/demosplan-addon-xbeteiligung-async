@@ -79,23 +79,7 @@
                </xbeteiligung:zeitraum>
                {{#INCLUDE_ANLAGEN_OEFFENTLICHKEIT}}
                <xbeteiligung:anlagen>
-                   <anlage>
-                       <versionsnummer>{{ANLAGE_VERSION_OEFFENTLICHKEIT}}</versionsnummer>
-                       <datum>{{ANLAGE_DATUM_OEFFENTLICHKEIT}}</datum>
-                       <anlageart listURI="urn:xoev-de:xleitstelle:codeliste:verfahrensunterlagetyp" listVersionID="1">
-                           <code>{{ANLAGE_ART_CODE_OEFFENTLICHKEIT}}</code>
-                       </anlageart>
-                       <mimeType listURI="urn:xoev-de:xbeteiligung:codeliste:xbau-mime" listVersionID="1">
-                           <code>{{ANLAGE_MIME_TYPE_OEFFENTLICHKEIT}}</code>
-                       </mimeType>
-                       <anhangOderVerlinkung>
-                           <xbeteiligung:anhang filesize="{{ANLAGE_FILESIZE_OEFFENTLICHKEIT}}" hashValue="{{ANLAGE_HASH_OEFFENTLICHKEIT}}">
-                               <dokumentid>{{ANLAGE_DOKUMENT_ID_OEFFENTLICHKEIT}}</dokumentid>
-                               <dateiname>{{ANLAGE_DATEINAME_OEFFENTLICHKEIT}}</dateiname>
-                           </xbeteiligung:anhang>
-                       </anhangOderVerlinkung>
-                       <xbeteiligung:dokument>{{ANLAGE_CONTENT_BASE64_OEFFENTLICHKEIT}}</xbeteiligung:dokument>
-                   </anlage>
+{{ANLAGEN_OEFFENTLICHKEIT_XML}}
                </xbeteiligung:anlagen>
                {{/INCLUDE_ANLAGEN_OEFFENTLICHKEIT}}
                <xbeteiligung:beteiligungKommunalOeffentlichkeitArt>
@@ -122,23 +106,7 @@
                </xbeteiligung:zeitraum>
                {{#INCLUDE_ANLAGEN_TOEB}}
                <xbeteiligung:anlagen>
-                   <anlage>
-                       <versionsnummer>{{ANLAGE_VERSION_TOEB}}</versionsnummer>
-                       <datum>{{ANLAGE_DATUM_TOEB}}</datum>
-                       <anlageart listURI="urn:xoev-de:xleitstelle:codeliste:verfahrensunterlagetyp" listVersionID="1">
-                           <code>{{ANLAGE_ART_CODE_TOEB}}</code>
-                       </anlageart>
-                       <mimeType listURI="urn:xoev-de:xbeteiligung:codeliste:xbau-mime" listVersionID="1">
-                           <code>{{ANLAGE_MIME_TYPE_TOEB}}</code>
-                       </mimeType>
-                       <anhangOderVerlinkung>
-                           <xbeteiligung:anhang filesize="{{ANLAGE_FILESIZE_TOEB}}" hashValue="{{ANLAGE_HASH_TOEB}}">
-                               <dokumentid>{{ANLAGE_DOKUMENT_ID_TOEB}}</dokumentid>
-                               <dateiname>{{ANLAGE_DATEINAME_TOEB}}</dateiname>
-                           </xbeteiligung:anhang>
-                       </anhangOderVerlinkung>
-                       <xbeteiligung:dokument>{{ANLAGE_CONTENT_BASE64_TOEB}}</xbeteiligung:dokument>
-                   </anlage>
+{{ANLAGEN_TOEB_XML}}
                </xbeteiligung:anlagen>
                {{/INCLUDE_ANLAGEN_TOEB}}
                <xbeteiligung:beteiligungKommunalTOEBArt>

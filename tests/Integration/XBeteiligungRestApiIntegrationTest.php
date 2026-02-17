@@ -14,7 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Integration;
 
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
-use DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory\XBeteiligung401TestFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\DataFactory\XBeteiligungXmlGenerator;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\HttpClient;
@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class XBeteiligungRestApiIntegrationTest extends TestCase
 {
     private HttpClientInterface $httpClient;
-    private XBeteiligung401TestFactory $xmlFactory;
+    private XBeteiligungXmlGenerator $xmlFactory;
     private string $baseUrl;
     private string $authToken;
 
@@ -42,9 +42,10 @@ class XBeteiligungRestApiIntegrationTest extends TestCase
         
         // Initialize XML factory for dynamic test data generation
         $commonHelpers = new CommonHelpers(new NullLogger());
-        $this->xmlFactory = new XBeteiligung401TestFactory(
+        $this->xmlFactory = new XBeteiligungXmlGenerator(
             AddonPath::getRootPath(),
-            $commonHelpers
+            $commonHelpers,
+            '401'
         );
         
         // Configure test environment using actual application configuration

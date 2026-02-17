@@ -1,0 +1,17 @@
+                   <anlage>
+                       <versionsnummer>{{VERSION}}</versionsnummer>
+                       <datum>{{DATUM}}</datum>
+                       <anlageart listURI="urn:xoev-de:xleitstelle:codeliste:verfahrensunterlagetyp" listVersionID="1">
+                           <code>{{ART_CODE}}</code>
+                       </anlageart>
+                       <mimeType listURI="urn:xoev-de:xbeteiligung:codeliste:xbau-mime" listVersionID="1">
+                           <code>{{MIME_TYPE}}</code>
+                       </mimeType>
+                       <anhangOderVerlinkung>
+                           <xbeteiligung:anhang filesize="{{FILESIZE}}" hashValue="{{HASH}}">
+                               <dokumentid>{{DOKUMENT_ID}}</dokumentid>
+                               <dateiname>{{DATEINAME}}</dateiname>
+                           </xbeteiligung:anhang>
+                       </anhangOderVerlinkung>
+                       <xbeteiligung:dokument>{{CONTENT_BASE64}}</xbeteiligung:dokument>
+                   </anlage>

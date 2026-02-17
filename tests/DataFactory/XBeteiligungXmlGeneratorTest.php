@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\DataFactory;
 
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
+use DemosEurope\DemosplanAddon\XBeteiligung\DataFactory\XBeteiligungXmlGenerator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -20,17 +21,18 @@ use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 /**
- * Unit tests for XBeteiligung401TestFactory.
+ * Unit tests for XBeteiligungXmlGenerator.
  *
- * Tests the factory's ability to:
+ * Tests the generator's ability to:
  * - Load templates and scenarios correctly
  * - Generate valid XML from test scenarios
  * - Handle conditional sections properly
  * - Validate input and provide meaningful errors
+ * - Support multiple message types
  */
-class XBeteiligung401TestFactoryTest extends TestCase
+class XBeteiligungXmlGeneratorTest extends TestCase
 {
-    private XBeteiligung401TestFactory $factory;
+    private XBeteiligungXmlGenerator $factory;
     private MockObject $commonHelpersMock;
 
     protected function setUp(): void
@@ -39,24 +41,27 @@ class XBeteiligung401TestFactoryTest extends TestCase
 
         $this->commonHelpersMock = $this->createMock(CommonHelpers::class);
 
-        $this->factory = new XBeteiligung401TestFactory(
-            AddonPath::getRootPath(),
-            $this->commonHelpersMock
+        $addonRootPath = AddonPath::getRootPath();
+
+        $this->factory = new XBeteiligungXmlGenerator(
+            $addonRootPath,
+            $this->commonHelpersMock,
+            '401'
         );
     }
 
     public function testConstructorLoadsTemplateAndScenarios(): void
     {
         // Test that constructor doesn't throw exceptions with valid files
-        $this->assertInstanceOf(XBeteiligung401TestFactory::class, $this->factory);
+        $this->assertInstanceOf(XBeteiligungXmlGenerator::class, $this->factory);
     }
 
     public function testConstructorThrowsExceptionForMissingTemplate(): void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Template file not found');
+        $this->expectExceptionMessage('No template file found for message type');
 
-        new XBeteiligung401TestFactory('/nonexistent/path', $this->commonHelpersMock);
+        new XBeteiligungXmlGenerator('/nonexistent/path', $this->commonHelpersMock, '401');
     }
 
     public function testGetAvailableScenarios(): void
@@ -204,15 +209,15 @@ class XBeteiligung401TestFactoryTest extends TestCase
             ->method('uuid')
             ->willReturn('test-uuid');
 
-        $xml = $this->factory->createXML('quickborn_with_attachments', true);
+        $xml = $this->factory->createXML('test_procedure_with_anlagen', true);
 
         // Check that attachments section is included
         $this->assertStringContainsString('<xbeteiligung:anlagen>', $xml);
         $this->assertStringContainsString('<anlage>', $xml);
         $this->assertStringContainsString('<versionsnummer>1.0</versionsnummer>', $xml);
         $this->assertStringContainsString('<code>application/pdf</code>', $xml);
-        $this->assertStringContainsString('<dateiname>bebauungsplan-entwurf.pdf</dateiname>', $xml);
-        $this->assertStringContainsString('filesize="3908"', $xml);
+        $this->assertStringContainsString('<dateiname>Planzeichnung.pdf</dateiname>', $xml);
+        $this->assertMatchesRegularExpression('/filesize="\d+"/', $xml);
     }
 
     public function testCreateXMLForInvalidScenario(): void
@@ -490,12 +495,12 @@ class XBeteiligung401TestFactoryTest extends TestCase
 
         $xml = $this->factory->createXML('test_procedure_with_anlagen', true);
 
-        // Count dokument elements (should have 2: one for Oeffentlichkeit, one for TOEB)
+        // Count dokument elements (should have 4: 2 for Oeffentlichkeit, 2 for TOEB)
         $dokumentCount = substr_count($xml, '<xbeteiligung:dokument>');
         $this->assertEquals(
-            2,
+            4,
             $dokumentCount,
-            'Should have 2 xbeteiligung:dokument elements (one for Oeffentlichkeit, one for TOEB)'
+            'Should have 4 xbeteiligung:dokument elements (2 for Oeffentlichkeit, 2 for TOEB)'
         );
 
         // Verify both participation sections are included
