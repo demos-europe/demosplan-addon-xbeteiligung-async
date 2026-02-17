@@ -44,6 +44,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\RoutingKeyComponents;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungGisLayerManager;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAttachmentService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -364,5 +365,13 @@ class MockFactoryTest
     public function getXBeteiligungAttachmentServiceMock(): XBeteiligungAttachmentService|MockObject
     {
         return $this->testCase->createMockObject(XBeteiligungAttachmentService::class);
+    }
+
+    public function getProcedurePhaseCodeDetectorMock(): ProcedurePhaseCodeDetector|MockObject
+    {
+        $mock = $this->testCase->createMockObject(ProcedurePhaseCodeDetector::class);
+        $mock->method('getExternalProcedurePhaseCode')->willReturn('invalid');
+        $mock->method('getExternalProcedureSubPhaseCode')->willReturn('invalid');
+        return $mock;
     }
 }

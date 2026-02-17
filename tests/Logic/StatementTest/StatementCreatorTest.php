@@ -24,6 +24,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
@@ -122,19 +123,7 @@ class StatementCreatorTest extends TestCase
                 $this->permissionEvaluator,
                 $this->mockFactory->getLoggerInterfaceMock(),
                 $this->mockFactory->getGlobalConfigInterfaceMock(),
-                new \DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration(
-                    rabbitMqEnabled: true,
-                    requestTimeout: 30,
-                    communicationDelay: 0,
-                    procedureMessageType: 'kommunal',
-                    auditEnabled: true,
-                    xoevAddressPrefixCockpit: 'test-cockpit',
-                    maxMessagesPerCycle: 10,
-                    consumerTimeout: 60,
-                    procedureTypeName: 'test',
-                    verfahrensschrittCode: '',
-                    verfahrensteilschrittCode: ''
-                )
+                $this->mockFactory->getProcedurePhaseCodeDetectorMock()
             ),
             $textSanitizer
         );
@@ -204,6 +193,7 @@ class StatementCreatorTest extends TestCase
         $phaseObject->method('setIteration')->with($iteration);
         // Configure the procedure mock to return the phase object
         $this->procedure->method('getPhaseObject')->willReturn($phaseObject);
+        $this->procedure->method('getPublicParticipationPhaseObject')->willReturn($phaseObject);
         // Configure the meta mock to return the organization name
         $meta = $this->createMock(StatementMetaInterface::class);
         $meta->method('getOrgaName')->willReturn('Privatperson');

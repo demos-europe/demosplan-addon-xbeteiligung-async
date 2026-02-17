@@ -1,6 +1,9 @@
 # Changelog
 
 ## UNRELEASED
+**Fix test failures (DPLAN-17308)**
+- Update test mocks after PhaseBuilder refactoring
+
 **Fix TOEB anlagen deserialization (DPLAN-17345)**
 - Fix JMS Serializer metadata configuration for BeteiligungKommunalTOEBType anlagen property
 - Comment out namespace specification in xml_list to match working Oeffentlichkeit configuration

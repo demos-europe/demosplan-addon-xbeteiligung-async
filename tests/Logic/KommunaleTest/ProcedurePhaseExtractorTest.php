@@ -47,14 +47,19 @@ class ProcedurePhaseExtractorTest extends TestCase
 
         // create expected procedure phase data object
         $expectedProcedurePhaseData = new ProcedurePhaseData(
-            'configuration', // public participation phase is now hardcoded to 'configuration'
-            'configuration', // institution participation phase is now hardcoded to 'configuration'
+            'configuration', // public participation phase key
+            'configuration', // institution participation phase key
+            null, // general phase code
+            null, // public participation phase code
+            null, // public participation sub phase code
+            null, // institution participation phase code
+            null, // institution participation sub phase code
             new DateTime('2025-01-01'), // start date for public participation
             new DateTime('2025-01-31'), // end date for public participation
             new DateTime('2025-02-01'), // start date for institution participation
             new DateTime('2025-02-28'), // end date for institution participation
-            1,
-            1
+            1, // public participation iteration
+            1 // institution participation iteration
         );
 
 

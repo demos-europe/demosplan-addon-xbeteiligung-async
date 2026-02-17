@@ -156,12 +156,13 @@ class XBeteiligungGisLayerManagerTest extends TestCase
             ->method('setLayers')
             ->with('vektordaten');
 
-        $this->logger->expects($this->exactly(3))
+        $this->logger->expects($this->exactly(4))
             ->method('info')
             ->with(
                 static::logicalOr(
                 self::stringContains('Processing WMS URL'),
                 self::stringContains('Extracted layers from WMS URL'),
+                self::stringContains('No existing Planzeichnung layer found'),
                 self::stringContains('Created single GIS layer with all layers')
             ));
 
@@ -193,12 +194,13 @@ class XBeteiligungGisLayerManagerTest extends TestCase
             ->method('setLayers')
             ->with('vektordaten,bp_raster');
 
-        $this->logger->expects($this->exactly(3))
+        $this->logger->expects($this->exactly(4))
             ->method('info')
             ->with(
                 static::logicalOr(
                 self::stringContains('Processing WMS URL'),
                 self::stringContains('Extracted layers from WMS URL'),
+                self::stringContains('No existing Planzeichnung layer found'),
                 self::stringContains('Created single GIS layer with all layers')
             ));
 
@@ -279,7 +281,9 @@ class XBeteiligungGisLayerManagerTest extends TestCase
     {
         $validUrl = self::WMS_BASE_URL . '?LAYERS=testlayer&REQUEST=GetMap&BBOX=1,2,3,4&SRS=EPSG:25832';
 
-        $this->gisLayerCategoryRepository->expects($this->once())
+        // getRootLayerCategory is called twice: once in findExistingPlanzeichnungLayer()
+        // and once in createGisLayer() where it throws the exception
+        $this->gisLayerCategoryRepository->expects($this->exactly(2))
             ->method('getRootLayerCategory')
             ->with(self::PROCEDURE_ID)
             ->willReturn(null);
@@ -542,7 +546,9 @@ class XBeteiligungGisLayerManagerTest extends TestCase
 
     private function setupMocksForValidUrl($mockGisLayer, $mockRootCategory, int $expectedLayerCount = 1): void
     {
-        $this->gisLayerCategoryRepository->expects($this->exactly($expectedLayerCount))
+        // getRootLayerCategory is called twice when creating a new layer:
+        // once in findExistingPlanzeichnungLayer() and once in createGisLayer()
+        $this->gisLayerCategoryRepository->expects($this->exactly($expectedLayerCount + 1))
             ->method('getRootLayerCategory')
             ->with(self::PROCEDURE_ID)
             ->willReturn($mockRootCategory);

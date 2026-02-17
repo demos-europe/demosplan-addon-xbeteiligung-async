@@ -17,6 +17,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Exeption\ProjectPrefixNotFoundException;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
@@ -34,6 +35,7 @@ class PhaseBuilderTest extends TestCase
     private MockObject|PermissionEvaluatorInterface $permissionEvaluator;
     private MockObject|LoggerInterface $logger;
     private MockObject|GlobalConfigInterface $globalConfig;
+    private MockObject|ProcedurePhaseCodeDetector $procedurePhaseCodeDetector;
     private XBeteiligungConfiguration $xbeteiligungConfiguration;
     private MockObject|StatementCreated $statementCreated;
     private MockObject|StellungnahmeType $statement;
@@ -43,17 +45,21 @@ class PhaseBuilderTest extends TestCase
         $this->permissionEvaluator = $this->createMock(PermissionEvaluatorInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->globalConfig = $this->createMock(GlobalConfigInterface::class);
+        $this->procedurePhaseCodeDetector = $this->createMock(ProcedurePhaseCodeDetector::class);
         $this->statementCreated = $this->createMock(StatementCreated::class);
         $this->statement = $this->createMock(StellungnahmeType::class);
 
         // Setup default configuration values
         $this->setupXBeteiligungConfiguration('1234', '5678');
 
+        // Setup default procedurePhaseCodeDetector behavior
+        $this->setupProcedurePhaseCodeDetector('1234', '5678');
+
         $this->phaseBuilder = new PhaseBuilder(
             $this->permissionEvaluator,
             $this->logger,
             $this->globalConfig,
-            $this->xbeteiligungConfiguration
+            $this->procedurePhaseCodeDetector
         );
     }
 
@@ -72,6 +78,14 @@ class PhaseBuilderTest extends TestCase
             verfahrensschrittCode: $verfahrensschrittCode,
             verfahrensteilschrittCode: $verfahrensteilschrittCode,
         );
+    }
+
+    private function setupProcedurePhaseCodeDetector(string $phaseCode, string $subPhaseCode): void
+    {
+        $this->procedurePhaseCodeDetector->method('getExternalProcedurePhaseCode')
+            ->willReturn($phaseCode);
+        $this->procedurePhaseCodeDetector->method('getExternalProcedureSubPhaseCode')
+            ->willReturn($subPhaseCode);
     }
 
     private function setupStatementCreatedMocks(string $phase = 'evaluating', string $publicStatement = StatementInterface::EXTERNAL): void
@@ -107,11 +121,19 @@ class PhaseBuilderTest extends TestCase
     private function createPhaseBuilderWithConfiguration(string $verfahrensschrittCode, string $verfahrensteilschrittCode): PhaseBuilder
     {
         $this->setupXBeteiligungConfiguration($verfahrensschrittCode, $verfahrensteilschrittCode);
+
+        // Create a new mock for this specific builder
+        $procedurePhaseCodeDetector = $this->createMock(ProcedurePhaseCodeDetector::class);
+        $procedurePhaseCodeDetector->method('getExternalProcedurePhaseCode')
+            ->willReturn($verfahrensschrittCode ?: 'invalid');
+        $procedurePhaseCodeDetector->method('getExternalProcedureSubPhaseCode')
+            ->willReturn($verfahrensteilschrittCode ?: 'invalid');
+
         return new PhaseBuilder(
             $this->permissionEvaluator,
             $this->logger,
             $this->globalConfig,
-            $this->xbeteiligungConfiguration
+            $procedurePhaseCodeDetector
         );
     }
 
