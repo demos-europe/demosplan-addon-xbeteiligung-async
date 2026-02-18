@@ -39,18 +39,5 @@ class XBeteiligungFileMappingRepository extends ServiceEntityRepository
         return $mapping;
     }
 
-    /**
-     * Delete all mappings for a procedure
-     *
-     * @return int Number of deleted records
-     */
-    public function deleteByProcedureId(string $procedureId): int
-    {
-        $qb = $this->createQueryBuilder('fm')
-            ->delete()
-            ->where('fm.procedureId = :procedureId')
-            ->setParameter('procedureId', $procedureId);
 
-        return $qb->getQuery()->execute();
-    }
 }
