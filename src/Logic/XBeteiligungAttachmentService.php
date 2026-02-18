@@ -71,40 +71,15 @@ class XBeteiligungAttachmentService
     }
 
     /**
-     * Process and save all attachments (Anlagen) from XBeteiligung message to procedure.
+     * Apply all attachments (Anlagen) from an XBeteiligung message to a procedure.
      *
-     * @param ProcedureInterface   $procedure           The target procedure
+     * For each anlage, replaces the existing file if a mapping for its dokumentId is found,
+     * otherwise adds it as a new attachment.
+     *
+     * @param ProcedureInterface  $procedure          The target procedure
      * @param AnlageValueObject[] $anlagenValueObject Array of attachment value objects
      */
-    public function saveAnlagenToProcedureCategories(
-        ProcedureInterface $procedure,
-        array $anlagenValueObject
-    ): void {
-        foreach ($anlagenValueObject as $anlage) {
-            try {
-                if (false === $this->isAttachmentValid($anlage, $procedure)) {
-                    continue;
-                }
-
-                $this->processSingleAttachment($anlage, $procedure);
-            } catch (Exception $e) {
-                $this->logAttachmentProcessingError($e, $anlage, $procedure);
-            }
-        }
-    }
-
-    /**
-     * Save or update attachments with file tracking for 402 message handling.
-     *
-     * This method extends saveAnlagenToProcedureCategories with file replacement logic:
-     * - If dokumentId exists and file mapping found: replaces existing file
-     * - If dokumentId exists but no mapping: creates new file and tracks it
-     * - If no dokumentId: creates new file without tracking (backward compatibility)
-     *
-     * @param ProcedureInterface   $procedure          The target procedure
-     * @param AnlageValueObject[] $anlagenValueObject Array of attachment value objects
-     */
-    public function saveOrUpdateAnlagenToProcedureCategories(
+    public function applyAnlagenToProcedure(
         ProcedureInterface $procedure,
         array $anlagenValueObject
     ): void {
@@ -116,7 +91,6 @@ class XBeteiligungAttachmentService
 
                 $dokumentId = $anlage->getDocumentId();
 
-                // Check if dokumentId exists and if we have a mapping for it
                 if (null !== $dokumentId && '' !== $dokumentId) {
                     $existingMapping = $this->fileMappingRepository->findByXmlFileIdAndProcedure(
                         $dokumentId,
@@ -124,30 +98,12 @@ class XBeteiligungAttachmentService
                     );
 
                     if (null !== $existingMapping) {
-                        // Replace existing file
                         $this->replaceExistingAttachment($anlage, $procedure, $existingMapping);
                         continue;
                     }
                 }
 
-                // Create new file (either no dokumentId or no existing mapping)
-                // This saves the attachment and creates the single document
-                $element = $this->ensureDocumentCategory($procedure, $anlage->getDocumentCategoryName());
-                $fileString = $this->saveAttachment($anlage, $procedure->getId());
-                $singleDocumentId = $this->createSingleDocument($procedure, $element, $anlage->getFileName(), $fileString);
-
-                $this->logger->info(self::LOG_PREFIX.'Successfully saved Anlage to procedure', [
-                    'filename' => $anlage->getFileName(),
-                    'procedureId' => $procedure->getId(),
-                    'categoryName' => $element->getTitle(),
-                    'singleDocumentId' => $singleDocumentId,
-                ]);
-
-                // Track mapping if dokumentId exists
-                if (null !== $dokumentId && '' !== $dokumentId && null !== $singleDocumentId) {
-                    $fileId = $this->extractFileIdFromFileString($fileString);
-                    $this->trackFileMapping($dokumentId, $procedure->getId(), $fileId, $singleDocumentId);
-                }
+                $this->addNewAttachment($anlage, $procedure);
             } catch (Exception $e) {
                 $this->logAttachmentProcessingError($e, $anlage, $procedure);
             }
@@ -194,19 +150,14 @@ class XBeteiligungAttachmentService
     }
 
     /**
-     * Process a single validated attachment.
-     *
-     * @param AnlageValueObject  $anlage    The attachment to process
-     * @param ProcedureInterface $procedure The target procedure
-     *
-     * @return string|null The created SingleDocument ID, or null if creation failed
+     * Add a new attachment to the procedure and track its mapping if a dokumentId is present.
      *
      * @throws ReflectionException
      */
-    private function processSingleAttachment(
+    private function addNewAttachment(
         AnlageValueObject $anlage,
         ProcedureInterface $procedure
-    ): ?string {
+    ): void {
         $element = $this->ensureDocumentCategory($procedure, $anlage->getDocumentCategoryName());
         $fileString = $this->saveAttachment($anlage, $procedure->getId());
         $singleDocumentId = $this->createSingleDocument($procedure, $element, $anlage->getFileName(), $fileString);
@@ -218,7 +169,11 @@ class XBeteiligungAttachmentService
             'singleDocumentId' => $singleDocumentId,
         ]);
 
-        return $singleDocumentId;
+        $dokumentId = $anlage->getDocumentId();
+        if (null !== $dokumentId && '' !== $dokumentId && null !== $singleDocumentId) {
+            $fileId = $this->extractFileIdFromFileString($fileString);
+            $this->trackFileMapping($dokumentId, $procedure->getId(), $fileId, $singleDocumentId);
+        }
     }
 
     /**

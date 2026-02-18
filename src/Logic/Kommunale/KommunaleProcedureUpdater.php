@@ -148,7 +148,7 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         // Process attachment updates (replaces existing files based on dokumentId)
         $anlagen = $procedureDataValueObject->getAnlagen();
         if (!empty($anlagen)) {
-            $this->xbeteiligungAttachmentService->saveOrUpdateAnlagenToProcedureCategories(
+            $this->xbeteiligungAttachmentService->applyAnlagenToProcedure(
                 $procedure,
                 $anlagen
             );
