@@ -32,9 +32,6 @@ class Version20260217190000 extends AbstractMigration
     public function down(Schema $schema): void
     {
         $this->abortIfNotMysql();
-        $this->addSql('ALTER TABLE xbeteiligung_file_mapping DROP FOREIGN KEY FK_mapping_procedure');
-        $this->addSql('ALTER TABLE xbeteiligung_file_mapping DROP FOREIGN KEY FK_mapping_file');
-        $this->addSql('ALTER TABLE xbeteiligung_file_mapping DROP FOREIGN KEY FK_mapping_document');
         $this->addSql('DROP TABLE IF EXISTS xbeteiligung_file_mapping');
     }
 
