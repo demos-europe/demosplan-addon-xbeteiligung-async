@@ -22,6 +22,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAkt
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure\ProcedureDataValueObject;
 use Exception;
 use GoetasWebservices\XML\XSDReader\Schema\Exception\SchemaException;
+use Throwable;
 
 class KommunaleProcedureUpdater extends ProcedureCommonFeatures
 {
@@ -54,9 +55,12 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
                 'message' => $e->getMessage()
             ]);
             return $this->buildErrorResponse($e->getErrorTypes(), $message);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
+            // Catch both Exception and Error (including TypeError, ArgumentCountError, etc.)
             $this->logger->error(self::PROCEDURE_UPDATE_FAILED_ERROR_DESCRIPTION, [
-                'errorMessage' => $e->getMessage()
+                'errorMessage' => $e->getMessage(),
+                'errorClass' => get_class($e),
+                'trace' => $e->getTraceAsString()
             ]);
             return $this->buildGenericErrorResponse($e->getMessage(), $message);
         }

@@ -416,18 +416,20 @@ class XBeteiligungAttachmentService
         $newFileId = $this->extractFileIdFromFileString($fileString);
 
         // Update the SingleDocument with new file
+        // Note: Handler expects keys with 'r_' prefix
         $updateData = [
-            'action' => 'singledocumentedit',
-            self::KEY_DOCUMENT_TITLE => $anlage->getFileName(),
-            self::KEY_DOCUMENT_FILE => $fileString,
+            'r_action' => 'singledocumentedit',
+            'r_ident' => $existingMapping->getSingleDocumentId(),
+            'r_title' => $anlage->getFileName(),
+            'r_document' => $fileString,
         ];
 
-        $result = $this->singleDocumentHandler->administrationDocumentEditHandler(
-            $existingMapping->getSingleDocumentId(),
-            $updateData
-        );
+        $result = $this->singleDocumentHandler->administrationDocumentEditHandler($updateData);
 
-        $newSingleDocumentId = $result[self::KEY_IDENT] ?? $existingMapping->getSingleDocumentId();
+        // Result should be array with 'ident' key, or false on failure
+        $newSingleDocumentId = is_array($result) && isset($result[self::KEY_IDENT])
+            ? $result[self::KEY_IDENT]
+            : $existingMapping->getSingleDocumentId();
 
         // Update mapping with new file IDs
         $existingMapping->setFileId($newFileId);
