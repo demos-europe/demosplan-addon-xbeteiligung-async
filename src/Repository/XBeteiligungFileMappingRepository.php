@@ -38,6 +38,4 @@ class XBeteiligungFileMappingRepository extends ServiceEntityRepository
 
         return $mapping;
     }
-
-
 }
