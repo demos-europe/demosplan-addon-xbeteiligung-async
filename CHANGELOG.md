@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.62 (2026-02-19)
 - merge changes from 0.60.1
 
 ## v0.61 (2026-02-17)
