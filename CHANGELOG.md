@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.60.1 (2026-02-19)
 - allow verfasser name to be id
 
 ## v0.60 (2026-02-11)
