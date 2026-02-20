@@ -27,6 +27,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeXBauMimeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
@@ -232,9 +233,10 @@ abstract class XBeteiligungServiceTest extends TestCase
         $attachment2->setBezeichnung('Test Video.mp4');
         $attachment2->setMimeType($mimeType2);
 
-        $attachments = [$attachment1, $attachment2];
+        $anlagenWrapper = new AnlagenType();
+        $anlagenWrapper->setAnlage([$attachment1, $attachment2]);
         $mockPlanningDocumentsLinkCreator->method('getPlanningDocuments')
-            ->willReturn($attachments);
+            ->willReturn([$anlagenWrapper]);
 
         return $mockPlanningDocumentsLinkCreator;
     }

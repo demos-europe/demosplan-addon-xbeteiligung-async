@@ -73,12 +73,12 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKomm
             accessor:
                 getter: getAnlagen
                 setter: setAnlagen
-            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType>
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType>
             xml_list:
-                inline: false
-                entry_name: anlage
+                inline: true
+                entry_name: anlagen
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
                 skip_when_empty: true
-#                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
         beteiligungKommunalOeffentlichkeitArt:
             expose: true
             access_type: public_method

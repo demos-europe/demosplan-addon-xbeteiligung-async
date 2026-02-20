@@ -57,7 +57,7 @@ class BeteiligungPlanfeststellungOeffentlichkeitType
     /**
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType[] $anlagen
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType[] $anlagen
      */
     private $anlagen = null;
 
@@ -277,9 +277,9 @@ class BeteiligungPlanfeststellungOeffentlichkeitType
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType $anlage
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType $anlage
      */
-    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType $anlage)
+    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType $anlage)
     {
         $this->anlagen[] = $anlage;
         return $this;
@@ -316,7 +316,7 @@ class BeteiligungPlanfeststellungOeffentlichkeitType
      *
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType[]
      */
     public function getAnlagen()
     {
@@ -328,7 +328,7 @@ class BeteiligungPlanfeststellungOeffentlichkeitType
      *
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType[] $anlagen
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType[] $anlagen
      * @return self
      */
     public function setAnlagen(array $anlagen = null)

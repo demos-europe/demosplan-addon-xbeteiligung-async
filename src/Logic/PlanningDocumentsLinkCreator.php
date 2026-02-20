@@ -22,6 +22,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ParagraphServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\ValueObject\FileInfoInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeXBauMimeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnhangOderVerlinkungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensunterlagetypType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -64,7 +65,7 @@ class PlanningDocumentsLinkCreator
     }
 
     /**
-     * @return null|array<int, MetadatenAnlageType>
+     * @return null|array<int, AnlagenType>
      */
     public function getPlanningDocuments(ProcedureInterface $procedure): ?array
     {
@@ -85,7 +86,14 @@ class PlanningDocumentsLinkCreator
 
         $planningDocuments = array_merge($planningDocumentsFromFiles, $planningDocumentsFromParagraphs);
 
-        return 0 < count($planningDocuments) ? $planningDocuments : null;
+        if (0 === count($planningDocuments)) {
+            return null;
+        }
+
+        $anlagenWrapper = new AnlagenType();
+        $anlagenWrapper->setAnlage($planningDocuments);
+
+        return [$anlagenWrapper];
     }
 
     private function handleCategoryFile(ElementsInterface $element, string $procedureId): array

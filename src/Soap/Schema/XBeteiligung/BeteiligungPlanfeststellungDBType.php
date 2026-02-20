@@ -134,7 +134,7 @@ class BeteiligungPlanfeststellungDBType
     /**
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert. Für die Übermittlung an die Beteiligungs-DB ist nur die Übermittlung von Links auf Unterlagen zulässig.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageLinkType[] $anlagen
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenLinkType[] $anlagen
      */
     private $anlagen = null;
 
@@ -626,9 +626,9 @@ class BeteiligungPlanfeststellungDBType
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert. Für die Übermittlung an die Beteiligungs-DB ist nur die Übermittlung von Links auf Unterlagen zulässig.
      *
      * @return self
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageLinkType $anlage
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenLinkType $anlage
      */
-    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageLinkType $anlage)
+    public function addToAnlagen(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenLinkType $anlage)
     {
         $this->anlagen[] = $anlage;
         return $this;
@@ -665,7 +665,7 @@ class BeteiligungPlanfeststellungDBType
      *
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert. Für die Übermittlung an die Beteiligungs-DB ist nur die Übermittlung von Links auf Unterlagen zulässig.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageLinkType[]
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenLinkType[]
      */
     public function getAnlagen()
     {
@@ -677,7 +677,7 @@ class BeteiligungPlanfeststellungDBType
      *
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert. Für die Übermittlung an die Beteiligungs-DB ist nur die Übermittlung von Links auf Unterlagen zulässig.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageLinkType[] $anlagen
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenLinkType[] $anlagen
      * @return self
      */
     public function setAnlagen(array $anlagen = null)
