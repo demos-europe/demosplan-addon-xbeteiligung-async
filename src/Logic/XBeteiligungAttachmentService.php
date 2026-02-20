@@ -366,6 +366,8 @@ class XBeteiligungAttachmentService
         ProcedureInterface $procedure,
         XBeteiligungFileMapping $existingMapping
     ): void {
+        $oldFileId = $existingMapping->getFileId();
+
         // Save new file version
         $fileString = $this->saveAttachment($anlage, $procedure->getId());
         $newFileId = $this->extractFileIdFromFileString($fileString);
@@ -391,11 +393,14 @@ class XBeteiligungAttachmentService
         $existingMapping->setSingleDocumentId($newSingleDocumentId);
         $this->fileMappingRepository->save($existingMapping);
 
+        // Delete the old file now that it has been replaced
+        $this->fileService->deleteFile($oldFileId);
+
         $this->logger->info(self::LOG_PREFIX.'Successfully replaced existing attachment', [
             'filename' => $anlage->getFileName(),
             'procedureId' => $procedure->getId(),
             'xmlFileId' => $anlage->getDocumentId(),
-            'oldFileId' => $existingMapping->getFileId(),
+            'oldFileId' => $oldFileId,
             'newFileId' => $newFileId,
             'singleDocumentId' => $newSingleDocumentId,
         ]);
