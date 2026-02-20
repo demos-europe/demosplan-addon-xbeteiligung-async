@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnhangOderVerlinkungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType;
@@ -91,9 +92,10 @@ class AnlagenExtractor
     }
 
     /**
-     * Processes an array of attachments and converts them to AnlageValueObject instances.
+     * Processes an array of AnlagenType wrappers and converts all contained anlage items
+     * to AnlageValueObject instances. Handles multiple <anlagen> wrappers as allowed by the XSD.
      *
-     * @param MetadatenAnlageType[]|null $anlagenArray
+     * @param AnlagenType[]|null $anlagenArray
      * @return AnlageValueObject[]
      */
     private function processAttachmentArray(?array $anlagenArray): array
@@ -103,14 +105,16 @@ class AnlagenExtractor
         }
 
         $anlagen = [];
-        foreach ($anlagenArray as $anlage) {
-            try {
-                $anlagen[] = $this->createAnlageValueObject($anlage);
-            } catch (Exception $e) {
-                $this->logger->warning('Failed to extract attachment', [
-                    'error' => $e->getMessage(),
-                    'attachment_title' => $anlage?->getBezeichnung(),
-                ]);
+        foreach ($anlagenArray as $anlagenWrapper) {
+            foreach ($anlagenWrapper->getAnlage() as $anlage) {
+                try {
+                    $anlagen[] = $this->createAnlageValueObject($anlage);
+                } catch (Exception $e) {
+                    $this->logger->warning('Failed to extract attachment', [
+                        'error' => $e->getMessage(),
+                        'attachment_title' => $anlage?->getBezeichnung(),
+                    ]);
+                }
             }
         }
 

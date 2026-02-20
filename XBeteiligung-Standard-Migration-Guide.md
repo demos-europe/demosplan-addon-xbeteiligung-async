@@ -133,25 +133,65 @@ xml_element:
     # namespace: 'http://xoev.de/schemata/code/1_0'
 ```
 
-#### 5.3 Comment Out Namespace in Beteiligung Types with Anlagen
+#### 5.3 Fix `anlagen` Mapping in Beteiligung Types
 
-**Files:**
+> **Background:** `xsd2php` contains a bug in `isArrayNestedElement()` that collapses the two-level
+> `anlagen`/`anlage` structure into a flat `MetadatenAnlageType[]` with `inline: false`. Because
+> `<anlagen>` itself is `maxOccurs="unbounded"`, this causes JMS Serializer to silently discard every
+> `<anlagen>` wrapper after the first. See `docs/xsd2php-anlagen-generation-bug.md` for full details.
+
+**Files to fix (standard types → use `AnlagenType`):**
 - `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml`
 - `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalTOEBType.yml`
 - `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungOeffentlichkeitType.yml`
 - `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungTOEBType.yml`
 - `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungType.yml`
+- `src/Soap/Metadata/Schema.XBeteiligung.StellungnahmeType.yml`
 
-Comment out namespace for `anlagen.xml_list` in all these files:
+**Files to fix (DB types → use `AnlagenLinkType`):**
+- `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalDBType.yml`
+- `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungDBType.yml`
+- `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungDBType.yml`
 
+Change from (generated — wrong):
 ```yaml
-# In the anlagen property xml_list section, comment out namespace
-xml_list:
-    inline: false
-    entry_name: anlage
-    skip_when_empty: true
-    # namespace: 'https://www.xleitstelle.de/xbeteiligung/[VERSION]'
+anlagen:
+    type: array<MetadatenAnlageType>
+    xml_list:
+        inline: false
+        entry_name: anlage
+        skip_when_empty: true
 ```
+
+To (correct for standard types):
+```yaml
+anlagen:
+    type: array<AnlagenType>
+    xml_list:
+        inline: true
+        entry_name: anlagen
+        namespace: 'https://www.xleitstelle.de/xbeteiligung/[VERSION]'
+        skip_when_empty: true
+```
+
+For DB types use `array<AnlagenLinkType>` instead of `array<AnlagenType>`.
+
+**Also update the PHP classes** for all 9 files above: replace `MetadatenAnlageType` → `AnlagenType`
+(or `MetadatenAnlageLinkType` → `AnlagenLinkType` for DB types) in the `$anlagen` property type
+annotation and the `addToAnlagen()` / `setAnlagen()` method signatures.
+
+**Also update related services:**
+- `AnlagenExtractor::processAttachmentArray()`: must iterate `AnlagenType[]` wrappers and then
+  `MetadatenAnlageType` children (two-level loop) — not `MetadatenAnlageType` directly
+- `PlanningDocumentsLinkCreator::getPlanningDocuments()`: must wrap all `MetadatenAnlageType` items
+  in a single `AnlagenType` container before returning
+
+**Finally**, comment out the namespace entries for the `anlage` field in:
+- `src/Soap/Metadata/Schema.XBeteiligung.AnlagenType.yml`
+- `src/Soap/Metadata/Schema.XBeteiligung.AnlagenLinkType.yml`
+
+The `<anlage>` child elements are defined with `form="unqualified"` in the XSD and must render
+without a namespace prefix.
 
 #### 5.4 Comment Out Namespaces in MetadatenAnlageType
 
@@ -219,7 +259,11 @@ Execute comprehensive tests to ensure the migration was successful:
 - [ ] PHP classes regenerated successfully
 - [ ] XBeteiligung prefix added to xml_root_name in key metadata files
 - [ ] Namespace entries commented out in Code.CodeType.yml
-- [ ] Namespace commented out for anlagen.xml_list
+- [ ] `anlagen` mapping fixed in all 9 Beteiligung type YMLs (`AnlagenType[]`/`AnlagenLinkType[]`, `inline: true`, `entry_name: anlagen`)
+- [ ] Corresponding PHP classes updated (`MetadatenAnlageType` → `AnlagenType`, `MetadatenAnlageLinkType` → `AnlagenLinkType`)
+- [ ] `AnlagenType.yml` and `AnlagenLinkType.yml`: namespace commented out for `anlage` field entries
+- [ ] `AnlagenExtractor::processAttachmentArray()` uses two-level iteration (AnlagenType → MetadatenAnlageType)
+- [ ] `PlanningDocumentsLinkCreator::getPlanningDocuments()` wraps items in `AnlagenType` container
 - [ ] Namespaces commented out for specified fields in MetadatenAnlageType
 - [ ] Test XML files updated to target version
 - [ ] All tests passing

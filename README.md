@@ -201,26 +201,62 @@ autor:
 
 comment out `namespace: ...` in [`Schema.Code.CodeType.yml`](src/Soap/Metadata/Schema.Code.CodeType.yml)
 for the fields `code` and `name`.
-comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml)
-for the fields: `anlagen.xml_list`
-comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungKommunalTOEBType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalTOEBType.yml)
-for the field: `anlagen.xml_list` (specifically the `entry_name: anlage` namespace configuration)
-comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungRaumordnungType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungType.yml)
-for the fields: `anlagen.xml_list` (specifically the `entry_name: anlage` namespace configuration)
+**Fix `anlagen` mapping in Beteiligung types** (see [`docs/xsd2php-anlagen-generation-bug.md`](docs/xsd2php-anlagen-generation-bug.md) for full background):
+
+`xsd2php` incorrectly generates `anlagen` as `MetadatenAnlageType[]` with `inline: false`. The XSD allows
+multiple `<anlagen>` wrapper elements (`maxOccurs="unbounded"`), so each must map to an `AnlagenType` object.
+Apply the following fix to all 6 standard Beteiligung types and also update the corresponding PHP classes:
+
+**JMS Metadata files to fix:**
+- [`BeteiligungKommunalOeffentlichkeitType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalOeffentlichkeitType.yml)
+- [`BeteiligungKommunalTOEBType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalTOEBType.yml)
+- [`BeteiligungPlanfeststellungOeffentlichkeitType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungOeffentlichkeitType.yml)
+- [`BeteiligungPlanfeststellungTOEBType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungTOEBType.yml)
+- [`BeteiligungRaumordnungType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungType.yml)
+- [`StellungnahmeType.yml`](src/Soap/Metadata/Schema.XBeteiligung.StellungnahmeType.yml)
+
+Change from (generated — wrong):
+```yaml
+anlagen:
+    type: array<MetadatenAnlageType>
+    xml_list:
+        inline: false
+        entry_name: anlage
+        skip_when_empty: true
+```
+To (correct):
+```yaml
+anlagen:
+    type: array<AnlagenType>
+    xml_list:
+        inline: true
+        entry_name: anlagen
+        namespace: 'https://www.xleitstelle.de/xbeteiligung/[VERSION]'
+        skip_when_empty: true
+```
+
+For the DB types ([`BeteiligungKommunalDBType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungKommunalDBType.yml),
+[`BeteiligungPlanfeststellungDBType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungDBType.yml),
+[`BeteiligungRaumordnungDBType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungDBType.yml))
+the same pattern applies but use `AnlagenLinkType` instead of `AnlagenType`.
+
+**Also update the corresponding PHP classes** (replace `MetadatenAnlageType` → `AnlagenType`, or
+`MetadatenAnlageLinkType` → `AnlagenLinkType` for DB types) in the `$anlagen` property type annotation
+and `addToAnlagen()` / `setAnlagen()` method signatures.
+
+**Important:** The `anlage` elements *inside* `AnlagenType` must NOT carry a namespace prefix because
+they are defined with `form="unqualified"` in the XSD. Comment out the namespace entries in
+[`AnlagenType.yml`](src/Soap/Metadata/Schema.XBeteiligung.AnlagenType.yml) and
+[`AnlagenLinkType.yml`](src/Soap/Metadata/Schema.XBeteiligung.AnlagenLinkType.yml)
+for the `anlage` field's `xml_element` and `xml_list` namespace entries, so elements render as
+`<anlage>` rather than `<xbeteiligung:anlage>`.
+
 comment out `namespace: ...` in [`Schema.XBeteiligung.MetadatenAnlageType.yml`](src/Soap/Metadata/Schema.XBeteiligung.MetadatenAnlageType.yml)
 for the fields: `bezeichnung`, `versionsnummer`, `datum`, `anlageart`, `mimeType` and `anhangOderVerlinkung`
-comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungPlanfeststellungOeffentlichkeitType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungOeffentlichkeitType.yml)
-for the field: `anlagen.xml_list` (specifically the `entry_name: anlage` namespace configuration)
-comment out `namespace: ...` in [`Schema.XBeteiligung.BeteiligungPlanfeststellungTOEBType.yml`](src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungTOEBType.yml)
-for the field: `anlagen.xml_list` (specifically the `entry_name: anlage` namespace configuration)
-comment out `namespace: ...` in [`Schema.XBeteiligung.AnlagenType.yml`](src/Soap/Metadata/Schema.XBeteiligung.AnlagenType.yml)
-for both `xml_element` and `xml_list` namespace entries for the `anlage` field
-comment out `namespace: ...` in [`Schema.XBeteiligung.AnlagenLinkType.yml`](src/Soap/Metadata/Schema.XBeteiligung.AnlagenLinkType.yml)
-for both `xml_element` and `xml_list` namespace entries for the `anlage` field
 
-**Important:** The `anlage` elements within `anlagen` collections must NOT have namespace prefixes according to the XBeteiligung XSD schema specification. These elements are defined with `form="unqualified"` in the schema, which means they should appear as `<anlage>` rather than `<xbeteiligung:anlage>`. Failure to comment out the namespace configuration will result in XSD validation errors.
-
-**Note:** The container `anlagen` element itself SHOULD keep its namespace configuration (for the element, not the list entries), as it appears as `<xbeteiligung:anlagen>` in the XML. Only the individual `<anlage>` entries within the collection should be unqualified.
+**Also update related services** after every regeneration:
+- `AnlagenExtractor::processAttachmentArray()`: iterate `AnlagenType[]` wrappers, then `MetadatenAnlageType` children (two-level loop)
+- `PlanningDocumentsLinkCreator::getPlanningDocuments()`: wrap all `MetadatenAnlageType` items in a single `AnlagenType` container before returning
 
 When updating to a new xBeteiligung standard version, update the hardcoded 
 namespace version in `XBeteiligungIncomingMessageParser::validateRequiredNamespace()` 

@@ -21,6 +21,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Beteiligung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensunterlagetypType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeXBauMimeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType;
@@ -164,12 +165,16 @@ class AnlagenExtractorTest extends TestCase
         // Public participation with attachment
         $publicParticipation = new BeteiligungKommunalOeffentlichkeitType();
         $publicAttachment = $this->createAttachmentWithAnhang(self::PUBLIC_TITLE, self::PUBLIC_FILENAME, self::PUBLIC_DOCUMENT_ID);
-        $publicParticipation->setAnlagen([$publicAttachment]);
+        $publicAnlagenWrapper = new AnlagenType();
+        $publicAnlagenWrapper->setAnlage([$publicAttachment]);
+        $publicParticipation->setAnlagen([$publicAnlagenWrapper]);
 
         // TOEB with link
         $toebParticipation = new BeteiligungKommunalTOEBType();
         $toebAttachment = $this->createAttachmentWithVerlinkung(self::TOEB_TITLE, self::TOEB_URL);
-        $toebParticipation->setAnlagen([$toebAttachment]);
+        $toebAnlagenWrapper = new AnlagenType();
+        $toebAnlagenWrapper->setAnlage([$toebAttachment]);
+        $toebParticipation->setAnlagen([$toebAnlagenWrapper]);
 
         $beteiligungKommunal->setBeteiligungOeffentlichkeit($publicParticipation);
         $beteiligungKommunal->setBeteiligungTOEB($toebParticipation);
@@ -184,7 +189,9 @@ class AnlagenExtractorTest extends TestCase
         // Public participation with base64 content
         $publicParticipation = new BeteiligungPlanfeststellungOeffentlichkeitType();
         $attachment = $this->createAttachmentWithBase64Content(self::PLANFEST_TITLE, self::PLANFEST_CONTENT);
-        $publicParticipation->setAnlagen([$attachment]);
+        $anlagenWrapper = new AnlagenType();
+        $anlagenWrapper->setAnlage([$attachment]);
+        $publicParticipation->setAnlagen([$anlagenWrapper]);
 
         $beteiligungPlanfeststellung->setBeteiligungOeffentlichkeit($publicParticipation);
         $beteiligungPlanfeststellung->setBeteiligungTOEB(null);
@@ -210,7 +217,9 @@ class AnlagenExtractorTest extends TestCase
         // This will cause an exception when trying to create the AnlageValueObject
         $invalidAttachment->method('getAnhangOderVerlinkung')->willThrowException(new \Exception('Test exception'));
 
-        $publicParticipation->setAnlagen([$invalidAttachment]);
+        $invalidAnlagenWrapper = new AnlagenType();
+        $invalidAnlagenWrapper->setAnlage([$invalidAttachment]);
+        $publicParticipation->setAnlagen([$invalidAnlagenWrapper]);
         $beteiligungKommunal->setBeteiligungOeffentlichkeit($publicParticipation);
         $beteiligungKommunal->setBeteiligungTOEB(null);
 

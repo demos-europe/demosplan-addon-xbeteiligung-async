@@ -183,9 +183,9 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlan
             accessor:
                 getter: getAnlagen
                 setter: setAnlagen
-            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageLinkType>
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnlagenLinkType>
             xml_list:
-                inline: false
-                entry_name: anlage
-                skip_when_empty: true
+                inline: true
+                entry_name: anlagen
                 namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+                skip_when_empty: true

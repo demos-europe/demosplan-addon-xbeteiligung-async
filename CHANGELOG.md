@@ -1,6 +1,29 @@
 # Changelog
 
 ## UNRELEASED
+
+**Fix anlagen deserialization for multiple wrapper elements (DPLAN-17345)**
+
+This is a complete fix for the `anlagen` deserialization bug that was previously only partially
+addressed in v0.61. The root cause is a bug in `goetas-webservices/xsd2php`: its
+`isArrayNestedElement()` method collapses nested unbounded elements without checking whether
+the outer element is also `unbounded`. This caused `<anlagen>` to be mapped as
+`MetadatenAnlageType[]` with `inline: false`, meaning JMS Serializer only ever processed
+the first `<anlagen>` wrapper element — all subsequent wrappers and their children were silently
+lost.
+
+- Fix JMS metadata YMLs (9 files): change `anlagen` mapping to `type: array<AnlagenType>`,
+  `inline: true`, `entry_name: anlagen` with proper namespace — correctly handles multiple
+  `<anlagen>` wrapper elements as allowed by the XSD (`maxOccurs="unbounded"`)
+- Fix PHP schema classes (9 files): update `$anlagen` property type annotations and method
+  signatures from `MetadatenAnlageType`/`MetadatenAnlageLinkType` to `AnlagenType`/`AnlagenLinkType`
+- Fix `AnlagenExtractor`: iterate `AnlagenType[]` wrappers and then `MetadatenAnlageType` children
+  (two-level iteration) instead of iterating `MetadatenAnlageType` directly
+- Fix `PlanningDocumentsLinkCreator`: wrap outgoing `MetadatenAnlageType` items in a single
+  `AnlagenType` container so outgoing messages serialize correctly
+- Add `docs/xsd2php-anlagen-generation-bug.md` documenting the xsd2php bug, the correct
+  JMS/PHP mapping, and a checklist of files to fix manually after every XSD regeneration
+
 ## v0.62 (2026-02-19)
 - merge changes from 0.60.1
 
