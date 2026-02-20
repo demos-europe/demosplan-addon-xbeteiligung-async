@@ -16,7 +16,7 @@
   },
   "minimum-stability": "stable",
   "require": {
-    "demos-europe/demosplan-addon": "^v0.65",
+    "demos-europe/demosplan-addon": "^v0.66",
     "demos-europe/demosplan-addon-installer": "^0",
     "doctrine/doctrine-bundle": "^2",
     "doctrine/doctrine-migrations-bundle": "^3.2",
