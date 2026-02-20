@@ -207,19 +207,26 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
         // get user from message should be set, because of that userId here is not correct
         try {
             $orgaName = $procedureDataValueObject->getContactOrganization() ?? '';
-            $orgaList = $this->orgaService->getOrgaByFields(['name' => $orgaName, 'deleted' => false]);
+            $isGwId = 1 === preg_match('/^[a-z]{2,}-[a-f0-9]{20,}$/i', $orgaName);
+            $orgaList = $isGwId
+                ? $this->orgaService->getOrgaByFields(['gwId' => $orgaName, 'deleted' => false])
+                : $this->orgaService->getOrgaByFields(['name' => $orgaName, 'deleted' => false]);
             if (0 === count($orgaList)) {
+                $fieldLabel = $isGwId ? 'der Id' : 'dem Namen';
                 $errorMessage = sprintf(
-                    'Es konnte keine Organisation mit dem Namen "%s" gefunden werden.',
+                    'Es konnte keine Organisation mit %s "%s" gefunden werden.',
+                    $fieldLabel,
                     $orgaName
                 );
 
                 throw new AddonOrgaNotFoundException($errorMessage);
             }
             if (1 < count($orgaList)) {
+                $fieldLabel = $isGwId ? 'die Id' : 'Der Organistationsname';
                 $errorMessage = sprintf(
-                    'Der Organistationsnamen "%s" scheint nicht unique zu sein. '
-                    . 'Es gibt mehrere Organisationen mit diesem Namen im System.',
+                    '%s "%s" scheint nicht unique zu sein. '
+                    . 'Es gibt mehrere Organisationen mit diesem Wert im System.',
+                    $fieldLabel,
                     $orgaName
                 );
 
