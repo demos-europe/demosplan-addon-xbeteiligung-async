@@ -17,8 +17,11 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\FileInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\FileServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Handler\SingleDocumentHandlerInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\SingleDocumentInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ElementsServiceInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\SingleDocumentServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungFileMapping;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exception\XBeteiligungAttachmentException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAttachmentService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungFileMappingRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\AnlageValueObject;
@@ -34,6 +37,7 @@ class XBeteiligungAttachmentServiceTest extends TestCase
     private MockObject $fileService;
     private MockObject $elementsService;
     private MockObject $singleDocumentHandler;
+    private MockObject $singleDocumentService;
     private MockObject $logger;
     private MockObject $fileMappingRepository;
     private XBeteiligungAttachmentService $sut;
@@ -52,6 +56,7 @@ class XBeteiligungAttachmentServiceTest extends TestCase
         $this->fileService = $this->createMock(FileServiceInterface::class);
         $this->elementsService = $this->createMock(ElementsServiceInterface::class);
         $this->singleDocumentHandler = $this->createMock(SingleDocumentHandlerInterface::class);
+        $this->singleDocumentService = $this->createMock(SingleDocumentServiceInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->fileMappingRepository = $this->createMock(XBeteiligungFileMappingRepository::class);
 
@@ -59,6 +64,7 @@ class XBeteiligungAttachmentServiceTest extends TestCase
             $this->fileService,
             $this->elementsService,
             $this->singleDocumentHandler,
+            $this->singleDocumentService,
             $this->logger,
             $this->fileMappingRepository
         );
@@ -120,9 +126,15 @@ class XBeteiligungAttachmentServiceTest extends TestCase
             ->setFileId(self::FILE_ID_OLD)
             ->setSingleDocumentId(self::DOC_ID);
 
+        $this->setupExistingCategory();
+
         $this->fileMappingRepository->method('findByXmlFileIdAndProcedure')
             ->with(self::XML_FILE_ID, self::PROCEDURE_ID)
             ->willReturn($existingMapping);
+
+        $currentDocument = $this->createMock(SingleDocumentInterface::class);
+        $currentDocument->method('getElementId')->willReturn(self::ELEMENT_ID);
+        $this->singleDocumentService->method('getSingleDocument')->willReturn($currentDocument);
 
         $this->fileService->method('saveBinaryFileContent')
             ->willReturn($this->createFileMock(self::FILE_STRING_NEW, self::FILE_ID_NEW));
@@ -150,7 +162,7 @@ class XBeteiligungAttachmentServiceTest extends TestCase
         $this->sut->applyAnlagenToProcedure($this->createProcedureMock(), [$anlage]);
     }
 
-    public function testAttachmentProcessingExceptionIsCaughtAndLogged(): void
+    public function testNewAttachmentFailureIsLoggedAndRethrown(): void
     {
         $anlage = $this->createAnlage(null);
         $procedure = $this->createProcedureMock();
@@ -160,6 +172,38 @@ class XBeteiligungAttachmentServiceTest extends TestCase
             ->willThrowException(new RuntimeException('Storage failure'));
 
         $this->logger->expects($this->once())->method('error');
+
+        $this->expectException(XBeteiligungAttachmentException::class);
+        $this->expectExceptionMessage('Das Dokument "test.pdf" konnte nicht erstellt werden.');
+
+        $this->sut->applyAnlagenToProcedure($procedure, [$anlage]);
+    }
+
+    public function testExistingAttachmentEditHandlerFailureIsLoggedAndRethrown(): void
+    {
+        $anlage = $this->createAnlage(self::XML_FILE_ID);
+        $procedure = $this->createProcedureMock();
+
+        $existingMapping = (new XBeteiligungFileMapping())
+            ->setXmlFileId(self::XML_FILE_ID)
+            ->setProcedureId(self::PROCEDURE_ID)
+            ->setFileId(self::FILE_ID_OLD)
+            ->setSingleDocumentId(self::DOC_ID);
+
+        $this->setupExistingCategory();
+
+        $this->fileMappingRepository->method('findByXmlFileIdAndProcedure')->willReturn($existingMapping);
+        $this->fileService->method('saveBinaryFileContent')
+            ->willReturn($this->createFileMock(self::FILE_STRING_NEW, self::FILE_ID_NEW));
+        $currentDocument = $this->createMock(SingleDocumentInterface::class);
+        $currentDocument->method('getElementId')->willReturn(self::ELEMENT_ID);
+        $this->singleDocumentService->method('getSingleDocument')->willReturn($currentDocument);
+        $this->singleDocumentHandler->method('administrationDocumentEditHandler')->willReturn(false);
+
+        $this->logger->expects($this->once())->method('error');
+
+        $this->expectException(XBeteiligungAttachmentException::class);
+        $this->expectExceptionMessage('Das Dokument "test.pdf" konnte nicht aktualisiert werden.');
 
         $this->sut->applyAnlagenToProcedure($procedure, [$anlage]);
     }

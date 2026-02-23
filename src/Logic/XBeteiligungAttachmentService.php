@@ -13,11 +13,14 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\FileInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\FileServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Handler\SingleDocumentHandlerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ElementsServiceInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\SingleDocumentServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungFileMapping;
+use DemosEurope\DemosplanAddon\XBeteiligung\Exception\XBeteiligungAttachmentException;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungFileMappingRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\AnlageValueObject;
 use Exception;
@@ -25,6 +28,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use ReflectionException;
 use RuntimeException;
+use Throwable;
 
 /**
  * Service for handling XBeteiligung file attachments and document management.
@@ -65,6 +69,7 @@ class XBeteiligungAttachmentService
         private readonly FileServiceInterface $fileService,
         private readonly ElementsServiceInterface $elementsService,
         private readonly SingleDocumentHandlerInterface $singleDocumentHandler,
+        private readonly SingleDocumentServiceInterface $singleDocumentService,
         private readonly LoggerInterface $logger,
         private readonly XBeteiligungFileMappingRepository $fileMappingRepository
     ) {
@@ -84,6 +89,7 @@ class XBeteiligungAttachmentService
         array $anlagenValueObject
     ): void {
         foreach ($anlagenValueObject as $anlage) {
+            $isReplacement = false;
             try {
                 if (false === $this->isAttachmentValid($anlage, $procedure)) {
                     continue;
@@ -98,14 +104,21 @@ class XBeteiligungAttachmentService
                     );
 
                     if (null !== $existingMapping) {
+                        $isReplacement = true;
                         $this->replaceExistingAttachment($anlage, $procedure, $existingMapping);
                         continue;
                     }
                 }
 
                 $this->addNewAttachment($anlage, $procedure);
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->logAttachmentProcessingError($e, $anlage, $procedure);
+                $action = $isReplacement ? 'aktualisiert' : 'erstellt';
+                throw new XBeteiligungAttachmentException(
+                    sprintf('Das Dokument "%s" konnte nicht %s werden.', $anlage->getFileName(), $action),
+                    0,
+                    $e
+                );
             }
         }
     }
@@ -153,14 +166,16 @@ class XBeteiligungAttachmentService
      * Add a new attachment to the procedure and track its mapping if a dokumentId is present.
      *
      * @throws ReflectionException
+     * @throws Exception
+     * @throws Throwable
      */
     private function addNewAttachment(
         AnlageValueObject $anlage,
         ProcedureInterface $procedure
     ): void {
         $element = $this->ensureDocumentCategory($procedure, $anlage->getDocumentCategoryName());
-        $fileString = $this->saveAttachment($anlage, $procedure->getId());
-        $singleDocumentId = $this->createSingleDocument($procedure, $element, $anlage->getFileName(), $fileString);
+        $file = $this->saveAttachment($anlage, $procedure->getId());
+        $singleDocumentId = $this->createSingleDocument($procedure, $element, $anlage->getFileName(), $file->getFileString());
 
         $this->logger->info(self::LOG_PREFIX.'Successfully saved Anlage to procedure', [
             'filename' => $anlage->getFileName(),
@@ -171,20 +186,19 @@ class XBeteiligungAttachmentService
 
         $dokumentId = $anlage->getDocumentId();
         if (null !== $dokumentId && '' !== $dokumentId && null !== $singleDocumentId) {
-            $fileId = $this->extractFileIdFromFileString($fileString);
-            $this->trackFileMapping($dokumentId, $procedure->getId(), $fileId, $singleDocumentId);
+            $this->trackFileMapping($dokumentId, $procedure->getId(), $file->getId(), $singleDocumentId);
         }
     }
 
     /**
      * Log an error that occurred during attachment processing.
      *
-     * @param Exception          $exception The exception that occurred
+     * @param Throwable          $exception The exception that occurred
      * @param AnlageValueObject  $anlage    The attachment being processed
      * @param ProcedureInterface $procedure The procedure context
      */
     private function logAttachmentProcessingError(
-        Exception $exception,
+        Throwable $exception,
         AnlageValueObject $anlage,
         ProcedureInterface $procedure
     ): void {
@@ -274,11 +288,9 @@ class XBeteiligungAttachmentService
      * @param AnlageValueObject $anlage      The attachment value object
      * @param string            $procedureId The procedure ID to associate the file with
      *
-     * @return string The file string in format: filename:file_id:size:mimetype
-     *
-     * @throws RuntimeException If the file string is empty
+     * @throws RuntimeException|Throwable If the file string is empty
      */
-    private function saveAttachment(AnlageValueObject $anlage, string $procedureId): string
+    private function saveAttachment(AnlageValueObject $anlage, string $procedureId): FileInterface
     {
         $this->logger->info(self::LOG_PREFIX.'Saving attachment', [
             'filename' => $anlage->getFileName(),
@@ -297,9 +309,7 @@ class XBeteiligungAttachmentService
             $procedureId
         );
 
-        // Get file string in format: filename:file_id:size:mimetype
-        $fileString = $file->getFileString();
-        if ('' === $fileString) {
+        if ('' === $file->getFileString()) {
             throw new RuntimeException(
                 'FileService returned empty file string for file: '.$anlage->getFileName()
             );
@@ -311,7 +321,7 @@ class XBeteiligungAttachmentService
             'fileId' => $file->getId(),
         ]);
 
-        return $fileString;
+        return $file;
     }
 
     /**
@@ -355,42 +365,47 @@ class XBeteiligungAttachmentService
     /**
      * Replace an existing attachment with new content from 402 update message.
      *
-     * @param AnlageValueObject        $anlage          The new attachment data
-     * @param ProcedureInterface       $procedure       The procedure
+     * @param AnlageValueObject       $anlage          The new attachment data
+     * @param ProcedureInterface      $procedure       The procedure
      * @param XBeteiligungFileMapping $existingMapping The existing file mapping
      *
-     * @throws ReflectionException
+     * @throws ReflectionException|Throwable
      */
     private function replaceExistingAttachment(
         AnlageValueObject $anlage,
         ProcedureInterface $procedure,
         XBeteiligungFileMapping $existingMapping
     ): void {
+        $element = $this->ensureDocumentCategory($procedure, $anlage->getDocumentCategoryName());
+
         $oldFileId = $existingMapping->getFileId();
 
         // Save new file
-        $fileString = $this->saveAttachment($anlage, $procedure->getId());
-        $newFileId = $this->extractFileIdFromFileString($fileString);
+        $file = $this->saveAttachment($anlage, $procedure->getId());
 
-        // Update the SingleDocument with new file
+        $currentDocument = $this->singleDocumentService->getSingleDocument($existingMapping->getSingleDocumentId(), false);
+
         // Note: Handler expects keys with 'r_' prefix
         $updateData = [
             'r_action' => 'singledocumentedit',
             'r_ident' => $existingMapping->getSingleDocumentId(),
             'r_title' => $anlage->getFileName(),
-            'r_document' => $fileString,
+            'r_document' => $file->getFileString(),
         ];
+
+        if ($currentDocument->getElementId() !== $element->getId()) {
+            $updateData['r_elementId'] = $element->getId();
+        }
 
         $result = $this->singleDocumentHandler->administrationDocumentEditHandler($updateData);
 
-        // Result should be array with 'ident' key, or false on failure
-        $newSingleDocumentId = is_array($result) && isset($result[self::KEY_IDENT])
-            ? $result[self::KEY_IDENT]
-            : $existingMapping->getSingleDocumentId();
+        if (!is_array($result) || !isset($result[self::KEY_IDENT])) {
+            throw new RuntimeException(
+                'administrationDocumentEditHandler failed for SingleDocument: '.$existingMapping->getSingleDocumentId()
+            );
+        }
 
-        // Update mapping with new file IDs
-        $existingMapping->setFileId($newFileId);
-        $existingMapping->setSingleDocumentId($newSingleDocumentId);
+        $existingMapping->setFileId($file->getId());
         $this->fileMappingRepository->save($existingMapping);
 
         // Delete the old file now that it has been replaced
@@ -401,8 +416,8 @@ class XBeteiligungAttachmentService
             'procedureId' => $procedure->getId(),
             'xmlFileId' => $anlage->getDocumentId(),
             'oldFileId' => $oldFileId,
-            'newFileId' => $newFileId,
-            'singleDocumentId' => $newSingleDocumentId,
+            'newFileId' => $file->getId(),
+            'singleDocumentId' => $existingMapping->getSingleDocumentId(),
         ]);
     }
 
@@ -461,27 +476,5 @@ class XBeteiligungAttachmentService
             ]);
             throw $e;
         }
-    }
-
-    /**
-     * Extract file ID from fileString format: filename:file_id:size:mimetype.
-     *
-     * @param string $fileString The file string from FileService
-     *
-     * @return string The extracted file ID
-     *
-     * @throws RuntimeException If fileString format is invalid
-     */
-    private function extractFileIdFromFileString(string $fileString): string
-    {
-        $parts = explode(':', $fileString);
-
-        if (count($parts) < 2) {
-            throw new RuntimeException(
-                'Invalid fileString format. Expected "filename:file_id:size:mimetype", got: '.$fileString
-            );
-        }
-
-        return $parts[1];
     }
 }
