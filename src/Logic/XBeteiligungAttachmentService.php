@@ -368,7 +368,7 @@ class XBeteiligungAttachmentService
     ): void {
         $oldFileId = $existingMapping->getFileId();
 
-        // Save new file version
+        // Save new file
         $fileString = $this->saveAttachment($anlage, $procedure->getId());
         $newFileId = $this->extractFileIdFromFileString($fileString);
 
