@@ -34,7 +34,7 @@ class XBeteiligungFileMappingRepository extends ServiceEntityRepository
     public function save(XBeteiligungFileMapping $mapping): XBeteiligungFileMapping
     {
         $this->getEntityManager()->persist($mapping);
-        $this->getEntityManager()->flush($mapping);
+        $this->getEntityManager()->flush();
 
         return $mapping;
     }
