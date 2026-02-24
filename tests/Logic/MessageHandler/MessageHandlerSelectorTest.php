@@ -17,6 +17,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\MessageHandlerS
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\Incoming\GenericProcedureMessageHandler;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\Incoming\GenericStatementResponseHandler;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -72,9 +73,8 @@ class MessageHandlerSelectorTest extends TestCase
     }
 
 
-    /**
-     * @dataProvider unsupportedMessageTypesProvider
-     */
+
+    #[DataProvider('unsupportedMessageTypesProvider')]
     public function testGetHandlerThrowsExceptionForUnsupportedTypes(string $messageType): void
     {
         $this->expectException(InvalidArgumentException::class);

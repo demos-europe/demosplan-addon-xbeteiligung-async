@@ -17,6 +17,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\CustomerServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungCustomerMappingService;
 use Exception;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -131,8 +132,8 @@ class XBeteiligungCustomerMappingServiceTest extends TestCase
     /**
      * Test various invalid federal state codes.
      *
-     * @dataProvider invalidFederalStateCodeProvider
      */
+    #[DataProvider('invalidFederalStateCodeProvider')]
     public function testGetCustomerByFederalStateCodeVariousInvalidCodes(string $invalidCode): void
     {
         $this->expectException(InvalidArgumentException::class);

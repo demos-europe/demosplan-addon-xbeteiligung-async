@@ -24,7 +24,6 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
@@ -48,6 +47,7 @@ use JMS\Serializer\Serializer;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Log\Logger;
 use Symfony\Component\Routing\RouterInterface;
@@ -96,6 +96,7 @@ class StatementCreatorTest extends TestCase
             $this->gisLayerCategoryRepository,
             $globalConfigMock,
             $this->createMock(LoggerInterface::class),
+            $this->createMock(MapProjectionConverterInterface::class),
             $this->createMock(ParameterBagInterface::class),
             $this->createMock(PlanningDocumentsLinkCreator::class),
             $this->procedureMessageRepository,
@@ -174,7 +175,7 @@ class StatementCreatorTest extends TestCase
                 Straßenumbaumaßnahmen sind in jedem Fall im Bereich von Bäumen durch eine Fachfirma baumpflegerisch zu begleiten. Für Neupflanzungen von Straßenbäumen im Vorhabengebiet ist unbedingt die FLL Richtlinie Empfehlungen für Baumpflanzungen- Pflanzgrubenbauweise anzuwenden!
                 Im Städtebaulichen Vertrag wird in § 14 Öffentlicher Kinderspielplatz geregelt, dass der Investor sich verpflichtet, einen bestimmten Betrag für die Ausstattung der Grün- und Parkanlagen mit Spielgeräten im Nahbereich des Vorhabens zur Verfügung stellt. In der Begründung zum Bebauungsplan unter Punkt 4.1.2 wird innerhalb der Parkanlage ein ca. 4.500 m² großer öffentlicher Spielplatz festgelegt. Hier geht nicht deutlich hervor, ob es in dem Gebiet einen Spielplatz geben wird bzw. ob die zur Verfügung gestellte Summe für diesen Spielplatz zur Verfügung steht oder es für einen beliebigen anderen Spielplatz gilt, der in der näheren Umgebung liegt. Hier sollte klar dargestellt werden, wo der Spielplatz liegen soll. Dies sollte ebenfalls in der Planzeichnung dargestellt werden.';
             $iteration = 1;
-            $date = new \DateTime('2019-05-01');
+            $date = new \DateTime('2019-05-01', new \DateTimeZone('UTC'));
             $feedback = 'email';
             $priority = 'A-Punkt';
             $firstName = 'Max';

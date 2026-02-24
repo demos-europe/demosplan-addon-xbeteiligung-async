@@ -20,6 +20,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalIni
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
 use JMS\Serializer\Serializer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Log\Logger;
@@ -63,9 +64,8 @@ class KommunaleProcedureCreatorTest extends TestCase
 
     }
 
-    /**
-     * @dataProvider getTestXmlFiles()
-     */
+
+    #[DataProvider('getTestXmlFiles')]
     public function testCreateNewProcedureFromKommunaleXbeteiligungMessage($filePath): void
     {
         $inputMsgXml = file_get_contents(AddonPath::getRootPath($filePath));

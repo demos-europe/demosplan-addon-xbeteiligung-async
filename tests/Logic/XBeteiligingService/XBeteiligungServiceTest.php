@@ -15,6 +15,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\XBeteiligingServic
 use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
@@ -76,6 +77,7 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->gisLayerCategoryRepository,
             $globalConfigMock,
             $this->createMock(LoggerInterface::class),
+            $this->createMock(MapProjectionConverterInterface::class),
             $this->createMock(ParameterBagInterface::class),
             $this->createMockedPlanningDocumentsLinkCreator(),
             $this->procedureMessageRepository,

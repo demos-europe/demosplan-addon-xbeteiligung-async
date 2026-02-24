@@ -23,6 +23,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Beteiligung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType\BeteiligungPlanfeststellungTOEBArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
@@ -99,6 +100,7 @@ class XBeteiligungService
         private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
         private readonly GlobalConfigInterface                  $globalConfig,
         private readonly LoggerInterface                        $logger,
+        private readonly MapProjectionConverterInterface        $mapProjectionConverter,
         private readonly ParameterBagInterface                  $parameterBag,
         private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
@@ -1196,43 +1198,22 @@ class XBeteiligungService
      */
     private function convertEpsg3857GeometryToWgs84Json(array $geometry): string
     {
-        $proj4 = new Proj4php();
-        $proj3857 = new Proj('EPSG:3857', $proj4);
-        $proj4326 = new Proj('EPSG:4326', $proj4);
+        $proj3857 = $this->mapProjectionConverter->getProjection('EPSG:3857');
+        $proj4326 = $this->mapProjectionConverter->getProjection('EPSG:4326');
 
-        $type = $geometry['type'];
-        $coordinates = $geometry['coordinates'];
+        $featureCollectionJson = json_encode([
+            'type'     => 'FeatureCollection',
+            'features' => [['type' => 'Feature', 'geometry' => $geometry, 'properties' => null]],
+        ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
 
-        if ('Polygon' === $type) {
-            $wgs84Coordinates = array_map(
-                fn (array $ring) => $this->transformRingToWgs84($ring, $proj4, $proj3857, $proj4326),
-                $coordinates
-            );
-        } elseif ('MultiPolygon' === $type) {
-            $wgs84Coordinates = array_map(
-                fn (array $polygon) => array_map(
-                    fn (array $ring) => $this->transformRingToWgs84($ring, $proj4, $proj3857, $proj4326),
-                    $polygon
-                ),
-                $coordinates
-            );
-        } else {
-            return json_encode($geometry, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
-        }
-
-        return json_encode(
-            ['type' => $type, 'coordinates' => $wgs84Coordinates],
-            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
+        $converted = $this->mapProjectionConverter->convertGeoJsonPolygon(
+            $featureCollectionJson,
+            $proj3857,
+            $proj4326,
+            MapProjectionConverterInterface::OBJECT_RETURN_TYPE
         );
-    }
 
-    private function transformRingToWgs84(array $ring, Proj4php $proj4, Proj $proj3857, Proj $proj4326): array
-    {
-        return array_map(function (array $coord) use ($proj4, $proj3857, $proj4326): array {
-            $pointSrc = new Point($coord[0], $coord[1], $proj3857);
-            $pointDst = $proj4->transform($proj4326, $pointSrc);
-            return [$pointDst->__get('x'), $pointDst->__get('y')];
-        }, $ring);
+        return json_encode($converted->features[0]->geometry, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
     }
 
     /**

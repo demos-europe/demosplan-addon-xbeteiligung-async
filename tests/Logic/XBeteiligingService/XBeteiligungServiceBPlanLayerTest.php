@@ -13,6 +13,9 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\XBeteiligingService;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
+use proj4php\Proj;
+use proj4php\Proj4php;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
@@ -28,7 +31,6 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -50,6 +52,10 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
     protected XBeteiligungService $sut;
     protected MockObject $gisLayerCategoryRepository;
     protected MockObject $logger;
+    protected MockObject $mapProjectionConverter;
+
+    // WGS84 polygon returned by the mock converter (Hamburg area, within Germany's bounds)
+    protected const WGS84_POLYGON = '{"type":"Polygon","coordinates":[[[10.02,53.55],[10.04,53.55],[10.04,53.56],[10.02,53.56],[10.02,53.55]]]}';
     protected const TERRITORY_DATA = '{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[10.083502,53.475728],[10.083429,53.475761],[10.083502,53.475728]]]},"properties":null}]}';
 
     // Realistic territory format from the DB: 1-feature FeatureCollection in EPSG:3857 (Web Mercator)
@@ -67,6 +73,13 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
+        $proj4 = new Proj4php();
+        $this->mapProjectionConverter = $this->createMock(MapProjectionConverterInterface::class);
+        $this->mapProjectionConverter->method('getProjection')
+            ->willReturnCallback(fn(string $name) => new Proj($name, $proj4));
+        $this->mapProjectionConverter->method('convertGeoJsonPolygon')
+            ->willReturn(json_decode('{"type":"FeatureCollection","features":[{"type":"Feature","geometry":' . self::WGS84_POLYGON . ',"properties":null}]}'));
+
         $globalConfigMock = $this->createMock(GlobalConfigInterface::class);
         $globalConfigMock->method('getMapDefaultProjection')
             ->willReturn([
@@ -82,6 +95,7 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
             $this->gisLayerCategoryRepository,
             $globalConfigMock,
             $this->logger,
+            $this->mapProjectionConverter,
             $this->createMock(ParameterBagInterface::class),
             $this->createMock(PlanningDocumentsLinkCreator::class),
             $this->createMock(ProcedureMessageRepository::class),

@@ -17,6 +17,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageHandler\Incoming\PlanId
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
 use Exception;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -97,9 +98,8 @@ class PlanIdExtractorTest extends TestCase
         static::assertNull($result);
     }
 
-    /**
-     * @dataProvider messageTypeToCodeProvider
-     */
+
+    #[DataProvider('messageTypeToCodeProvider')]
     public function testExtractFromMessageHandlesAllSupportedMessageTypes(
         string $messageType,
         string $expectedCode

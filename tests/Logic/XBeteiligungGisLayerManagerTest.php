@@ -22,6 +22,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungGisLayerManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -396,9 +397,8 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         self::assertSame(self::PROCEDURE_ID, $setParameters['procedureId'], 'Procedure ID should be set correctly');
     }
 
-    /**
-     * @dataProvider invalidWmsUrlDataProvider
-     */
+
+    #[DataProvider('invalidWmsUrlDataProvider')]
     public function testProcessWmsUrlWithVariousInvalidUrls(string $invalidUrl): void
     {
         $this->logger->expects($this->once())
@@ -414,9 +414,8 @@ class XBeteiligungGisLayerManagerTest extends TestCase
         $this->sut->processUrl($invalidUrl, $this->procedure);
     }
 
-    /**
-     * @dataProvider validWmsUrlDataProvider
-     */
+
+    #[DataProvider('validWmsUrlDataProvider')]
     public function testProcessWmsUrlWithValidUrls(string $url, array $expectedLayers, string $expectedServiceType, ?string $expectedVersion): void
     {
         $mockGisLayer = $this->createMockGisLayer();
