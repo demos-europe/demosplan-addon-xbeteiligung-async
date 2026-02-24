@@ -3,6 +3,16 @@
 ## UNRELEASED
 - bump demosplan-addon version from v0.65 to v0.67
 
+**Implement file tracking and replacement for 402 Anlagen (DPLAN-17308)**
+- Add `XBeteiligungFileMapping` entity to track the relationship between XML `dokumentId` and demosplan File/SingleDocument records
+- Add `XBeteiligungFileMappingRepository` with `findByXmlFileIdAndProcedure` and `save` methods
+- Add database migration to create `xbeteiligung_file_mapping` table with unique constraint on `(xml_file_id, procedure_id)`
+- Enable attachment processing in 402 (KOMMUNAL_AKTUALISIEREN) messages in `KommunaleProcedureUpdater`
+- When a 402 message includes an Anlage with a known `dokumentId`, the existing file and SingleDocument are updated instead of creating duplicates; the old file is deleted after replacement
+- Element category (AnlageArt) is respected during replacement — the SingleDocument is moved to the new category if it has changed
+- Track file mappings in 401 (KOMMUNAL_ERSTELLEN) handler so subsequent 402 updates can find and replace existing attachments
+- Add `XBeteiligungAttachmentException` for propagating attachment failures as NOK responses with a descriptive German error message
+
 ## v0.62 (2026-02-19)
 - merge changes from 0.60.1
 
