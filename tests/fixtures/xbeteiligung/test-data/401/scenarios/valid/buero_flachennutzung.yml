@@ -1,0 +1,23 @@
+# Test with Büro organization - different org validation
+description: "Test procedure creation with Büro organization"
+org_name: "Büro"
+plan_name: "Flächennutzungsplan Änderung Südwest"
+arbeitstitel: "FNP-Änderung Nr. 15 - Wohngebiet Südwest"
+planart_code: "3_Flaechennutzungsplan"
+verfahrensschritt_code: "2000"
+beschreibung_planungsanlass: "Änderung des Flächennutzungsplans zur Ausweisung eines neuen Wohngebiets"
+flaechen_url: "https://buero.test.local/api/verfahren/fnp-suedwest/karten"
+raeumliche_beschreibung: "Gebiet im südwestlichen Bereich der Gemeinde"
+geltungsbereich_geojson_file: "../../geojson/default_territory.geojson"
+include_beteiligung_oeffentlichkeit: false
+include_beteiligung_toeb: true
+beteiligung_toeb_id: "bet_toeb_001"
+durchgang_toeb: 1
+bekanntmachung_toeb: "2025-07-01"
+zeitraum_beginn_toeb: "2025-07-15+02:00"
+zeitraum_ende_toeb: "2025-08-15+02:00"
+zeitraum_zusatz_toeb: "TÖB Beteiligung per E-Mail"
+beteiligung_formal_code_toeb: "2000"
+veroeffentlichung_beginn_toeb: "2025-07-01+02:00"
+veroeffentlichung_ende_toeb: "2025-08-30+02:00"
+veroeffentlichung_zusatz_toeb: "Direktversand an TÖB"

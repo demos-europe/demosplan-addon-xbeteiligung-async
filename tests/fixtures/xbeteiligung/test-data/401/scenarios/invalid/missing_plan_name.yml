@@ -1,0 +1,12 @@
+# Required field validation
+description: "Test with missing plan name (should fail)"
+expected_error_type: "validation_error"
+org_name: "Stadt Quickborn"
+plan_name: ""
+arbeitstitel: "Test Arbeitstitel"
+planart_code: "6_Bebauungsplan"
+beschreibung_planungsanlass: "Test ohne Planname"
+flaechen_url: "https://test.local/api/verfahren/noname/karten"
+raeumliche_beschreibung: "Test Beschreibung"
+include_beteiligung_oeffentlichkeit: false
+include_beteiligung_toeb: false

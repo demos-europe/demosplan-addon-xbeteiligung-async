@@ -1,0 +1,12 @@
+description: "Test with malformed GeoJSON (should fail)"
+expected_error_type: "validation_error"
+org_name: "Stadt Quickborn"
+plan_name: "Test Plan Malformed GeoJSON"
+arbeitstitel: "Test Arbeitstitel"
+planart_code: "6_Bebauungsplan"
+beschreibung_planungsanlass: "Test mit ungültigem GeoJSON"
+flaechen_url: "https://test.local/api/verfahren/malformed/karten"
+raeumliche_beschreibung: "Test Beschreibung"
+geltungsbereich_geojson_file: "../../geojson/invalid_territory.geojson"
+include_beteiligung_oeffentlichkeit: false
+include_beteiligung_toeb: false

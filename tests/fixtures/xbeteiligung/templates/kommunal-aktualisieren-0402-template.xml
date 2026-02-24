@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xbeteiligung:kommunal.Aktualisieren.0402
+        produkt="{{PRODUKT}}"
+        produkthersteller="{{PRODUKTHERSTELLER}}"
+        standard="XBeteiligung"
+        version="1.2"
+        xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/12"
+        xmlns:g2g="http://xoev.de/schemata/basisnachricht/g2g/1_1"
+        xmlns:kommunikation="http://xoev.de/schemata/basisnachricht/kommunikation/1_1"
+        xmlns:behoerde="http://xoev.de/schemata/basisnachricht/behoerde/1_1">
+   <g2g:nachrichtenkopf.g2g>
+       <g2g:identifikation.nachricht>
+           <g2g:nachrichtenUUID>{{NACHRICHTEN_UUID}}</g2g:nachrichtenUUID>
+           <g2g:nachrichtentyp listURI="urn:xoev-de:xleitstelle:codeliste:xbeteiligung-nachrichten" listVersionID="1.2">
+               <code>0402</code>
+               <name>kommunal.Aktualisieren.0402</name>
+           </g2g:nachrichtentyp>
+           <g2g:erstellungszeitpunkt>{{ERSTELLUNGSZEITPUNKT}}</g2g:erstellungszeitpunkt>
+       </g2g:identifikation.nachricht>
+       <g2g:leser>
+           <behoerde:verzeichnisdienst listURI="urn:xoev-de:kosit:codeliste:verzeichnisdienst" listVersionID="3">
+               <code>DVDV</code>
+           </behoerde:verzeichnisdienst>
+           <behoerde:kennung>{{LESER_KENNUNG}}</behoerde:kennung>
+           <behoerde:name>{{LESER_NAME}}</behoerde:name>
+           <kommunikation:erreichbarkeit>
+               <kommunikation:kanal listURI="urn:de:xoev:codeliste:erreichbarkeit" listVersionID="3">
+                   <code>{{LESER_KANAL_CODE}}</code>
+               </kommunikation:kanal>
+               <kommunikation:kennung>{{LESER_KONTAKT}}</kommunikation:kennung>
+           </kommunikation:erreichbarkeit>
+       </g2g:leser>
+       <g2g:autor>
+           <behoerde:verzeichnisdienst listURI="urn:xoev-de:kosit:codeliste:verzeichnisdienst" listVersionID="3">
+               <code>DVDV</code>
+           </behoerde:verzeichnisdienst>
+           <behoerde:kennung>{{AUTOR_KENNUNG}}</behoerde:kennung>
+           <behoerde:name>{{AUTOR_NAME}}</behoerde:name>
+           <kommunikation:erreichbarkeit>
+               <kommunikation:kanal listURI="urn:de:xoev:codeliste:erreichbarkeit" listVersionID="3">
+                   <code>{{AUTOR_KANAL_CODE}}</code>
+               </kommunikation:kanal>
+               <kommunikation:kennung>{{AUTOR_KONTAKT}}</kommunikation:kennung>
+           </kommunikation:erreichbarkeit>
+       </g2g:autor>
+   </g2g:nachrichtenkopf.g2g>
+   <xbeteiligung:nachrichteninhalt>
+       <xbeteiligung:vorgangsID>{{VORGANGS_ID}}</xbeteiligung:vorgangsID>
+       <xbeteiligung:beteiligung>
+           <xbeteiligung:akteurVorhaben>
+               <xbeteiligung:veranlasser>
+                   <name>
+                       <name>{{ORG_NAME}}</name>
+                   </name>
+               </xbeteiligung:veranlasser>
+           </xbeteiligung:akteurVorhaben>
+           <xbeteiligung:planID>{{PLAN_ID}}</xbeteiligung:planID>
+           <xbeteiligung:planname>{{PLAN_NAME}}</xbeteiligung:planname>
+           <xbeteiligung:arbeitstitel>{{ARBEITSTITEL}}</xbeteiligung:arbeitstitel>
+           <xbeteiligung:planartKommunal listURI="urn:xoev-de:xleitstelle:codeliste:planartkommunal" listVersionID="1">
+               <code>{{PLANART_CODE}}</code>
+           </xbeteiligung:planartKommunal>
+           <xbeteiligung:verfahrensschrittKommunal listURI="urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal" listVersionID="1">
+               <code>{{VERFAHRENSSCHRITT_CODE}}</code>
+           </xbeteiligung:verfahrensschrittKommunal>
+           <xbeteiligung:beschreibungPlanungsanlass>{{BESCHREIBUNG_PLANUNGSANLASS}}</xbeteiligung:beschreibungPlanungsanlass>
+           <xbeteiligung:flaechenabgrenzungUrl>{{FLAECHEN_URL}}</xbeteiligung:flaechenabgrenzungUrl>
+           <xbeteiligung:geltungsbereich>{{GELTUNGSBEREICH_JSON}}</xbeteiligung:geltungsbereich>
+           <xbeteiligung:raeumlicheBeschreibung>{{RAEUMLICHE_BESCHREIBUNG}}</xbeteiligung:raeumlicheBeschreibung>
+           {{#INCLUDE_BETEILIGUNG_OEFFENTLICHKEIT}}
+           <xbeteiligung:beteiligungOeffentlichkeit>
+               <xbeteiligung:beteiligungsID>{{BETEILIGUNG_OEFFENTLICHKEIT_ID}}</xbeteiligung:beteiligungsID>
+               <xbeteiligung:durchgang>{{DURCHGANG_OEFFENTLICHKEIT}}</xbeteiligung:durchgang>
+               <xbeteiligung:bekanntmachung>{{BEKANNTMACHUNG_OEFFENTLICHKEIT}}</xbeteiligung:bekanntmachung>
+               <xbeteiligung:zeitraum>
+                   <xbeteiligung:beginn>{{ZEITRAUM_BEGINN_OEFFENTLICHKEIT}}</xbeteiligung:beginn>
+                   <xbeteiligung:ende>{{ZEITRAUM_ENDE_OEFFENTLICHKEIT}}</xbeteiligung:ende>
+                   <xbeteiligung:zusatz>{{ZEITRAUM_ZUSATZ_OEFFENTLICHKEIT}}</xbeteiligung:zusatz>
+               </xbeteiligung:zeitraum>
+               {{#INCLUDE_ANLAGEN_OEFFENTLICHKEIT}}
+               <xbeteiligung:anlagen>
+{{ANLAGEN_OEFFENTLICHKEIT_XML}}
+               </xbeteiligung:anlagen>
+               {{/INCLUDE_ANLAGEN_OEFFENTLICHKEIT}}
+               <xbeteiligung:beteiligungKommunalOeffentlichkeitArt>
+                   <xbeteiligung:beteiligungKommunalFormalOeffentlichkeit listURI="urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal" listVersionID="1">
+                       <code>{{BETEILIGUNG_FORMAL_CODE_OEFFENTLICHKEIT}}</code>
+                   </xbeteiligung:beteiligungKommunalFormalOeffentlichkeit>
+               </xbeteiligung:beteiligungKommunalOeffentlichkeitArt>
+               <xbeteiligung:veroeffentlichungszeitraum>
+                   <xbeteiligung:beginn>{{VEROEFFENTLICHUNG_BEGINN_OEFFENTLICHKEIT}}</xbeteiligung:beginn>
+                   <xbeteiligung:ende>{{VEROEFFENTLICHUNG_ENDE_OEFFENTLICHKEIT}}</xbeteiligung:ende>
+                   <xbeteiligung:zusatz>{{VEROEFFENTLICHUNG_ZUSATZ_OEFFENTLICHKEIT}}</xbeteiligung:zusatz>
+               </xbeteiligung:veroeffentlichungszeitraum>
+           </xbeteiligung:beteiligungOeffentlichkeit>
+           {{/INCLUDE_BETEILIGUNG_OEFFENTLICHKEIT}}
+           {{#INCLUDE_BETEILIGUNG_TOEB}}
+           <xbeteiligung:beteiligungTOEB>
+               <xbeteiligung:beteiligungsID>{{BETEILIGUNG_TOEB_ID}}</xbeteiligung:beteiligungsID>
+               <xbeteiligung:durchgang>{{DURCHGANG_TOEB}}</xbeteiligung:durchgang>
+               <xbeteiligung:bekanntmachung>{{BEKANNTMACHUNG_TOEB}}</xbeteiligung:bekanntmachung>
+               <xbeteiligung:zeitraum>
+                   <xbeteiligung:beginn>{{ZEITRAUM_BEGINN_TOEB}}</xbeteiligung:beginn>
+                   <xbeteiligung:ende>{{ZEITRAUM_ENDE_TOEB}}</xbeteiligung:ende>
+                   <xbeteiligung:zusatz>{{ZEITRAUM_ZUSATZ_TOEB}}</xbeteiligung:zusatz>
+               </xbeteiligung:zeitraum>
+               {{#INCLUDE_ANLAGEN_TOEB}}
+               <xbeteiligung:anlagen>
+{{ANLAGEN_TOEB_XML}}
+               </xbeteiligung:anlagen>
+               {{/INCLUDE_ANLAGEN_TOEB}}
+               <xbeteiligung:beteiligungKommunalTOEBArt>
+                   <xbeteiligung:beteiligungKommunalFormalTOEB listURI="urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal" listVersionID="1">
+                       <code>{{BETEILIGUNG_FORMAL_CODE_TOEB}}</code>
+                   </xbeteiligung:beteiligungKommunalFormalTOEB>
+               </xbeteiligung:beteiligungKommunalTOEBArt>
+               <xbeteiligung:veroeffentlichungszeitraum>
+                   <xbeteiligung:beginn>{{VEROEFFENTLICHUNG_BEGINN_TOEB}}</xbeteiligung:beginn>
+                   <xbeteiligung:ende>{{VEROEFFENTLICHUNG_ENDE_TOEB}}</xbeteiligung:ende>
+                   <xbeteiligung:zusatz>{{VEROEFFENTLICHUNG_ZUSATZ_TOEB}}</xbeteiligung:zusatz>
+               </xbeteiligung:veroeffentlichungszeitraum>
+           </xbeteiligung:beteiligungTOEB>
+           {{/INCLUDE_BETEILIGUNG_TOEB}}
+       </xbeteiligung:beteiligung>
+   </xbeteiligung:nachrichteninhalt>
+</xbeteiligung:kommunal.Aktualisieren.0402>

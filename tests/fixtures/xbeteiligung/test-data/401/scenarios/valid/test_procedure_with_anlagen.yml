@@ -1,0 +1,64 @@
+# Test procedure with real file attachments (auto-loaded and base64-encoded)
+description: "Test with real PDF and DOCX files from anlagen directory"
+org_name: "Amt Nordwest"
+plan_name: "Verfahren Integration Test 11"
+arbeitstitel: "Test mit echten Dokumenten"
+planart_code: "6_Bebauungsplan"
+beschreibung_planungsanlass: "Verfahren Integration Test mit echten Dateien aus tests/fixtures/test-data"
+flaechen_url: "https://init.xplan.develop.diplanung.de/xplan-wms/services/planwerkwmspre/internalid/6004_TA_Base_318ec5c1-da2f-4670-ade9-867af2efdae5?request=GetMap&amp;service=WMS&amp;version=1.3.0&amp;format=image/png&amp;transparent=true&amp;exceptions=application/vnd.ogc.se_inimage&amp;crs=epsg:25832&amp;layers=vektordaten,bp_raster&amp;bbox=564984.128,5940442.486,565072.441,5940522.63&amp;width=89&amp;height=81"
+raeumliche_beschreibung: "Testgebiet mit echten Anlagen"
+
+# Enable public participation with attachments
+include_beteiligung_oeffentlichkeit: true
+beteiligung_oeffentlichkeit_id: "bet_oeffentlich_real_files"
+durchgang_oeffentlichkeit: 1
+bekanntmachung_oeffentlichkeit: "2026-02-16"
+zeitraum_beginn_oeffentlichkeit: "2026-02-16+02:00"
+zeitraum_ende_oeffentlichkeit: "2026-02-18+02:00"
+zeitraum_zusatz_oeffentlichkeit: "Öffentliche Auslegung im Rathaus"
+beteiligung_formal_code_oeffentlichkeit: "4000"
+veroeffentlichung_beginn_oeffentlichkeit: "2026-02-16+02:00"
+veroeffentlichung_ende_oeffentlichkeit: "2026-02-20+02:00"
+veroeffentlichung_zusatz_oeffentlichkeit: "Veröffentlichung im Amtsblatt"
+
+# File attachments for Oeffentlichkeit (multiple anlagen supported)
+# File paths are relative to test-data/401/anlagen/
+anlagen_oeffentlichkeit:
+  - file: "docx/Begründung.docx"
+    version: "1.0"
+    datum: "2026-02-16+02:00"
+    art_code: "1100"  # Planzeichnung
+  - file: "pdf/Planzeichnung.pdf"
+    version: "1.0"
+    datum: "2026-02-16+02:00"
+    art_code: "1200"  # Begründung
+
+# Each anlage will auto-calculate:
+# - filesize, hash (SHA-256), content_base64
+# - dateiname (from file path)
+# - mime_type (detected from extension)
+# - dokument_id (auto-generated UUID)
+
+# Enable TOEB participation with attachments
+include_beteiligung_toeb: true
+beteiligung_toeb_id: "bet_toeb_real_files"
+durchgang_toeb: 1
+bekanntmachung_toeb: "2026-02-16"
+zeitraum_beginn_toeb: "2026-02-16+02:00"
+zeitraum_ende_toeb: "2026-02-18+02:00"
+zeitraum_zusatz_toeb: "TöB-Beteiligung"
+beteiligung_formal_code_toeb: "5100"
+veroeffentlichung_beginn_toeb: "2026-02-16+02:00"
+veroeffentlichung_ende_toeb: "2026-02-18+02:00"
+veroeffentlichung_zusatz_toeb: "Versand per E-Mail"
+
+# File attachments for TOEB (multiple anlagen supported)
+anlagen_toeb:
+  - file: "pdf/Funktionsplan.pdf"
+    version: "1.0"
+    datum: "2026-02-16+02:00"
+    art_code: "1300"  # Funktionsplan
+  - file: "docx/Verordnung.docx"
+    version: "1.0"
+    datum: "2026-02-16+02:00"
+    art_code: "1300"  # Verordnung

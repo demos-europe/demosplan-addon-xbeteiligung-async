@@ -1,0 +1,23 @@
+# XBeteiligung 401 Default Values
+# These values are used across all test scenarios unless overridden
+
+# Message metadata
+produkt: "DiPlan Cockpit"
+produkthersteller: "DEMOS plan GmbH"
+
+# Message header defaults
+leser_kennung: "xyz:0002"
+leser_name: "DiPlanBeteiligung"
+leser_kanal_code: "02"
+leser_kontakt: "+49 30 123456"
+
+autor_kennung: "xyz:0001"
+autor_name: "DEMOS plan GmbH"
+autor_kanal_code: "07"
+autor_kontakt: "https://demos-deutschland.de/impressum.html"
+
+# Default procedure values
+verfahrensschritt_code: "4000"
+
+# Default GeoJSON reference (can be overridden per scenario)
+geltungsbereich_geojson_file: "geojson/default_territory.geojson"

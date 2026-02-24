@@ -1,0 +1,12 @@
+# Organization validation errors
+description: "Test with non-existent organization (should fail)"
+expected_error: "Es konnte keine Organisation mit dem Namen \"Musterzuständigkeit\" gefunden werden."
+org_name: "Musterzuständigkeit"
+plan_name: "Test Plan Unknown Org"
+arbeitstitel: "Test Arbeitstitel"
+planart_code: "6_Bebauungsplan"
+beschreibung_planungsanlass: "Test mit unbekannter Organisation"
+flaechen_url: "https://test.local/api/verfahren/unknown/karten"
+raeumliche_beschreibung: "Test Beschreibung"
+include_beteiligung_oeffentlichkeit: false
+include_beteiligung_toeb: false

@@ -6,6 +6,34 @@ https://miro.com/app/board/uXjVKuYy5ow=/
 We use https://github.com/goetas-webservices/xsd2php to automagically
 generate php classes from the xsd files from the XBeteiligung specification.
 
+# IDE Configuration for XSD Schemas
+
+## PhpStorm XML Schema Resolution
+
+When working with XBeteiligung XML files in PhpStorm, you may see errors like "Cannot resolve symbol xbeteiligung:..." or "Element must be declared". This happens because PhpStorm cannot locate the XSD schema files for validation and code completion.
+
+### Solution: Map XML Namespaces to Local XSD Files
+
+Configure PhpStorm to recognize the XBeteiligung namespace:
+
+1. Open **Settings/Preferences** → **Languages & Frameworks** → **Schemas and DTDs**
+2. Click the **+** button to add a new External Schema
+3. Configure the mapping:
+   - **URI**: `https://www.xleitstelle.de/xbeteiligung/12`
+   - **File**: Browse to `Resources/xsd/xbeteiligung.xsd` in this repository
+4. Click **OK** to save
+
+After this configuration, PhpStorm will:
+- Validate XML files against the XBeteiligung schema
+- Provide auto-completion for XBeteiligung elements
+- Show inline documentation from the XSD files
+- Highlight schema validation errors
+
+**Note:** You may also need to map the related XOeV namespaces:
+- `http://xoev.de/schemata/basisnachricht/g2g/1_1` → `Resources/xsd/xoev-basisnachricht-g2g_1.1.xsd`
+- `http://xoev.de/schemata/basisnachricht/behoerde/1_1` → `Resources/xsd/xoev-basisnachricht-behoerde_1.1.xsd`
+- `http://xoev.de/schemata/basisnachricht/kommunikation/1_1` → `Resources/xsd/xoev-basisnachricht-kommunikation_1.1.xsd`
+
 # Usage
 How to use it is documented in tests like testReadBeteiligung2PlanungBeteiligungNeuOK0410()
 

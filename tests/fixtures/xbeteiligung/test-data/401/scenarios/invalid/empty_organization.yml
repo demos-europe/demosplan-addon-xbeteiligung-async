@@ -1,0 +1,11 @@
+description: "Test with empty organization name (should fail)"
+expected_error_type: "validation_error"
+org_name: ""
+plan_name: "Test Plan Empty Org"
+arbeitstitel: "Test Arbeitstitel"
+planart_code: "6_Bebauungsplan"
+beschreibung_planungsanlass: "Test mit leerer Organisation"
+flaechen_url: "https://test.local/api/verfahren/empty/karten"
+raeumliche_beschreibung: "Test Beschreibung"
+include_beteiligung_oeffentlichkeit: false
+include_beteiligung_toeb: false
