@@ -353,30 +353,7 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
         $xml = $this->sut->createProcedureNew401FromObject($procedure);
 
         self::assertStringContainsString('geltungsbereich>', $xml, 'XML should contain geltungsbereich element');
-
-        // Extract the Geltungsbereich JSON from the XML
-        preg_match('/<[^>]*geltungsbereich[^>]*>(.*?)<\/[^>]*geltungsbereich>/', $xml, $matches);
-        self::assertNotEmpty($matches[1], 'Geltungsbereich should have content');
-
-        $geltungsbereich = json_decode(html_entity_decode($matches[1]), true);
-        self::assertNotNull($geltungsbereich, 'Geltungsbereich should be valid JSON');
-        self::assertSame('Polygon', $geltungsbereich['type']);
-
-        // Verify all coordinates are in WGS84 range (EPSG:3857 values would be in the millions)
-        foreach ($geltungsbereich['coordinates'][0] as $coord) {
-            self::assertGreaterThan(-180, $coord[0], 'Longitude must be > -180 (WGS84)');
-            self::assertLessThan(180, $coord[0], 'Longitude must be < 180 (WGS84)');
-            self::assertGreaterThan(-90, $coord[1], 'Latitude must be > -90 (WGS84)');
-            self::assertLessThan(90, $coord[1], 'Latitude must be < 90 (WGS84)');
-        }
-
-        // More specifically: coordinates should be within Germany's bounding box
-        foreach ($geltungsbereich['coordinates'][0] as $coord) {
-            self::assertGreaterThan(5.0, $coord[0], 'Longitude should be within Germany (> 5°E)');
-            self::assertLessThan(16.0, $coord[0], 'Longitude should be within Germany (< 16°E)');
-            self::assertGreaterThan(47.0, $coord[1], 'Latitude should be within Germany (> 47°N)');
-            self::assertLessThan(56.0, $coord[1], 'Latitude should be within Germany (< 56°N)');
-        }
+        $this->assertGeltungsbereichIsWgs84($xml);
     }
 
     /**
@@ -392,6 +369,11 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
 
         $xml = $this->sut->createProcedureNew401FromObject($procedure);
 
+        $this->assertGeltungsbereichIsWgs84($xml);
+    }
+
+    private function assertGeltungsbereichIsWgs84(string $xml): void
+    {
         preg_match('/<[^>]*geltungsbereich[^>]*>(.*?)<\/[^>]*geltungsbereich>/', $xml, $matches);
         self::assertNotEmpty($matches[1], 'Geltungsbereich should have content');
 
