@@ -72,8 +72,7 @@ class XBeteiligungMapService
             $transformedCoordinates[] = [$pointDst->__get('x'), $pointDst->__get('y')];
         }
 
-        // Create FeatureCollection with both original (WGS84) and transformed (Web Mercator) geometries
-        // This matches the format expected by the frontend and used in manual entries
+        // Create FeatureCollection with the EPSG:3857 transformed geometry for frontend map display
         $featureCollection = [
             'type' => 'FeatureCollection',
             'features' => [

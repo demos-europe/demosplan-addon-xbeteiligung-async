@@ -522,8 +522,9 @@ class XBeteiligungService
             )
         );
 
-        // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
+        // no Geltungsbereich zeichnen option in Planfeststellung yet
         $participationType->setGeltungsbereich('');
+
         $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure, $participationType));
         $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure, $participationType));
 
@@ -1139,13 +1140,11 @@ class XBeteiligungService
     }
 
     /**
-     * Extract the original WGS84 polygon from a territory FeatureCollection.
+     * Extract the WGS84 polygon from a territory FeatureCollection for use in outgoing XBeteiligung messages.
      *
-     * The territory field now contains a FeatureCollection with two features:
-     * 1. Original WGS84 geometry (MultiPolygon or Polygon)
-     * 2. Transformed Web Mercator geometry (Polygon)
-     *
-     * For outgoing XBeteiligung messages, we need the original WGS84 geometry.
+     * Territory is stored as a FeatureCollection with one feature in EPSG:3857 (Web Mercator).
+     * Since GeoJSON (RFC 7946) and the XBeteiligung standard require WGS84/EPSG:4326 coordinates,
+     * the stored EPSG:3857 geometry is converted to WGS84 before being returned.
      */
     private function extractOriginalGeltungsbereichFromTerritory(?string $territory): ?string
     {
@@ -1175,23 +1174,65 @@ class XBeteiligungService
         $hasType = isset($featureCollection['type']);
         $isLegacyGeometry = $hasType && in_array($featureCollection['type'], ['Polygon', 'MultiPolygon']);
 
-        // Handle legacy format (direct polygon/multipolygon)
+        // Handle legacy format (direct polygon/multipolygon) - assumed to already be WGS84
         if ($isLegacyGeometry) {
-            return $territory; // Already in correct format
+            return $territory;
         }
 
         $isFeatureCollection = $hasType && 'FeatureCollection' === $featureCollection['type'];
         $hasFeaturesArray = isset($featureCollection['features']);
         $hasFeatures = $hasFeaturesArray && count($featureCollection['features']) > 0;
 
-        // Handle new FeatureCollection format
         if ($isFeatureCollection && $hasFeatures) {
-            // Return the first feature's geometry (original WGS84)
-            $originalGeometry = $featureCollection['features'][0]['geometry'];
-            return json_encode($originalGeometry, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            // All FeatureCollection features are stored in EPSG:3857 — convert to WGS84
+            return $this->convertEpsg3857GeometryToWgs84Json($featureCollection['features'][0]['geometry']);
         }
 
         return null;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function convertEpsg3857GeometryToWgs84Json(array $geometry): string
+    {
+        $proj4 = new Proj4php();
+        $proj3857 = new Proj('EPSG:3857', $proj4);
+        $proj4326 = new Proj('EPSG:4326', $proj4);
+
+        $type = $geometry['type'];
+        $coordinates = $geometry['coordinates'];
+
+        if ('Polygon' === $type) {
+            $wgs84Coordinates = array_map(
+                fn (array $ring) => $this->transformRingToWgs84($ring, $proj4, $proj3857, $proj4326),
+                $coordinates
+            );
+        } elseif ('MultiPolygon' === $type) {
+            $wgs84Coordinates = array_map(
+                fn (array $polygon) => array_map(
+                    fn (array $ring) => $this->transformRingToWgs84($ring, $proj4, $proj3857, $proj4326),
+                    $polygon
+                ),
+                $coordinates
+            );
+        } else {
+            return json_encode($geometry, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+        }
+
+        return json_encode(
+            ['type' => $type, 'coordinates' => $wgs84Coordinates],
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
+        );
+    }
+
+    private function transformRingToWgs84(array $ring, Proj4php $proj4, Proj $proj3857, Proj $proj4326): array
+    {
+        return array_map(function (array $coord) use ($proj4, $proj3857, $proj4326): array {
+            $pointSrc = new Point($coord[0], $coord[1], $proj3857);
+            $pointDst = $proj4->transform($proj4326, $pointSrc);
+            return [$pointDst->__get('x'), $pointDst->__get('y')];
+        }, $ring);
     }
 
     /**
