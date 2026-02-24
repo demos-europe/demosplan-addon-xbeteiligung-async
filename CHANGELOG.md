@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.63 (2026-02-24)
 - bump demosplan-addon version from v0.65 to v0.67
 
 **Implement file tracking and replacement for 402 Anlagen (DPLAN-17308)**
