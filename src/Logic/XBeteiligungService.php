@@ -1174,9 +1174,9 @@ class XBeteiligungService
         $hasType = isset($featureCollection['type']);
         $isLegacyGeometry = $hasType && in_array($featureCollection['type'], ['Polygon', 'MultiPolygon']);
 
-        // Handle legacy format (direct polygon/multipolygon) - assumed to already be WGS84
+        // Handle legacy format (direct polygon/multipolygon) — also stored in EPSG:3857, convert to WGS84
         if ($isLegacyGeometry) {
-            return $territory;
+            return $this->convertEpsg3857GeometryToWgs84Json($featureCollection);
         }
 
         $isFeatureCollection = $hasType && 'FeatureCollection' === $featureCollection['type'];

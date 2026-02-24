@@ -56,6 +56,10 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
     // Coordinates around Hamburg (≈ 10.02°E, 51.5°N in WGS84)
     protected const TERRITORY_EPSG3857 = '{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[1116296.9705734858,6634813.663749559],[1117905.9884860306,6634187.8624979565],[1117301.031359643,6636161.866445964],[1115603.7905328334,6635901.465925163],[1116296.9705734858,6634813.663749559]]]},"properties":null}]}';
 
+    // Legacy territory format from older DB records: bare Polygon directly (no FeatureCollection wrapper), also in EPSG:3857
+    // Coordinates from diplanbau_develop_2025_10_08 snapshot (≈ 10.0°E, 53.5°N in WGS84, Hamburg area)
+    protected const TERRITORY_LEGACY_POLYGON_EPSG3857 = '{"type":"Polygon","coordinates":[[[1111896.0216485453,7083012.661495186],[1113000.0,7084000.0],[1112000.0,7085000.0],[1111896.0216485453,7083012.661495186]]]}';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -358,6 +362,34 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
             self::assertLessThan(16.0, $coord[0], 'Longitude should be within Germany (< 16°E)');
             self::assertGreaterThan(47.0, $coord[1], 'Latitude should be within Germany (> 47°N)');
             self::assertLessThan(56.0, $coord[1], 'Latitude should be within Germany (< 56°N)');
+        }
+    }
+
+    /**
+     * Legacy territory format (bare Polygon without FeatureCollection wrapper) is also stored in EPSG:3857.
+     * Verified against the diplanbau_develop_2025_10_08 DB snapshot.
+     */
+    public function testLegacyPolygonTerritoryIsConvertedFromEpsg3857ToWgs84(): void
+    {
+        $procedure = $this->createTestProcedureWithLayers(
+            [$this->createBPlanLayer()],
+            self::TERRITORY_LEGACY_POLYGON_EPSG3857
+        );
+
+        $xml = $this->sut->createProcedureNew401FromObject($procedure);
+
+        preg_match('/<[^>]*geltungsbereich[^>]*>(.*?)<\/[^>]*geltungsbereich>/', $xml, $matches);
+        self::assertNotEmpty($matches[1], 'Geltungsbereich should have content');
+
+        $geltungsbereich = json_decode(html_entity_decode($matches[1]), true);
+        self::assertNotNull($geltungsbereich, 'Geltungsbereich should be valid JSON');
+        self::assertSame('Polygon', $geltungsbereich['type']);
+
+        foreach ($geltungsbereich['coordinates'][0] as $coord) {
+            self::assertGreaterThan(-180, $coord[0], 'Longitude must be > -180 (WGS84)');
+            self::assertLessThan(180, $coord[0], 'Longitude must be < 180 (WGS84)');
+            self::assertGreaterThan(-90, $coord[1], 'Latitude must be > -90 (WGS84)');
+            self::assertLessThan(90, $coord[1], 'Latitude must be < 90 (WGS84)');
         }
     }
 
