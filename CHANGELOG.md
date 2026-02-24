@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.64 (2026-02-24)
 
 **Fix Geltungsbereich CRS in outgoing XBeteiligung messages (DPLAN-17434)**
 - Fix outgoing KommunalInitiieren/KommunalAktualisieren messages sending Geltungsbereich in EPSG:3857 instead of WGS84 as required by GeoJSON RFC 7946 and the XBeteiligung standard
