@@ -1,6 +1,12 @@
 # Changelog
 
 ## UNRELEASED
+
+**Fix Geltungsbereich CRS in outgoing XBeteiligung messages (DPLAN-17434)**
+- Fix outgoing KommunalInitiieren/KommunalAktualisieren messages sending Geltungsbereich in EPSG:3857 instead of WGS84 as required by GeoJSON RFC 7946 and the XBeteiligung standard
+- Add EPSG:3857 → WGS84 conversion in `XBeteiligungService::extractGeometryFromTerritoryData()` using `proj4php`
+- Fix misleading comment in `XBeteiligungMapService::setMapData()` that claimed both WGS84 and EPSG:3857 geometries were stored (only EPSG:3857 is stored for frontend map display)
+
 ## v0.63 (2026-02-24)
 - bump demosplan-addon version from v0.65 to v0.67
 
