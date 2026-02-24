@@ -17,6 +17,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinSt
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenNOK0721;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenOK0711\AllgemeinStellungnahmeNeuabgegebenOK0711AnonymousPHPType\NachrichteninhaltAnonymousPHPType as OkContentType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegebenNOK0721\AllgemeinStellungnahmeNeuabgegebenNOK0721AnonymousPHPType\NachrichteninhaltAnonymousPHPType as NokContentType;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -79,9 +80,8 @@ class StatementIdExtractorTest extends TestCase
         static::assertSame('12345_67890', $result);
     }
 
-    /**
-     * @dataProvider statementIdVariationsProvider
-     */
+
+    #[DataProvider('statementIdVariationsProvider')]
     public function testExtractFromXmlHandlesVariousStatementIdFormats(
         string $inputId,
         ?string $expectedResult

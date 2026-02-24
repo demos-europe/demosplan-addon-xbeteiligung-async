@@ -23,6 +23,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Beteiligung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType\BeteiligungPlanfeststellungTOEBArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittPlanfeststellungType;
@@ -99,6 +100,7 @@ class XBeteiligungService
         private readonly GisLayerCategoryRepositoryInterface    $gisLayerCategoryRepository,
         private readonly GlobalConfigInterface                  $globalConfig,
         private readonly LoggerInterface                        $logger,
+        private readonly MapProjectionConverterInterface        $mapProjectionConverter,
         private readonly ParameterBagInterface                  $parameterBag,
         private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
@@ -522,8 +524,9 @@ class XBeteiligungService
             )
         );
 
-        // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
+        // no Geltungsbereich zeichnen option in Planfeststellung yet
         $participationType->setGeltungsbereich('');
+
         $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure, $participationType));
         $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure, $participationType));
 
@@ -1139,13 +1142,11 @@ class XBeteiligungService
     }
 
     /**
-     * Extract the original WGS84 polygon from a territory FeatureCollection.
+     * Extract the WGS84 polygon from a territory FeatureCollection for use in outgoing XBeteiligung messages.
      *
-     * The territory field now contains a FeatureCollection with two features:
-     * 1. Original WGS84 geometry (MultiPolygon or Polygon)
-     * 2. Transformed Web Mercator geometry (Polygon)
-     *
-     * For outgoing XBeteiligung messages, we need the original WGS84 geometry.
+     * Territory is stored as a FeatureCollection with one feature in EPSG:3857 (Web Mercator).
+     * Since GeoJSON (RFC 7946) and the XBeteiligung standard require WGS84/EPSG:4326 coordinates,
+     * the stored EPSG:3857 geometry is converted to WGS84 before being returned.
      */
     private function extractOriginalGeltungsbereichFromTerritory(?string $territory): ?string
     {
@@ -1175,23 +1176,44 @@ class XBeteiligungService
         $hasType = isset($featureCollection['type']);
         $isLegacyGeometry = $hasType && in_array($featureCollection['type'], ['Polygon', 'MultiPolygon']);
 
-        // Handle legacy format (direct polygon/multipolygon)
+        // Handle legacy format (direct polygon/multipolygon) — also stored in EPSG:3857, convert to WGS84
         if ($isLegacyGeometry) {
-            return $territory; // Already in correct format
+            return $this->convertEpsg3857GeometryToWgs84Json($featureCollection);
         }
 
         $isFeatureCollection = $hasType && 'FeatureCollection' === $featureCollection['type'];
         $hasFeaturesArray = isset($featureCollection['features']);
         $hasFeatures = $hasFeaturesArray && count($featureCollection['features']) > 0;
 
-        // Handle new FeatureCollection format
         if ($isFeatureCollection && $hasFeatures) {
-            // Return the first feature's geometry (original WGS84)
-            $originalGeometry = $featureCollection['features'][0]['geometry'];
-            return json_encode($originalGeometry, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+            // All FeatureCollection features are stored in EPSG:3857 — convert to WGS84
+            return $this->convertEpsg3857GeometryToWgs84Json($featureCollection['features'][0]['geometry']);
         }
 
         return null;
+    }
+
+    /**
+     * @throws JsonException
+     */
+    private function convertEpsg3857GeometryToWgs84Json(array $geometry): string
+    {
+        $proj3857 = $this->mapProjectionConverter->getProjection('EPSG:3857');
+        $proj4326 = $this->mapProjectionConverter->getProjection('EPSG:4326');
+
+        $featureCollectionJson = json_encode([
+            'type'     => 'FeatureCollection',
+            'features' => [['type' => 'Feature', 'geometry' => $geometry, 'properties' => null]],
+        ], JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+
+        $converted = $this->mapProjectionConverter->convertGeoJsonPolygon(
+            $featureCollectionJson,
+            $proj3857,
+            $proj4326,
+            MapProjectionConverterInterface::OBJECT_RETURN_TYPE
+        );
+
+        return json_encode($converted->features[0]->geometry, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
     }
 
     /**

@@ -16,6 +16,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfigurat
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungOutgoingRoutingKeyBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingKeyParser;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -52,9 +53,8 @@ class XBeteiligungOutgoingRoutingKeyBuilderTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider incomingToOutgoingRoutingKeyProvider
-     */
+
+    #[DataProvider('incomingToOutgoingRoutingKeyProvider')]
     public function testBuildFromIncomingRoutingKey(
         string $incomingRoutingKey,
         string $outgoingMessageIdentifier,

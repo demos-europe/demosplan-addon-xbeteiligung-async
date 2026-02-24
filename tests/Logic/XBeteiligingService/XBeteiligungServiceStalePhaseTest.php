@@ -32,6 +32,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepositor
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -111,6 +112,7 @@ class XBeteiligungServiceStalePhaseTest extends TestCase
             $this->gisLayerCategoryRepository,
             $this->globalConfig,
             $this->createMock(LoggerInterface::class),
+            $this->createMock(MapProjectionConverterInterface::class),
             $this->createMock(ParameterBagInterface::class),
             $this->createMock(PlanningDocumentsLinkCreator::class),
             $this->createMock(ProcedureMessageRepository::class),

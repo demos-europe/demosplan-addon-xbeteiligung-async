@@ -15,6 +15,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Services;
 use DemosEurope\DemosplanAddon\XBeteiligung\Services\XBeteiligungRoutingKeyParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\RoutingKeyComponents;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 
@@ -29,9 +30,8 @@ class XBeteiligungRoutingKeyParserTest extends TestCase
         $this->parser = new XBeteiligungRoutingKeyParser($this->logger);
     }
 
-    /**
-     * @dataProvider validRoutingKeyProvider
-     */
+
+    #[DataProvider('validRoutingKeyProvider')]
     public function testParseRoutingKey(
         string $routingKey,
         string $expectedMandant,
@@ -71,9 +71,8 @@ class XBeteiligungRoutingKeyParserTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidRoutingKeyProvider
-     */
+
+    #[DataProvider('invalidRoutingKeyProvider')]
     public function testParseRoutingKeyThrowsException(string $invalidRoutingKey, string $expectedExceptionMessage): void
     {
         $this->expectException(InvalidArgumentException::class);
