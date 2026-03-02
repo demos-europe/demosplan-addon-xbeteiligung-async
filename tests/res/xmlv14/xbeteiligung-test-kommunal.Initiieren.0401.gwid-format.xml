@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns5:kommunal.Initiieren.0401
+        produkt="DiPlan Cockpit"
+        produkthersteller="]init[ AG"
+        standard="XBeteiligung"
+        version="1.2"
+        xmlns:ns6="http://xplanverfahren.de/V14"
+        xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12"
+        xmlns:ns2="http://xoev.de/schemata/basisnachricht/g2g/1_1"
+        xmlns:ns4="http://xoev.de/schemata/basisnachricht/kommunikation/1_1"
+        xmlns:ns3="http://xoev.de/schemata/basisnachricht/behoerde/1_1">
+   <ns2:nachrichtenkopf.g2g>
+       <ns2:identifikation.nachricht>
+           <ns2:nachrichtenUUID>60f6667b-fa45-4bd7-b717-f4d6c65e5edb</ns2:nachrichtenUUID>
+           <ns2:nachrichtentyp listURI="urn:xoev-de:xleitstelle:codeliste:xbeteiligung-nachrichten" listVersionID="1.2">
+               <code>0401</code>
+               <name>kommunal.Initiieren.0401</name>
+           </ns2:nachrichtentyp>
+           <ns2:erstellungszeitpunkt>2025-02-20T16:41:19.880Z</ns2:erstellungszeitpunkt>
+       </ns2:identifikation.nachricht>
+       <ns2:leser>
+           <ns3:verzeichnisdienst listURI="urn:xoev-de:kosit:codeliste:verzeichnisdienst" listVersionID="3">
+               <code>DVDV</code>
+           </ns3:verzeichnisdienst>
+           <ns3:kennung>xyz:0002</ns3:kennung>
+           <ns3:name>behoerde2</ns3:name>
+           <ns4:erreichbarkeit>
+               <ns4:kanal listURI="urn:de:xoev:codeliste:erreichbarkeit" listVersionID="3">
+                   <code>02</code>
+               </ns4:kanal>
+               <ns4:kennung>+49 30 123456</ns4:kennung>
+           </ns4:erreichbarkeit>
+           <ns4:erreichbarkeit>
+               <ns4:kanal listURI="urn:de:xoev:codeliste:erreichbarkeit" listVersionID="3">
+                   <code>02</code>
+               </ns4:kanal>
+               <ns4:kennung>hans.mustermann@example.com</ns4:kennung>
+           </ns4:erreichbarkeit>
+       </ns2:leser>
+       <ns2:autor>
+           <ns3:verzeichnisdienst listURI="urn:xoev-de:kosit:codeliste:verzeichnisdienst" listVersionID="3">
+               <code>DVDV</code>
+           </ns3:verzeichnisdienst>
+           <ns3:kennung>xyz:0001</ns3:kennung>
+           <ns3:name>behoerde1</ns3:name>
+           <ns4:erreichbarkeit>
+               <ns4:kanal listURI="urn:de:xoev:codeliste:erreichbarkeit" listVersionID="3">
+                   <code>02</code>
+               </ns4:kanal>
+               <ns4:kennung>+49 30 123456</ns4:kennung>
+           </ns4:erreichbarkeit>
+           <ns4:erreichbarkeit>
+               <ns4:kanal listURI="urn:de:xoev:codeliste:erreichbarkeit" listVersionID="3">
+                   <code>02</code>
+               </ns4:kanal>
+               <ns4:kennung>hans.mustermann@example.com</ns4:kennung>
+           </ns4:erreichbarkeit>
+       </ns2:autor>
+   </ns2:nachrichtenkopf.g2g>
+   <ns5:nachrichteninhalt>
+       <ns5:vorgangsID>ID_3d4d41e8-0088-451e-bf88-2aaeb3eb45c9</ns5:vorgangsID>
+       <ns5:beteiligung>
+           <ns5:akteurVorhaben>
+               <ns5:veranlasser>
+                   <name>
+                       <name>de-a1b2c3d4e5f6a7b8c9d0e1</name>
+                   </name>
+               </ns5:veranlasser>
+           </ns5:akteurVorhaben>
+           <ns5:planID>ID_0f8d6117-043f-4b83-941b-e219390e7c68</ns5:planID>
+           <ns5:planname>TestAdrian33</ns5:planname>
+           <ns5:arbeitstitel>XBeteiligung_Test1</ns5:arbeitstitel>
+           <ns5:planartKommunal listURI="urn:xoev-de:xleitstelle:codeliste:planartkommunal" listVersionID="1">
+               <code>6_Bebauungsplan</code>
+           </ns5:planartKommunal>
+           <ns5:verfahrensschrittKommunal listURI="urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal" listVersionID="1">
+               <code>4000</code>
+           </ns5:verfahrensschrittKommunal>
+           <ns5:beschreibungPlanungsanlass>Test XBeteiligung Kommunikation 0401 Richtung DiPlanBeteiligung</ns5:beschreibungPlanungsanlass>
+           <ns5:flaechenabgrenzungUrl>https://init.cockpit.develop.diplanung.de/api/cockpit/verfahren/ID_0f8d6117-043f-4b83-941b-e219390e7c68/karten/KARTE_GRENZEN_PLANGEBIET</ns5:flaechenabgrenzungUrl>
+           <ns5:geltungsbereich>{"type":"Polygon","coordinates":[[[10.083502443258789,53.4757288003767],[10.083429490182915,53.47576152622487],[10.083400410030347,53.47577456349788],[10.083366319813274,53.47579026203547],[10.083333270520775,53.47580482747944],[10.083331795409155,53.47580547908394],[10.08331926488615,53.47580866698014],[10.083256935900343,53.47584027164056],[10.08314898716939,53.47589339636827],[10.083006315593096,53.475951006673355],[10.082998589842441,53.47595412402215],[10.082780909993662,53.47606617808371],[10.082880814185861,53.47614209428491],[10.083063369812717,53.47628086872254],[10.08319709506387,53.47638251975901],[10.082963072579423,53.47628718021578],[10.082715068850042,53.476177071833604],[10.082655540859767,53.476150643652645],[10.082249301890487,53.47597029713991],[10.082114928765295,53.47590285472612],[10.08202455168821,53.475847167157774],[10.081938887602648,53.4758002282623],[10.081799787264908,53.47572401890613],[10.081736287779703,53.475683576144206],[10.081711276868695,53.47566764001535],[10.081685239986353,53.475651056958654],[10.081640517794856,53.47562257056897],[10.081788926921929,53.475506749993286],[10.081979191432035,53.475358288106705],[10.082102400829797,53.47525293396821],[10.082085740954678,53.47524542605364],[10.082087350701677,53.475244144003014],[10.082112874303986,53.47522397488263],[10.082301439647335,53.47507515030799],[10.08232881930632,53.47505864989147],[10.082391982530082,53.475096551450164],[10.082365442403269,53.475114069042796],[10.082159507242343,53.47527663366427],[10.081977913623232,53.47542000137431],[10.081945727586783,53.47544540855245],[10.081966594534938,53.47545837078007],[10.082353039491036,53.475698360924426],[10.082590142108064,53.47560233915516],[10.082694270443177,53.475694496639605],[10.082793472208856,53.47564935306544],[10.082950992304669,53.47558848919951],[10.082982110021197,53.475572035660996],[10.083012845895292,53.47555952283386],[10.083025807429076,53.47555491976254],[10.083103621307476,53.47552728292131],[10.0831979358928,53.47549379731889],[10.08314179497457,53.47552165127809],[10.083161633302659,53.47554627259404],[10.083179324356271,53.47556822560713],[10.083190316447318,53.47557148792042],[10.083371063292857,53.47562511483863],[10.08337510174049,53.47562630974262],[10.083502443258789,53.4757288003767]]]}</ns5:geltungsbereich>
+           <ns5:raeumlicheBeschreibung>Das ist die räumliche Beschreibung des Geltungsbereichs.</ns5:raeumlicheBeschreibung>
+       </ns5:beteiligung>
+   </ns5:nachrichteninhalt>
+</ns5:kommunal.Initiieren.0401>

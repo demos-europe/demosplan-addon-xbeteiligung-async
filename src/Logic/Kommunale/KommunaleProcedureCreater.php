@@ -206,17 +206,35 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
     ): ProcedureInterface {
         // get user from message should be set, because of that userId here is not correct
         try {
-            $orgaName = $procedureDataValueObject->getContactOrganization() ?? '';
-            $isGwId = 1 === preg_match('/^[a-z]{2,}-[a-f0-9]{20,}$/i', $orgaName);
-            $orgaList = $isGwId
-                ? $this->orgaService->getOrgaByFields(['gwId' => $orgaName, 'deleted' => false])
-                : $this->orgaService->getOrgaByFields(['name' => $orgaName, 'deleted' => false]);
+            // The Veranlasser name field can contain:
+            // 1. A plain organization name (e.g. "Musterzuständigkeit") → looked up by name
+            // 2. A gwId (e.g. "de-a1b2c3d4e5f6a7b8c9d0e1") → looked up by gwId
+            // 3. An orgaId|fachbezug compound (e.g. "de-a1b2c3d4e5f6a7b8c9d0e1|Stadtplanung")
+            //    → looked up by gwId with full string first, then by orgaId part only as fallback
+            $orgaIdentifier = $procedureDataValueObject->getContactOrganization() ?? '';
+            $containsPipe = str_contains($orgaIdentifier, '|');
+
+            if ($containsPipe) {
+                // Format: orgaId|fachbezug — try full string as gwId first
+                $orgaList = $this->orgaService->getOrgaByFields(['gwId' => $orgaIdentifier, 'deleted' => false]);
+                // Fallback: extract orgaId (before |) and try as gwId
+                if (0 === count($orgaList)) {
+                    $orgaIdPart = explode('|', $orgaIdentifier, 2)[0];
+                    $orgaList = $this->orgaService->getOrgaByFields(['gwId' => $orgaIdPart, 'deleted' => false]);
+                }
+                $isGwId = true;
+            } else {
+                $isGwId = 1 === preg_match('/^[a-z]{2,}-[a-f0-9]{20,}$/i', $orgaIdentifier);
+                $orgaList = $isGwId
+                    ? $this->orgaService->getOrgaByFields(['gwId' => $orgaIdentifier, 'deleted' => false])
+                    : $this->orgaService->getOrgaByFields(['name' => $orgaIdentifier, 'deleted' => false]);
+            }
             if (0 === count($orgaList)) {
                 $fieldLabel = $isGwId ? 'der Id' : 'dem Namen';
                 $errorMessage = sprintf(
                     'Es konnte keine Organisation mit %s "%s" gefunden werden.',
                     $fieldLabel,
-                    $orgaName
+                    $orgaIdentifier
                 );
 
                 throw new AddonOrgaNotFoundException($errorMessage);
@@ -227,7 +245,7 @@ class KommunaleProcedureCreater extends ProcedureCommonFeatures
                     '%s "%s" scheint nicht unique zu sein. '
                     . 'Es gibt mehrere Organisationen mit diesem Wert im System.',
                     $fieldLabel,
-                    $orgaName
+                    $orgaIdentifier
                 );
 
                 throw new AddonOrgaNotFoundException($errorMessage);

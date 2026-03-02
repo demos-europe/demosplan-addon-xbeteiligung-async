@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 
+use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\DataFixtures\MockFactoryTest;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureCreater;
@@ -29,7 +30,8 @@ class KommunaleProcedureHandlerFactory
     }
 
     public function createProcedureHandler(
-        string $handlerType
+        string $handlerType,
+        ?OrgaServiceInterface $orgaServiceOverride = null
     ): KommunaleProcedureCreater|KommunaleProcedureUpdater {
         // Create necessary mocks for ProcedureCommonFeatures
         $logger = $this->mockFactory->getLoggerInterfaceMock();
@@ -70,7 +72,7 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getTransActionServiceInterfaceMock(),
             $this->mockFactory->getTranslatorMock(),
             $this->mockFactory->getUserHandlerMock(),
-            $this->mockFactory->getOrgaServiceInterfaceMock(),
+            $orgaServiceOverride ?? $this->mockFactory->getOrgaServiceInterfaceMock(),
             $this->mockFactory->getXBeteiligungAgsServiceMock(),
             $this->mockFactory->getXBeteiligungCustomerMappingServiceMock(),
             $mapService,
