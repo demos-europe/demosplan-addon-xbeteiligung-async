@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.66 (2026-03-03)
 - Backmerge v0.60.2
 
 ## v0.65 (2026-03-03)
