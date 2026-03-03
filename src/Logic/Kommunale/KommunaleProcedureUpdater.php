@@ -85,14 +85,17 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
 
     private function findProcedureToUpdate(BeteiligungKommunalType $beteiligungKommunal): ProcedureInterface
     {
-        $procedure = $this->procedureService->getProcedure(
-            $beteiligungKommunal->getBeteiligungOeffentlichkeit()?->getBeteiligungsID()
-        );
+        $procedure = null;
+        $beteiligungsIdOeffentlichkeit = $beteiligungKommunal->getBeteiligungOeffentlichkeit()?->getBeteiligungsID();
+        if (null !== $beteiligungsIdOeffentlichkeit) {
+            $procedure = $this->procedureService->getProcedure($beteiligungsIdOeffentlichkeit);
+        }
 
         if (null === $procedure) {
-            $procedure = $this->procedureService->getProcedure(
-                $beteiligungKommunal->getBeteiligungTOEB()?->getBeteiligungsID()
-            );
+            $beteiligungsIdToeb = $beteiligungKommunal->getBeteiligungTOEB()?->getBeteiligungsID();
+            if (null !== $beteiligungsIdToeb) {
+                $procedure = $this->procedureService->getProcedure($beteiligungsIdToeb);
+            }
         }
 
         if (null === $procedure) {
