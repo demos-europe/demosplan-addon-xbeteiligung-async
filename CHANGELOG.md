@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Tags need to be strings in Xmessage
+
 ## v0.60.1 (2026-02-19)
 - allow verfasser name to be id
 
