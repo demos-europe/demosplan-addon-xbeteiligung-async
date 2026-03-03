@@ -1,6 +1,11 @@
 # Changelog
 
 ## UNRELEASED
+
+**Fix null BeteiligungsID causing MissingIdentifierField error in KommunalAktualisieren (0402) (ADO-51485)**
+- Guard against null `BeteiligungsID` before calling `getProcedure()` in `KommunaleProcedureUpdater::findProcedureToUpdate()`
+- Previously, when only `BeteiligungTOEB` was present (no `BeteiligungOeffentlichkeit`), Doctrine threw a `MissingIdentifierField` exception instead of falling through to the TOEB lookup
+
 ## v0.64 (2026-02-24)
 
 **Fix Geltungsbereich CRS in outgoing XBeteiligung messages (DPLAN-17434)**
