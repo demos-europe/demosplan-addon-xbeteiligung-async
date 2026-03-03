@@ -41,6 +41,9 @@
 - Comment out namespace specification in xml_list to match working Oeffentlichkeit configuration
 - TOEB attachments now properly deserialize from incoming 401 messages
 
+## v0.60.2 (2026-03-03)
+- Tags need to be strings in Xmessage
+
 ## v0.60.1 (2026-02-19)
 - allow verfasser name to be id
 
