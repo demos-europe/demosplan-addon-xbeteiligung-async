@@ -149,7 +149,8 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
             );
         }
         // set Schlagwort (sanitize tags for DIN 91379 datatypeC compliance)
-        $statement->setSchlagwort($this->textSanitizer->sanitizeArray($statementCreated->getTags()));
+        $tagTitles = array_map(static fn ($tag): string => $tag->getTitle(), $statementCreated->getTags());
+        $statement->setSchlagwort($this->textSanitizer->sanitizeArray($tagTitles));
         $nachricht = new NachrichteninhaltAnonymousPHPType();
         $nachricht->setStellungnahme($statement);
         $nachricht->setVorgangsID($this->commonHelpers->uuid());
