@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Backmerge v0.60.2
+
 ## v0.65 (2026-03-03)
 
 **Fix null BeteiligungsID causing MissingIdentifierField error in KommunalAktualisieren (0402) (ADO-51485)**
