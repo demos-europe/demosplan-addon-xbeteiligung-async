@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Add the possibility to create procedures as a orga with a Fachbezug
+
 ## v0.66 (2026-03-03)
 - Backmerge v0.60.2
 
