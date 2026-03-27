@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.67 (2026-03-27)
 - Add the possibility to create procedures as a orga with a Fachbezug
 
 ## v0.66 (2026-03-03)
