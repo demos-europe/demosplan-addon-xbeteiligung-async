@@ -3,6 +3,15 @@
 ## UNRELEASED
 - Add the possibility to create procedures as a orga with a Fachbezug
 
+## v0.66 (2026-03-03)
+- Backmerge v0.60.2
+
+## v0.65 (2026-03-03)
+
+**Fix null BeteiligungsID causing MissingIdentifierField error in KommunalAktualisieren (0402) (ADO-51485)**
+- Guard against null `BeteiligungsID` before calling `getProcedure()` in `KommunaleProcedureUpdater::findProcedureToUpdate()`
+- Previously, when only `BeteiligungTOEB` was present (no `BeteiligungOeffentlichkeit`), Doctrine threw a `MissingIdentifierField` exception instead of falling through to the TOEB lookup
+
 ## v0.64 (2026-02-24)
 
 **Fix Geltungsbereich CRS in outgoing XBeteiligung messages (DPLAN-17434)**
@@ -36,6 +45,9 @@
 - Fix JMS Serializer metadata configuration for BeteiligungKommunalTOEBType anlagen property
 - Comment out namespace specification in xml_list to match working Oeffentlichkeit configuration
 - TOEB attachments now properly deserialize from incoming 401 messages
+
+## v0.60.2 (2026-03-03)
+- Tags need to be strings in Xmessage
 
 ## v0.60.1 (2026-02-19)
 - allow verfasser name to be id
