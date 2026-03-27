@@ -1,5 +1,10 @@
-# Overview Efa components
-https://miro.com/app/board/uXjVKuYy5ow=/
+# demosplan-addon-xbeteiligung-async
+
+Addon for [demosplan](https://github.com/demos-europe/demosplan-core) that implements the [XBeteiligung](https://www.xleitstelle.de/xbeteiligung) standard for digital public participation in planning processes.
+
+XBeteiligung is a German government interoperability standard (based on XÖV) that enables standardized machine-to-machine communication between planning authorities and participation platforms. This addon handles incoming XBeteiligung XML messages (e.g. initiating, updating, or deleting participation procedures) and produces compliant response messages.
+
+Messages are received either via RabbitMQ or a REST API endpoint, deserialized into PHP objects using JMS Serializer, processed against the demosplan core, and answered with OK/NOK response messages. The addon supports three procedure categories defined by the standard: Kommunal (municipal planning), Raumordnung (spatial planning), and Planfeststellung (plan approval).
 
 # Generation of php classes from xsd files
 
