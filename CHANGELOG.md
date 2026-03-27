@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- Add the possibility to create procedures as a orga with a Fachbezug
+
 ## v0.64 (2026-02-24)
 
 **Fix Geltungsbereich CRS in outgoing XBeteiligung messages (DPLAN-17434)**
