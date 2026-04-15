@@ -1,6 +1,11 @@
 # Changelog
 
 ## UNRELEASED
+
+**Fix ValueError for unknown procedure phase keys in XBeteiligung messages (DPLAN-16867)**
+- Replace `ProcedurePhaseKey::from()` with `::tryFrom()` in `XBeteiligungService` to avoid `ValueError` for project-specific phase keys not defined in the enum (e.g. `einsichtnahme`, `scoping`)
+- `ProcedurePhaseMapping::getPhaseCode/getPhaseName` now accept nullable `ProcedurePhaseKey` and return `null` for unknown phases, falling back to the existing placeholder code
+
 ## v0.67 (2026-03-27)
 - Add the possibility to create procedures as a orga with a Fachbezug
 
