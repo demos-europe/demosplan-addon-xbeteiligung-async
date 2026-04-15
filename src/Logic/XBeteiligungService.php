@@ -349,7 +349,7 @@ class XBeteiligungService
         $phaseCode = ProcedurePhaseMapping::getPhaseCode(
             ProcedureMessageTyp::RAUMORDNUNG,
             $participationType,
-            ProcedurePhaseKey::from($phaseKey)
+            ProcedurePhaseKey::tryFrom($phaseKey)
         );
 
         $codeType->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
@@ -380,7 +380,7 @@ class XBeteiligungService
         $phaseCode = ProcedurePhaseMapping::getPhaseCode(
             ProcedureMessageTyp::PLANFESTSTELLUNG,
             $participationType,
-            ProcedurePhaseKey::from($phaseKey)
+            ProcedurePhaseKey::tryFrom($phaseKey)
         );
 
         $codeType->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
@@ -1009,7 +1009,7 @@ class XBeteiligungService
         $phaseCode = ProcedurePhaseMapping::getPhaseCode(
             ProcedureMessageTyp::KOMMUNAL,
             ParticipationType::PUBLIC,
-            ProcedurePhaseKey::from($phaseKey)
+            ProcedurePhaseKey::tryFrom($phaseKey)
         );
 
         $codeProcedurePhase->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
@@ -1029,7 +1029,7 @@ class XBeteiligungService
         $phaseCode = ProcedurePhaseMapping::getPhaseCode(
             ProcedureMessageTyp::KOMMUNAL,
             ParticipationType::INSTITUTION,
-            ProcedurePhaseKey::from($phaseKey)
+            ProcedurePhaseKey::tryFrom($phaseKey)
         );
 
         $codeProcedurePhase->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);

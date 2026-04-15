@@ -157,8 +157,12 @@ class ProcedurePhaseMapping
     public static function getPhaseCode(
         ProcedureMessageTyp $procedureType,
         ParticipationType $participationType,
-        ProcedurePhaseKey $phaseKey
+        ?ProcedurePhaseKey $phaseKey
     ): ?string {
+        if (null === $phaseKey) {
+            return null;
+        }
+
         $mapping = self::getMapping($procedureType, $participationType);
         $phaseData = $mapping[$phaseKey->value] ?? null;
 
@@ -177,8 +181,12 @@ class ProcedurePhaseMapping
     public static function getPhaseName(
         ProcedureMessageTyp $procedureType,
         ParticipationType $participationType,
-        ProcedurePhaseKey $phaseKey
+        ?ProcedurePhaseKey $phaseKey
     ): ?string {
+        if (null === $phaseKey) {
+            return null;
+        }
+
         $mapping = self::getMapping($procedureType, $participationType);
         $phaseData = $mapping[$phaseKey->value] ?? null;
 
