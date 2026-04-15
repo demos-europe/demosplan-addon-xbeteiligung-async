@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.68 (2026-04-15)
 
 **Fix ValueError for unknown procedure phase keys in XBeteiligung messages (DPLAN-16867)**
 - Replace `ProcedurePhaseKey::from()` with `::tryFrom()` in `XBeteiligungService` to avoid `ValueError` for project-specific phase keys not defined in the enum (e.g. `einsichtnahme`, `scoping`)
