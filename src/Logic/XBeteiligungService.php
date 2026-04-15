@@ -349,7 +349,7 @@ class XBeteiligungService
         $phaseCode = ProcedurePhaseMapping::getPhaseCode(
             ProcedureMessageTyp::RAUMORDNUNG,
             $participationType,
-            ProcedurePhaseKey::tryFrom($phaseKey)
+            $this->resolvePhaseKey($phaseKey, $procedure->getId())
         );
 
         $codeType->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
@@ -380,7 +380,7 @@ class XBeteiligungService
         $phaseCode = ProcedurePhaseMapping::getPhaseCode(
             ProcedureMessageTyp::PLANFESTSTELLUNG,
             $participationType,
-            ProcedurePhaseKey::tryFrom($phaseKey)
+            $this->resolvePhaseKey($phaseKey, $procedure->getId())
         );
 
         $codeType->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
@@ -1009,7 +1009,7 @@ class XBeteiligungService
         $phaseCode = ProcedurePhaseMapping::getPhaseCode(
             ProcedureMessageTyp::KOMMUNAL,
             ParticipationType::PUBLIC,
-            ProcedurePhaseKey::tryFrom($phaseKey)
+            $this->resolvePhaseKey($phaseKey, $procedure->getId())
         );
 
         $codeProcedurePhase->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
@@ -1029,13 +1029,26 @@ class XBeteiligungService
         $phaseCode = ProcedurePhaseMapping::getPhaseCode(
             ProcedureMessageTyp::KOMMUNAL,
             ParticipationType::INSTITUTION,
-            ProcedurePhaseKey::tryFrom($phaseKey)
+            $this->resolvePhaseKey($phaseKey, $procedure->getId())
         );
 
         $codeProcedurePhase->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
         $codeProcedurePhase->setName($this->getInstitutionPhaseNameFromKey($procedure));
 
         return $codeProcedurePhase;
+    }
+
+    private function resolvePhaseKey(string $phaseKey, string $procedureId): ?ProcedurePhaseKey
+    {
+        $phaseKeyEnum = ProcedurePhaseKey::tryFrom($phaseKey);
+        if (null === $phaseKeyEnum) {
+            $this->logger->warning('XBeteiligung: Unknown procedure phase key, falling back to placeholder code', [
+                'phaseKey'    => $phaseKey,
+                'procedureId' => $procedureId,
+            ]);
+        }
+
+        return $phaseKeyEnum;
     }
 
     private function getInstitutionNewsList(ProcedureInterface $procedure): array
