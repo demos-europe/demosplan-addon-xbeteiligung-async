@@ -1,0 +1,17 @@
+{
+  "name": "demosplan-addon-xbeteiligung-async",
+  "version": "v0.68",
+  "description": "UI for demosplan-addon-xbeteiligung-async - a demosplan-core addon",
+  "repository": "git@github.com:demos-europe/demosplan-addon-xbeteiligung-async",
+  "license": "LicenseRef-LICENSE",
+  "devDependencies": {
+    "@demos-europe/demosplan-addon-client-builder": "^0.0.13",
+    "webpack": "5.88.2",
+    "webpack-cli": "^5.1.4"
+  },
+  "scripts": {
+    "dev": "webpack build",
+    "prod": "webpack build --node-env=production"
+  },
+  "packageManager": "yarn@4.2.2"
+}
