@@ -43,6 +43,16 @@ services:
         arguments:
             $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungFileMapping'
 
+    DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeRepository:
+        arguments:
+            $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCode'
+
     DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseCockpitRepository:
         arguments:
             $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedurePhaseCockpit'
+
+    DemosEurope\DemosplanAddon\XBeteiligung\ResourceType\XBeteiligungPhaseDefinitionCodeResourceType:
+        autowire: true
+        arguments:
+            $conditionFactory: '@EDT\DqlQuerying\ConditionFactories\DqlConditionFactory'
+        tags: [ 'dplan.resourceType' ]

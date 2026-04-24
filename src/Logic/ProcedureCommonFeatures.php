@@ -21,6 +21,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterfa
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
@@ -64,6 +65,7 @@ abstract class ProcedureCommonFeatures
         protected readonly XBeteiligungGisLayerManager        $gisLayerManager,
         protected readonly XBeteiligungAttachmentService      $xbeteiligungAttachmentService,
         protected readonly ProcedurePhaseCodeDetector $procedurePhaseCodeDetector,
+        protected readonly XBeteiligungPhaseDefinitionResolver $phaseDefinitionResolver,
     )
     {
     }
@@ -72,11 +74,26 @@ abstract class ProcedureCommonFeatures
         ProcedureInterface $procedure,
         ProcedurePhaseData $procedurePhaseData,
     ): void {
-        if (null !== $this->procedurePhaseCodeDetector->getPublicParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
-            $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhaseKey());
+        $customerId = $procedure->getCustomerId();
+
+        $publicCode = $procedurePhaseData->getPublicParticipationPhaseCode();
+        if (null !== $customerId
+            && null !== $publicCode
+            && null !== $this->procedurePhaseCodeDetector->getPublicParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
+            $definition = $this->phaseDefinitionResolver->resolveByCodeAndCustomer($publicCode, $customerId, 'external');
+            if (null !== $definition) {
+                $procedure->getPublicParticipationPhaseObject()->setPhaseDefinition($definition);
+            }
         }
-        if (null !== $this->procedurePhaseCodeDetector->getInstitutionParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
-            $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhaseKey());
+
+        $institutionCode = $procedurePhaseData->getInstitutionParticipationPhaseCode();
+        if (null !== $customerId
+            && null !== $institutionCode
+            && null !== $this->procedurePhaseCodeDetector->getInstitutionParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
+            $definition = $this->phaseDefinitionResolver->resolveByCodeAndCustomer($institutionCode, $customerId, 'internal');
+            if (null !== $definition) {
+                $procedure->getPhaseObject()->setPhaseDefinition($definition);
+            }
         }
         if (null !== $procedurePhaseData->getPublicParticipationStartDate()) {
             $procedure->setPublicParticipationStartDate($procedurePhaseData->getPublicParticipationStartDate());
