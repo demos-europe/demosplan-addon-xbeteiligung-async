@@ -20,6 +20,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUp
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ProcedureDataExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungPhaseDefinitionResolver;
 use InvalidArgumentException;
 
 class KommunaleProcedureHandlerFactory
@@ -81,7 +82,8 @@ class KommunaleProcedureHandlerFactory
             $procedureDataExtractor,
             $this->mockFactory->getXBeteiligungGisLayerManagerMock(),
             $this->mockFactory->getXBeteiligungAttachmentServiceMock(),
-            $this->mockFactory->getProcedurePhaseCodeDetectorMock()
+            $this->mockFactory->getProcedurePhaseCodeDetectorMock(),
+            $this->mockFactory->getXBeteiligungPhaseDefinitionResolverMock(),
         ];
 
         switch ($handlerType) {
