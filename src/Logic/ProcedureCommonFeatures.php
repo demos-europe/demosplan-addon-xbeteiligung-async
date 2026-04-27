@@ -79,7 +79,7 @@ abstract class ProcedureCommonFeatures
         $publicCode = $procedurePhaseData->getPublicParticipationPhaseCode();
         if (null !== $customerId
             && null !== $publicCode
-            && null !== $this->procedurePhaseCodeDetector->getPublicParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
+            && $this->procedurePhaseCodeDetector->hasPublicParticipationPhaseChanged($procedure->getId(), $procedurePhaseData)) {
             $definition = $this->phaseDefinitionResolver->resolveByCodeAndCustomer($publicCode, $customerId, 'external');
             if (null !== $definition) {
                 $procedure->getPublicParticipationPhaseObject()->setPhaseDefinition($definition);
@@ -89,7 +89,7 @@ abstract class ProcedureCommonFeatures
         $institutionCode = $procedurePhaseData->getInstitutionParticipationPhaseCode();
         if (null !== $customerId
             && null !== $institutionCode
-            && null !== $this->procedurePhaseCodeDetector->getInstitutionParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
+            && $this->procedurePhaseCodeDetector->hasInstitutionParticipationPhaseChanged($procedure->getId(), $procedurePhaseData)) {
             $definition = $this->phaseDefinitionResolver->resolveByCodeAndCustomer($institutionCode, $customerId, 'internal');
             if (null !== $definition) {
                 $procedure->getPhaseObject()->setPhaseDefinition($definition);

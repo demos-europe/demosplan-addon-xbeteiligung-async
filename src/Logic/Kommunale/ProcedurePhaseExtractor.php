@@ -26,7 +26,6 @@ use Psr\Log\LoggerInterface;
 
 class ProcedurePhaseExtractor
 {
-    private const CONFIGURATION_PHASE = 'configuration';
     public function __construct(
         private readonly LoggerInterface            $logger)
     {
@@ -74,8 +73,6 @@ class ProcedurePhaseExtractor
         );
 
         return new ProcedurePhaseData(
-            self::CONFIGURATION_PHASE,
-            self::CONFIGURATION_PHASE,
             $codeVerfahrensschrittType,
             $codeOeffentlichkeitVerfahrensschritt,
             $codeOeffentlichkeitVerfahrensteilschritt,

@@ -14,7 +14,6 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\ValueObject;
 
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use Doctrine\Common\Collections\Collection;
@@ -32,7 +31,6 @@ class StatementAction extends ValueObject
     protected ProcedureInterface $procedure;
     protected DateTime $createdAt;
     protected string $plannerDetailViewUrl;
-    protected string $phaseKey = '';
     protected bool $publicUseName = false;
     protected string $priority;
     protected string $organizationName;
@@ -246,107 +244,4 @@ class StatementAction extends ValueObject
 
 
 
-    /**
-     * 'Konfiguration TöB'                                                 => '4000',
-     * 'Ermittlung und Information Behörden und berührte Gemeinden*'       => '4100',
-     * 'Anhörung TöB'                                                      => '4200',
-     * 'Erwiderung /Planänderung bzw. Auswertung'                          => '4300',
-     * 'Erörterungstermin'                                                 => '4400',
-     * 'Erneute Anhörung TöB (Durchlaufnummer)'                            => '4500',
-     * 'Auswertung TöB'                                                    => '4600',
-     * 'Beschlussfassung TöB'                                              => '4700',
-     * 'Konfiguration betroffene Öffentlichkeit'                           => '5000',
-     * 'Ermittlung und Information Betroffene (durch Gemeinden)'           => '5100',
-     * 'Anhörung Betroffener (Öffentlichkeit)'                             => '5200',
-     * 'Erwiderung /Planänderung bzw. Auswertung'                          => '5300',
-     * 'Erörterungstermin'                                                 => '5400',
-     * 'Erneute Anhörung Betroffener (Öffentlichkeit) (Durchlaufnummer)'   => '5500',
-     * 'Auswertung betroffene Öffentlichkeit'                              => '5600',
-     * 'Beschlussfassung betroffene Öffentlichkeit'                        => '5700',
-     * 'kein VS'                                                           => '9998',
-     *  This function map can not be correct as it is not clear what the phaseKey is
-     */
-    public static function mapPhaseKeyRaumordnung($phaseKey, $publicStatement): ?string
-    {
-        $mappedPhaseCode = '';
-        if ($publicStatement === StatementInterface::INTERNAL) {
-            switch ($phaseKey) {
-                case 'configuration': // Konfiguration TöB
-                    $mappedPhaseCode = '4000';
-                    break;
-                case 'earlyparticipation': // Erneute Anhörung TöB (Durchlaufnummer)
-                case 'renewparticipation':
-                    $mappedPhaseCode = '4500';
-                    break;
-                case 'participation': // Anhörung TöB
-                    $mappedPhaseCode = '4200';
-                    break;
-                case 'closed': // Beschlussfassung TöB
-                    $mappedPhaseCode = '4700';
-                    break;
-                default:
-                    $mappedPhaseCode = '9998';
-            }
-        }
-        if ($publicStatement === StatementInterface::EXTERNAL) {
-            switch ($phaseKey) {
-                case 'configuration': // Konfiguration betroffene Öffentlichkeit
-                    $mappedPhaseCode = '5000';
-                    break;
-                case 'earlyparticipation': // Ermittlung und Information Betroffene (durch Gemeinden)
-                    $mappedPhaseCode = '5100';
-                    break;
-                case 'participation': //Anhörung Betroffener (Öffentlichkeit)
-                    $mappedPhaseCode = '5200';
-                    break;
-                case 'anotherparticipation': // Erneute Anhörung Betroffener (Öffentlichkeit) (Durchlaufnummer)
-                    $mappedPhaseCode = '5500';
-                    break;
-                case 'closed': // Beschlussfassung betroffene Öffentlichkeit
-                    $mappedPhaseCode =  '5700';
-                    break;
-                default:
-                    $mappedPhaseCode = '9998';
-            }
-        }
-
-        return $mappedPhaseCode;
-    }
-
-    /**
-     * 'kein VS' => '9998',
-     */
-    public static function mapPhaseKeyPlanfeststellung($phaseKey): ?string
-    {
-        switch ($phaseKey) {
-            case 'configuration': // Konfiguration = Vorplanung
-                $mappedPhaseCode = '0000';
-                break;
-            case 'affectedmunicipalities':
-                $mappedPhaseCode = '0600';
-                break;
-            case 'consultation':
-                $mappedPhaseCode = '1200';
-                break;
-            case 'discussionmeeting':
-            case 'reconsultation':
-            case 'replayevaluating':
-                $mappedPhaseCode =  '0200';
-                break;
-            default:
-                $mappedPhaseCode = '';
-        }
-
-        return $mappedPhaseCode;
-    }
-
-    public function getPhaseCodeRaumordnung($phaseKey, $publicStatement): ?string
-    {
-        return self::mapPhaseKeyRaumordnung($phaseKey, $publicStatement);
-    }
-
-    public function getPhaseCodePlanfeststellung(): ?string
-    {
-        return self::mapPhaseKeyPlanfeststellung($this->phaseKey);
-    }
 }
