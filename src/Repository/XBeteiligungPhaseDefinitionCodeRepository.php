@@ -13,10 +13,13 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Repository;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
+use DemosEurope\DemosplanAddon\Logic\ApiRequest\FluentRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCode;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
-class XBeteiligungPhaseDefinitionCodeRepository extends ServiceEntityRepository
+/**
+ * @template-extends FluentRepository<XBeteiligungPhaseDefinitionCode>
+ */
+class XBeteiligungPhaseDefinitionCodeRepository extends FluentRepository
 {
     /**
      * Returns all code mappings for the given XBeteiligung Verfahrensschritt code.
