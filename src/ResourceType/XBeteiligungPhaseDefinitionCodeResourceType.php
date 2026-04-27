@@ -21,6 +21,8 @@ use EDT\ConditionFactory\ConditionFactoryInterface;
 use EDT\DqlQuerying\Contracts\ClauseFunctionInterface;
 use EDT\DqlQuerying\Contracts\OrderBySortMethodInterface;
 use EDT\JsonApi\ResourceConfig\Builder\ResourceConfigBuilderInterface;
+use EDT\Wrapping\EntityDataInterface;
+use EDT\Wrapping\PropertyBehavior\FixedSetBehavior;
 use Webmozart\Assert\Assert;
 
 /**
@@ -89,6 +91,14 @@ class XBeteiligungPhaseDefinitionCodeResourceType extends AddonResourceType
             ->setReadableByPath()
             ->setFilterable()
             ->addPathCreationBehavior();
+
+        $configBuilder->addPostConstructorBehavior(
+            new FixedSetBehavior(function (XBeteiligungPhaseDefinitionCode $entity, EntityDataInterface $entityData): array {
+                $this->getEntityManager()->persist($entity);
+
+                return [];
+            })
+        );
 
         return $configBuilder;
     }
