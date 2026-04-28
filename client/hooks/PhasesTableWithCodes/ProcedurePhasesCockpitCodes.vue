@@ -12,7 +12,10 @@ All rights reserved
     :is="demosplanUi.DpDataTable"
     :header-fields="headerFields"
     :items="phaseDefinitionsWithCodes"
+    density="spacious"
     track-by="id"
+    has-borders
+    is-resizable
   />
 </template>
 
