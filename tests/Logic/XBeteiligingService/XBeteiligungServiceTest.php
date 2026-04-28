@@ -34,6 +34,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -86,7 +87,8 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
-            $this->createMock(XBeteiligungAuditService::class)
+            $this->createMock(XBeteiligungAuditService::class),
+            $this->createMock(XBeteiligungPhaseDefinitionCodeRepository::class),
         );
     }
 
@@ -122,13 +124,8 @@ abstract class XBeteiligungServiceTest extends TestCase
         $procedurePhaseMock->method('getStartDate')->willReturn($startDate);
         $procedurePhaseMock->method('getEndDate')->willReturn($endDate);
         $procedurePhaseMock->method('getIteration')->willReturn(1);
-        $procedurePhaseMock->method('getKey')->willReturn('configuration');
         $procedure->method('getPhaseObject')->willReturn($procedurePhaseMock);
         $procedure->method('getPublicParticipationPhaseObject')->willReturn($procedurePhaseMock);
-        $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
-        $procedure->method('getPublicParticipationPhaseName')->willReturn('configuration');
-        $procedure->method('getPhaseName')->willReturn('configuration');
-        $procedure->method('getPhase')->willReturn('earlyparticipation');
         $procedure->method('getSettings')->willReturn($procedureSettingsMock);
         $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(
             [

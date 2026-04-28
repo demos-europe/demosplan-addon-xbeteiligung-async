@@ -18,6 +18,7 @@ use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
@@ -29,6 +30,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeRepository;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -63,28 +65,6 @@ class XBeteiligungServiceStalePhaseTest extends TestCase
                 'label' => 'EPSG:3857',
                 'value' => '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs'
             ]);
-
-        // Mock phase name lookups - this is what should be used instead of the stale name field
-        $this->globalConfig->method('getPhaseNameWithPriorityExternal')
-            ->willReturnCallback(function ($phaseKey) {
-                // Configuration for mapping phase keys to names
-                $phaseMap = [
-                    'configuration' => 'Konfiguration',
-                    'earlyparticipation' => 'Frühzeitige Beteiligung Öffentlichkeit',
-                    'participation' => 'Öffentliche Auslegung',
-                ];
-                return $phaseMap[$phaseKey] ?? $phaseKey;
-            });
-
-        $this->globalConfig->method('getPhaseNameWithPriorityInternal')
-            ->willReturnCallback(function ($phaseKey) {
-                $phaseMap = [
-                    'configuration' => 'Konfiguration',
-                    'earlyparticipation' => 'Frühzeitige Beteiligung TÖB',
-                    'participation' => 'Beteiligung der Träger öffentlicher Belange',
-                ];
-                return $phaseMap[$phaseKey] ?? $phaseKey;
-            });
 
         // Mock GIS layer category repository with a proper layer setup
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
@@ -121,7 +101,8 @@ class XBeteiligungServiceStalePhaseTest extends TestCase
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
-            $this->createMock(XBeteiligungAuditService::class)
+            $this->createMock(XBeteiligungAuditService::class),
+            $this->createMock(XBeteiligungPhaseDefinitionCodeRepository::class),
         );
     }
 
@@ -182,27 +163,19 @@ class XBeteiligungServiceStalePhaseTest extends TestCase
         $procedure->method('getStartDate')->willReturn($startDate);
         $procedure->method('getEndDate')->willReturn($endDate);
 
-        // Create phase object with STALE data (simulating onFlush state)
+        // Create phase definition with correct (current) name
+        $phaseDefinition = $this->createMock(ProcedurePhaseDefinitionInterface::class);
+        $phaseDefinition->method('getName')->willReturn('Konfiguration');
+
+        // Create phase object - phase definition holds the authoritative name
         $phaseObject = $this->createMock(ProcedurePhaseInterface::class);
-
-        // Key is UPDATED (current value)
-        $phaseObject->method('getKey')->willReturn('configuration');
-
-        // Name is STALE (old value from before phase change)
-        $phaseObject->method('getName')->willReturn('Frühzeitige Beteiligung Öffentlichkeit');
-
-        // Dates are STALE (from the old phase)
+        $phaseObject->method('getPhaseDefinition')->willReturn($phaseDefinition);
         $phaseObject->method('getStartDate')->willReturn($startDate);
         $phaseObject->method('getEndDate')->willReturn($endDate);
         $phaseObject->method('getIteration')->willReturn(1);
 
         $procedure->method('getPublicParticipationPhaseObject')->willReturn($phaseObject);
         $procedure->method('getPhaseObject')->willReturn($phaseObject);
-
-        // These methods return STALE values (what exists in the entity before enrichment)
-        $procedure->method('getPublicParticipationPhaseName')->willReturn('Frühzeitige Beteiligung Öffentlichkeit');
-        $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
-        $procedure->method('getPhaseName')->willReturn('Frühzeitige Beteiligung Öffentlichkeit');
 
         $procedure->method('getOrga')->willReturn(null);
         $procedure->method('getSettings')->willReturn(

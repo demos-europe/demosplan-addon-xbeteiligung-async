@@ -20,6 +20,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
@@ -30,7 +31,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCode;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -53,6 +56,7 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
     protected MockObject $gisLayerCategoryRepository;
     protected MockObject $logger;
     protected MockObject $mapProjectionConverter;
+    protected MockObject $phaseDefinitionCodeRepository;
 
     // WGS84 polygon returned by the mock converter (Hamburg area, within Germany's bounds)
     protected const WGS84_POLYGON = '{"type":"Polygon","coordinates":[[[10.02,53.55],[10.04,53.55],[10.04,53.56],[10.02,53.56],[10.02,53.55]]]}';
@@ -72,6 +76,11 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
 
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
+
+        $codeMapping = $this->createMock(XBeteiligungPhaseDefinitionCode::class);
+        $codeMapping->method('getCode')->willReturn('1000');
+        $this->phaseDefinitionCodeRepository = $this->createMock(XBeteiligungPhaseDefinitionCodeRepository::class);
+        $this->phaseDefinitionCodeRepository->method('findOneByPhaseDefinition')->willReturn($codeMapping);
 
         $proj4 = new Proj4php();
         $this->mapProjectionConverter = $this->createMock(MapProjectionConverterInterface::class);
@@ -104,7 +113,8 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
-            $this->createMock(XBeteiligungAuditService::class)
+            $this->createMock(XBeteiligungAuditService::class),
+            $this->phaseDefinitionCodeRepository,
         );
     }
 
@@ -443,11 +453,13 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
         $procedureSettings->method('getMapExtent')->willReturn('904640.92,7067292.96,1195347.64,7350657.51');
 
         // Setup procedure phase
+        $phaseDefinition = $this->createMock(ProcedurePhaseDefinitionInterface::class);
+        $phaseDefinition->method('getName')->willReturn('configuration');
         $phase = $this->createMock(ProcedurePhaseInterface::class);
         $phase->method('getStartDate')->willReturn(new \DateTime('2025-01-01'));
         $phase->method('getEndDate')->willReturn(new \DateTime('2025-02-01'));
         $phase->method('getIteration')->willReturn(1);
-        $phase->method('getKey')->willReturn('configuration');
+        $phase->method('getPhaseDefinition')->willReturn($phaseDefinition);
 
         // Setup organization
         $orga = $this->createMock(OrgaInterface::class);
@@ -465,10 +477,6 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
         $procedure->method('getEndDate')->willReturn(new \DateTime('2025-02-01'));
         $procedure->method('getPhaseObject')->willReturn($phase);
         $procedure->method('getPublicParticipationPhaseObject')->willReturn($phase);
-        $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
-        $procedure->method('getPublicParticipationPhaseName')->willReturn('configuration');
-        $procedure->method('getPhaseName')->willReturn('configuration');
-        $procedure->method('getPhase')->willReturn('earlyparticipation');
 
         return $procedure;
     }
