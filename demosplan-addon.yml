@@ -5,5 +5,11 @@ demosplan_addon:
     This plugin provides Handling of XBeteiligung messages.
   entry: DemosEurope\DemosplanAddon\XBeteiligung\XBeteiligungAsyncAddon
   permissionInitializer: DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\PermissionInitializer
-
+  ui:
+    manifest: dist/assets-manifest.json
+    hooks:
+        phases.table.with.codes:
+            entry: ProcedurePhasesCockpitCodes
+        phase.create.form:
+            entry: PhaseCodeFormField
 
