@@ -8,6 +8,9 @@ const config = DemosPlanAddon.build(
     ProcedurePhasesCockpitCodes: DemosPlanAddon.resolve(
       'client/hooks/PhasesTableWithCodes/ProcedurePhasesCockpitCodes.vue'
     ),
+    PhaseCodeFormField: DemosPlanAddon.resolve(
+      'client/hooks/PhaseCreateForm/PhaseCodeFormField.vue'
+    ),
   }
 )
 

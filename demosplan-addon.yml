@@ -10,4 +10,6 @@ demosplan_addon:
     hooks:
         phases.table.with.codes:
             entry: ProcedurePhasesCockpitCodes
+        phase.create.form:
+            entry: PhaseCodeFormField
 
