@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.69-rc1 (2026-04-29)
 
 **Make XBeteiligung phase codes configurable per procedure phase definition (DPLAN-16766)**
 - Add `XBeteiligungPhaseDefinitionCode` entity linking procedure phase definitions to XBeteiligung phase codes
