@@ -63,7 +63,7 @@ class StatementCreator
             : $eventStatement->getOName();
         $statementCreated->setOrganizationName($orgaName);
         $statementCreated->setPublicUseName($eventStatement->getPublicUseName());
-        $statementCreated->setPhase($eventStatement->getPhase());
+        $statementCreated->setPhase($eventStatement->getPhaseDefinition()->getName());
         $statementCreated->setProcedureName($eventStatement->getProcedure()->getName());
         $statementCreated->setStatus($eventStatement->getStatus());
         $statementCreated->setTitle($eventStatement->getTitle());

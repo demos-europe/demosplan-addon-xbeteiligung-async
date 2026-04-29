@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders;
 
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\Permissions\Features;
@@ -35,7 +34,6 @@ class PhaseBuilder
     public function __construct(
         private readonly PermissionEvaluatorInterface $permissionEvaluator,
         private readonly LoggerInterface              $logger,
-        private readonly GlobalConfigInterface        $globalConfig,
         private readonly ProcedurePhaseCodeDetector   $procedurePhaseCodeDetector,
     ) {
     }
@@ -92,15 +90,9 @@ class PhaseBuilder
         };
     }
 
-    private function getPhaseName(StatementCreated $statementCreated) {
-        // If internal statement, use internal phase name
-        if (StatementInterface::INTERNAL === $statementCreated->getPublicStatement()) {
-            return $this->globalConfig->getPhaseNameWithPriorityInternal($statementCreated->getPhase());
-        }
-
-        // Default to external phase name
-        return $this->globalConfig->getPhaseNameWithPriorityExternal($statementCreated->getPhase());
-
+    private function getPhaseName(StatementCreated $statementCreated): string
+    {
+        return $statementCreated->getPhase();
     }
 
     public function setVerfahrensteilschritt(StatementCreated $statementCreated, StellungnahmeType $statement): void

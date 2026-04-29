@@ -1,6 +1,15 @@
 # Changelog
 
 ## UNRELEASED
+## v0.69-rc1 (2026-04-29)
+
+**Make XBeteiligung phase codes configurable per procedure phase definition (DPLAN-16766)**
+- Add `XBeteiligungPhaseDefinitionCode` entity linking procedure phase definitions to XBeteiligung phase codes
+- Add `XBeteiligungPhaseDefinitionResolver` service to resolve phase codes via the new entity
+- Add EDT JSON:API resource type for `XBeteiligungPhaseDefinitionCode` to allow management via API
+- Remove hardcoded `ProcedurePhaseMapping`/`ProcedurePhaseKey` layer in favor of the new configurable mapping
+- Replace phase key string passing with boolean change detection in `ProcedurePhaseData`
+
 ## v0.68 (2026-04-15)
 
 **Fix ValueError for unknown procedure phase keys in XBeteiligung messages (DPLAN-16867)**
