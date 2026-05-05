@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.69-rc2 (2026-05-05)
 
 **Seed XBeteiligung phase codes from historical mapping (DPLAN-16766)**
 - Add data migration that seeds `xbeteiligung_phase_definition_code` for all existing procedure phase definitions of diplanbau, diplanrog and diplanfest based on the historical `ProcedurePhaseMapping`
