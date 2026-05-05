@@ -1,6 +1,12 @@
 # Changelog
 
 ## UNRELEASED
+## v0.69-rc2 (2026-05-05)
+
+**Seed XBeteiligung phase codes from historical mapping (DPLAN-16766)**
+- Add data migration that seeds `xbeteiligung_phase_definition_code` for all existing procedure phase definitions of diplanbau, diplanrog and diplanfest based on the historical `ProcedurePhaseMapping`
+- Phases without a historical code mapping (e.g. Einsichtnahme, Scoping) receive the placeholder code `0815`
+
 ## v0.69-rc1 (2026-04-29)
 
 **Make XBeteiligung phase codes configurable per procedure phase definition (DPLAN-16766)**
