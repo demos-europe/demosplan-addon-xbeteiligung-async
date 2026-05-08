@@ -8,8 +8,8 @@ demosplan_addon:
   ui:
     manifest: dist/assets-manifest.json
     hooks:
-        phases.table.with.codes:
-            entry: ProcedurePhasesCockpitCodes
         phase.create.form:
             entry: PhaseCodeFormField
+        phase.list.fields:
+            entry: PhaseCodeTableField
 

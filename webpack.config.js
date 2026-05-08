@@ -5,11 +5,11 @@ const DemosPlanAddon = require('@demos-europe/demosplan-addon-client-builder')
 const config = DemosPlanAddon.build(
   'demosplan-addon-xbeteiligung-async',
   {
-    ProcedurePhasesCockpitCodes: DemosPlanAddon.resolve(
-      'client/hooks/PhasesTableWithCodes/ProcedurePhasesCockpitCodes.vue'
-    ),
     PhaseCodeFormField: DemosPlanAddon.resolve(
       'client/hooks/PhaseCreateForm/PhaseCodeFormField.vue'
+    ),
+    PhaseCodeTableField: DemosPlanAddon.resolve(
+      'client/hooks/PhaseListFields/PhaseCodeTableField.vue'
     ),
   }
 )
