@@ -8,14 +8,28 @@ All rights reserved
 </license>
 
 <template>
-  <component
-    :is="demosplanUi.DpInput"
+  <div
     v-if="isEditing"
-    id="phaseCodeInput"
-    :class="{ '[&_input]:border-status-failed': addonPayload.isDuplicate }"
-    :model-value="phaseCodeDraft"
-    @update:model-value="handleCodeInput"
-  />
+    class="flex items-center gap-1"
+  >
+    <component
+      :is="demosplanUi.DpInput"
+      id="phaseCodeInput"
+      :class="{ '[&_input]:border-status-failed': addonPayload.isDuplicate }"
+      :model-value="phaseCodeDraft"
+      @update:model-value="handleCodeInput"
+    />
+
+    <component
+      :is="demosplanUi.DpButton"
+      :disabled="!phaseCodeDraft.trim()"
+      :text="Translator.trans('remove')"
+      icon="x"
+      variant="subtle"
+      hide-text
+      @click="removeCode"
+    />
+  </div>
 
   <span v-else>{{ currentPhaseCode }}</span>
 </template>
@@ -133,6 +147,10 @@ export default {
         name: 'edit-change',
         payload: this.addonPayload,
       })
+    },
+
+    removeCode () {
+      this.handleCodeInput('')
     },
   },
 
