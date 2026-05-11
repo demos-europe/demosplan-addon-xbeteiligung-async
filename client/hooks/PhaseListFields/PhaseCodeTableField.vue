@@ -8,7 +8,15 @@ All rights reserved
 </license>
 
 <template>
-  <span>{{ procedurePhaseCode }}</span>
+  <component
+    :is="demosplanUi.DpInput"
+    v-if="isEditing"
+    id="phaseCodeInput"
+    :model-value="phaseCodeDraft"
+    @update:model-value="handleCodeInput"
+  />
+
+  <span v-else>{{ currentPhaseCode }}</span>
 </template>
 
 <script>
@@ -25,26 +33,84 @@ let requestInProgress = null
 export default {
   name: 'PhaseCodeTableField',
 
+  emits: ['addonEvent:emit'],
+
   props: {
     demosplanUi: {
       type: Object,
       required: true,
     },
 
+    isEditing: {
+      type: Boolean,
+      default: false,
+    },
+
     phaseId: {
       type: String,
       required: true,
+    },
+
+    /*
+    * Set by core after a successful save so the cell reflects the new value
+    * without remount. `null` means "core has not pushed anything yet"; the
+    * cell uses its own fetched values instead.
+    */
+    savedRowPayload: {
+      type: Object,
+      default: null,
     },
   },
 
   data () {
     return {
-      procedurePhaseCode: '',
+      fetchedCode: '',
+      fetchedResourceId: null,
+      phaseCodeDraft: '',
     }
   },
 
+  computed: {
+    addonPayload () {
+      const trimmedCode = this.phaseCodeDraft.trim()
+
+      return {
+        attributes: {
+          code: trimmedCode,
+        },
+        parentRelationshipName: 'phaseDefinition',
+        phaseId: this.phaseId,
+        resourceId: this.currentResourceId,
+        resourceType: 'XBeteiligungPhaseDefinitionCode',
+        value: trimmedCode,
+      }
+    },
+
+    currentPhaseCode () {
+      return this.savedRowPayload ? this.savedRowPayload.code : this.fetchedCode
+    },
+
+    currentResourceId () {
+      return this.savedRowPayload ? this.savedRowPayload.resourceId : this.fetchedResourceId
+    },
+  },
+
+  watch: {
+    isEditing (newValue) {
+      if (newValue) {
+        this.phaseCodeDraft = this.currentPhaseCode
+        this.$emit('addonEvent:emit', {
+          name: 'edit-start',
+          payload: this.addonPayload,
+        })
+      } else {
+        this.phaseCodeDraft = ''
+      }
+    },
+  },
+
   methods: {
-    fetchPhaseCodes () {
+    fetchAllPhaseCodes () {
       /*
        * Reuse the cache only if it already knows the phase. New phases added
        * after the initial load won't be in there, so refetch in that case.
@@ -70,7 +136,10 @@ export default {
           cachedPhaseCodes = data.data.reduce((phaseCodesByPhaseId, item) => {
             const phaseId = item.relationships?.phaseDefinition?.data?.id
             if (phaseId) {
-              phaseCodesByPhaseId[phaseId] = item.attributes.code
+              phaseCodesByPhaseId[phaseId] = {
+                code: item.attributes.code,
+                resourceId: item.id,
+              }
             }
 
             return phaseCodesByPhaseId
@@ -93,12 +162,22 @@ export default {
 
       return requestInProgress
     },
+
+    handleCodeInput (value) {
+      this.phaseCodeDraft = value
+      this.$emit('addonEvent:emit', {
+        name: 'edit-change',
+        payload: this.addonPayload,
+      })
+    },
   },
 
   created () {
-    this.fetchPhaseCodes().then(byPhaseId => {
-      if (this.phaseId in byPhaseId) {
-        this.procedurePhaseCode = byPhaseId[this.phaseId]
+    this.fetchAllPhaseCodes().then(byPhaseId => {
+      const entry = byPhaseId[this.phaseId]
+      if (entry) {
+        this.fetchedCode = entry.code
+        this.fetchedResourceId = entry.resourceId
       }
     })
   },

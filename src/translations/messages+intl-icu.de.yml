@@ -1,2 +1,3 @@
 phase.created.code.failed: "Verfahrensschritt wurde erstellt, aber der Code konnte nicht gespeichert werden"
 procedure.phase.code: "Cockpit Code"
+procedure.phase.code.edit.success: "Änderungen am Cockpit Code wurden gespeichert"
