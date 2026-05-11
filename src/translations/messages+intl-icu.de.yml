@@ -1,3 +1,4 @@
-phase.created.code.failed: "Verfahrensschritt wurde erstellt, aber der Code konnte nicht gespeichert werden"
+phase.create.code.failed: "Verfahrensschritt wurde erstellt, aber der Code konnte nicht gespeichert werden"
 procedure.phase.code: "Cockpit Code"
+procedure.phase.code.duplicate: "Der Code ist bereits vergeben. Bitte verwenden Sie einen anderen Code."
 procedure.phase.code.edit.success: "Änderungen am Cockpit Code wurden gespeichert"
