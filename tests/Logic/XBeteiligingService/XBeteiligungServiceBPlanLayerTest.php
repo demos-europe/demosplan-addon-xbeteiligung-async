@@ -31,9 +31,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
-use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCode;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -56,7 +54,6 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
     protected MockObject $gisLayerCategoryRepository;
     protected MockObject $logger;
     protected MockObject $mapProjectionConverter;
-    protected MockObject $phaseDefinitionCodeRepository;
 
     // WGS84 polygon returned by the mock converter (Hamburg area, within Germany's bounds)
     protected const WGS84_POLYGON = '{"type":"Polygon","coordinates":[[[10.02,53.55],[10.04,53.55],[10.04,53.56],[10.02,53.56],[10.02,53.55]]]}';
@@ -76,11 +73,6 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
 
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-
-        $codeMapping = $this->createMock(XBeteiligungPhaseDefinitionCode::class);
-        $codeMapping->method('getCode')->willReturn('1000');
-        $this->phaseDefinitionCodeRepository = $this->createMock(XBeteiligungPhaseDefinitionCodeRepository::class);
-        $this->phaseDefinitionCodeRepository->method('findOneByPhaseDefinition')->willReturn($codeMapping);
 
         $proj4 = new Proj4php();
         $this->mapProjectionConverter = $this->createMock(MapProjectionConverterInterface::class);
@@ -114,7 +106,6 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
             $this->createMock(XBeteiligungAuditService::class),
-            $this->phaseDefinitionCodeRepository,
         );
     }
 
@@ -454,7 +445,10 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
 
         // Setup procedure phase
         $phaseDefinition = $this->createMock(ProcedurePhaseDefinitionInterface::class);
-        $phaseDefinition->method('getName')->willReturn('configuration');
+        // Use a Klarname that maps in both KOMMUNAL_INSTITUTION and KOMMUNAL_PUBLIC
+        // so getPhaseCodeFromDefinition does not log a "no mapping" warning that would
+        // pollute the warning-count expectations in these tests.
+        $phaseDefinition->method('getName')->willReturn('Bestands- und Potentialanalyse');
         $phase = $this->createMock(ProcedurePhaseInterface::class);
         $phase->method('getStartDate')->willReturn(new \DateTime('2025-01-01'));
         $phase->method('getEndDate')->willReturn(new \DateTime('2025-02-01'));

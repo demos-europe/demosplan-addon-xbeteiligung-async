@@ -15,7 +15,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ParticipationType;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ProcedureMessageTyp;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType\BeteiligungPlanfeststellungOeffentlichkeitArtAnonymousPHPType;
@@ -109,7 +109,6 @@ class XBeteiligungService
         private readonly CommonHelpers                          $commonHelpers,
         private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
         private readonly XBeteiligungAuditService               $auditService,
-        private readonly XBeteiligungPhaseDefinitionCodeRepository $phaseDefinitionCodeRepository,
     ) {
     }
 
@@ -345,7 +344,12 @@ class XBeteiligungService
             ? $procedure->getPublicParticipationPhaseObject()
             : $procedure->getPhaseObject();
 
-        $codeType->setCode($this->getPhaseCodeFromDefinition($phaseObject, $procedure->getId()));
+        $codeType->setCode($this->getPhaseCodeFromDefinition(
+            $phaseObject,
+            ProcedureMessageTyp::RAUMORDNUNG,
+            $participationType,
+            $procedure->getId()
+        ));
         $codeType->setName($phaseObject->getPhaseDefinition()->getName());
 
         return $codeType;
@@ -365,7 +369,12 @@ class XBeteiligungService
             ? $procedure->getPublicParticipationPhaseObject()
             : $procedure->getPhaseObject();
 
-        $codeType->setCode($this->getPhaseCodeFromDefinition($phaseObject, $procedure->getId()));
+        $codeType->setCode($this->getPhaseCodeFromDefinition(
+            $phaseObject,
+            ProcedureMessageTyp::PLANFESTSTELLUNG,
+            $participationType,
+            $procedure->getId()
+        ));
         $codeType->setName($phaseObject->getPhaseDefinition()->getName());
 
         return $codeType;
@@ -957,7 +966,12 @@ class XBeteiligungService
         $codeProcedurePhase->setListVersionID('1.0');
 
         $phaseObject = $procedure->getPublicParticipationPhaseObject();
-        $codeProcedurePhase->setCode($this->getPhaseCodeFromDefinition($phaseObject, $procedure->getId()));
+        $codeProcedurePhase->setCode($this->getPhaseCodeFromDefinition(
+            $phaseObject,
+            ProcedureMessageTyp::KOMMUNAL,
+            ParticipationType::PUBLIC,
+            $procedure->getId()
+        ));
         $codeProcedurePhase->setName($phaseObject->getPhaseDefinition()->getName());
 
         return $codeProcedurePhase;
@@ -970,26 +984,39 @@ class XBeteiligungService
         $codeProcedurePhase->setListVersionID('1.0');
 
         $phaseObject = $procedure->getPhaseObject();
-        $codeProcedurePhase->setCode($this->getPhaseCodeFromDefinition($phaseObject, $procedure->getId()));
+        $codeProcedurePhase->setCode($this->getPhaseCodeFromDefinition(
+            $phaseObject,
+            ProcedureMessageTyp::KOMMUNAL,
+            ParticipationType::INSTITUTION,
+            $procedure->getId()
+        ));
         $codeProcedurePhase->setName($phaseObject->getPhaseDefinition()->getName());
 
         return $codeProcedurePhase;
     }
 
-    private function getPhaseCodeFromDefinition(ProcedurePhaseInterface $phaseObject, string $procedureId): string
-    {
+    private function getPhaseCodeFromDefinition(
+        ProcedurePhaseInterface $phaseObject,
+        ProcedureMessageTyp $procedureType,
+        ParticipationType $participationType,
+        string $procedureId
+    ): string {
         $definition = $phaseObject->getPhaseDefinition();
-        $mapping = $this->phaseDefinitionCodeRepository->findOneByPhaseDefinition($definition);
-        if (null === $mapping) {
+        $phaseName = $definition->getName();
+        $code = ProcedurePhaseMapping::getPhaseCode($procedureType, $participationType, $phaseName);
+        if (null === $code) {
             $this->logger->warning('XBeteiligung: No code mapping for phase definition, falling back to placeholder', [
-                'phaseDefinitionId' => $definition->getId() ?? '',
-                'procedureId'       => $procedureId,
+                'phaseDefinitionId'  => $definition->getId() ?? '',
+                'phaseDefinitionName'=> $phaseName,
+                'procedureType'      => $procedureType->value,
+                'participationType'  => $participationType->value,
+                'procedureId'        => $procedureId,
             ]);
 
             return self::PLACEHOLDER_PROCEDURE_PHASE_CODE;
         }
 
-        return $mapping->getCode();
+        return $code;
     }
 
     private function getInstitutionNewsList(ProcedureInterface $procedure): array
