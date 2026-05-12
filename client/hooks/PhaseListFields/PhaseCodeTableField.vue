@@ -8,8 +8,14 @@ All rights reserved
 </license>
 
 <template>
+  <component
+    v-if="isLoading"
+    :is="demosplanUi.DpLoading"
+    hide-label
+  />
+
   <div
-    v-if="isEditing"
+    v-else-if="isEditing"
     class="flex items-center gap-1"
   >
     <component
@@ -78,6 +84,7 @@ export default {
     return {
       fetchedCode: '',
       fetchedResourceId: null,
+      isLoading: true,
       phaseCodeDraft: '',
     }
   },
@@ -170,6 +177,9 @@ export default {
         } else {
           dplan.notify.error(Translator.trans('error.api.generic'))
         }
+      })
+      .finally(() => {
+        this.isLoading = false
       })
   },
 }
