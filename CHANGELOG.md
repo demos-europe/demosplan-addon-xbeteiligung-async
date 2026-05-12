@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.69-rc3 (2026-05-12)
 
 **Hardcode K3 phase mapping and force Konfiguration on cockpit-init (DPLAN-16766)**
 - Reintroduce hardcoded `ProcedurePhaseMapping`, now keyed by `ProcedurePhaseDefinition.name` (Klarname) instead of phase keys, and use it in `XBeteiligungService` for the outgoing K3 direction
