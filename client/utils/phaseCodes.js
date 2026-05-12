@@ -78,19 +78,3 @@ export function isDuplicateCode (value, excludeResourceId) {
     entry.code === trimmed && entry.resourceId !== excludeResourceId,
   )
 }
-
-export function removePhaseCode (phaseId) {
-  if (cachedPhaseCodes === null) {
-    return
-  }
-
-  delete cachedPhaseCodes[phaseId]
-}
-
-export function updateOrCreatePhaseCode (phaseId, code, resourceId) {
-  if (cachedPhaseCodes === null) {
-    cachedPhaseCodes = {}
-  }
-
-  cachedPhaseCodes[phaseId] = { code, resourceId }
-}

@@ -43,9 +43,8 @@ All rights reserved
 <script>
 import {
   fetchAllPhaseCodes,
+  invalidatePhaseCodesCache,
   isDuplicateCode,
-  removePhaseCode,
-  updateOrCreatePhaseCode,
 } from '../../utils/phaseCodes'
 
 export default {
@@ -117,33 +116,43 @@ export default {
 
   watch: {
     isEditing (newValue) {
-      if (newValue) {
-        this.phaseCodeDraft = this.currentPhaseCode
-        this.$emit('addonEvent:emit', {
-          name: 'edit-start',
-          payload: this.addonPayload,
-        })
-      } else {
+      if (!newValue) {
         this.phaseCodeDraft = ''
-      }
-    },
 
-    /*
-     * Keep the shared cache in sync with whatever core just persisted, so
-     * other rows' duplicate checks reflect this row's new state without a
-     * re-fetch. Fires only on a successful save (core writes to the prop
-     * after the request resolves).
-     */
-    savedRowPayload (newPayload) {
-      if (newPayload === null) {
         return
       }
 
-      if (newPayload.resourceId === null) {
-        removePhaseCode(this.phaseId)
-      } else {
-        updateOrCreatePhaseCode(this.phaseId, newPayload.code, newPayload.resourceId)
-      }
+      /*
+       * Refresh the shared code cache from the backend before opening the edit
+       * UI. The in-memory cache drifts out of sync over the session (the
+       * `savedRowPayload` prop-watcher doesn't reliably fire across the addon's
+       * Vue boundary), so duplicate checks during typing can read stale data.
+       * Invalidating + refetching guarantees `addonPayload.isDuplicate` and
+       * `currentResourceId` reflect current backend state.
+       */
+      this.isLoading = true
+      invalidatePhaseCodesCache()
+      fetchAllPhaseCodes(this.demosplanUi.dpApi)
+        .then(byPhaseId => {
+          const entry = byPhaseId[this.phaseId]
+          this.fetchedCode = entry ? entry.code : ''
+          this.fetchedResourceId = entry ? entry.resourceId : null
+        })
+        .catch(err => {
+          if (err?.data?.meta?.messages) {
+            this.demosplanUi.handleResponseMessages(err.data.meta)
+          } else {
+            dplan.notify.error(Translator.trans('error.api.generic'))
+          }
+        })
+        .finally(() => {
+          this.isLoading = false
+          this.phaseCodeDraft = this.currentPhaseCode
+          this.$emit('addonEvent:emit', {
+            name: 'edit-start',
+            payload: this.addonPayload,
+          })
+        })
     },
   },
 
