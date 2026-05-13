@@ -44,8 +44,8 @@ use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\RoutingKeyComponents;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungMapService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungGisLayerManager;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAttachmentService;
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedurePhaseDefinitionServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungPhaseDefinitionResolver;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -373,11 +373,13 @@ class MockFactoryTest
         $mock = $this->testCase->createMockObject(ProcedurePhaseCodeDetector::class);
         $mock->method('getExternalProcedurePhaseCode')->willReturn('invalid');
         $mock->method('getExternalProcedureSubPhaseCode')->willReturn('invalid');
+        $mock->method('hasPublicParticipationPhaseChanged')->willReturn(true);
+        $mock->method('hasInstitutionParticipationPhaseChanged')->willReturn(true);
         return $mock;
     }
 
-    public function getXBeteiligungPhaseDefinitionResolverMock(): XBeteiligungPhaseDefinitionResolver|MockObject
+    public function getProcedurePhaseDefinitionServiceMock(): ProcedurePhaseDefinitionServiceInterface|MockObject
     {
-        return $this->testCase->createMockObject(XBeteiligungPhaseDefinitionResolver::class);
+        return $this->testCase->createMockObject(ProcedurePhaseDefinitionServiceInterface::class);
     }
 }

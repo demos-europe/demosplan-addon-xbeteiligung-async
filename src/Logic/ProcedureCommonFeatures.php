@@ -16,12 +16,12 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CustomerServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedurePhaseDefinitionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
@@ -64,35 +64,44 @@ abstract class ProcedureCommonFeatures
         protected readonly ProcedureDataExtractor             $procedureDataExtractor,
         protected readonly XBeteiligungGisLayerManager        $gisLayerManager,
         protected readonly XBeteiligungAttachmentService      $xbeteiligungAttachmentService,
-        protected readonly ProcedurePhaseCodeDetector $procedurePhaseCodeDetector,
-        protected readonly XBeteiligungPhaseDefinitionResolver $phaseDefinitionResolver,
+        protected readonly ProcedurePhaseCodeDetector         $procedurePhaseCodeDetector,
+        protected readonly ProcedurePhaseDefinitionServiceInterface $phaseDefinitionService,
     )
     {
     }
 
+    /**
+     * Resets the procedure phase to the customer's initial (Konfiguration) phase
+     * when the cockpit signals a new phase code for the respective audience.
+     *
+     * The phase-code value itself is not mapped onto a specific definition — every
+     * change is treated as "back to Konfiguration", consistent with main's behavior.
+     * Unchanged codes (same code as previously stored) skip the setter, so a 0402
+     * update that only carries new dates won't reset the phase.
+     */
     protected function setProcedurePhase(
         ProcedureInterface $procedure,
         ProcedurePhaseData $procedurePhaseData,
     ): void {
-        $customerId = $procedure->getCustomerId();
-
-        $publicCode = $procedurePhaseData->getPublicParticipationPhaseCode();
-        if (null !== $customerId
-            && null !== $publicCode
-            && $this->procedurePhaseCodeDetector->hasPublicParticipationPhaseChanged($procedure->getId(), $procedurePhaseData)) {
-            $definition = $this->phaseDefinitionResolver->resolveByCodeAndCustomer($publicCode, $customerId, 'external');
-            if (null !== $definition) {
-                $procedure->getPublicParticipationPhaseObject()->setPhaseDefinition($definition);
+        $customer = $procedure->getCustomer();
+        if (null !== $customer) {
+            if ($this->procedurePhaseCodeDetector->hasPublicParticipationPhaseChanged(
+                $procedure->getId(),
+                $procedurePhaseData
+            )) {
+                $publicDefinition = $this->phaseDefinitionService->findInitialDefinition('external', $customer);
+                if (null !== $publicDefinition) {
+                    $procedure->getPublicParticipationPhaseObject()->setPhaseDefinition($publicDefinition);
+                }
             }
-        }
-
-        $institutionCode = $procedurePhaseData->getInstitutionParticipationPhaseCode();
-        if (null !== $customerId
-            && null !== $institutionCode
-            && $this->procedurePhaseCodeDetector->hasInstitutionParticipationPhaseChanged($procedure->getId(), $procedurePhaseData)) {
-            $definition = $this->phaseDefinitionResolver->resolveByCodeAndCustomer($institutionCode, $customerId, 'internal');
-            if (null !== $definition) {
-                $procedure->getPhaseObject()->setPhaseDefinition($definition);
+            if ($this->procedurePhaseCodeDetector->hasInstitutionParticipationPhaseChanged(
+                $procedure->getId(),
+                $procedurePhaseData
+            )) {
+                $institutionDefinition = $this->phaseDefinitionService->findInitialDefinition('internal', $customer);
+                if (null !== $institutionDefinition) {
+                    $procedure->getPhaseObject()->setPhaseDefinition($institutionDefinition);
+                }
             }
         }
         if (null !== $procedurePhaseData->getPublicParticipationStartDate()) {

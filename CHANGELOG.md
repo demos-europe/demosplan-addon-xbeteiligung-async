@@ -1,6 +1,13 @@
 # Changelog
 
 ## UNRELEASED
+## v0.69-rc3 (2026-05-12)
+
+**Hardcode K3 phase mapping and force Konfiguration on cockpit-init (DPLAN-16766)**
+- Reintroduce hardcoded `ProcedurePhaseMapping`, now keyed by `ProcedurePhaseDefinition.name` (Klarname) instead of phase keys, and use it in `XBeteiligungService` for the outgoing K3 direction
+- Remove the seed migration `Version20260505080140` and the now-obsolete `XBeteiligungPhaseDefinitionResolver`; the `xbeteiligung_phase_definition_code` table is no longer consulted for K3 message building
+- On incoming cockpit messages (0401 init, 0402 update), set the procedure to the customer's initial Konfiguration phase via `ProcedurePhaseDefinitionServiceInterface::findInitialDefinition` instead of mapping the incoming code onto a specific phase definition; unchanged codes still skip the setter via the existing `hasXxxPhaseChanged` gate
+
 ## v0.69-rc2 (2026-05-05)
 
 **Seed XBeteiligung phase codes from historical mapping (DPLAN-16766)**
