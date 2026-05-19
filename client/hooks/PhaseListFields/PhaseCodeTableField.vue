@@ -116,44 +116,11 @@ export default {
 
   watch: {
     isEditing (newValue) {
-      if (!newValue) {
+      if (newValue) {
+        this.startEditing()
+      } else {
         this.phaseCodeDraft = ''
-
-        return
       }
-
-      /*
-       * Refresh the shared code cache from the backend before opening the edit
-       * UI. The in-memory cache drifts out of sync over the session (the
-       * `savedRowPayload` prop-watcher doesn't reliably fire across the addon's
-       * Vue boundary), so duplicate checks during typing can read stale data.
-       * Invalidating + refetching guarantees `addonPayload.isDuplicate` and
-       * `currentResourceId` reflect current backend state.
-       */
-      this.isLoading = true
-      invalidatePhaseCodesCache()
-      fetchAllPhaseCodes(this.demosplanUi.dpApi)
-        .then(byPhaseId => {
-          const entry = byPhaseId[this.phaseId]
-
-          this.fetchedCode = entry ? entry.code : ''
-          this.fetchedResourceId = entry ? entry.resourceId : null
-        })
-        .catch(err => {
-          if (err?.data?.meta?.messages) {
-            this.demosplanUi.handleResponseMessages(err.data.meta)
-          } else {
-            dplan.notify.error(Translator.trans('error.api.generic'))
-          }
-        })
-        .finally(() => {
-          this.isLoading = false
-          this.phaseCodeDraft = this.currentPhaseCode
-          this.$emit('addonEvent:emit', {
-            name: 'edit-start',
-            payload: this.addonPayload,
-          })
-        })
     },
   },
 
@@ -166,31 +133,54 @@ export default {
       })
     },
 
+    handleFetch () {
+      return fetchAllPhaseCodes(this.demosplanUi.dpApi)
+        .then(byPhaseId => {
+          const entry = byPhaseId[this.phaseId]
+
+          if (entry) {
+            this.fetchedCode = entry.code
+            this.fetchedResourceId = entry.resourceId
+          }
+        })
+        .catch(err => {
+          if (err?.data?.meta?.messages) {
+            this.demosplanUi.handleResponseMessages(err.data.meta)
+          } else {
+            dplan.notify.error(Translator.trans('error.api.generic'))
+          }
+        })
+        .finally(() => {
+          this.isLoading = false
+        })
+    },
+
     removeCode () {
       this.handleCodeInput('')
+    },
+
+    /*
+     * Refresh the shared code cache at the start of an edit session so the
+     * duplicate check sees current backend state at submit time. Needed
+     * because `savedRowPayload` updates don't reliably carry across the
+     * addon's Vue boundary, so the cache drifts out of sync over the session.
+     */
+    startEditing () {
+      this.isLoading = true
+      invalidatePhaseCodesCache()
+
+      this.handleFetch().then(() => {
+        this.phaseCodeDraft = this.currentPhaseCode
+        this.$emit('addonEvent:emit', {
+          name: 'edit-start',
+          payload: this.addonPayload,
+        })
+      })
     },
   },
 
   created () {
-    fetchAllPhaseCodes(this.demosplanUi.dpApi)
-      .then(byPhaseId => {
-        const entry = byPhaseId[this.phaseId]
-
-        if (entry) {
-          this.fetchedCode = entry.code
-          this.fetchedResourceId = entry.resourceId
-        }
-      })
-      .catch(err => {
-        if (err?.data?.meta?.messages) {
-          this.demosplanUi.handleResponseMessages(err.data.meta)
-        } else {
-          dplan.notify.error(Translator.trans('error.api.generic'))
-        }
-      })
-      .finally(() => {
-        this.isLoading = false
-      })
+    this.handleFetch()
   },
 }
 </script>

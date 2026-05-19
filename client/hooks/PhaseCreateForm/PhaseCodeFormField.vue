@@ -76,21 +76,25 @@ export default {
         payload: this.addonPayload,
       })
     },
+
+    /*
+     * Initialize cache for empty table case. Without this, `isDuplicate`
+     * would compare against an empty cache.
+     */
+    handleFetch () {
+      return fetchAllPhaseCodes(this.demosplanUi.dpApi)
+        .catch(err => {
+          if (err?.data?.meta?.messages) {
+            this.demosplanUi.handleResponseMessages(err.data.meta)
+          } else {
+            dplan.notify.error(Translator.trans('error.api.generic'))
+          }
+        })
+    },
   },
 
-  /*
-   * Initialize cache for empty table case. Without this, `isDuplicate`
-   * would compare against an empty cache.
-   */
   created () {
-    fetchAllPhaseCodes(this.demosplanUi.dpApi)
-      .catch(err => {
-        if (err?.data?.meta?.messages) {
-          this.demosplanUi.handleResponseMessages(err.data.meta)
-        } else {
-          dplan.notify.error(Translator.trans('error.api.generic'))
-        }
-      })
+    this.handleFetch()
   },
 
   /*
