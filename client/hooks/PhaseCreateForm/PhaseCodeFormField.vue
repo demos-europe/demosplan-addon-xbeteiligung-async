@@ -28,8 +28,6 @@ import {
 export default {
   name: 'PhaseCodeFormField',
 
-  emits: ['addonEvent:emit'],
-
   props: {
     demosplanUi: {
       type: Object,
@@ -45,6 +43,8 @@ export default {
       default: false,
     },
   },
+
+  emits: ['addonEvent:emit'],
 
   data () {
     return {
@@ -99,7 +99,7 @@ export default {
    * Invalidating in both cases costs at most one extra fetch on the next
    * read, in exchange for not needing core to signal which case happened.
    */
-  beforeDestroy () {
+  beforeUnmount () {
     invalidatePhaseCodesCache()
   },
 }

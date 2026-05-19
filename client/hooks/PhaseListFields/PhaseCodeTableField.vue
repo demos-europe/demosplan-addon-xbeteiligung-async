@@ -50,8 +50,6 @@ import {
 export default {
   name: 'PhaseCodeTableField',
 
-  emits: ['addonEvent:emit'],
-
   props: {
     demosplanUi: {
       type: Object,
@@ -78,6 +76,8 @@ export default {
       default: null,
     },
   },
+
+  emits: ['addonEvent:emit'],
 
   data () {
     return {
@@ -135,6 +135,7 @@ export default {
       fetchAllPhaseCodes(this.demosplanUi.dpApi)
         .then(byPhaseId => {
           const entry = byPhaseId[this.phaseId]
+
           this.fetchedCode = entry ? entry.code : ''
           this.fetchedResourceId = entry ? entry.resourceId : null
         })
