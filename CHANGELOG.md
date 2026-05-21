@@ -3,20 +3,25 @@
 ## UNRELEASED
 ## v0.69-rc3 (2026-05-12)
 
-**Hardcode K3 phase mapping and force Konfiguration on cockpit-init (DPLAN-16766)**
+**Hardcode K3 phase mapping and force Konfiguration on cockpit-init (DPLAN-16767)**
 - Reintroduce hardcoded `ProcedurePhaseMapping`, now keyed by `ProcedurePhaseDefinition.name` (Klarname) instead of phase keys, and use it in `XBeteiligungService` for the outgoing K3 direction
 - Remove the seed migration `Version20260505080140` and the now-obsolete `XBeteiligungPhaseDefinitionResolver`; the `xbeteiligung_phase_definition_code` table is no longer consulted for K3 message building
 - On incoming cockpit messages (0401 init, 0402 update), set the procedure to the customer's initial Konfiguration phase via `ProcedurePhaseDefinitionServiceInterface::findInitialDefinition` instead of mapping the incoming code onto a specific phase definition; unchanged codes still skip the setter via the existing `hasXxxPhaseChanged` gate
 
+**Add admin UI for managing XBeteiligung phase codes per procedure phase definition**
+- Render code input in the procedure phase create form via addon hook
+- Add code column with inline edit/delete to the procedure phase admin table (table owned by core, cell provided by addon)
+- Validate uniqueness of phase codes
+
 ## v0.69-rc2 (2026-05-05)
 
-**Seed XBeteiligung phase codes from historical mapping (DPLAN-16766)**
+**Seed XBeteiligung phase codes from historical mapping (DPLAN-16767)**
 - Add data migration that seeds `xbeteiligung_phase_definition_code` for all existing procedure phase definitions of diplanbau, diplanrog and diplanfest based on the historical `ProcedurePhaseMapping`
 - Phases without a historical code mapping (e.g. Einsichtnahme, Scoping) receive the placeholder code `0815`
 
 ## v0.69-rc1 (2026-04-29)
 
-**Make XBeteiligung phase codes configurable per procedure phase definition (DPLAN-16766)**
+**Make XBeteiligung phase codes configurable per procedure phase definition (DPLAN-16767)**
 - Add `XBeteiligungPhaseDefinitionCode` entity linking procedure phase definitions to XBeteiligung phase codes
 - Add `XBeteiligungPhaseDefinitionResolver` service to resolve phase codes via the new entity
 - Add EDT JSON:API resource type for `XBeteiligungPhaseDefinitionCode` to allow management via API
