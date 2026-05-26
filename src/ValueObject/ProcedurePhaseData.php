@@ -18,8 +18,6 @@ use DateTime;
 class ProcedurePhaseData extends ValueObject
 {
     public function __construct(
-        private ?string $publicParticipationPhaseKey,
-        private ?string $institutionParticipationPhaseKey,
         private ?string $generalPhaseCode,
         private ?string $publicParticipationPhaseCode,
         private ?string $publicParticipationSubPhaseCode,
@@ -32,8 +30,6 @@ class ProcedurePhaseData extends ValueObject
         private ?int $publicParticipationIteration,
         private ?int $institutionParticipationIteration
     ) {
-        $this->publicParticipationPhaseKey = $publicParticipationPhaseKey;
-        $this->institutionParticipationPhaseKey = $institutionParticipationPhaseKey;
         $this->generalPhaseCode = $generalPhaseCode;
         $this->publicParticipationPhaseCode = $publicParticipationPhaseCode;
         $this->publicParticipationSubPhaseCode = $publicParticipationSubPhaseCode;
@@ -47,16 +43,6 @@ class ProcedurePhaseData extends ValueObject
         $this->institutionParticipationIteration = $institutionParticipationIteration;
 
         $this->lock();
-    }
-
-    public function getPublicParticipationPhaseKey(): ?string
-    {
-        return $this->publicParticipationPhaseKey;
-    }
-
-    public function getInstitutionParticipationPhaseKey(): ?string
-    {
-        return $this->institutionParticipationPhaseKey;
     }
 
     public function getGeneralPhaseCode(): ?string

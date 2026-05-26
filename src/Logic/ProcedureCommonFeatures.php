@@ -13,9 +13,11 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CustomerServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\ProcedurePhaseDefinitionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceStorageInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
@@ -63,20 +65,45 @@ abstract class ProcedureCommonFeatures
         protected readonly ProcedureDataExtractor             $procedureDataExtractor,
         protected readonly XBeteiligungGisLayerManager        $gisLayerManager,
         protected readonly XBeteiligungAttachmentService      $xbeteiligungAttachmentService,
-        protected readonly ProcedurePhaseCodeDetector $procedurePhaseCodeDetector,
+        protected readonly ProcedurePhaseCodeDetector         $procedurePhaseCodeDetector,
+        protected readonly ProcedurePhaseDefinitionServiceInterface $phaseDefinitionService,
     )
     {
     }
 
+    /**
+     * Resets the procedure phase to the customer's initial (Konfiguration) phase
+     * when the cockpit signals a new phase code for the respective audience.
+     *
+     * The phase-code value itself is not mapped onto a specific definition — every
+     * change is treated as "back to Konfiguration", consistent with main's behavior.
+     * Unchanged codes (same code as previously stored) skip the setter, so a 0402
+     * update that only carries new dates won't reset the phase.
+     */
     protected function setProcedurePhase(
         ProcedureInterface $procedure,
         ProcedurePhaseData $procedurePhaseData,
     ): void {
-        if (null !== $this->procedurePhaseCodeDetector->getPublicParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
-            $procedure->setPublicParticipationPhase($procedurePhaseData->getPublicParticipationPhaseKey());
-        }
-        if (null !== $this->procedurePhaseCodeDetector->getInstitutionParticipationPhaseKey($procedure->getId(), $procedurePhaseData)) {
-            $procedure->setPhase($procedurePhaseData->getInstitutionParticipationPhaseKey());
+        $customer = $procedure->getCustomer();
+        if (null !== $customer) {
+            if ($this->procedurePhaseCodeDetector->hasPublicParticipationPhaseChanged(
+                $procedure->getId(),
+                $procedurePhaseData
+            )) {
+                $publicDefinition = $this->phaseDefinitionService->findInitialDefinition(StatementInterface::EXTERNAL, $customer);
+                if (null !== $publicDefinition) {
+                    $procedure->getPublicParticipationPhaseObject()->setPhaseDefinition($publicDefinition);
+                }
+            }
+            if ($this->procedurePhaseCodeDetector->hasInstitutionParticipationPhaseChanged(
+                $procedure->getId(),
+                $procedurePhaseData
+            )) {
+                $institutionDefinition = $this->phaseDefinitionService->findInitialDefinition(StatementInterface::INTERNAL, $customer);
+                if (null !== $institutionDefinition) {
+                    $procedure->getPhaseObject()->setPhaseDefinition($institutionDefinition);
+                }
+            }
         }
         if (null !== $procedurePhaseData->getPublicParticipationStartDate()) {
             $procedure->setPublicParticipationStartDate($procedurePhaseData->getPublicParticipationStartDate());

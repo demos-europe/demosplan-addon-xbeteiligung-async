@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\MessageFactory\MessageComponentsBuilders;
 
-use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
@@ -34,7 +33,6 @@ class PhaseBuilderTest extends TestCase
     private PhaseBuilder $phaseBuilder;
     private MockObject|PermissionEvaluatorInterface $permissionEvaluator;
     private MockObject|LoggerInterface $logger;
-    private MockObject|GlobalConfigInterface $globalConfig;
     private MockObject|ProcedurePhaseCodeDetector $procedurePhaseCodeDetector;
     private XBeteiligungConfiguration $xbeteiligungConfiguration;
     private MockObject|StatementCreated $statementCreated;
@@ -44,7 +42,6 @@ class PhaseBuilderTest extends TestCase
     {
         $this->permissionEvaluator = $this->createMock(PermissionEvaluatorInterface::class);
         $this->logger = $this->createMock(LoggerInterface::class);
-        $this->globalConfig = $this->createMock(GlobalConfigInterface::class);
         $this->procedurePhaseCodeDetector = $this->createMock(ProcedurePhaseCodeDetector::class);
         $this->statementCreated = $this->createMock(StatementCreated::class);
         $this->statement = $this->createMock(StellungnahmeType::class);
@@ -58,7 +55,6 @@ class PhaseBuilderTest extends TestCase
         $this->phaseBuilder = new PhaseBuilder(
             $this->permissionEvaluator,
             $this->logger,
-            $this->globalConfig,
             $this->procedurePhaseCodeDetector
         );
     }
@@ -94,12 +90,6 @@ class PhaseBuilderTest extends TestCase
         $this->statementCreated->method('getPublicStatement')->willReturn($publicStatement);
     }
 
-    private function setupGlobalConfigMocks(string $internalPhaseName = 'Internal Phase', string $externalPhaseName = 'External Phase'): void
-    {
-        $this->globalConfig->method('getPhaseNameWithPriorityInternal')->willReturn($internalPhaseName);
-        $this->globalConfig->method('getPhaseNameWithPriorityExternal')->willReturn($externalPhaseName);
-    }
-
     private function callPrivateGetPhaseName(StatementCreated $statementCreated): string
     {
         $reflection = new ReflectionClass($this->phaseBuilder);
@@ -132,7 +122,6 @@ class PhaseBuilderTest extends TestCase
         return new PhaseBuilder(
             $this->permissionEvaluator,
             $this->logger,
-            $this->globalConfig,
             $procedurePhaseCodeDetector
         );
     }
@@ -149,7 +138,6 @@ class PhaseBuilderTest extends TestCase
     public function testSetVerfahrenschrittWithKommunalPermission(): void
     {
         $this->setupStatementCreatedMocks();
-        $this->setupGlobalConfigMocks();
         $this->permissionEvaluator->method('isPermissionEnabled')
             ->willReturnCallback(function($permission) {
                 if ($permission->getPermissionName() === 'feature_procedure_message_kom_create') return true;
@@ -166,7 +154,6 @@ class PhaseBuilderTest extends TestCase
     public function testSetVerfahrenschrittWithRaumordnungPermission(): void
     {
         $this->setupStatementCreatedMocks();
-        $this->setupGlobalConfigMocks();
         $this->permissionEvaluator->method('isPermissionEnabled')
             ->willReturnCallback(function($permission) {
                 if ($permission->getPermissionName() === 'feature_procedure_message_rog_create') return true;
@@ -183,7 +170,6 @@ class PhaseBuilderTest extends TestCase
     public function testSetVerfahrenschrittWithPlanfeststellungPermission(): void
     {
         $this->setupStatementCreatedMocks();
-        $this->setupGlobalConfigMocks();
         $this->permissionEvaluator->method('isPermissionEnabled')
             ->willReturnCallback(function($permission) {
                 if ($permission->getPermissionName() === 'feature_procedure_message_pln_create') return true;
@@ -209,24 +195,13 @@ class PhaseBuilderTest extends TestCase
         $this->phaseBuilder->setVerfahrenschritt($this->statementCreated, $this->statement);
     }
 
-    public function testGetPhaseNameReturnsInternalPhaseNameForInternalStatement(): void
+    public function testGetPhaseNameReturnsPhaseFromStatementCreated(): void
     {
         $this->setupStatementCreatedMocks('evaluating', StatementInterface::INTERNAL);
-        $this->setupGlobalConfigMocks('Internal Evaluating Phase', 'External Evaluating Phase');
 
         $result = $this->callPrivateGetPhaseName($this->statementCreated);
 
-        $this->assertEquals('Internal Evaluating Phase', $result);
-    }
-
-    public function testGetPhaseNameReturnsExternalPhaseNameForExternalStatement(): void
-    {
-        $this->setupStatementCreatedMocks('evaluating', StatementInterface::EXTERNAL);
-        $this->setupGlobalConfigMocks('Internal Evaluating Phase', 'External Evaluating Phase');
-
-        $result = $this->callPrivateGetPhaseName($this->statementCreated);
-
-        $this->assertEquals('External Evaluating Phase', $result);
+        $this->assertEquals('evaluating', $result);
     }
 
     public function testCreatePhaseTypeReturnsKommunalType(): void
@@ -281,7 +256,7 @@ class PhaseBuilderTest extends TestCase
     public function testSetVerfahrensteilschrittSetsCorrectValues(): void
     {
         $this->setupStatementCreatedMocks();
-        $this->setupGlobalConfigMocks('Internal Phase', 'External Phase');
+
 
         $this->statement->expects($this->once())
             ->method('setVerfahrensteilschritt')
@@ -298,7 +273,7 @@ class PhaseBuilderTest extends TestCase
     public function testSetVerfahrensteilschrittUsesInternalPhaseNameForInternalStatement(): void
     {
         $this->setupStatementCreatedMocks('evaluating', StatementInterface::INTERNAL);
-        $this->setupGlobalConfigMocks('Internal Phase', 'External Phase');
+
 
         $this->statement->expects($this->once())
             ->method('setVerfahrensteilschritt')
@@ -327,7 +302,6 @@ class PhaseBuilderTest extends TestCase
     {
         $phaseBuilder = $this->createPhaseBuilderWithConfiguration('', '5678'); // Empty verfahrensschrittCode
         $this->setupStatementCreatedMocks();
-        $this->setupGlobalConfigMocks();
         $this->setupKommunalPermission();
 
         $this->statement->expects($this->once())->method('setVerfahrensschrittKommunal')
@@ -342,7 +316,6 @@ class PhaseBuilderTest extends TestCase
     {
         $phaseBuilder = $this->createPhaseBuilderWithConfiguration('9999', '5678'); // Non-empty verfahrensschrittCode
         $this->setupStatementCreatedMocks();
-        $this->setupGlobalConfigMocks();
         $this->setupKommunalPermission();
 
         $this->statement->expects($this->once())->method('setVerfahrensschrittKommunal')

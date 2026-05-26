@@ -16,7 +16,6 @@ use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ParticipationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ProcedureMessageTyp;
-use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ProcedurePhaseKey;
 use DemosEurope\DemosplanAddon\XBeteiligung\Enum\XBeteiligungMessageType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungOeffentlichkeitType\BeteiligungPlanfeststellungOeffentlichkeitArtAnonymousPHPType;
@@ -341,23 +340,17 @@ class XBeteiligungService
         $codeType->setListVersionID('1.0');
         $codeType->setListURI($listUri);
 
-        // Get the phase code from the mapping
-        $phaseKey = $participationType === ParticipationType::PUBLIC
-            ? $procedure->getPublicParticipationPhaseObject()->getKey()
-            : $procedure->getPhaseObject()->getKey();
+        $phaseObject = $participationType === ParticipationType::PUBLIC
+            ? $procedure->getPublicParticipationPhaseObject()
+            : $procedure->getPhaseObject();
 
-        $phaseCode = ProcedurePhaseMapping::getPhaseCode(
+        $codeType->setCode($this->getPhaseCodeFromDefinition(
+            $phaseObject,
             ProcedureMessageTyp::RAUMORDNUNG,
             $participationType,
-            $this->resolvePhaseKey($phaseKey, $procedure->getId())
-        );
-
-        $codeType->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
-
-        $phaseName = $participationType === ParticipationType::PUBLIC
-            ? $this->getPublicParticipationPhaseNameFromKey($procedure)
-            : $this->getInstitutionPhaseNameFromKey($procedure);
-        $codeType->setName($phaseName);
+            $procedure->getId()
+        ));
+        $codeType->setName($phaseObject->getPhaseDefinition()->getName());
 
         return $codeType;
     }
@@ -372,23 +365,17 @@ class XBeteiligungService
         $codeType->setListVersionID('1.0');
         $codeType->setListURI($listUri);
 
-        // Get the phase code from the mapping
-        $phaseKey = $participationType === ParticipationType::PUBLIC
-            ? $procedure->getPublicParticipationPhaseObject()->getKey()
-            : $procedure->getPhaseObject()->getKey();
+        $phaseObject = $participationType === ParticipationType::PUBLIC
+            ? $procedure->getPublicParticipationPhaseObject()
+            : $procedure->getPhaseObject();
 
-        $phaseCode = ProcedurePhaseMapping::getPhaseCode(
+        $codeType->setCode($this->getPhaseCodeFromDefinition(
+            $phaseObject,
             ProcedureMessageTyp::PLANFESTSTELLUNG,
             $participationType,
-            $this->resolvePhaseKey($phaseKey, $procedure->getId())
-        );
-
-        $codeType->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
-
-        $phaseName = $participationType === ParticipationType::PUBLIC
-            ? $this->getPublicParticipationPhaseNameFromKey($procedure)
-            : $this->getInstitutionPhaseNameFromKey($procedure);
-        $codeType->setName($phaseName);
+            $procedure->getId()
+        ));
+        $codeType->setName($phaseObject->getPhaseDefinition()->getName());
 
         return $codeType;
     }
@@ -972,48 +959,20 @@ class XBeteiligungService
         $this->procedureMessageRepository->saveOnFlush($procedureMessage);
     }
 
-    /**
-     * Gets the current public participation phase name by looking up the phase key.
-     * This method is used during onFlush events where enriched entity fields may be stale.
-     *
-     * @param ProcedureInterface $procedure
-     * @return string The phase name from configuration
-     */
-    private function getPublicParticipationPhaseNameFromKey(ProcedureInterface $procedure): string
-    {
-        $phaseKey = $procedure->getPublicParticipationPhaseObject()->getKey();
-        return $this->globalConfig->getPhaseNameWithPriorityExternal($phaseKey);
-    }
-
-    /**
-     * Gets the current institution phase name by looking up the phase key.
-     * This method is used during onFlush events where enriched entity fields may be stale.
-     *
-     * @param ProcedureInterface $procedure
-     * @return string The phase name from configuration
-     */
-    private function getInstitutionPhaseNameFromKey(ProcedureInterface $procedure): string
-    {
-        $phaseKey = $procedure->getPhaseObject()->getKey();
-        return $this->globalConfig->getPhaseNameWithPriorityInternal($phaseKey);
-    }
-
     private function getPublicProcedurePhaseCodeType(ProcedureInterface $procedure): CodeVerfahrensschrittKommunalType
     {
         $codeProcedurePhase = new CodeVerfahrensschrittKommunalType();
         $codeProcedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
         $codeProcedurePhase->setListVersionID('1.0');
 
-        // Get the phase code from the mapping (always Kommunal for this method)
-        $phaseKey = $procedure->getPublicParticipationPhaseObject()->getKey();
-        $phaseCode = ProcedurePhaseMapping::getPhaseCode(
+        $phaseObject = $procedure->getPublicParticipationPhaseObject();
+        $codeProcedurePhase->setCode($this->getPhaseCodeFromDefinition(
+            $phaseObject,
             ProcedureMessageTyp::KOMMUNAL,
             ParticipationType::PUBLIC,
-            $this->resolvePhaseKey($phaseKey, $procedure->getId())
-        );
-
-        $codeProcedurePhase->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
-        $codeProcedurePhase->setName($this->getPublicParticipationPhaseNameFromKey($procedure));
+            $procedure->getId()
+        ));
+        $codeProcedurePhase->setName($phaseObject->getPhaseDefinition()->getName());
 
         return $codeProcedurePhase;
     }
@@ -1024,31 +983,40 @@ class XBeteiligungService
         $codeProcedurePhase->setListURI('urn:xoev-de:xleitstelle:codeliste:verfahrensschrittkommunal');
         $codeProcedurePhase->setListVersionID('1.0');
 
-        // Get the phase code from the mapping for institution participation
-        $phaseKey = $procedure->getPhaseObject()->getKey();
-        $phaseCode = ProcedurePhaseMapping::getPhaseCode(
+        $phaseObject = $procedure->getPhaseObject();
+        $codeProcedurePhase->setCode($this->getPhaseCodeFromDefinition(
+            $phaseObject,
             ProcedureMessageTyp::KOMMUNAL,
             ParticipationType::INSTITUTION,
-            $this->resolvePhaseKey($phaseKey, $procedure->getId())
-        );
-
-        $codeProcedurePhase->setCode($phaseCode ?? self::PLACEHOLDER_PROCEDURE_PHASE_CODE);
-        $codeProcedurePhase->setName($this->getInstitutionPhaseNameFromKey($procedure));
+            $procedure->getId()
+        ));
+        $codeProcedurePhase->setName($phaseObject->getPhaseDefinition()->getName());
 
         return $codeProcedurePhase;
     }
 
-    private function resolvePhaseKey(string $phaseKey, string $procedureId): ?ProcedurePhaseKey
-    {
-        $phaseKeyEnum = ProcedurePhaseKey::tryFrom($phaseKey);
-        if (null === $phaseKeyEnum) {
-            $this->logger->warning('XBeteiligung: Unknown procedure phase key, falling back to placeholder code', [
-                'phaseKey'    => $phaseKey,
-                'procedureId' => $procedureId,
+    private function getPhaseCodeFromDefinition(
+        ProcedurePhaseInterface $phaseObject,
+        ProcedureMessageTyp $procedureType,
+        ParticipationType $participationType,
+        string $procedureId
+    ): string {
+        $definition = $phaseObject->getPhaseDefinition();
+        $phaseName = $definition->getName();
+        $code = ProcedurePhaseMapping::getPhaseCode($procedureType, $participationType, $phaseName);
+        if (null === $code) {
+            $this->logger->warning('XBeteiligung: No code mapping for phase definition, falling back to placeholder', [
+                'phaseDefinitionId'  => $definition->getId() ?? '',
+                'phaseDefinitionName'=> $phaseName,
+                'procedureType'      => $procedureType->value,
+                'participationType'  => $participationType->value,
+                'procedureId'        => $procedureId,
             ]);
+
+            return self::PLACEHOLDER_PROCEDURE_PHASE_CODE;
         }
 
-        return $phaseKeyEnum;
+        return $code;
     }
 
     private function getInstitutionNewsList(ProcedureInterface $procedure): array

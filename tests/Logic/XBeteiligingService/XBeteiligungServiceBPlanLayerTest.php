@@ -20,6 +20,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\OrgaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
@@ -104,7 +105,7 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
-            $this->createMock(XBeteiligungAuditService::class)
+            $this->createMock(XBeteiligungAuditService::class),
         );
     }
 
@@ -443,11 +444,16 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
         $procedureSettings->method('getMapExtent')->willReturn('904640.92,7067292.96,1195347.64,7350657.51');
 
         // Setup procedure phase
+        $phaseDefinition = $this->createMock(ProcedurePhaseDefinitionInterface::class);
+        // Use a Klarname that maps in both KOMMUNAL_INSTITUTION and KOMMUNAL_PUBLIC
+        // so getPhaseCodeFromDefinition does not log a "no mapping" warning that would
+        // pollute the warning-count expectations in these tests.
+        $phaseDefinition->method('getName')->willReturn('Bestands- und Potentialanalyse');
         $phase = $this->createMock(ProcedurePhaseInterface::class);
         $phase->method('getStartDate')->willReturn(new \DateTime('2025-01-01'));
         $phase->method('getEndDate')->willReturn(new \DateTime('2025-02-01'));
         $phase->method('getIteration')->willReturn(1);
-        $phase->method('getKey')->willReturn('configuration');
+        $phase->method('getPhaseDefinition')->willReturn($phaseDefinition);
 
         // Setup organization
         $orga = $this->createMock(OrgaInterface::class);
@@ -465,10 +471,6 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
         $procedure->method('getEndDate')->willReturn(new \DateTime('2025-02-01'));
         $procedure->method('getPhaseObject')->willReturn($phase);
         $procedure->method('getPublicParticipationPhaseObject')->willReturn($phase);
-        $procedure->method('getPublicParticipationPhase')->willReturn('configuration');
-        $procedure->method('getPublicParticipationPhaseName')->willReturn('configuration');
-        $procedure->method('getPhaseName')->willReturn('configuration');
-        $procedure->method('getPhase')->willReturn('earlyparticipation');
 
         return $procedure;
     }

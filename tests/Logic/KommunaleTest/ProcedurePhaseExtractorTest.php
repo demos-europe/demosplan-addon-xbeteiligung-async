@@ -47,8 +47,6 @@ class ProcedurePhaseExtractorTest extends TestCase
 
         // create expected procedure phase data object
         $expectedProcedurePhaseData = new ProcedurePhaseData(
-            'configuration', // public participation phase key
-            'configuration', // institution participation phase key
             null, // general phase code
             null, // public participation phase code
             null, // public participation sub phase code
@@ -66,14 +64,6 @@ class ProcedurePhaseExtractorTest extends TestCase
         $procedurePhaseData = $this->sut->extract($beteiligungKommunal);
 
         self::assertInstanceOf(ProcedurePhaseData::class, $procedurePhaseData);
-        self::assertSame(
-            $expectedProcedurePhaseData->getPublicParticipationPhaseKey(),
-            $procedurePhaseData->getPublicParticipationPhaseKey()
-        );
-        self::assertSame(
-            $expectedProcedurePhaseData->getInstitutionParticipationPhaseKey(),
-            $procedurePhaseData->getInstitutionParticipationPhaseKey()
-        );
         self::assertSame(
             $expectedProcedurePhaseData->getPublicParticipationStartDate()->format('Y-m-d'),
             $procedurePhaseData->getPublicParticipationStartDate()->format('Y-m-d')

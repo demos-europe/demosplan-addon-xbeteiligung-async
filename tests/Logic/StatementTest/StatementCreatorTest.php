@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\StatementTest;
 
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\TagInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\AddressInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
@@ -35,6 +36,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\Behoerde\BehoerdeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtenkopfG2GTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Basisnachricht\G2g\NachrichtG2GTypeType;
@@ -105,7 +107,8 @@ class StatementCreatorTest extends TestCase
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
-            $this->createMock(XBeteiligungAuditService::class)
+            $this->createMock(XBeteiligungAuditService::class),
+            $this->createMock(XBeteiligungPhaseDefinitionCodeRepository::class),
         );
         $this->XBeteiligungService = $xbeteiligungService;
         $this->logger = new Logger();
@@ -123,7 +126,6 @@ class StatementCreatorTest extends TestCase
             new PhaseBuilder(
                 $this->permissionEvaluator,
                 $this->mockFactory->getLoggerInterfaceMock(),
-                $this->mockFactory->getGlobalConfigInterfaceMock(),
                 $this->mockFactory->getProcedurePhaseCodeDetectorMock()
             ),
             $textSanitizer
@@ -183,7 +185,11 @@ class StatementCreatorTest extends TestCase
             $gender = 'männlich';
             $userTitle = 'Dr.';
             $vote = 'acknowledge';
-            $tags = ['Radverkehr', 'Straßenbau', 'Straßenbäume', 'Städtebaulicher Vertrag'];
+            $tags = array_map(function (string $title): TagInterface {
+                $tag = $this->createMock(TagInterface::class);
+                $tag->method('getTitle')->willReturn($title);
+                return $tag;
+            }, ['Radverkehr', 'Straßenbau', 'Straßenbäume', 'Städtebaulicher Vertrag']);
             $file = 'Legende.pdf:dc855abd-c8df-11e5-8550-005056ae0004:119994:application/pdf';
             $accessUrl = 'https://bob.beispiel.de?stellungnahmeID=S34992191-830d-4d1d-a136-f38d322b521d';
         } else {
