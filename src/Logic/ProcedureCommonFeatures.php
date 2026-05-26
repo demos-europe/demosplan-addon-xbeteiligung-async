@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CurrentUserProviderInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\CustomerServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\OrgaServiceInterface;
@@ -89,7 +90,7 @@ abstract class ProcedureCommonFeatures
                 $procedure->getId(),
                 $procedurePhaseData
             )) {
-                $publicDefinition = $this->phaseDefinitionService->findInitialDefinition('external', $customer);
+                $publicDefinition = $this->phaseDefinitionService->findInitialDefinition(StatementInterface::EXTERNAL, $customer);
                 if (null !== $publicDefinition) {
                     $procedure->getPublicParticipationPhaseObject()->setPhaseDefinition($publicDefinition);
                 }
@@ -98,7 +99,7 @@ abstract class ProcedureCommonFeatures
                 $procedure->getId(),
                 $procedurePhaseData
             )) {
-                $institutionDefinition = $this->phaseDefinitionService->findInitialDefinition('internal', $customer);
+                $institutionDefinition = $this->phaseDefinitionService->findInitialDefinition(StatementInterface::INTERNAL, $customer);
                 if (null !== $institutionDefinition) {
                     $procedure->getPhaseObject()->setPhaseDefinition($institutionDefinition);
                 }
