@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.71 (2026-05-26)
 **Integrate ProcedurePhaseDefinition into XBeteiligung phase handling (DPLAN-16767)**
 - Remove `ProcedurePhaseKey` enum and the legacy phase-key lookup layer; `ProcedurePhaseMapping` is now keyed by `ProcedurePhaseDefinition.name` (Klarname)
 - Resolve outgoing K3 phase code/name from the procedure's `PhaseDefinition` directly in `XBeteiligungService` (Kommunal/Raumordnung/Planfeststellung), removing the intermediate phase-key string passing
