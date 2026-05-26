@@ -1,6 +1,13 @@
 # Changelog
 
 ## UNRELEASED
+**Integrate ProcedurePhaseDefinition into XBeteiligung phase handling (DPLAN-16766)**
+- Remove `ProcedurePhaseKey` enum and the legacy phase-key lookup layer; `ProcedurePhaseMapping` is now keyed by `ProcedurePhaseDefinition.name` (Klarname)
+- Resolve outgoing K3 phase code/name from the procedure's `PhaseDefinition` directly in `XBeteiligungService` (Kommunal/Raumordnung/Planfeststellung), removing the intermediate phase-key string passing
+- On incoming cockpit messages (`KommunalInitiieren.0401`, `KommunalAktualisieren.0402`), set the procedure to the customer's initial Konfiguration phase via `ProcedurePhaseDefinitionServiceInterface::findInitialDefinition` instead of mapping the incoming XBeteiligung code to a specific phase definition; unchanged codes still skip the setter via the existing `hasXxxPhaseChanged` gate
+- Replace phase-key string passing with boolean change detection in `ProcedurePhaseData`
+- Add `XBeteiligungPhaseDefinitionCode` entity + repository + EDT JSON:API resource type + migration `Version20260424120741` for mandant-admin-configurable phase-code mapping per `ProcedurePhaseDefinition` (DPLAN-16767 prep). Not yet consumed by message building — outgoing K3 still uses the hardcoded `ProcedurePhaseMapping`
+
 ## v0.70 (2026-05-21)
 - **chore DPLAN-17129**: Align composer dependencies with core's Doctrine ORM v3 upgrade
     - Widen `demos-europe/demosplan-addon` constraint from `^v0.67` to `^0.71`
