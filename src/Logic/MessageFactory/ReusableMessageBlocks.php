@@ -42,7 +42,7 @@ class ReusableMessageBlocks
         $messageObject->setProdukthersteller('DEMOS plan GmbH'); // required
         $messageObject->setProduktversion('1.1'); // optional
         $messageObject->setStandard(XBeteiligungService::STANDARD); // required
-        $messageObject->setVersion('1.3'); // required
+        $messageObject->setVersion(XBeteiligungService::STANDARD_VERSION); // required
 
         return $messageObject;
     }
