@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- **fix DPLAN-17857**: Correct XBeteiligung standard version in message header from `1.3` to `1.2`; introduce `XBeteiligungService::STANDARD_VERSION` constant to replace the magic string
+
 ## v0.71 (2026-05-26)
 **Integrate ProcedurePhaseDefinition into XBeteiligung phase handling (DPLAN-16767)**
 - Remove `ProcedurePhaseKey` enum and the legacy phase-key lookup layer; `ProcedurePhaseMapping` is now keyed by `ProcedurePhaseDefinition.name` (Klarname)

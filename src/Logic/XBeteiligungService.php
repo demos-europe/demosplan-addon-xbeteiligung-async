@@ -84,6 +84,7 @@ class XBeteiligungService
     private const DIMENSION_HEIGHT = 'height';
     private const PLACEHOLDER_PROCEDURE_PHASE_CODE = '0815';
     public const STANDARD = 'XBeteiligung';
+    public const STANDARD_VERSION = '1.2';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
     public const MISSING_USER_ERROR_CODE = '3000';

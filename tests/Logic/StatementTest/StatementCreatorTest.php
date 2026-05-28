@@ -258,7 +258,7 @@ class StatementCreatorTest extends TestCase
         self::assertSame('demosplan', $xmlMessage->getProdukt());
         self::assertSame('DEMOS plan GmbH', $xmlMessage->getProdukthersteller());
         self::assertSame('XBeteiligung', $xmlMessage->getStandard());
-        self::assertSame('1.3', $xmlMessage->getVersion());
+        self::assertSame('1.2', $xmlMessage->getVersion());
     }
 
     private function validateMessageId(string $msgType, NachrichtenkopfG2GTypeType $header): void
