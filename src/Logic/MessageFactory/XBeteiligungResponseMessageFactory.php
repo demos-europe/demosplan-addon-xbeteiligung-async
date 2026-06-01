@@ -166,14 +166,20 @@ class XBeteiligungResponseMessageFactory
         array $errorTypes,
         KommunalAktualisieren0402|PlanfeststellungAktualisieren0202|RaumordnungAktualisieren0302 $xmlObject,
         NachrichtG2GTypeType $messageClass,
-        KommunalAktualisierenNOOKAnonymousPHPType|RaumordnungAktualisierenNOOKAnonymousPHPType|PlanfeststellungAktualisierenNOOKAnonymousPHPType $contentClass
+        KommunalAktualisierenNOOKAnonymousPHPType|RaumordnungAktualisierenNOOKAnonymousPHPType|PlanfeststellungAktualisierenNOOKAnonymousPHPType $contentClass,
+        ?string $procedureId = null
     ): ResponseValue {
         $messageClass = $this->reusableMessageBlocks->setProductInfo($messageClass);
         $header = $this->reusableMessageBlocks->createMessageHeadFor($messageClass);
 
-        // Extract BeteiligungsID from the appropriate participation type
+        // The beteiligungsID is mandatory in the NOK. Prefer the resolved procedure's id
+        // (the only reliable source when the 0402 omitted the beteiligungsID and the
+        // procedure was found via the planID fallback), otherwise fall back to whatever
+        // the message itself carried. Only a genuine "procedure not found" with no
+        // beteiligungsID in the message leaves this empty (accepted XSD-invalid edge case).
         $beteiligung = $xmlObject->getNachrichteninhalt()?->getBeteiligung();
-        $beteiligungsID = $beteiligung?->getBeteiligungOeffentlichkeit()?->getBeteiligungsID()
+        $beteiligungsID = $procedureId
+            ?? $beteiligung?->getBeteiligungOeffentlichkeit()?->getBeteiligungsID()
             ?? $beteiligung?->getBeteiligungTOEB()?->getBeteiligungsID();
 
         $contentClass->setBeteiligungsID($beteiligungsID);

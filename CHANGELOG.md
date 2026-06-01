@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- **feat DPLAN-17455**: Resolve the procedure for a `KommunalAktualisieren.0402` via the mandatory `planID` when the message omits the (XSD-optional) `beteiligungsID` — first through the cockpit phase mapping, then through the `planID` stored on the procedure (`xtaPlanId`). Blank `beteiligungsID` values are guarded against and ids are trimmed. The 0422 NOK now carries the resolved procedure's id as `beteiligungsID`, falling back to the message value
 - **fix DPLAN-17857**: Correct XBeteiligung standard version in message header from `1.3` to `1.2`; introduce `XBeteiligungService::STANDARD_VERSION` constant to replace the magic string
 
 ## v0.71 (2026-05-26)
