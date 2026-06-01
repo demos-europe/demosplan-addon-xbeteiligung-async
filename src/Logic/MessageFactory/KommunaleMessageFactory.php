@@ -109,14 +109,16 @@ class KommunaleMessageFactory extends XBeteiligungResponseMessageFactory
      */
     public function buildProcedureUpdateErrorResponse422(
         array $errorTypes,
-        KommunalAktualisieren0402 $xmlObject402
+        KommunalAktualisieren0402 $xmlObject402,
+        ?string $procedureId = null
     ): ResponseValue
     {
         return $this->buildUpdateErrorResponse(
             $errorTypes,
             $xmlObject402,
             new KommunalAktualisierenNOK0422(),
-            new KommunalAktualisierenNOOKAnonymousPHPType()
+            new KommunalAktualisierenNOOKAnonymousPHPType(),
+            $procedureId
         );
     }
 
