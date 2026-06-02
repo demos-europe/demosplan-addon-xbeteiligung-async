@@ -41,6 +41,14 @@ class ProcedurePhaseCodeDetector {
         $this->repository->save($procedurePhaseCockpit);
     }
 
+    /**
+     * Resolves the internal procedure id from an external XBeteiligung planId
+     * using the stored cockpit mapping. Returns null when no mapping exists.
+     */
+    public function findProcedureIdByPlanId(string $planId): ?string {
+        return $this->repository->findOneBy(['planId' => $planId])?->getProcedureId();
+    }
+
     public function getExternalProcedurePhaseCode(StatementCreated $statementCreated): string {
         /**
          * @var XBeteiligungProcedurePhaseCockpit $xBeteiligungProcedurePhaseCockpit

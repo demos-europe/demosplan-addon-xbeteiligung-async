@@ -29,9 +29,15 @@ class KommunaleProcedureHandlerFactory
         $this->mockFactory = $mockFactory;
     }
 
+    /**
+     * @param array<string, object> $overrides Optional collaborator overrides keyed by name.
+     *                                          Supported keys: entityManager, kommunaleMessageFactory,
+     *                                          procedureService, procedurePhaseCodeDetector.
+     */
     public function createProcedureHandler(
         string $handlerType,
-        ?OrgaServiceInterface $orgaServiceOverride = null
+        ?OrgaServiceInterface $orgaServiceOverride = null,
+        array $overrides = []
     ): KommunaleProcedureCreater|KommunaleProcedureUpdater {
         // Create necessary mocks for ProcedureCommonFeatures
         $logger = $this->mockFactory->getLoggerInterfaceMock();
@@ -59,13 +65,13 @@ class KommunaleProcedureHandlerFactory
         $commonDependencies = [
             $this->mockFactory->getCurrentUserProviderInterfaceMock(),
             $this->mockFactory->getCustomerServiceInterfaceMock(),
-            $this->mockFactory->getEntityManagerMock(),
-            $this->mockFactory->getKommunaleResponseMessageFactory(),
+            $overrides['entityManager'] ?? $this->mockFactory->getEntityManagerMock(),
+            $overrides['kommunaleMessageFactory'] ?? $this->mockFactory->getKommunaleResponseMessageFactory(),
             $this->mockFactory->getLoggerInterfaceMock(),
             $this->mockFactory->getPlanfeststellungResponseMessageFactory(),
             $phaseExtractor,
             $anlagenExtractor,
-            $this->mockFactory->getProcedureServiceInterface(),
+            $overrides['procedureService'] ?? $this->mockFactory->getProcedureServiceInterface(),
             $this->mockFactory->getProcedureServiceStorage(),
             $this->mockFactory->getProcedureTypeService(),
             $this->mockFactory->getRaumordnungResponseMessageFactory(),
@@ -81,7 +87,7 @@ class KommunaleProcedureHandlerFactory
             $procedureDataExtractor,
             $this->mockFactory->getXBeteiligungGisLayerManagerMock(),
             $this->mockFactory->getXBeteiligungAttachmentServiceMock(),
-            $this->mockFactory->getProcedurePhaseCodeDetectorMock(),
+            $overrides['procedurePhaseCodeDetector'] ?? $this->mockFactory->getProcedurePhaseCodeDetectorMock(),
             $this->mockFactory->getProcedurePhaseDefinitionServiceMock(),
         ];
 

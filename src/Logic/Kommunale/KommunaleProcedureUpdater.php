@@ -35,9 +35,13 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
      */
     public function updateProcedure(KommunalAktualisieren0402 $message): ResponseValue
     {
+        // Kept available for the catch blocks so a NOK can carry the resolved
+        // procedure's id as beteiligungsID even when the subsequent update fails.
+        $procedureId = null;
         try {
             $beteiligungKommunal = $this->validateAndExtractBeteiligung($message);
             $procedure = $this->findProcedureToUpdate($beteiligungKommunal);
+            $procedureId = $procedure->getId();
 
             $procedureDataValueObject = $this->procedureDataExtractor->extract($message);
 
@@ -54,7 +58,7 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
             $this->logger->error(self::PROCEDURE_UPDATE_FAILED_ERROR_DESCRIPTION, [
                 'message' => $e->getMessage()
             ]);
-            return $this->buildErrorResponse($e->getErrorTypes(), $message);
+            return $this->buildErrorResponse($e->getErrorTypes(), $message, $procedureId);
         } catch (Throwable $e) {
             // Catch both Exception and Error (including TypeError, ArgumentCountError, etc.)
             $this->logger->error(self::PROCEDURE_UPDATE_FAILED_ERROR_DESCRIPTION, [
@@ -62,7 +66,7 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
                 'errorClass' => get_class($e),
                 'trace' => $e->getTraceAsString()
             ]);
-            return $this->buildGenericErrorResponse($e->getMessage(), $message);
+            return $this->buildGenericErrorResponse($e->getMessage(), $message, $procedureId);
         }
     }
 
@@ -85,18 +89,8 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
 
     private function findProcedureToUpdate(BeteiligungKommunalType $beteiligungKommunal): ProcedureInterface
     {
-        $procedure = null;
-        $beteiligungsIdOeffentlichkeit = $beteiligungKommunal->getBeteiligungOeffentlichkeit()?->getBeteiligungsID();
-        if (null !== $beteiligungsIdOeffentlichkeit) {
-            $procedure = $this->procedureService->getProcedure($beteiligungsIdOeffentlichkeit);
-        }
-
-        if (null === $procedure) {
-            $beteiligungsIdToeb = $beteiligungKommunal->getBeteiligungTOEB()?->getBeteiligungsID();
-            if (null !== $beteiligungsIdToeb) {
-                $procedure = $this->procedureService->getProcedure($beteiligungsIdToeb);
-            }
-        }
+        $procedure = $this->resolveByBeteiligungsId($beteiligungKommunal)
+            ?? $this->resolveByPlanId($beteiligungKommunal);
 
         if (null === $procedure) {
             throw new XBeteiligungProcedureException(
@@ -109,6 +103,63 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         }
 
         return $procedure;
+    }
+
+    /**
+     * Resolves the procedure via the beteiligungsID carried by either participation
+     * block. An empty string in one block must not block the lookup in the other,
+     * which is why each id is validated before it reaches the service (a blank id
+     * would otherwise trigger a Doctrine "identifier is missing" error).
+     */
+    private function resolveByBeteiligungsId(BeteiligungKommunalType $beteiligungKommunal): ?ProcedureInterface
+    {
+        $participants = [
+            $beteiligungKommunal->getBeteiligungOeffentlichkeit(),
+            $beteiligungKommunal->getBeteiligungTOEB(),
+        ];
+
+        foreach ($participants as $participant) {
+            $beteiligungsId = $participant?->getBeteiligungsID();
+            if (null === $beteiligungsId || '' === trim($beteiligungsId)) {
+                continue;
+            }
+
+            $procedure = $this->procedureService->getProcedure(trim($beteiligungsId));
+            if (null !== $procedure) {
+                return $procedure;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Fallback used when the 0402 carries no beteiligungsID (XSD-allowed): the planID
+     * is mandatory in the 0402 and lets us resolve the procedure created during the 0401.
+     */
+    private function resolveByPlanId(BeteiligungKommunalType $beteiligungKommunal): ?ProcedureInterface
+    {
+        $planId = $beteiligungKommunal->getPlanID();
+        if (null === $planId || '' === trim($planId)) {
+            return null;
+        }
+        $planId = trim($planId);
+
+        // Primary: dedicated XBeteiligung cockpit mapping, written on 0401 ingress.
+        $procedureId = $this->procedurePhaseCodeDetector->findProcedureIdByPlanId($planId);
+        if (null !== $procedureId) {
+            $procedure = $this->procedureService->getProcedure($procedureId);
+            if (null !== $procedure) {
+                return $procedure;
+            }
+        }
+
+        // Fallback: planID persisted directly on the procedure (extern_id). Filled in the
+        // same transaction as the 0401 procedure creation, so it survives even when the
+        // subsequent cockpit-mapping write failed.
+        return $this->entityManager
+            ->getRepository(ProcedureInterface::class)
+            ->findOneBy(['xtaPlanId' => $planId, 'deleted' => false]);
     }
 
     private function updateProcedureData(
@@ -183,21 +234,28 @@ class KommunaleProcedureUpdater extends ProcedureCommonFeatures
         }
     }
 
-    private function buildErrorResponse(array $errorTypes, KommunalAktualisieren0402 $message): ResponseValue
-    {
+    private function buildErrorResponse(
+        array $errorTypes,
+        KommunalAktualisieren0402 $message,
+        ?string $procedureId = null
+    ): ResponseValue {
         return $this->kommunaleMessageFactory->buildProcedureUpdateErrorResponse422(
             $errorTypes,
-            $message
+            $message,
+            $procedureId
         );
     }
 
-    private function buildGenericErrorResponse(string $errorMessage, KommunalAktualisieren0402 $message): ResponseValue
-    {
+    private function buildGenericErrorResponse(
+        string $errorMessage,
+        KommunalAktualisieren0402 $message,
+        ?string $procedureId = null
+    ): ResponseValue {
         $errorTypes = [$this->getErrorType(
             XBeteiligungService::GENERIC_ERROR_CODE,
             $errorMessage
         )];
 
-        return $this->buildErrorResponse($errorTypes, $message);
+        return $this->buildErrorResponse($errorTypes, $message, $procedureId);
     }
 }
