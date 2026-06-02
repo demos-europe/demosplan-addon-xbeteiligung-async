@@ -111,7 +111,10 @@ class ProcedureMessageController extends APIController
             return $this->createEmptyResponse();
         }
 
-        $procedureMessages = $procedureMessageRepository->findBy(['requestCount' => 0]);
+        $procedureMessages = $procedureMessageRepository->findBy(
+            ['requestCount' => 0],
+            ['createdDate' => 'ASC']
+        );
         $responseData = [];
 
         /** @var ProcedureMessage $procedureMessage */
