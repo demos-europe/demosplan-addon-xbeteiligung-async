@@ -11,7 +11,7 @@ All rights reserved
   <component
     :is="demosplanUi.DpInput"
     id="phaseCode"
-    :class="{ '[&_input]:border-status-failed': hasAttemptedSubmit && addonPayload.isDuplicate }"
+    :invalid="hasAttemptedSubmit && addonPayload.isDuplicate"
     :label="{ text: Translator.trans('procedure.phase.code') }"
     :model-value="phaseCode"
     @update:model-value="handleCodeInput"
