@@ -4,6 +4,8 @@
 changelog_file="CHANGELOG.md"
 # Specify the composer.json file
 composer_file="composer.json"
+# Specify the package.json file
+package_file="package.json"
 
 # Specify the release version (you can pass this as an argument)
 release_version=$1
@@ -33,8 +35,11 @@ sed -i "/## UNRELEASED/a\\## $release_version ($current_date)" "$changelog_file"
 # Update the version in composer.json
 jq ".version = \"$release_version\"" "$composer_file" > tmpfile && mv tmpfile "$composer_file"
 
+# Update the version in package.json
+jq ".version = \"$release_version\"" "$package_file" > tmpfile && mv tmpfile "$package_file"
+
 # Add and commit the changes
-git add "$changelog_file" "$composer_file"
+git add "$changelog_file" "$composer_file" "$package_file"
 git commit -m "Prepare release $release_version"
 
 echo "Files updated and committed for version $release_version."
