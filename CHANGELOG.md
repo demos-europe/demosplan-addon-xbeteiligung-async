@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+
+## v0.73 (2026-06-12)
 - **feat DPLAN-17527**: Use the new prop for invalid input styling in DpInput
 
 ## v0.72 (2026-06-02)
