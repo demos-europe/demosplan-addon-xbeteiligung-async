@@ -1,7 +1,7 @@
 # Changelog
 
 ## UNRELEASED
-- **feat DPLAN-17527**: Use the new prop for invalid input styling in DpInput.
+- **feat DPLAN-17527**: Use the new prop for invalid input styling in DpInput
 
 ## v0.72 (2026-06-02)
 - **fix**: Return new procedure messages from `GET /api/new/procedure_message/ids` ordered by `createdDate` ascending. Previously `findBy` was called without an order, so rows came back in (random UUID) primary-key order, allowing K3 to fetch and process a later `0402` update before its preceding `0401` init for the same plan
