@@ -1,6 +1,6 @@
 {
   "name": "demosplan-addon-xbeteiligung-async",
-  "version": "v0.68",
+  "version": "v0.73",
   "description": "UI for demosplan-addon-xbeteiligung-async - a demosplan-core addon",
   "repository": "git@github.com:demos-europe/demosplan-addon-xbeteiligung-async",
   "license": "LicenseRef-LICENSE",
