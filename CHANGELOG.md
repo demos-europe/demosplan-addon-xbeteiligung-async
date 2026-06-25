@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+- **feat DPLAN-18064**: Add `XBeteiligungPhaseDefinitionCodeSubscriber` to automatically delete `XBeteiligungPhaseDefinitionCode` mappings when their linked `ProcedurePhaseDefinition` is soft-deleted
 
 ## v0.73 (2026-06-12)
 - **feat DPLAN-17527**: Use the new prop for invalid input styling in DpInput
