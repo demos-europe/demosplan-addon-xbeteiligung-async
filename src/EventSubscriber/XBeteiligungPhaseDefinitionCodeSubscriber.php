@@ -17,6 +17,10 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefiniti
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Cleans up XBeteiligungPhaseDefinitionCode mappings when a ProcedurePhaseDefinition
+ * is soft-deleted, ensuring no orphaned code mappings remain.
+ */
 class XBeteiligungPhaseDefinitionCodeSubscriber implements EventSubscriberInterface
 {
     public function __construct(
