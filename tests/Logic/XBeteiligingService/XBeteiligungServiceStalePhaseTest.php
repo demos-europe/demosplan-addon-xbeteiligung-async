@@ -24,6 +24,7 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
@@ -102,6 +103,7 @@ class XBeteiligungServiceStalePhaseTest extends TestCase
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
             $this->createMock(XBeteiligungAuditService::class),
+            new Din91379TextSanitizerService($this->createMock(LoggerInterface::class)),
             $this->createMock(XBeteiligungPhaseDefinitionCodeRepository::class),
         );
     }
