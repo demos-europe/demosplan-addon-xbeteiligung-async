@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.74 (2026-06-30)
 - **feat DPLAN-18064**: Add `XBeteiligungPhaseDefinitionCodeSubscriber` to automatically delete `XBeteiligungPhaseDefinitionCode` mappings when their linked `ProcedurePhaseDefinition` is soft-deleted
 
 ## v0.73 (2026-06-12)
