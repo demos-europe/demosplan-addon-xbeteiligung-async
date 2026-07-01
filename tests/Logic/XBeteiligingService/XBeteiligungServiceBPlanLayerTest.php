@@ -26,6 +26,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
@@ -106,6 +107,7 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
             $this->createMock(XBeteiligungAuditService::class),
+            new Din91379TextSanitizerService($this->createMock(LoggerInterface::class))
         );
     }
 

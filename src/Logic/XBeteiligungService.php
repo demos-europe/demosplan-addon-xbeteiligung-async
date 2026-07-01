@@ -110,6 +110,7 @@ class XBeteiligungService
         private readonly CommonHelpers                          $commonHelpers,
         private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
         private readonly XBeteiligungAuditService               $auditService,
+        private readonly Din91379TextSanitizerService           $textSanitizer,
     ) {
     }
 
@@ -383,7 +384,9 @@ class XBeteiligungService
 
     private function getExternalDescriptionOfProcedure(ProcedureInterface $procedure): string
     {
-        return str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''));
+        $description = str_replace('<br>', "\n", strip_tags($procedure->getExternalDesc() ?? ''));
+
+        return $this->textSanitizer->sanitize($description);
     }
 
     private function createTimeSpanOfProcedurePhase(ProcedurePhaseInterface $procedurePhase): ZeitraumType
@@ -406,7 +409,7 @@ class XBeteiligungService
             $this->createAkteurVorhabenType($procedure->getOrga()?->getName() ?? '')
         );
         $participationType->setPlanID($this->determinePlanId($procedure));
-        $participationType->setPlanname($procedure->getName());
+        $participationType->setPlanname($this->textSanitizer->sanitize($procedure->getName()));
         $participationType->setBeschreibungPlanungsanlass($this->getExternalDescriptionOfProcedure($procedure));
         $wmsUrl = $this->generateFaceBoundaryWMSUrl($procedure);
         if (null !== $wmsUrl) {
