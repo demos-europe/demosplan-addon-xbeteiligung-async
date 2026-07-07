@@ -13,19 +13,19 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\EventSubscriber;
 
 use DemosEurope\DemosplanAddon\Contracts\Events\ProcedurePhaseDefinitionMarkedAsDeletedEventInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeMappingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
- * Cleans up XBeteiligungPhaseDefinitionCode mappings when a ProcedurePhaseDefinition
+ * Cleans up XBeteiligungPhaseDefinitionCodeMapping mappings when a ProcedurePhaseDefinition
  * is soft-deleted, ensuring no orphaned code mappings remain.
  */
-class XBeteiligungPhaseDefinitionCodeSubscriber implements EventSubscriberInterface
+class XBeteiligungPhaseDefinitionCodeMappingSubscriber implements EventSubscriberInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
-        private readonly XBeteiligungPhaseDefinitionCodeRepository $repository,
+        private readonly XBeteiligungPhaseDefinitionCodeMappingRepository $repository,
     ) {
     }
 
@@ -38,9 +38,9 @@ class XBeteiligungPhaseDefinitionCodeSubscriber implements EventSubscriberInterf
 
     public function onPhaseDefinitionMarkedAsDeleted(ProcedurePhaseDefinitionMarkedAsDeletedEventInterface $event): void
     {
-        $code = $this->repository->findOneByPhaseDefinition($event->getPhaseDefinition());
-        if (null !== $code) {
-            $this->entityManager->remove($code);
+        $mapping = $this->repository->findOneByPhaseDefinition($event->getPhaseDefinition());
+        if (null !== $mapping) {
+            $this->entityManager->remove($mapping);
         }
     }
 }

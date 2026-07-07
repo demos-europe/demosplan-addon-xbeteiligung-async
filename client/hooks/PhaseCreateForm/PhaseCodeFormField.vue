@@ -58,11 +58,11 @@ export default {
 
       return {
         attributes: {
-          code: trimmedCode,
+          xBeteiligungStandardCode: trimmedCode,
         },
         isDuplicate: isDuplicateCode(trimmedCode, null),
         parentRelationshipName: 'phaseDefinition',
-        resourceType: 'XBeteiligungPhaseDefinitionCode',
+        resourceType: 'XBeteiligungPhaseDefinitionCodeMapping',
         value: trimmedCode,
       }
     },

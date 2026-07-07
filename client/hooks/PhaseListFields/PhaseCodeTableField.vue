@@ -99,13 +99,13 @@ export default {
 
       return {
         attributes: {
-          code: trimmedCode,
+          xBeteiligungStandardCode: trimmedCode,
         },
         isDuplicate: isDuplicateCode(trimmedCode, this.currentResourceId),
         parentRelationshipName: 'phaseDefinition',
         phaseId: this.phaseId,
         resourceId: this.currentResourceId,
-        resourceType: 'XBeteiligungPhaseDefinitionCode',
+        resourceType: 'XBeteiligungPhaseDefinitionCodeMapping',
         value: trimmedCode,
       }
     },

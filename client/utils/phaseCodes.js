@@ -20,9 +20,9 @@ export function fetchAllPhaseCodes (dpApi) {
   }
 
   const url = Routing.generate('api_resource_list', {
-    resourceType: 'XBeteiligungPhaseDefinitionCode',
+    resourceType: 'XBeteiligungPhaseDefinitionCodeMapping',
     fields: {
-      XBeteiligungPhaseDefinitionCode: ['code', 'phaseDefinition'].join(','),
+      XBeteiligungPhaseDefinitionCodeMapping: ['xBeteiligungStandardCode', 'phaseDefinition'].join(','),
     },
     include: 'phaseDefinition',
   })
@@ -33,7 +33,7 @@ export function fetchAllPhaseCodes (dpApi) {
         const phaseId = item.relationships?.phaseDefinition?.data?.id
         if (phaseId) {
           phaseCodesByPhaseId[phaseId] = {
-            code: item.attributes.code,
+            code: item.attributes.xBeteiligungStandardCode,
             resourceId: item.id,
           }
         }

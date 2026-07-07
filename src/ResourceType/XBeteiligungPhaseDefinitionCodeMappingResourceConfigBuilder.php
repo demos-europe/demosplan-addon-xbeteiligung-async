@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\ResourceType;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCode;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCodeMapping;
 use EDT\DqlQuerying\Contracts\ClauseFunctionInterface;
 use EDT\DqlQuerying\Contracts\OrderBySortMethodInterface;
 use EDT\JsonApi\PropertyConfig\Builder\AttributeConfigBuilderInterface;
@@ -21,11 +21,11 @@ use EDT\JsonApi\PropertyConfig\Builder\ToOneRelationshipConfigBuilderInterface;
 use EDT\JsonApi\ResourceConfig\Builder\MagicResourceConfigBuilder;
 
 /**
- * @template-extends MagicResourceConfigBuilder<ClauseFunctionInterface<bool>, OrderBySortMethodInterface, XBeteiligungPhaseDefinitionCode>
+ * @template-extends MagicResourceConfigBuilder<ClauseFunctionInterface<bool>, OrderBySortMethodInterface, XBeteiligungPhaseDefinitionCodeMapping>
  *
- * @property-read AttributeConfigBuilderInterface<ClauseFunctionInterface<bool>, XBeteiligungPhaseDefinitionCode> $code
- * @property-read ToOneRelationshipConfigBuilderInterface<ClauseFunctionInterface<bool>, OrderBySortMethodInterface, XBeteiligungPhaseDefinitionCode, ProcedurePhaseDefinitionInterface> $phaseDefinition
+ * @property-read AttributeConfigBuilderInterface<ClauseFunctionInterface<bool>, XBeteiligungPhaseDefinitionCodeMapping> $xBeteiligungStandardCode
+ * @property-read ToOneRelationshipConfigBuilderInterface<ClauseFunctionInterface<bool>, OrderBySortMethodInterface, XBeteiligungPhaseDefinitionCodeMapping, ProcedurePhaseDefinitionInterface> $phaseDefinition
  */
-class XBeteiligungPhaseDefinitionCodeResourceConfigBuilder extends MagicResourceConfigBuilder
+class XBeteiligungPhaseDefinitionCodeMappingResourceConfigBuilder extends MagicResourceConfigBuilder
 {
 }

@@ -16,7 +16,7 @@ use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UuidEntityInterface;
 use DemosEurope\DemosplanAddon\Doctrine\Generator\UuidV4Generator;
-use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeMappingRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -30,9 +30,9 @@ use Gedmo\Mapping\Annotation as Gedmo;
  * The constraint is one code per phase definition (unique on phase_definition_id).
  * Filtering by customer and audience is done via the linked ProcedurePhaseDefinition entity.
  */
-#[ORM\Entity(repositoryClass: XBeteiligungPhaseDefinitionCodeRepository::class)]
-#[ORM\Table(name: 'xbeteiligung_phase_definition_code')]
-class XBeteiligungPhaseDefinitionCode implements UuidEntityInterface
+#[ORM\Entity(repositoryClass: XBeteiligungPhaseDefinitionCodeMappingRepository::class)]
+#[ORM\Table(name: 'xbeteiligung_phase_definition_code_mapping')]
+class XBeteiligungPhaseDefinitionCodeMapping implements UuidEntityInterface
 {
     #[ORM\Column(type: 'string', length: 36, nullable: false, options: ['fixed' => true])]
     #[ORM\Id]
@@ -41,8 +41,8 @@ class XBeteiligungPhaseDefinitionCode implements UuidEntityInterface
     private ?string $id = null;
 
     /** XBeteiligung Verfahrensschritt code */
-    #[ORM\Column(name: 'code', type: 'string', length: 100, nullable: false)]
-    private string $code;
+    #[ORM\Column(name: 'xbeteiligung_standard_code', type: 'string', length: 100, nullable: false)]
+    private string $xBeteiligungStandardCode;
 
     #[ORM\ManyToOne(targetEntity: ProcedurePhaseDefinitionInterface::class)]
     #[ORM\JoinColumn(name: 'phase_definition_id', referencedColumnName: 'id', nullable: false, unique: true)]
@@ -61,14 +61,14 @@ class XBeteiligungPhaseDefinitionCode implements UuidEntityInterface
         return $this->id;
     }
 
-    public function getCode(): string
+    public function getXBeteiligungStandardCode(): string
     {
-        return $this->code;
+        return $this->xBeteiligungStandardCode;
     }
 
-    public function setCode(string $code): self
+    public function setXBeteiligungStandardCode(string $xBeteiligungStandardCode): self
     {
-        $this->code = $code;
+        $this->xBeteiligungStandardCode = $xBeteiligungStandardCode;
 
         return $this;
     }
