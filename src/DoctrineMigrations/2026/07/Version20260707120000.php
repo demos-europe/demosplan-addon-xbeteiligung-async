@@ -28,8 +28,19 @@ final class Version20260707120000 extends AbstractMigration
     {
         $this->abortIfNotMysql();
 
-        if ($schema->hasTable(self::OLD_TABLE) && !$schema->hasTable(self::NEW_TABLE)) {
+        // $schema is a snapshot taken before this method runs, so it never reflects
+        // SQL queued earlier in the same call — both statements must be decided
+        // from that one snapshot instead of chaining on each other's result.
+        if ($schema->hasTable(self::OLD_TABLE)) {
             $this->addSql(sprintf('RENAME TABLE %s TO %s', self::OLD_TABLE, self::NEW_TABLE));
+            $this->addSql(sprintf(
+                'ALTER TABLE %s CHANGE %s %s VARCHAR(100) NOT NULL',
+                self::NEW_TABLE,
+                self::OLD_COLUMN,
+                self::NEW_COLUMN
+            ));
+
+            return;
         }
 
         if ($schema->hasTable(self::NEW_TABLE) && $schema->getTable(self::NEW_TABLE)->hasColumn(self::OLD_COLUMN)) {
@@ -49,7 +60,11 @@ final class Version20260707120000 extends AbstractMigration
     {
         $this->abortIfNotMysql();
 
-        if ($schema->hasTable(self::NEW_TABLE) && $schema->getTable(self::NEW_TABLE)->hasColumn(self::NEW_COLUMN)) {
+        if (!$schema->hasTable(self::NEW_TABLE)) {
+            return;
+        }
+
+        if ($schema->getTable(self::NEW_TABLE)->hasColumn(self::NEW_COLUMN)) {
             $this->addSql(sprintf(
                 'ALTER TABLE %s CHANGE %s %s VARCHAR(100) NOT NULL',
                 self::NEW_TABLE,
@@ -58,9 +73,7 @@ final class Version20260707120000 extends AbstractMigration
             ));
         }
 
-        if ($schema->hasTable(self::NEW_TABLE) && !$schema->hasTable(self::OLD_TABLE)) {
-            $this->addSql(sprintf('RENAME TABLE %s TO %s', self::NEW_TABLE, self::OLD_TABLE));
-        }
+        $this->addSql(sprintf('RENAME TABLE %s TO %s', self::NEW_TABLE, self::OLD_TABLE));
     }
 
     /**
