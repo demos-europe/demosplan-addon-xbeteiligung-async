@@ -56,6 +56,8 @@ final class Version20260708134926 extends AbstractMigration
             $this->addSql(sprintf('ALTER TABLE %s DROP FOREIGN KEY FK_20D12CF58EFDFE33', self::OLD_TABLE));
             $this->addSql(sprintf('DROP TABLE %s', self::OLD_TABLE));
         }
+
+        $this->insertMappingsForUnmappedPhaseDefinitions();
     }
 
     /**
@@ -159,6 +161,30 @@ final class Version20260708134926 extends AbstractMigration
         ");
     }
 
+    /**
+     * Every procedure phase definition needs a mapping row, not just the ones a
+     * mandant-admin had previously configured a Verfahrensschritt code for —
+     * backfills the rest with no XBeteiligung code and DCAT "unknown".
+     */
+    private function insertMappingsForUnmappedPhaseDefinitions(): void
+    {
+        $this->addSql("
+            INSERT INTO xbeteiligung_phase_definition_code_mapping (
+                id, dcat_ap_plu_standard_code_id, phase_definition_id, xbeteiligung_standard_code, created_at, modified_at
+            )
+            SELECT
+                UUID(),
+                (SELECT id FROM xbeteiligung_dcat_ap_plu_standard_code WHERE code = 'unknown'),
+                pd.id,
+                NULL,
+                NOW(),
+                NOW()
+            FROM procedure_phase_definition pd
+            LEFT JOIN xbeteiligung_phase_definition_code_mapping m ON m.phase_definition_id = pd.id
+            WHERE pd.is_deleted = 0 AND m.id IS NULL
+        ");
+    }
+
     private function addConstraintsToMappingTable(): void
     {
         $this->addSql('
@@ -181,14 +207,11 @@ final class Version20260708134926 extends AbstractMigration
 
     private function createOldTable(): void
     {
-        // code is nullable here (unlike the original shipped version of this table) so
-        // rows created after xbeteiligung_standard_code became nullable can still be
-        // copied back by copyRowsIntoOldTable() below.
         $this->addSql('
             CREATE TABLE xbeteiligung_phase_definition_code (
                 id CHAR(36) NOT NULL,
                 phase_definition_id CHAR(36) NOT NULL,
-                code VARCHAR(100) DEFAULT NULL,
+                code VARCHAR(100) NOT NULL,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
                 modified_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
                 UNIQUE INDEX UNIQ_20D12CF58EFDFE33 (phase_definition_id),
@@ -197,12 +220,19 @@ final class Version20260708134926 extends AbstractMigration
         ');
     }
 
+    /**
+     * Only carries back rows that trace to an original xbeteiligung_phase_definition_code
+     * entry (identifiable by having a code at all) — excludes the rows
+     * insertMappingsForUnmappedPhaseDefinitions() backfilled for phase definitions that
+     * never had a row in that table to begin with.
+     */
     private function copyRowsIntoOldTable(): void
     {
         $this->addSql('
             INSERT INTO xbeteiligung_phase_definition_code (id, phase_definition_id, code, created_at, modified_at)
             SELECT id, phase_definition_id, xbeteiligung_standard_code, created_at, modified_at
             FROM xbeteiligung_phase_definition_code_mapping
+            WHERE xbeteiligung_standard_code IS NOT NULL
         ');
     }
 

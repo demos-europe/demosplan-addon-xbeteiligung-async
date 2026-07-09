@@ -5,6 +5,7 @@
   - Rename it to `XBeteiligungPhaseDefinitionCodeMapping` (field `code` → nullable `xBeteiligungStandardCode`)
   - Add a required `dcatApPluStandardCode` relationship to a new read-only `XBeteiligungDcatApPluStandardCode` lookup entity
   - Seed the 7 fixed DCAT-AP-PLU codes; default existing rows to "unknown"
+  - Backfill a mapping row (no XBeteiligung code, DCAT "unknown") for every procedure phase definition that doesn't have one yet
   - Disable DELETE on the `XBeteiligungPhaseDefinitionCodeMapping` resource type
 
 ## v0.74 (2026-06-30)
