@@ -1,7 +1,11 @@
 # Changelog
 
 ## UNRELEASED
-- **refactor DPLAN-18120**: Rename `XBeteiligungPhaseDefinitionCode` entity/repository/resource type to `XBeteiligungPhaseDefinitionCodeMapping` and its `code` field to `xBeteiligungStandardCode`, ahead of adding a DCAT-AP-PLU code mapping to the same table. Migration `Version20260707120000` renames the table/column in place, preserving existing mandant-admin-configured mappings
+- **feat DPLAN-18120**: Add DCAT-AP-PLU code mapping to `XBeteiligungPhaseDefinitionCode`
+  - Rename it to `XBeteiligungPhaseDefinitionCodeMapping` (field `code` → nullable `xBeteiligungStandardCode`)
+  - Add a required `dcatApPluStandardCode` relationship to a new read-only `XBeteiligungDcatApPluStandardCode` lookup entity
+  - Seed the 7 fixed DCAT-AP-PLU codes; default existing rows to "unknown"
+  - Disable DELETE on the `XBeteiligungPhaseDefinitionCodeMapping` resource type
 
 ## v0.74 (2026-06-30)
 - **feat DPLAN-18064**: Add `XBeteiligungPhaseDefinitionCodeSubscriber` to automatically delete `XBeteiligungPhaseDefinitionCode` mappings when their linked `ProcedurePhaseDefinition` is soft-deleted

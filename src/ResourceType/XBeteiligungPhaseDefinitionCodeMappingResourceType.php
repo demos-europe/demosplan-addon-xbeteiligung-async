@@ -38,6 +38,7 @@ class XBeteiligungPhaseDefinitionCodeMappingResourceType extends AddonResourceTy
         private readonly ConditionFactoryInterface $conditionFactory,
         private readonly CurrentContextProviderInterface $currentContextProvider,
         private readonly ProcedurePhaseDefinitionResourceTypeInterface $phaseDefinitionResourceType,
+        private readonly XBeteiligungDcatApPluStandardCodeResourceType $dcatApPluStandardCodeResourceType,
     ) {
     }
 
@@ -86,6 +87,13 @@ class XBeteiligungPhaseDefinitionCodeMappingResourceType extends AddonResourceTy
             ->addPathUpdateBehavior()
             ->addPathCreationBehavior();
 
+        $configBuilder->dcatApPluStandardCode
+            ->setRelationshipType($this->dcatApPluStandardCodeResourceType)
+            ->setReadableByPath()
+            ->setFilterable()
+            ->addPathUpdateBehavior()
+            ->addPathCreationBehavior();
+
         $configBuilder->phaseDefinition
             ->setRelationshipType($this->phaseDefinitionResourceType)
             ->setReadableByPath()
@@ -125,6 +133,6 @@ class XBeteiligungPhaseDefinitionCodeMappingResourceType extends AddonResourceTy
 
     public function isDeleteAllowed(): bool
     {
-        return $this->isAvailable();
+        return false;
     }
 }

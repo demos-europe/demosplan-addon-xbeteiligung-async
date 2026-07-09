@@ -41,8 +41,12 @@ class XBeteiligungPhaseDefinitionCodeMapping implements UuidEntityInterface
     private ?string $id = null;
 
     /** XBeteiligung Verfahrensschritt code */
-    #[ORM\Column(name: 'xbeteiligung_standard_code', type: 'string', length: 100, nullable: false)]
-    private string $xBeteiligungStandardCode;
+    #[ORM\Column(name: 'xbeteiligung_standard_code', type: 'string', length: 100, nullable: true)]
+    private ?string $xBeteiligungStandardCode = null;
+
+    #[ORM\ManyToOne(targetEntity: XBeteiligungDcatApPluStandardCode::class)]
+    #[ORM\JoinColumn(name: 'dcat_ap_plu_standard_code_id', referencedColumnName: 'id', nullable: false)]
+    private XBeteiligungDcatApPluStandardCode $dcatApPluStandardCode;
 
     #[ORM\ManyToOne(targetEntity: ProcedurePhaseDefinitionInterface::class)]
     #[ORM\JoinColumn(name: 'phase_definition_id', referencedColumnName: 'id', nullable: false, unique: true)]
@@ -61,14 +65,26 @@ class XBeteiligungPhaseDefinitionCodeMapping implements UuidEntityInterface
         return $this->id;
     }
 
-    public function getXBeteiligungStandardCode(): string
+    public function getXBeteiligungStandardCode(): ?string
     {
         return $this->xBeteiligungStandardCode;
     }
 
-    public function setXBeteiligungStandardCode(string $xBeteiligungStandardCode): self
+    public function setXBeteiligungStandardCode(?string $xBeteiligungStandardCode): self
     {
         $this->xBeteiligungStandardCode = $xBeteiligungStandardCode;
+
+        return $this;
+    }
+
+    public function getDcatApPluStandardCode(): XBeteiligungDcatApPluStandardCode
+    {
+        return $this->dcatApPluStandardCode;
+    }
+
+    public function setDcatApPluStandardCode(XBeteiligungDcatApPluStandardCode $dcatApPluStandardCode): self
+    {
+        $this->dcatApPluStandardCode = $dcatApPluStandardCode;
 
         return $this;
     }
