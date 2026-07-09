@@ -23,6 +23,7 @@ use EDT\JsonApi\ResourceConfig\Builder\MagicResourceConfigBuilder;
  *
  * @property-read AttributeConfigBuilderInterface<ClauseFunctionInterface<bool>, XBeteiligungDcatApPluStandardCode> $code
  * @property-read AttributeConfigBuilderInterface<ClauseFunctionInterface<bool>, XBeteiligungDcatApPluStandardCode> $description
+ * @property-read AttributeConfigBuilderInterface<ClauseFunctionInterface<bool>, XBeteiligungDcatApPluStandardCode> $sortOrder
  */
 class XBeteiligungDcatApPluStandardCodeResourceConfigBuilder extends MagicResourceConfigBuilder
 {

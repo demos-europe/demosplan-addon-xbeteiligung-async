@@ -106,18 +106,23 @@ final class Version20260708134926 extends AbstractMigration
                 id CHAR(36) NOT NULL,
                 code VARCHAR(100) NOT NULL,
                 description VARCHAR(255) NOT NULL,
+                sort_order INT NOT NULL,
                 UNIQUE INDEX UNIQ_C090E3A277153098 (code),
                 PRIMARY KEY(id)
             ) DEFAULT CHARACTER SET UTF8 COLLATE `UTF8_unicode_ci` ENGINE = InnoDB
         ');
 
+        // DCAT_CODES is listed in the order the ticket's codelist defines — array
+        // position becomes sort_order, so the FE dropdown matches it without hardcoding.
+        $sortOrder = 0;
         foreach (self::DCAT_CODES as $code => $description) {
             $this->addSql(sprintf(
-                "INSERT INTO xbeteiligung_dcat_ap_plu_standard_code (id, code, description)
-                 VALUES ('%s', '%s', '%s')",
+                "INSERT INTO xbeteiligung_dcat_ap_plu_standard_code (id, code, description, sort_order)
+                 VALUES ('%s', '%s', '%s', %d)",
                 Uuid::uuid4()->toString(),
                 $code,
-                $description
+                $description,
+                $sortOrder++
             ));
         }
     }
