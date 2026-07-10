@@ -63,4 +63,6 @@ services:
 
     DemosEurope\DemosplanAddon\XBeteiligung\ResourceType\XBeteiligungDcatApPluStandardCodeResourceType:
         autowire: true
+        arguments:
+            $sortMethodFactory: '@EDT\DqlQuerying\SortMethodFactories\SortMethodFactory'
         tags: [ 'dplan.resourceType' ]

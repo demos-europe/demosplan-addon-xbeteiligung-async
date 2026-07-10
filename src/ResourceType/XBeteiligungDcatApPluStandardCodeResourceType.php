@@ -18,6 +18,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungDcatApPluStandard
 use EDT\DqlQuerying\Contracts\ClauseFunctionInterface;
 use EDT\DqlQuerying\Contracts\OrderBySortMethodInterface;
 use EDT\JsonApi\ResourceConfig\Builder\ResourceConfigBuilderInterface;
+use EDT\Querying\Contracts\SortMethodFactoryInterface;
 
 /**
  * Read-only: the DCAT-AP-PLU codelist is fixed and seeded via migration, not admin-editable.
@@ -26,9 +27,21 @@ use EDT\JsonApi\ResourceConfig\Builder\ResourceConfigBuilderInterface;
  */
 class XBeteiligungDcatApPluStandardCodeResourceType extends AddonResourceType
 {
+    /**
+     * @param SortMethodFactoryInterface<OrderBySortMethodInterface> $sortMethodFactory
+     */
     public function __construct(
         private readonly PermissionEvaluatorInterface $permissionEvaluator,
+        private readonly SortMethodFactoryInterface $sortMethodFactory,
     ) {
+    }
+
+    /**
+     * @return list<OrderBySortMethodInterface>
+     */
+    public function getDefaultSortMethods(): array
+    {
+        return [$this->sortMethodFactory->propertyAscending('sortOrder')];
     }
 
     public function getTypeName(): string
@@ -71,6 +84,10 @@ class XBeteiligungDcatApPluStandardCodeResourceType extends AddonResourceType
 
         $configBuilder->description
             ->setReadableByPath();
+
+        $configBuilder->sortOrder
+            ->setReadableByPath()
+            ->setFilterable();
 
         return $configBuilder;
     }

@@ -40,6 +40,10 @@ class XBeteiligungDcatApPluStandardCode implements UuidEntityInterface
     #[ORM\Column(name: 'description', type: 'string', length: 255, nullable: false)]
     private string $description;
 
+    /** Fixed display order matching the DCAT-AP-PLU codelist as defined in the ticket. */
+    #[ORM\Column(name: 'sort_order', type: 'integer', nullable: false)]
+    private int $sortOrder;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -65,6 +69,18 @@ class XBeteiligungDcatApPluStandardCode implements UuidEntityInterface
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getSortOrder(): int
+    {
+        return $this->sortOrder;
+    }
+
+    public function setSortOrder(int $sortOrder): self
+    {
+        $this->sortOrder = $sortOrder;
 
         return $this;
     }
