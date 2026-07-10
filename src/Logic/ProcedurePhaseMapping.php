@@ -24,8 +24,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ProcedureMessageTyp;
  * is used for both Kommunal public and Raumordnung institution phases), which is
  * why the mappings are split by procedure type and participation audience.
  *
- * Phases without a historical code mapping receive the placeholder code '0815'
- * (matching XBeteiligungService::PLACEHOLDER_PROCEDURE_PHASE_CODE).
+ * Phases without a historical code mapping receive the placeholder code '0815'.
+ * If a phase name has no entry here at all, XBeteiligungService falls back to
+ * XBeteiligungDcatApPluStandardCode::CODE_UNKNOWN instead.
  */
 class ProcedurePhaseMapping
 {

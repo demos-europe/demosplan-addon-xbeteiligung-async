@@ -28,6 +28,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'xbeteiligung_dcat_ap_plu_standard_code')]
 class XBeteiligungDcatApPluStandardCode implements UuidEntityInterface
 {
+    /** Default value for phase definitions not yet classified — signals callers to fall back. */
+    public const CODE_UNKNOWN = 'unknown';
+
     #[ORM\Column(type: 'string', length: 36, nullable: false, options: ['fixed' => true])]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -59,6 +62,11 @@ class XBeteiligungDcatApPluStandardCode implements UuidEntityInterface
         $this->code = $code;
 
         return $this;
+    }
+
+    public function isUnknown(): bool
+    {
+        return self::CODE_UNKNOWN === $this->code;
     }
 
     public function getDescription(): string

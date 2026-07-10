@@ -89,6 +89,15 @@ class XBeteiligungPhaseDefinitionCodeMapping implements UuidEntityInterface
         return $this;
     }
 
+    /**
+     * The DCAT-AP-PLU code to use for outgoing K3 messages, or null if this phase definition
+     * hasn't been classified yet (DCAT code still "unknown") — callers fall back accordingly.
+     */
+    public function getEffectiveDcatCode(): ?string
+    {
+        return $this->dcatApPluStandardCode->isUnknown() ? null : $this->dcatApPluStandardCode->getCode();
+    }
+
     public function getPhaseDefinition(): ProcedurePhaseDefinitionInterface
     {
         return $this->phaseDefinition;

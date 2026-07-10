@@ -32,6 +32,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessageParser;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeMappingRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -106,6 +107,7 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
             $this->createMock(XBeteiligungAuditService::class),
+            $this->createMock(XBeteiligungPhaseDefinitionCodeMappingRepository::class),
         );
     }
 
