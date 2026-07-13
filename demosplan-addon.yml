@@ -9,7 +9,7 @@ demosplan_addon:
     manifest: dist/assets-manifest.json
     hooks:
         phase.create.form:
-            entry: PhaseCodeFormField
+            entry: XBeteiligungCreateFormFields
         phase.list.fields:
             entry: PhaseCodeTableField
 
