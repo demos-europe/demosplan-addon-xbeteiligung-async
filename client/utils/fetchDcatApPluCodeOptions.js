@@ -1,13 +1,13 @@
 /*
  * The DCAT-AP-PLU codelist is a fixed, read-only set of 7 rows seeded via
  * migration — it never changes at runtime, so the cache never needs
- * invalidating. Shared between the portal-phase cell and
- * the create-form field.
+ * invalidating. Shared between the portal-phase table cell and
+ * the create-form field for portal-phase.
  */
 let cachedOptions = null
 let requestInProgress = null
 
-export function fetchDcatApPluStandardCodes (dpApi) {
+export function fetchDcatApPluCodeOptions (dpApi) {
   if (cachedOptions !== null) {
     return Promise.resolve(cachedOptions)
   }
