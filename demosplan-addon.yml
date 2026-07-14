@@ -11,5 +11,5 @@ demosplan_addon:
         phase.create.form:
             entry: XBeteiligungCreateFormFields
         phase.list.fields:
-            entry: PhaseCodeTableField
+            entry: XBeteiligungTableFields
 

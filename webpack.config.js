@@ -7,8 +7,8 @@ const config = DemosPlanAddon.build(
     XBeteiligungCreateFormFields: DemosPlanAddon.resolve(
       'client/hooks/PhaseCreateForm/XBeteiligungCreateFormFields.vue'
     ),
-    PhaseCodeTableField: DemosPlanAddon.resolve(
-      'client/hooks/PhaseListFields/PhaseCodeTableField.vue'
+    XBeteiligungTableFields: DemosPlanAddon.resolve(
+      'client/hooks/PhaseListFields/XBeteiligungTableFields.vue'
     ),
   }
 )
