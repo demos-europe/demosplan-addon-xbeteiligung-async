@@ -44,6 +44,7 @@ All rights reserved
 import { handleFetchError } from '../../utils/handleFetchError'
 import {
   fetchAllPhaseMappings,
+  invalidatePhaseMappingCache,
   isCockpitCodeDuplicate,
   trimCockpitCodeOrNull,
   updateCachedPhaseMapping,
@@ -122,6 +123,14 @@ export default {
   watch: {
     isEditing (newValue) {
       if (newValue) {
+        /*
+         * Invalidate cache and reload mapping to avoid stale cache after code deletion
+         * (so that the deleted value passes the duplicate check and may be reused)
+         */
+        invalidatePhaseMappingCache()
+        fetchAllPhaseMappings(this.demosplanUi.dpApi)
+          .catch(err => handleFetchError(err, this.demosplanUi))
+
         initDraft(this.phaseId, this.currentMapping)
         this.phaseCodeDraft = this.currentMapping?.xBeteiligungStandardCode || ''
         this.$emit('addonEvent:emit', {
