@@ -20,8 +20,4 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungDcatApPluStandard
  */
 class XBeteiligungDcatApPluStandardCodeRepository extends FluentRepository
 {
-    public function findOneByCode(string $code): ?XBeteiligungDcatApPluStandardCode
-    {
-        return $this->findOneBy(['code' => $code]);
-    }
 }
