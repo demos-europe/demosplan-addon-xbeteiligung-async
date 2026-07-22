@@ -125,11 +125,17 @@ export default {
       if (newValue) {
         /*
          * Invalidate cache and reload mapping to avoid stale cache after code deletion
-         * (so that the deleted value passes the duplicate check and may be reused)
+         * (so that the deleted value passes the duplicate check and may be reused).
+         * Gate the input behind isLoading until the reload resolves, so isDuplicate
+         * can never be checked against the still-empty cache.
          */
+        this.isLoading = true
         invalidatePhaseMappingCache()
         fetchAllPhaseMappings(this.demosplanUi.dpApi)
           .catch(err => handleFetchError(err, this.demosplanUi))
+          .finally(() => {
+            this.isLoading = false
+          })
 
         initDraft(this.phaseId, this.currentMapping)
         this.phaseCodeDraft = this.currentMapping?.xBeteiligungStandardCode || ''
