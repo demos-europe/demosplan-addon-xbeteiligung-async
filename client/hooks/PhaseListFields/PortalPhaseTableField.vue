@@ -52,11 +52,6 @@ export default {
       required: true,
     },
 
-    hasAttemptedSubmit: {
-      type: Boolean,
-      default: false,
-    },
-
     isEditing: {
       type: Boolean,
       default: false,
