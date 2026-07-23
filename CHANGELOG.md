@@ -9,6 +9,9 @@
   - Backfill a mapping row (no XBeteiligung code, DCAT "unknown") for every procedure phase definition that doesn't have one yet
   - Disable DELETE on the `XBeteiligungPhaseDefinitionCodeMapping` resource type
   - Send the configured DCAT-AP-PLU code to K3 as the phase's `<code>` instead of the hardcoded `ProcedurePhaseMapping` value, unless it's still "unknown" — then fall back to the hardcoded mapping, and to "unknown" itself if that has no entry either (replacing the old `0815` placeholder)
+  - FE: Add a dropdown for the DCAT-AP-PLU phase in the phase create form (required field)
+  - FE: Add DCAT-AP-PLU phase column in the phase list table, make value editable
+  - FE: Rewrite DELETE request to PATCH
 
 ## v0.74 (2026-06-30)
 - **feat DPLAN-18064**: Add `XBeteiligungPhaseDefinitionCodeSubscriber` to automatically delete `XBeteiligungPhaseDefinitionCode` mappings when their linked `ProcedurePhaseDefinition` is soft-deleted
