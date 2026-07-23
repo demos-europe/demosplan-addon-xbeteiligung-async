@@ -31,14 +31,17 @@ use JsonException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungDcatApPluStandardCode;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeMappingRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\NameOrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\OrganisationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AkteurVorhabenType;
@@ -82,7 +85,6 @@ class XBeteiligungService
     private const WMS_DEFAULT_WIDTH = 512;
     private const DIMENSION_WIDTH = 'width';
     private const DIMENSION_HEIGHT = 'height';
-    private const PLACEHOLDER_PROCEDURE_PHASE_CODE = '0815';
     public const STANDARD = 'XBeteiligung';
     public const STANDARD_VERSION = '1.2';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
@@ -110,6 +112,7 @@ class XBeteiligungService
         private readonly CommonHelpers                          $commonHelpers,
         private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
         private readonly XBeteiligungAuditService               $auditService,
+        private readonly XBeteiligungPhaseDefinitionCodeMappingRepository $phaseDefinitionCodeMappingRepository,
     ) {
     }
 
@@ -1003,10 +1006,16 @@ class XBeteiligungService
         string $procedureId
     ): string {
         $definition = $phaseObject->getPhaseDefinition();
+
+        $configuredCode = $this->getConfiguredDcatCode($definition);
+        if (null !== $configuredCode) {
+            return $configuredCode;
+        }
+
         $phaseName = $definition->getName();
         $code = ProcedurePhaseMapping::getPhaseCode($procedureType, $participationType, $phaseName);
         if (null === $code) {
-            $this->logger->warning('XBeteiligung: No code mapping for phase definition, falling back to placeholder', [
+            $this->logger->warning('XBeteiligung: No code mapping for phase definition, falling back to DCAT "unknown" code', [
                 'phaseDefinitionId'  => $definition->getId() ?? '',
                 'phaseDefinitionName'=> $phaseName,
                 'procedureType'      => $procedureType->value,
@@ -1014,10 +1023,21 @@ class XBeteiligungService
                 'procedureId'        => $procedureId,
             ]);
 
-            return self::PLACEHOLDER_PROCEDURE_PHASE_CODE;
+            return XBeteiligungDcatApPluStandardCode::CODE_UNKNOWN;
         }
 
         return $code;
+    }
+
+    /**
+     * DPLAN-18120: the mandant-configured DCAT-AP-PLU code takes priority over the hardcoded
+     * ProcedurePhaseMapping lookup, unless the phase definition hasn't been classified yet.
+     */
+    private function getConfiguredDcatCode(ProcedurePhaseDefinitionInterface $definition): ?string
+    {
+        return $this->phaseDefinitionCodeMappingRepository
+            ->findOneByPhaseDefinition($definition)
+            ?->getEffectiveDcatCode();
     }
 
     private function getInstitutionNewsList(ProcedureInterface $procedure): array

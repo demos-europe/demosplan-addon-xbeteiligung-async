@@ -43,16 +43,26 @@ services:
         arguments:
             $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungFileMapping'
 
-    DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeRepository:
+    DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeMappingRepository:
         arguments:
-            $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCode'
+            $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCodeMapping'
 
     DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseCockpitRepository:
         arguments:
             $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedurePhaseCockpit'
 
-    DemosEurope\DemosplanAddon\XBeteiligung\ResourceType\XBeteiligungPhaseDefinitionCodeResourceType:
+    DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungDcatApPluStandardCodeRepository:
+        arguments:
+            $entityClass: 'DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungDcatApPluStandardCode'
+
+    DemosEurope\DemosplanAddon\XBeteiligung\ResourceType\XBeteiligungPhaseDefinitionCodeMappingResourceType:
         autowire: true
         arguments:
             $conditionFactory: '@EDT\DqlQuerying\ConditionFactories\DqlConditionFactory'
+        tags: [ 'dplan.resourceType' ]
+
+    DemosEurope\DemosplanAddon\XBeteiligung\ResourceType\XBeteiligungDcatApPluStandardCodeResourceType:
+        autowire: true
+        arguments:
+            $sortMethodFactory: '@EDT\DqlQuerying\SortMethodFactories\SortMethodFactory'
         tags: [ 'dplan.resourceType' ]

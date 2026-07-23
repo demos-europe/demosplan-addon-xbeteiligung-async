@@ -14,30 +14,30 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Repository;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
 use DemosEurope\DemosplanAddon\Logic\ApiRequest\FluentRepository;
-use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCode;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCodeMapping;
 
 /**
- * @template-extends FluentRepository<XBeteiligungPhaseDefinitionCode>
+ * @template-extends FluentRepository<XBeteiligungPhaseDefinitionCodeMapping>
  */
-class XBeteiligungPhaseDefinitionCodeRepository extends FluentRepository
+class XBeteiligungPhaseDefinitionCodeMappingRepository extends FluentRepository
 {
     /**
      * Returns all code mappings for the given XBeteiligung Verfahrensschritt code.
      * The caller filters by customer/audience via the linked ProcedurePhaseDefinition.
      *
-     * @return XBeteiligungPhaseDefinitionCode[]
+     * @return XBeteiligungPhaseDefinitionCodeMapping[]
      */
-    public function findByCode(string $code): array
+    public function findByXBeteiligungStandardCode(string $xBeteiligungStandardCode): array
     {
-        return $this->findBy(['code' => $code]);
+        return $this->findBy(['xBeteiligungStandardCode' => $xBeteiligungStandardCode]);
     }
 
-    public function findOneByPhaseDefinition(ProcedurePhaseDefinitionInterface $phaseDefinition): ?XBeteiligungPhaseDefinitionCode
+    public function findOneByPhaseDefinition(ProcedurePhaseDefinitionInterface $phaseDefinition): ?XBeteiligungPhaseDefinitionCodeMapping
     {
         return $this->findOneBy(['phaseDefinition' => $phaseDefinition]);
     }
 
-    public function save(XBeteiligungPhaseDefinitionCode $entity): void
+    public function save(XBeteiligungPhaseDefinitionCodeMapping $entity): void
     {
         $this->getEntityManager()->persist($entity);
         $this->getEntityManager()->flush($entity);
