@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.75 (2026-07-23)
 - **feat DPLAN-18120**: Add DCAT-AP-PLU code mapping to `XBeteiligungPhaseDefinitionCode`
   - Rename it to `XBeteiligungPhaseDefinitionCodeMapping` (field `code` → nullable `xBeteiligungStandardCode`)
   - Add a required `dcatApPluStandardCode` relationship to a new read-only `XBeteiligungDcatApPluStandardCode` lookup entity
