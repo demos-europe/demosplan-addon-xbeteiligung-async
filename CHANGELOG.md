@@ -1,6 +1,11 @@
 # Changelog
 
 ## UNRELEASED
+- **feat DPLAN-18237**: Resolve incoming 0401/0402 Verfahrensschritt codes against the Mandanten-Admin-configured `XBeteiligungPhaseDefinitionCodeMapping` instead of always resetting the procedure to the Konfiguration phase
+  - Add `ProcedurePhaseDefinitionCodeResolver` to look up the mapped `ProcedurePhaseDefinition` for a code, scoped by the procedure's customer and audience
+  - Falls back to `findInitialDefinition` (Konfiguration) when no code was sent, no mapping matches, or the mapping is ambiguous (logged as a warning)
+  - The existing "0402 with unchanged phase code doesn't touch the phase" gate is unchanged
+
 ## v0.75 (2026-07-23)
 - **feat DPLAN-18120**: Add DCAT-AP-PLU code mapping to `XBeteiligungPhaseDefinitionCode`
   - Rename it to `XBeteiligungPhaseDefinitionCodeMapping` (field `code` → nullable `xBeteiligungStandardCode`)
