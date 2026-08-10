@@ -32,7 +32,8 @@ class KommunaleProcedureHandlerFactory
     /**
      * @param array<string, object> $overrides Optional collaborator overrides keyed by name.
      *                                          Supported keys: entityManager, kommunaleMessageFactory,
-     *                                          procedureService, procedurePhaseCodeDetector.
+     *                                          procedureService, procedurePhaseCodeDetector,
+     *                                          procedurePhaseDefinitionCodeResolver.
      */
     public function createProcedureHandler(
         string $handlerType,
@@ -89,6 +90,7 @@ class KommunaleProcedureHandlerFactory
             $this->mockFactory->getXBeteiligungAttachmentServiceMock(),
             $overrides['procedurePhaseCodeDetector'] ?? $this->mockFactory->getProcedurePhaseCodeDetectorMock(),
             $this->mockFactory->getProcedurePhaseDefinitionServiceMock(),
+            $overrides['procedurePhaseDefinitionCodeResolver'] ?? $this->mockFactory->getProcedurePhaseDefinitionCodeResolverMock(),
         ];
 
         switch ($handlerType) {

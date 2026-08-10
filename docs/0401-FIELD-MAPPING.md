@@ -53,7 +53,7 @@
 | **`planname`** | **USED** | `_procedure._p_name` (r_name) | `ProcedureDataExtractor::extract()` → `createProcedureArrayFormatFromBeteiligungType()` |
 | `arbeitstitel` | NOT READ | — | Not in `ProcedureDataExtractor::extract()` |
 | `planartKommunal` | NOT READ | — | Not extracted |
-| **`verfahrensschrittKommunal > code`** | **STORED** | Extracted via `ProcedurePhaseExtractor::getSpecificVerfahrensschrittType()`, passed to `ProcedurePhaseData`, and persisted via `ProcedurePhaseCodeDetector::storeExternalProcedurePhaseCodes()`. Phase itself is still **always set to `configuration`**. | `ProcedurePhaseExtractor::extract()` → `ProcedurePhaseCodeDetector` |
+| **`verfahrensschrittKommunal > code`** | **USED** | Extracted via `ProcedurePhaseExtractor::getSpecificVerfahrensschrittType()`, passed to `ProcedurePhaseData`, and persisted via `ProcedurePhaseCodeDetector::storeExternalProcedurePhaseCodes()`. Resolved to the Mandanten-Admin-configured `ProcedurePhaseDefinition` for this code (`XBeteiligungPhaseDefinitionCodeMapping`); falls back to the customer's Konfiguration phase if no mapping exists for the code. | `ProcedurePhaseExtractor::extract()` → `ProcedurePhaseDefinitionCodeResolver` |
 | `durchgang` (at participation level) | NOT READ | — | — |
 | `verfahrensartKommunal` | NOT READ | — | — |
 | **`beschreibungPlanungsanlass`** | **USED** | `_procedure._p_desc` (r_desc) **AND** `_procedure._p_external_desc` (r_externalDesc) | `ProcedureDataExtractor::extract()` → `createProcedureArrayFormatFromBeteiligungType()` |
@@ -89,7 +89,7 @@
 | ↳ `versionsnummer` | **USED** | In AnlageValueObject | `AnlagenExtractor::createAnlageValueObject()` |
 | ↳ `datum` | **USED** | In AnlageValueObject | `AnlagenExtractor::createAnlageValueObject()` |
 | ↳ `bezeichnung` | **USED** | In AnlageValueObject | `AnlagenExtractor::createAnlageValueObject()` |
-| **`beteiligungKommunalOeffentlichkeitArt`** | **STORED** | Code extracted via `getCodeOeffentlichkeitVerfahrensschritt()`, stored in `ProcedurePhaseData`, persisted via `ProcedurePhaseCodeDetector`. Also gates whether phase is set in `ProcedureCommonFeatures::setProcedurePhase()`. | `ProcedurePhaseExtractor::getCodeOeffentlichkeitVerfahrensschritt()` |
+| **`beteiligungKommunalOeffentlichkeitArt`** | **USED** | Code extracted via `getCodeOeffentlichkeitVerfahrensschritt()`, stored in `ProcedurePhaseData`, persisted via `ProcedurePhaseCodeDetector`. Gates whether phase is set, and resolved to a configured `ProcedurePhaseDefinition` (or Konfiguration fallback) in `ProcedureCommonFeatures::setProcedurePhase()`. | `ProcedurePhaseExtractor::getCodeOeffentlichkeitVerfahrensschritt()` |
 | `veroeffentlichungszeitraum` | NOT READ | — | — |
 
 ---
@@ -106,7 +106,7 @@
 | **`zeitraum > ende`** | **USED** | `_procedure._p_end_date` (public agency end date) | `ProcedurePhaseExtractor::extract()` → `ProcedureCommonFeatures::setProcedurePhase()` |
 | `zeitraum > zusatz` | NOT READ | — | — |
 | **`anlagen > anlage`** | **USED** | Same as public participation: files are saved, SingleDocuments are created | `AnlagenExtractor::extractToebAttachments()` |
-| **`beteiligungKommunalTOEBArt`** | **STORED** | Code extracted via `getCodeBeteiligungTOEBVerfahrensschritt()`, stored in `ProcedurePhaseData`, persisted via `ProcedurePhaseCodeDetector`. Also gates whether phase is set in `ProcedureCommonFeatures::setProcedurePhase()`. | `ProcedurePhaseExtractor::getCodeBeteiligungTOEBVerfahrensschritt()` |
+| **`beteiligungKommunalTOEBArt`** | **USED** | Code extracted via `getCodeBeteiligungTOEBVerfahrensschritt()`, stored in `ProcedurePhaseData`, persisted via `ProcedurePhaseCodeDetector`. Gates whether phase is set, and resolved to a configured `ProcedurePhaseDefinition` (or Konfiguration fallback) in `ProcedureCommonFeatures::setProcedurePhase()`. | `ProcedurePhaseExtractor::getCodeBeteiligungTOEBVerfahrensschritt()` |
 | `veroeffentlichungszeitraum` | NOT READ | — | — |
 
 ---
@@ -143,11 +143,11 @@
 
 ### Stored as Metadata (5 fields)
 
-These are extracted, passed through `ProcedurePhaseData`, and persisted via `ProcedurePhaseCodeDetector::storeExternalProcedurePhaseCodes()`. They gate conditional phase-setting logic in `ProcedureCommonFeatures::setProcedurePhase()`, but the actual phase key remains `configuration`.
+These are extracted, passed through `ProcedurePhaseData`, and persisted via `ProcedurePhaseCodeDetector::storeExternalProcedurePhaseCodes()`. The two Verfahrensschritt codes additionally gate and drive phase-definition resolution in `ProcedureCommonFeatures::setProcedurePhase()` (via `ProcedurePhaseDefinitionCodeResolver`); the two Verfahrensteilschritt codes are metadata only, echoed back on outgoing 0701 messages.
 
-- `verfahrensschrittKommunal > code` → External procedure phase code
-- `beteiligungKommunalOeffentlichkeitArt` → Public participation phase sub-code
-- `beteiligungKommunalTOEBArt` → Public agency participation phase sub-code
+- `verfahrensschrittKommunal > code` → External procedure phase code (public fallback)
+- `beteiligungKommunalOeffentlichkeitArt` → Public participation phase code
+- `beteiligungKommunalTOEBArt` → Public agency participation phase code
 - `verfahrensteilschrittKommunal` (public) → Public participation sub-step code
 - `verfahrensteilschrittKommunal` (TOEB) → Public agency participation sub-step code
 
@@ -172,7 +172,7 @@ These are extracted, passed through `ProcedurePhaseData`, and persisted via `Pro
 
 ## Important Notes
 
-1. **Phase is always `configuration`**: Regardless of the `verfahrensschrittKommunal` code, the procedure is always created in the `configuration` phase. The external phase codes are stored via `ProcedurePhaseCodeDetector` and used to conditionally gate phase-setting in `ProcedureCommonFeatures::setProcedurePhase()`, but the phase key itself remains `configuration`. The phase must be changed manually or via a 0402 update.
+1. **Phase is resolved from the Cockpit code, with a Konfiguration fallback**: The incoming Verfahrensschritt code is resolved against the Mandanten-Admin-configured `XBeteiligungPhaseDefinitionCodeMapping` for the procedure's customer and audience (`ProcedurePhaseDefinitionCodeResolver`, called from `ProcedureCommonFeatures::setProcedurePhase()`). If no code was sent, or no mapping matches it, the procedure falls back to the customer's initial (`Konfiguration`) phase — the same as before this was implemented (DPLAN-17844).
 
 2. **Organization name must match exactly**: The `veranlasser > name` is used for an exact string comparison with `orga.name` in the database. Any deviations (whitespace, umlauts, capitalization) will cause the assignment to fail.
 

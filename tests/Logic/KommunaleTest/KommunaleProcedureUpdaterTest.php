@@ -12,10 +12,15 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\KommunaleTest;
 
+use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureServiceInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseDefinitionCodeResolver;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\KommunaleProcedureUpdater;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ResponseValue;
@@ -363,6 +368,125 @@ class KommunaleProcedureUpdaterTest extends TestCase
             'kommunaleMessageFactory'    => $messageFactory,
         ]);
 
+        self::assertNotNull($sut->updateProcedure($message));
+    }
+
+    /**
+     * Procedure mock with a customer and phase objects configured, needed to exercise the
+     * setProcedurePhase() code-mapping branches (which are skipped entirely for a procedure
+     * without a customer, as covered by the other tests in this class).
+     */
+    private function createProcedureMockWithCustomer(string $id, ProcedurePhaseInterface&MockObject $phaseObject): ProcedureInterface&MockObject
+    {
+        $procedure = $this->createProcedureMock($id);
+        $procedure->method('getCustomer')->willReturn($this->createMock(CustomerInterface::class));
+        $procedure->method('getPublicParticipationPhaseObject')->willReturn($phaseObject);
+        $procedure->method('getPhaseObject')->willReturn($phaseObject);
+
+        return $procedure;
+    }
+
+    public function testUpdateProcedureAppliesMappedPublicPhaseDefinition(): void
+    {
+        // Arrange: cockpit signals a changed public-participation code (1000, per fixture);
+        // the resolver has a mapping configured for it.
+        $message = $this->parse402('tests/res/example402FromCockpit.xml');
+        $procedureId = 'b1f2c3d4-0000-4000-8000-000000000010';
+        $phaseObject = $this->createMock(ProcedurePhaseInterface::class);
+        $procedure = $this->createProcedureMockWithCustomer($procedureId, $phaseObject);
+
+        $procedureService = $this->createMock(ProcedureServiceInterface::class);
+        $procedureService->method('getProcedure')->willReturn($procedure);
+        $procedureService->method('updateProcedureObject')->willReturnArgument(0);
+
+        $detector = $this->createMock(ProcedurePhaseCodeDetector::class);
+        $detector->method('hasPublicParticipationPhaseChanged')->willReturn(true);
+        $detector->method('hasInstitutionParticipationPhaseChanged')->willReturn(false);
+
+        $mappedDefinition = $this->createMock(ProcedurePhaseDefinitionInterface::class);
+        $resolver = $this->createMock(ProcedurePhaseDefinitionCodeResolver::class);
+        $resolver->expects(self::once())
+            ->method('resolve')
+            ->with(StatementInterface::EXTERNAL, '1000', self::isInstanceOf(CustomerInterface::class))
+            ->willReturn($mappedDefinition);
+
+        $phaseObject->expects(self::once())->method('setPhaseDefinition')->with($mappedDefinition);
+
+        $sut = $this->makeUpdater([
+            'procedureService'                     => $procedureService,
+            'procedurePhaseCodeDetector'            => $detector,
+            'procedurePhaseDefinitionCodeResolver'  => $resolver,
+        ]);
+
+        // Act & Assert (expectations on the resolver and phase object mocks).
+        self::assertNotNull($sut->updateProcedure($message));
+    }
+
+    public function testUpdateProcedureAppliesMappedInstitutionPhaseDefinition(): void
+    {
+        // Arrange: cockpit signals a changed institution-participation code (1000, per fixture).
+        $message = $this->parse402('tests/res/example402FromCockpit.xml');
+        $procedureId = 'b1f2c3d4-0000-4000-8000-000000000011';
+        $phaseObject = $this->createMock(ProcedurePhaseInterface::class);
+        $procedure = $this->createProcedureMockWithCustomer($procedureId, $phaseObject);
+
+        $procedureService = $this->createMock(ProcedureServiceInterface::class);
+        $procedureService->method('getProcedure')->willReturn($procedure);
+        $procedureService->method('updateProcedureObject')->willReturnArgument(0);
+
+        $detector = $this->createMock(ProcedurePhaseCodeDetector::class);
+        $detector->method('hasPublicParticipationPhaseChanged')->willReturn(false);
+        $detector->method('hasInstitutionParticipationPhaseChanged')->willReturn(true);
+
+        $mappedDefinition = $this->createMock(ProcedurePhaseDefinitionInterface::class);
+        $resolver = $this->createMock(ProcedurePhaseDefinitionCodeResolver::class);
+        $resolver->expects(self::once())
+            ->method('resolve')
+            ->with(StatementInterface::INTERNAL, '1000', self::isInstanceOf(CustomerInterface::class))
+            ->willReturn($mappedDefinition);
+
+        $phaseObject->expects(self::once())->method('setPhaseDefinition')->with($mappedDefinition);
+
+        $sut = $this->makeUpdater([
+            'procedureService'                     => $procedureService,
+            'procedurePhaseCodeDetector'            => $detector,
+            'procedurePhaseDefinitionCodeResolver'  => $resolver,
+        ]);
+
+        // Act & Assert (expectations on the resolver and phase object mocks).
+        self::assertNotNull($sut->updateProcedure($message));
+    }
+
+    public function testUpdateProcedureDoesNotTouchPhaseWhenResolverFindsNoDefinitionAtAll(): void
+    {
+        // Arrange: changed code, but the resolver can't resolve anything at all (no mapping
+        // AND no Konfiguration phase configured for the customer) — the phase must be left
+        // untouched, same as today's null-guard behavior.
+        $message = $this->parse402('tests/res/example402FromCockpit.xml');
+        $procedureId = 'b1f2c3d4-0000-4000-8000-000000000012';
+        $phaseObject = $this->createMock(ProcedurePhaseInterface::class);
+        $procedure = $this->createProcedureMockWithCustomer($procedureId, $phaseObject);
+
+        $procedureService = $this->createMock(ProcedureServiceInterface::class);
+        $procedureService->method('getProcedure')->willReturn($procedure);
+        $procedureService->method('updateProcedureObject')->willReturnArgument(0);
+
+        $detector = $this->createMock(ProcedurePhaseCodeDetector::class);
+        $detector->method('hasPublicParticipationPhaseChanged')->willReturn(true);
+        $detector->method('hasInstitutionParticipationPhaseChanged')->willReturn(true);
+
+        $resolver = $this->createMock(ProcedurePhaseDefinitionCodeResolver::class);
+        $resolver->method('resolve')->willReturn(null);
+
+        $phaseObject->expects(self::never())->method('setPhaseDefinition');
+
+        $sut = $this->makeUpdater([
+            'procedureService'                     => $procedureService,
+            'procedurePhaseCodeDetector'            => $detector,
+            'procedurePhaseDefinitionCodeResolver'  => $resolver,
+        ]);
+
+        // Act & Assert (expectation on the phase object mock).
         self::assertNotNull($sut->updateProcedure($message));
     }
 
