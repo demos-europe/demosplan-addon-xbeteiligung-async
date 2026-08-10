@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.76 (2026-08-10)
 - **feat DPLAN-18237**: Resolve incoming 0401/0402 Verfahrensschritt codes against the Mandanten-Admin-configured `XBeteiligungPhaseDefinitionCodeMapping` instead of always resetting the procedure to the Konfiguration phase
   - Add `ProcedurePhaseDefinitionCodeResolver` to look up the mapped `ProcedurePhaseDefinition` for a code, scoped by the procedure's customer and audience
   - Falls back to `findInitialDefinition` (Konfiguration) when no code was sent, no mapping matches, or the mapping is ambiguous (logged as a warning)
