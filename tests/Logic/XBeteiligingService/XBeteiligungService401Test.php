@@ -44,4 +44,22 @@ class XBeteiligungService401Test extends XBeteiligungServiceTest
 
         $this->validateProcedureXML($procedureXml, PlanfeststellungInitiieren0201::class);
     }
+
+    public function testEnDashInNameAndDescriptionIsSanitizedToHyphen(): void
+    {
+        $enDash = "\u{2013}";
+        $procedure = $this->getTestProcedure(
+            $this->getTestProcedureSettings(),
+            'Marsbasis Alpha '.$enDash.' Süd',
+            'Trasse Krater Alpha '.$enDash.' Düne Beta '.$enDash.' Marsbasis Süd'
+        );
+
+        $procedureXml = $this->sut->createProcedureNew401FromObject($procedure);
+
+        // The XML must validate against the XBeteiligung XSD; an en-dash would violate the String.Latin pattern.
+        $this->validateProcedureXML($procedureXml, KommunalInitiieren0401::class);
+        // The en-dash must have been replaced by a hyphen-minus in both planname and beschreibungPlanungsanlass.
+        self::assertStringNotContainsString($enDash, $procedureXml);
+        self::assertStringContainsString('Krater Alpha - Düne Beta - Marsbasis Süd', $procedureXml);
+    }
 }

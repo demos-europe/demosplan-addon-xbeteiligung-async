@@ -26,6 +26,7 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\RoleInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType;
@@ -89,11 +90,15 @@ abstract class XBeteiligungServiceTest extends TestCase
             $reusableMessageBlocks,
             $this->createMock(XBeteiligungAuditService::class),
             $this->createMock(XBeteiligungPhaseDefinitionCodeMappingRepository::class),
+            new Din91379TextSanitizerService($this->createMock(LoggerInterface::class)),
         );
     }
 
-    protected function getTestProcedure(MockObject $procedureSettingsMock)
-    {
+    protected function getTestProcedure(
+        MockObject $procedureSettingsMock,
+        string $name = 'Mars 2050',
+        ?string $externalDesc = null
+    ) {
         $gisLayerCategoryInterfaceMock = $this->createMock(
             GisLayerCategoryInterface::class
         );
@@ -114,7 +119,8 @@ abstract class XBeteiligungServiceTest extends TestCase
         $orga = $this->createMock(OrgaInterface::class);
         $orga->method('getName')->willReturn('SoFreshAndSoClean');
         $procedure->method('getOrga')->willReturn($orga);
-        $procedure->method('getName')->willReturn('Mars 2050');
+        $procedure->method('getName')->willReturn($name);
+        $procedure->method('getExternalDesc')->willReturn($externalDesc);
         $procedure->method('getDesc')->willReturn('return will be planned on the fly :)');
         $startDate = new DateTime();
         $endDate = (new DateTime())->add(new DateInterval('P7D'));
