@@ -1,6 +1,10 @@
 # Changelog
 
 ## UNRELEASED
+**Fix XBeteiligung XSD validation for procedure name and description**
+- Sanitize `planname` and `beschreibungPlanungsanlass` via `Din91379TextSanitizerService` in `XBeteiligungService`, so characters outside the XÖV String.Latin set (e.g. en-dash U+2013) no longer cause outgoing messages to be rejected by the schema
+- The sanitizer was already applied to statement fields; this extends it to the procedure-level fields
+
 ## v0.76 (2026-08-10)
 - **feat DPLAN-18237**: Resolve incoming 0401/0402 Verfahrensschritt codes against the Mandanten-Admin-configured `XBeteiligungPhaseDefinitionCodeMapping` instead of always resetting the procedure to the Konfiguration phase
   - Add `ProcedurePhaseDefinitionCodeResolver` to look up the mapped `ProcedurePhaseDefinition` for a code, scoped by the procedure's customer and audience
@@ -22,10 +26,6 @@
 
 ## v0.74 (2026-06-30)
 - **feat DPLAN-18064**: Add `XBeteiligungPhaseDefinitionCodeSubscriber` to automatically delete `XBeteiligungPhaseDefinitionCode` mappings when their linked `ProcedurePhaseDefinition` is soft-deleted
-
-**Fix XBeteiligung XSD validation for procedure name and description**
-- Sanitize `planname` and `beschreibungPlanungsanlass` via `Din91379TextSanitizerService` in `XBeteiligungService`, so characters outside the XÖV String.Latin set (e.g. en-dash U+2013) no longer cause outgoing messages to be rejected by the schema
-- The sanitizer was already applied to statement fields; this extends it to the procedure-level fields
 
 ## v0.73 (2026-06-12)
 - **feat DPLAN-17527**: Use the new prop for invalid input styling in DpInput
