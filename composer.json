@@ -1,7 +1,7 @@
 {
   "name": "demos-europe/demosplan-addon-xbeteiligung-async",
   "description": "This plugin provides Handling of XBeteiligung messages",
-  "version": "v0.73",
+  "version": "v0.76",
   "type": "demosplan-addon",
   "license": "proprietary",
   "autoload": {
@@ -16,7 +16,7 @@
   },
   "minimum-stability": "stable",
   "require": {
-    "demos-europe/demosplan-addon": "^v0.72",
+    "demos-europe/demosplan-addon": "^v0.76",
     "demos-europe/demosplan-addon-installer": "^0",
     "doctrine/doctrine-bundle": "^2",
     "doctrine/doctrine-migrations-bundle": "^3.2",
@@ -30,7 +30,7 @@
     "goetas-webservices/xsd-reader": "^0.3.7",
     "goetas-webservices/xsd2php-runtime": "^0.2.16",
     "jms/serializer": "^3.23",
-    "php": ">=8.1 || < 8.3",
+    "php": "^8.1",
     "php-amqplib/rabbitmq-bundle": "2.*",
     "proj4php/proj4php": "^2.0",
     "symfony/http-client": "6.*.*",

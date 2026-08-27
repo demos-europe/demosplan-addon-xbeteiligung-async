@@ -1,4 +1,4 @@
+portal.procedure.phase: "Portal Verfahrensschritt"
 procedure.phase.code: "Cockpit Code"
-procedure.phase.code.create.failed: "Verfahrensschritt wurde erstellt, aber der Code konnte nicht gespeichert werden"
+procedure.phase.mapping.create.failed: "Verfahrensschritt wurde erstellt, aber der Cockpit Code und der Portal Verfahrensschritt konnten nicht gespeichert werden"
 procedure.phase.code.duplicate: "Dieser Code ist bereits vergeben. Bitte verwenden Sie einen anderen."
-procedure.phase.code.edit.success: "Änderungen am Cockpit Code wurden gespeichert"

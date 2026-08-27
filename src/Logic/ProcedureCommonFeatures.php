@@ -24,6 +24,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureTypeServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\TransactionServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\UserHandlerInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseDefinitionCodeResolver;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\ProcedurePhaseExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Kommunale\AnlagenExtractor;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\KommunaleMessageFactory;
@@ -67,18 +68,19 @@ abstract class ProcedureCommonFeatures
         protected readonly XBeteiligungAttachmentService      $xbeteiligungAttachmentService,
         protected readonly ProcedurePhaseCodeDetector         $procedurePhaseCodeDetector,
         protected readonly ProcedurePhaseDefinitionServiceInterface $phaseDefinitionService,
+        protected readonly ProcedurePhaseDefinitionCodeResolver $procedurePhaseDefinitionCodeResolver,
     )
     {
     }
 
     /**
-     * Resets the procedure phase to the customer's initial (Konfiguration) phase
-     * when the cockpit signals a new phase code for the respective audience.
+     * Resolves the procedure phase to the Mandanten-Admin-configured definition for the
+     * cockpit's incoming phase code, for each audience whose code changed.
      *
-     * The phase-code value itself is not mapped onto a specific definition — every
-     * change is treated as "back to Konfiguration", consistent with main's behavior.
-     * Unchanged codes (same code as previously stored) skip the setter, so a 0402
-     * update that only carries new dates won't reset the phase.
+     * Falls back to the customer's initial (Konfiguration) phase definition when no code
+     * was sent, or when the code has no (unambiguous) mapping configured. Unchanged codes
+     * (same code as previously stored) skip the setter, so a 0402 update that only carries
+     * new dates won't reset the phase.
      */
     protected function setProcedurePhase(
         ProcedureInterface $procedure,
@@ -90,7 +92,8 @@ abstract class ProcedureCommonFeatures
                 $procedure->getId(),
                 $procedurePhaseData
             )) {
-                $publicDefinition = $this->phaseDefinitionService->findInitialDefinition(StatementInterface::EXTERNAL, $customer);
+                $publicCode = $procedurePhaseData->getPublicParticipationPhaseCode() ?? $procedurePhaseData->getGeneralPhaseCode();
+                $publicDefinition = $this->procedurePhaseDefinitionCodeResolver->resolve(StatementInterface::EXTERNAL, $publicCode, $customer);
                 if (null !== $publicDefinition) {
                     $procedure->getPublicParticipationPhaseObject()->setPhaseDefinition($publicDefinition);
                 }
@@ -99,7 +102,8 @@ abstract class ProcedureCommonFeatures
                 $procedure->getId(),
                 $procedurePhaseData
             )) {
-                $institutionDefinition = $this->phaseDefinitionService->findInitialDefinition(StatementInterface::INTERNAL, $customer);
+                $institutionCode = $procedurePhaseData->getInstitutionParticipationPhaseCode();
+                $institutionDefinition = $this->procedurePhaseDefinitionCodeResolver->resolve(StatementInterface::INTERNAL, $institutionCode, $customer);
                 if (null !== $institutionDefinition) {
                     $procedure->getPhaseObject()->setPhaseDefinition($institutionDefinition);
                 }

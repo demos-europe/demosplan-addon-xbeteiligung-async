@@ -16,7 +16,7 @@ use DemosEurope\DemosplanAddon\Contracts\CurrentContextProviderInterface;
 use DemosEurope\DemosplanAddon\Contracts\ResourceType\AddonResourceType;
 use DemosEurope\DemosplanAddon\Contracts\ResourceType\ProcedurePhaseDefinitionResourceTypeInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
-use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCode;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCodeMapping;
 use EDT\ConditionFactory\ConditionFactoryInterface;
 use EDT\DqlQuerying\Contracts\ClauseFunctionInterface;
 use EDT\DqlQuerying\Contracts\OrderBySortMethodInterface;
@@ -26,9 +26,9 @@ use EDT\Wrapping\PropertyBehavior\FixedSetBehavior;
 use Webmozart\Assert\Assert;
 
 /**
- * @template-extends AddonResourceType<XBeteiligungPhaseDefinitionCode>
+ * @template-extends AddonResourceType<XBeteiligungPhaseDefinitionCodeMapping>
  */
-class XBeteiligungPhaseDefinitionCodeResourceType extends AddonResourceType
+class XBeteiligungPhaseDefinitionCodeMappingResourceType extends AddonResourceType
 {
     /**
      * @param ConditionFactoryInterface<ClauseFunctionInterface<bool>> $conditionFactory
@@ -38,17 +38,18 @@ class XBeteiligungPhaseDefinitionCodeResourceType extends AddonResourceType
         private readonly ConditionFactoryInterface $conditionFactory,
         private readonly CurrentContextProviderInterface $currentContextProvider,
         private readonly ProcedurePhaseDefinitionResourceTypeInterface $phaseDefinitionResourceType,
+        private readonly XBeteiligungDcatApPluStandardCodeResourceType $dcatApPluStandardCodeResourceType,
     ) {
     }
 
     public function getTypeName(): string
     {
-        return 'XBeteiligungPhaseDefinitionCode';
+        return 'XBeteiligungPhaseDefinitionCodeMapping';
     }
 
     public function getEntityClass(): string
     {
-        return XBeteiligungPhaseDefinitionCode::class;
+        return XBeteiligungPhaseDefinitionCodeMapping::class;
     }
 
     public function isAvailable(): bool
@@ -67,11 +68,11 @@ class XBeteiligungPhaseDefinitionCodeResourceType extends AddonResourceType
     }
 
     /**
-     * @return ResourceConfigBuilderInterface<ClauseFunctionInterface<bool>, OrderBySortMethodInterface, XBeteiligungPhaseDefinitionCode>
+     * @return ResourceConfigBuilderInterface<ClauseFunctionInterface<bool>, OrderBySortMethodInterface, XBeteiligungPhaseDefinitionCodeMapping>
      */
     protected function getProperties(): ResourceConfigBuilderInterface
     {
-        $configBuilder = new XBeteiligungPhaseDefinitionCodeResourceConfigBuilder(
+        $configBuilder = new XBeteiligungPhaseDefinitionCodeMappingResourceConfigBuilder(
             $this->getEntityClass(),
             $this->getPropertyBuilderFactory()
         );
@@ -80,7 +81,14 @@ class XBeteiligungPhaseDefinitionCodeResourceType extends AddonResourceType
             ->setReadableByPath()
             ->setFilterable();
 
-        $configBuilder->code
+        $configBuilder->xBeteiligungStandardCode
+            ->setReadableByPath()
+            ->setFilterable()
+            ->addPathUpdateBehavior()
+            ->addPathCreationBehavior();
+
+        $configBuilder->dcatApPluStandardCode
+            ->setRelationshipType($this->dcatApPluStandardCodeResourceType)
             ->setReadableByPath()
             ->setFilterable()
             ->addPathUpdateBehavior()
@@ -93,7 +101,7 @@ class XBeteiligungPhaseDefinitionCodeResourceType extends AddonResourceType
             ->addPathCreationBehavior();
 
         $configBuilder->addPostConstructorBehavior(
-            new FixedSetBehavior(function (XBeteiligungPhaseDefinitionCode $entity, EntityDataInterface $entityData): array {
+            new FixedSetBehavior(function (XBeteiligungPhaseDefinitionCodeMapping $entity, EntityDataInterface $entityData): array {
                 $this->getEntityManager()->persist($entity);
 
                 return [];
@@ -125,6 +133,6 @@ class XBeteiligungPhaseDefinitionCodeResourceType extends AddonResourceType
 
     public function isDeleteAllowed(): bool
     {
-        return $this->isAvailable();
+        return false;
     }
 }

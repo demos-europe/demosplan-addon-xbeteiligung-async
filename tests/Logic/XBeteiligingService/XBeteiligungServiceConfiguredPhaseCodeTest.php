@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\XBeteiligingService;
 
-use DateInterval;
 use DateTime;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerCategoryInterface;
@@ -20,11 +19,13 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\GisLayerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepositoryInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
-use Doctrine\Common\Collections\ArrayCollection;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungDcatApPluStandardCode;
+use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCodeMapping;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
-use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
@@ -35,40 +36,30 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefiniti
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
- * Test that XBeteiligungService correctly handles stale phase names during onFlush events.
- *
- * During Doctrine's onFlush event, enriched entity fields (like ProcedurePhase->name)
- * may still contain old values from before the flush, while persisted fields
- * (like ProcedurePhase->key) have already been updated.
- *
- * This test simulates that scenario and verifies the service uses the current key
- * to look up the correct phase name, not the stale name field.
+ * DPLAN-18120: outgoing K3 messages must prefer the mandant-configured DCAT-AP-PLU code
+ * over the hardcoded ProcedurePhaseMapping, unless it's still the default "unknown".
  */
-class XBeteiligungServiceStalePhaseTest extends TestCase
+class XBeteiligungServiceConfiguredPhaseCodeTest extends TestCase
 {
     protected XBeteiligungService $sut;
-    protected MockObject $globalConfig;
-    protected MockObject $gisLayerCategoryRepository;
-    protected MockObject $procedureNewsService;
+    protected MockObject $phaseDefinitionCodeMappingRepository;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->globalConfig = $this->createMock(GlobalConfigInterface::class);
-        $this->globalConfig->method('getMapDefaultProjection')
+        $globalConfig = $this->createMock(GlobalConfigInterface::class);
+        $globalConfig->method('getMapDefaultProjection')
             ->willReturn([
                 'label' => 'EPSG:3857',
-                'value' => '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs'
+                'value' => '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs',
             ]);
 
-        // Mock GIS layer category repository with a proper layer setup
-        $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
+        $gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $gisLayerCategory = $this->createMock(GisLayerCategoryInterface::class);
         $gisLayer = $this->createMock(GisLayerInterface::class);
         $gisLayer->method('getName')->willReturn('basemap');
@@ -78,82 +69,99 @@ class XBeteiligungServiceStalePhaseTest extends TestCase
         $gisLayer->method('getType')->willReturn('base');
         $gisLayer->method('isEnabled')->willReturn(true);
         $gisLayer->method('getProjectionLabel')->willReturn('EPSG:3857');
-        $gisLayerCategory->method('getGisLayers')->willReturn(new ArrayCollection([$gisLayer]));
-        $this->gisLayerCategoryRepository->method('getRootLayerCategory')->willReturn($gisLayerCategory);
+        $gisLayerCategory->method('getGisLayers')->willReturn(new \Doctrine\Common\Collections\ArrayCollection([$gisLayer]));
+        $gisLayerCategoryRepository->method('getRootLayerCategory')->willReturn($gisLayerCategory);
 
-        // Mock procedure news service
-        $this->procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
-        $this->procedureNewsService->method('getProcedureNewsAdminList')->willReturn(['result' => []]);
+        $procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
+        $procedureNewsService->method('getProcedureNewsAdminList')->willReturn(['result' => []]);
 
         $reusableMessageBlocks = new ReusableMessageBlocks(
             new CommonHelpers($this->createMock(LoggerInterface::class))
         );
 
+        $this->phaseDefinitionCodeMappingRepository = $this->createMock(XBeteiligungPhaseDefinitionCodeMappingRepository::class);
+
         $this->sut = new XBeteiligungService(
-            $this->gisLayerCategoryRepository,
-            $this->globalConfig,
+            $gisLayerCategoryRepository,
+            $globalConfig,
             $this->createMock(LoggerInterface::class),
             $this->createMock(MapProjectionConverterInterface::class),
             $this->createMock(ParameterBagInterface::class),
             $this->createMock(PlanningDocumentsLinkCreator::class),
             $this->createMock(ProcedureMessageRepository::class),
-            $this->procedureNewsService,
+            $procedureNewsService,
             $this->createMock(RouterInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
             $this->createMock(XBeteiligungAuditService::class),
-            new Din91379TextSanitizerService($this->createMock(LoggerInterface::class)),
-            $this->createMock(XBeteiligungPhaseDefinitionCodeMappingRepository::class),
+            $this->phaseDefinitionCodeMappingRepository,
         );
     }
 
-    /**
-     * Test that when phase key is "configuration" but name is stale,
-     * the service looks up the correct name from the key.
-     */
-    public function testCreateProcedureUpdate402UsesPhaseKeyNotStaleName(): void
+    public function testUsesConfiguredDcatCodeWhenNotUnknown(): void
     {
-        // ARRANGE: Create a procedure that simulates the onFlush scenario
-        $procedure = $this->createProcedureWithStalePhase();
+        // Arrange
+        $dcatCode = (new XBeteiligungDcatApPluStandardCode())->setCode('earlyInvolveAuth');
+        $mapping = (new XBeteiligungPhaseDefinitionCodeMapping())->setDcatApPluStandardCode($dcatCode);
+        $this->phaseDefinitionCodeMappingRepository->method('findOneByPhaseDefinition')->willReturn($mapping);
 
-        // ACT: Generate the 0402 message
+        $procedure = $this->createProcedureWithPhase('Konfiguration Öffentlichkeit');
+
+        // Act
         $xml = $this->sut->createProcedureUpdate402FromObject($procedure);
 
-        // ASSERT: The XML should contain the CURRENT phase name based on the key, not the stale name
-        self::assertStringContainsString('Konfiguration', $xml,
-            'XML should contain phase name "Konfiguration" looked up from key "configuration"');
-
-        self::assertStringNotContainsString('Frühzeitige Beteiligung Öffentlichkeit', $xml,
-            'XML should NOT contain the stale phase name "Frühzeitige Beteiligung Öffentlichkeit"');
+        // Assert
+        self::assertStringContainsString('earlyInvolveAuth', $xml);
+        self::assertStringNotContainsString('>1000<', $xml);
     }
 
-    /**
-     * Test that beteiligungOeffentlichkeit is included even when phase is configuration.
-     */
-    public function testCreateProcedureUpdate402IncludesBeteiligungOeffentlichkeitInConfigurationPhase(): void
+    public function testFallsBackToHardcodedMappingWhenNoConfiguredMapping(): void
     {
-        // ARRANGE
-        $procedure = $this->createProcedureWithStalePhase();
+        // Arrange
+        $this->phaseDefinitionCodeMappingRepository->method('findOneByPhaseDefinition')->willReturn(null);
 
-        // ACT
+        $procedure = $this->createProcedureWithPhase('Konfiguration Öffentlichkeit');
+
+        // Act
         $xml = $this->sut->createProcedureUpdate402FromObject($procedure);
 
-        // ASSERT: beteiligungOeffentlichkeit should be included for configuration phase
-        self::assertStringContainsString('beteiligungOeffentlichkeit', $xml,
-            'beteiligungOeffentlichkeit should be included even when phase is configuration');
-
-        self::assertStringContainsString('beteiligungTOEB', $xml,
-            'beteiligungTOEB should be included even when phase is configuration');
+        // Assert: 'Konfiguration Öffentlichkeit' maps to '1000' in KOMMUNAL_PUBLIC_PHASE_MAPPING
+        self::assertStringContainsString('>1000<', $xml);
     }
 
-    /**
-     * Create a mock procedure that simulates the onFlush state:
-     * - Phase key is updated to "configuration" (current/persisted value)
-     * - Phase name is still "Frühzeitige Beteiligung Öffentlichkeit" (stale/enriched value)
-     * - Phase dates are still from the old phase (stale)
-     */
-    private function createProcedureWithStalePhase(): MockObject
+    public function testFallsBackToHardcodedMappingWhenDcatCodeIsUnknown(): void
+    {
+        // Arrange
+        $dcatCode = (new XBeteiligungDcatApPluStandardCode())->setCode(XBeteiligungDcatApPluStandardCode::CODE_UNKNOWN);
+        $mapping = (new XBeteiligungPhaseDefinitionCodeMapping())->setDcatApPluStandardCode($dcatCode);
+        $this->phaseDefinitionCodeMappingRepository->method('findOneByPhaseDefinition')->willReturn($mapping);
+
+        $procedure = $this->createProcedureWithPhase('Konfiguration Öffentlichkeit');
+
+        // Act
+        $xml = $this->sut->createProcedureUpdate402FromObject($procedure);
+
+        // Assert: same hardcoded fallback as when no mapping exists at all
+        self::assertStringContainsString('>1000<', $xml);
+    }
+
+    public function testFallsBackToUnknownWhenNoHardcodedMappingExists(): void
+    {
+        // Arrange
+        $this->phaseDefinitionCodeMappingRepository->method('findOneByPhaseDefinition')->willReturn(null);
+
+        // 'Konfiguration' has no entry in KOMMUNAL_PUBLIC_PHASE_MAPPING/KOMMUNAL_INSTITUTION_PHASE_MAPPING
+        $procedure = $this->createProcedureWithPhase('Konfiguration');
+
+        // Act
+        $xml = $this->sut->createProcedureUpdate402FromObject($procedure);
+
+        // Assert
+        self::assertStringContainsString('unknown', $xml);
+    }
+
+    private function createProcedureWithPhase(string $phaseName): MockObject
     {
         $procedure = $this->createMock(ProcedureInterface::class);
         $procedure->method('getId')->willReturn('test-procedure-id');
@@ -161,15 +169,13 @@ class XBeteiligungServiceStalePhaseTest extends TestCase
         $procedure->method('getXtaPlanId')->willReturn('test-xta-plan-id');
 
         $startDate = new DateTime('2025-10-13');
-        $endDate = (new DateTime('2025-10-19'));
+        $endDate = new DateTime('2025-10-19');
         $procedure->method('getStartDate')->willReturn($startDate);
         $procedure->method('getEndDate')->willReturn($endDate);
 
-        // Create phase definition with correct (current) name
         $phaseDefinition = $this->createMock(ProcedurePhaseDefinitionInterface::class);
-        $phaseDefinition->method('getName')->willReturn('Konfiguration');
+        $phaseDefinition->method('getName')->willReturn($phaseName);
 
-        // Create phase object - phase definition holds the authoritative name
         $phaseObject = $this->createMock(ProcedurePhaseInterface::class);
         $phaseObject->method('getPhaseDefinition')->willReturn($phaseDefinition);
         $phaseObject->method('getStartDate')->willReturn($startDate);
@@ -181,7 +187,7 @@ class XBeteiligungServiceStalePhaseTest extends TestCase
 
         $procedure->method('getOrga')->willReturn(null);
         $procedure->method('getSettings')->willReturn(
-            $this->createMock(\DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureSettingsInterface::class)
+            $this->createMock(ProcedureSettingsInterface::class)
         );
 
         return $procedure;

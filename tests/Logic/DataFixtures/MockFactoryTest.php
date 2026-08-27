@@ -46,6 +46,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungGisLayerManager;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAttachmentService;
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedurePhaseDefinitionServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseDefinitionCodeResolver;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -381,5 +382,10 @@ class MockFactoryTest
     public function getProcedurePhaseDefinitionServiceMock(): ProcedurePhaseDefinitionServiceInterface|MockObject
     {
         return $this->testCase->createMockObject(ProcedurePhaseDefinitionServiceInterface::class);
+    }
+
+    public function getProcedurePhaseDefinitionCodeResolverMock(): ProcedurePhaseDefinitionCodeResolver|MockObject
+    {
+        return $this->testCase->createMockObject(ProcedurePhaseDefinitionCodeResolver::class);
     }
 }
