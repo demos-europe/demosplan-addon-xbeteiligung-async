@@ -89,8 +89,8 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
             $this->createMock(XBeteiligungAuditService::class),
-            new Din91379TextSanitizerService($this->createMock(LoggerInterface::class)),
             $this->createMock(XBeteiligungPhaseDefinitionCodeMappingRepository::class),
+            new Din91379TextSanitizerService($this->createMock(LoggerInterface::class)),
         );
     }
 
