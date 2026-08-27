@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.77 (2026-08-27)
 **Fix XBeteiligung XSD validation for procedure name and description**
 - Sanitize `planname` and `beschreibungPlanungsanlass` via `Din91379TextSanitizerService` in `XBeteiligungService`, so characters outside the XÖV String.Latin set (e.g. en-dash U+2013) no longer cause outgoing messages to be rejected by the schema
 - The sanitizer was already applied to statement fields; this extends it to the procedure-level fields
