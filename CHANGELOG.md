@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- bump demosplan-addon version from to v0.82
+
 ## v0.77 (2026-08-27)
 **Fix XBeteiligung XSD validation for procedure name and description**
 - Sanitize `planname` and `beschreibungPlanungsanlass` via `Din91379TextSanitizerService` in `XBeteiligungService`, so characters outside the XÖV String.Latin set (e.g. en-dash U+2013) no longer cause outgoing messages to be rejected by the schema
