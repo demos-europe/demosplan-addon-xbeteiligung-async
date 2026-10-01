@@ -1,6 +1,11 @@
 # Changelog
 
 ## UNRELEASED
+- **feat DPLAN-18209**: Update XBeteiligung standard from 1.2 to 1.2.1
+  - Namespace changes from `xbeteiligung/12` to `xbeteiligung/1/2/1` for incoming and outgoing messages (hard switch, 1.2 messages are no longer processed)
+  - Regenerate schema classes and JMS metadata from the 1.2.1 XSDs (`xlink.xsd`/`xml.xsd` replaced by `xlinks.xsd`)
+  - Outgoing 0301/0302 now include `beteiligungOeffentlichkeit` and `beteiligungTOEB`, like Kommunal and Planfeststellung; `verfahrensteilschrittRaumordnung` is resolved via `ProcedurePhaseCodeDetector`
+  - 0701: `abwaegungsvorschlag` is now wrapped in the new `Abwaegungsvorschlag` type (`empfehlung`)
 ## v0.79 (2026-09-25)
 - bump demosplan-addon version from to v0.81
 

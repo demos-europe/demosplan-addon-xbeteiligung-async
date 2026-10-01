@@ -5,7 +5,7 @@ xsd2php:
   namespaces:
     # gmlProfilexplan.xsd
     'http://www.opengis.net/gml/3.2': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Gml'
-    # xlink.xsd
+    # xlinks.xsd
     'http://www.w3.org/1999/xlink': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Xlink'
     # xbau-kernmodul-datentypen.xsd and xbau-kernmodul-codes.xsd
     'http://www.xleitstelle.de/xbau/kernmodul/1/2/1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul'
@@ -23,7 +23,7 @@ xsd2php:
     'http://xoev.de/schemata/code/1_0': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Code'
     # xbeteiligung-kommunaleBauleitplanung.xsd, xbeteiligung-planfeststellung.xsd, xbeteiligung-raumordnung.xsd,
     # xbeteiligung.xsd, xbeteiligung-allgemein.xsd, xbeteiligung-baukasten.xsd, xbeteiligung-codes.xsd
-    'https://www.xleitstelle.de/xbeteiligung/12': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung'
+    'https://www.xleitstelle.de/xbeteiligung/1/2/1': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung'
     # din-norm-91379-datatypes.xsd
     'urn:xoev-de:kosit:xoev:datentyp:din-91379_2022-08': 'DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema'
     # din-91379-datatypes.xsd

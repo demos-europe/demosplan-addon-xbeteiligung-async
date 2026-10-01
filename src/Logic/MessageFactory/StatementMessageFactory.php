@@ -22,6 +22,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AbwaegungsvorschlagType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AllgemeinStellungnahmeNeuabgegeben0701\AllgemeinStellungnahmeNeuabgegeben0701AnonymousPHPType\NachrichteninhaltAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalTOEBType;
@@ -141,12 +142,10 @@ class StatementMessageFactory extends XBeteiligungResponseMessageFactory
         $statement->setPrioritaet($priority);
         // set Abwaegungsvorschlag - optional field - only set it if a value is given
         if (null !== $statementCreated->getVotePla()) {
-            $abwaegungVorschlag = new CodeAbwaegungsvorschlagType();
-            $statement->setAbwaegungsvorschlag(
-                $abwaegungVorschlag->setCode(
-                    $this->getAbwaegungVorschlag($statementCreated->getVotePla())
-                )
-            );
+            $empfehlung = new CodeAbwaegungsvorschlagType();
+            $empfehlung->setCode($this->getAbwaegungVorschlag($statementCreated->getVotePla()));
+            $abwaegungVorschlag = new AbwaegungsvorschlagType();
+            $statement->setAbwaegungsvorschlag($abwaegungVorschlag->setEmpfehlung($empfehlung));
         }
         // set Schlagwort (sanitize tags for DIN 91379 datatypeC compliance)
         $tagTitles = array_map(static fn ($tag): string => $tag->getTitle(), $statementCreated->getTags());

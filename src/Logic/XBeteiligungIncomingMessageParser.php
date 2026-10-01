@@ -137,7 +137,7 @@ class XBeteiligungIncomingMessageParser
     /**
      * Validates that the incoming XML contains the expected xBeteiligung namespace.
      *
-     * The primary namespace for this addon is XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/12)
+     * The primary namespace for this addon is XLeitstelle xBeteiligung (xleitstelle.de/xbeteiligung/1/2/1)
      * as we implement the xBeteiligung standard for public participation workflows.
      *
      * XPlan namespace (xplanverfahren.de/V14) is for spatial planning data exchange and is often
@@ -148,8 +148,8 @@ class XBeteiligungIncomingMessageParser
         $namespaces = $simpleXML->getNamespaces();
         $this->logger->info('XML namespaces', ['namespaces' => $namespaces]);
 
-        // Check for our primary expected namespace (XLeitstelle xBeteiligung 1.2)
-        $expectedNamespace = 'https://www.xleitstelle.de/xbeteiligung/12';
+        // Check for our primary expected namespace (XLeitstelle xBeteiligung 1.2.1)
+        $expectedNamespace = 'https://www.xleitstelle.de/xbeteiligung/1/2/1';
         foreach ($namespaces as $prefix => $namespace) {
             if ($namespace === $expectedNamespace) {
                 $this->logger->info('Found expected XLeitstelle xBeteiligung namespace', [

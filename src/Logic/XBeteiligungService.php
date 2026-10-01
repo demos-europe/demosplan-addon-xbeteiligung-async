@@ -39,6 +39,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Utilities\AddonPath;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\ProcedureMessage;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungDcatApPluStandardCode;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeMappingRepository;
@@ -50,11 +51,16 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Beteiligung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalTOEBType\BeteiligungKommunalTOEBArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungKommunalType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungOeffentlichkeitType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungOeffentlichkeitType\BeteiligungRaumordnungOeffentlichkeitArtAnonymousPHPType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungTOEBType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungTOEBType\BeteiligungRaumordnungTOEBArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartRaumordnungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittKommunalType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalAktualisieren0402\KommunalAktualisieren0402AnonymousPHPType\NachrichteninhaltAnonymousPHPType as Nachrichteninhalt402;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401;
@@ -86,7 +92,8 @@ class XBeteiligungService
     private const DIMENSION_WIDTH = 'width';
     private const DIMENSION_HEIGHT = 'height';
     public const STANDARD = 'XBeteiligung';
-    public const STANDARD_VERSION = '1.2';
+    public const STANDARD_VERSION = '1.2.1';
+    private const VERFAHRENSTEILSCHRITT_LIST_VERSION_ID = '3';
     public const CODELIST_ERREICHBARKEIT = 'urn:de:xoev:codeliste:erreichbarkeit';
     public const MISSING_USER_ERROR_DESCRIPTION = 'Es konnte kein*e Nutzer*in mit der ID %1$s gefunden werden.';
     public const MISSING_USER_ERROR_CODE = '3000';
@@ -114,6 +121,7 @@ class XBeteiligungService
         private readonly XBeteiligungAuditService               $auditService,
         private readonly XBeteiligungPhaseDefinitionCodeMappingRepository $phaseDefinitionCodeMappingRepository,
         private readonly Din91379TextSanitizerService           $textSanitizer,
+        private readonly ProcedurePhaseCodeDetector             $procedurePhaseCodeDetector,
     ) {
     }
 
@@ -497,10 +505,9 @@ class XBeteiligungService
         // In rog we have currently no "Geltungsbereich zeichnen" option under "Planungsdokumente und Planzeichnung".
         $participationType->setGeltungsbereich('');
         // *************************************************************************************************************
-        // *** With the next standard update something like this should be available. **********************************
-        //$participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure));
-        //$participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure));
-        // *************************************************************************************************************
+
+        $participationType->setBeteiligungOeffentlichkeit($this->generatePublicParticipationType($procedure, $participationType));
+        $participationType->setBeteiligungTOEB($this->generateInstitutionParticipationType($procedure, $participationType));
 
         return $participationType;
     }
@@ -562,8 +569,8 @@ class XBeteiligungService
 
     private function generateInstitutionParticipationType(
         ProcedureInterface $procedure,
-        BeteiligungKommunalType|BeteiligungPlanfeststellungType $participationType
-    ): BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType {
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType|BeteiligungRaumordnungType $participationType
+    ): BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType|BeteiligungRaumordnungTOEBType {
         $institutionParticipationType = $this->getSpecificParticipationToebType($participationType);
 
         // we as demos think this id is useless - did not win the discussion as it seems :(
@@ -588,8 +595,8 @@ class XBeteiligungService
 
     private function generatePublicParticipationType(
         ProcedureInterface $procedure,
-        BeteiligungKommunalType|BeteiligungPlanfeststellungType $participationType
-    ): BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType|BeteiligungRaumordnungType $participationType
+    ): BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType|BeteiligungRaumordnungOeffentlichkeitType
     {
         $publicParticipationType = $this->getSpecificParticipationOeffentlichkeitType($participationType);
 
@@ -614,8 +621,8 @@ class XBeteiligungService
     }
 
     private function getSpecificParticipationOeffentlichkeitType(
-        BeteiligungKommunalType|BeteiligungPlanfeststellungType $participationType
-    ): null|BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType {
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType|BeteiligungRaumordnungType $participationType
+    ): null|BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType|BeteiligungRaumordnungOeffentlichkeitType {
         $participationOeffentlichkeitType = null;
         if ($participationType instanceof BeteiligungKommunalType) {
             $participationOeffentlichkeitType = new BeteiligungKommunalOeffentlichkeitType();
@@ -623,13 +630,16 @@ class XBeteiligungService
         if ($participationType instanceof BeteiligungPlanfeststellungType) {
             $participationOeffentlichkeitType = new BeteiligungPlanfeststellungOeffentlichkeitType();
         }
+        if ($participationType instanceof BeteiligungRaumordnungType) {
+            $participationOeffentlichkeitType = new BeteiligungRaumordnungOeffentlichkeitType();
+        }
 
         return $participationOeffentlichkeitType;
     }
 
     private function getSpecificParticipationToebType(
-        BeteiligungKommunalType|BeteiligungPlanfeststellungType $participationType
-    ): null|BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType {
+        BeteiligungKommunalType|BeteiligungPlanfeststellungType|BeteiligungRaumordnungType $participationType
+    ): null|BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType|BeteiligungRaumordnungTOEBType {
         $participationToebType = null;
         if ($participationType instanceof BeteiligungKommunalType) {
             $participationToebType = new BeteiligungKommunalTOEBType();
@@ -637,13 +647,16 @@ class XBeteiligungService
         if ($participationType instanceof BeteiligungPlanfeststellungType) {
             $participationToebType = new BeteiligungPlanfeststellungTOEBType();
         }
+        if ($participationType instanceof BeteiligungRaumordnungType) {
+            $participationToebType = new BeteiligungRaumordnungTOEBType();
+        }
 
         return $participationToebType;
     }
 
     private function setSpecificParticipationOeffentlichkeitArtType(
         ProcedureInterface $procedure,
-        BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType $participationType
+        BeteiligungKommunalOeffentlichkeitType|BeteiligungPlanfeststellungOeffentlichkeitType|BeteiligungRaumordnungOeffentlichkeitType $participationType
     ): void {
         if ($participationType instanceof BeteiligungKommunalOeffentlichkeitType) {
             $participationOeffentlichkeitArtType = new BeteiligungKommunalOeffentlichkeitArtAnonymousPHPType();
@@ -663,11 +676,25 @@ class XBeteiligungService
             );
             $participationType->setBeteiligungPlanfeststellungOeffentlichkeitArt($participationOeffentlichkeitArtType);
         }
+        if ($participationType instanceof BeteiligungRaumordnungOeffentlichkeitType) {
+            $participationOeffentlichkeitArtType = new BeteiligungRaumordnungOeffentlichkeitArtAnonymousPHPType();
+            $participationOeffentlichkeitArtType->setBeteiligungRaumordnungFormalOeffentlichkeit(
+                $this->createCodeTypeRaumordnung(
+                    'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung',
+                    $procedure,
+                    ParticipationType::PUBLIC
+                )
+            );
+            $participationType->setBeteiligungRaumordnungOeffentlichkeitArt($participationOeffentlichkeitArtType);
+            $participationType->setVerfahrensteilschrittRaumordnung(
+                $this->createVerfahrensteilschrittCodeType($procedure, ParticipationType::PUBLIC)
+            );
+        }
     }
 
     private function setSpecificParticipationToebArtType(
         ProcedureInterface $procedure,
-        BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType $participationType
+        BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType|BeteiligungRaumordnungTOEBType $participationType
     ): void {
         if ($participationType instanceof BeteiligungKommunalTOEBType) {
             $participationOeffentlichkeitArtType = new BeteiligungKommunalTOEBArtAnonymousPHPType();
@@ -686,6 +713,36 @@ class XBeteiligungService
             );
             $participationType->setBeteiligungPlanfeststellungTOEBArt($participationOeffentlichkeitArtType);
         }
+        if ($participationType instanceof BeteiligungRaumordnungTOEBType) {
+            $participationToebArtType = new BeteiligungRaumordnungTOEBArtAnonymousPHPType();
+            $participationToebArtType->setBeteiligungRaumordnungFormalTOEB(
+                $this->createCodeTypeRaumordnung(
+                    'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung',
+                    $procedure,
+                    ParticipationType::INSTITUTION
+                )
+            );
+            $participationType->setBeteiligungRaumordnungTOEBArt($participationToebArtType);
+            $participationType->setVerfahrensteilschrittRaumordnung(
+                $this->createVerfahrensteilschrittCodeType($procedure, ParticipationType::INSTITUTION)
+            );
+        }
+    }
+
+    private function createVerfahrensteilschrittCodeType(
+        ProcedureInterface $procedure,
+        ParticipationType $participationType
+    ): CodeVerfahrensteilschrittType {
+        $codeType = new CodeVerfahrensteilschrittType();
+        $codeType->setCode(
+            $this->procedurePhaseCodeDetector->getExternalProcedureSubPhaseCodeByProcedureId(
+                $procedure->getId(),
+                $participationType
+            )
+        );
+        $codeType->setListVersionID(self::VERFAHRENSTEILSCHRITT_LIST_VERSION_ID);
+
+        return $codeType;
     }
 
     /**

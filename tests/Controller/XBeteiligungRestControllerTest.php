@@ -201,7 +201,7 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testCreateProcedureWithValidData(): void
     {
-        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test content</ns5:kommunal.Initiieren.0401>';
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/1/2/1">test content</ns5:kommunal.Initiieren.0401>';
         $expectedResponse = '<xml>response</xml>';
 
         $response = $this->executeProcedureTest(
@@ -233,7 +233,7 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testUpdateProcedureWithValidData(): void
     {
-        $xmlData = '<ns5:kommunal.Aktualisieren.0402 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test update</ns5:kommunal.Aktualisieren.0402>';
+        $xmlData = '<ns5:kommunal.Aktualisieren.0402 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/1/2/1">test update</ns5:kommunal.Aktualisieren.0402>';
         $expectedResponse = '<xml>update response</xml>';
 
         $response = $this->executeProcedureTest(
@@ -265,7 +265,7 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testUpdateProcedureWithServiceException(): void
     {
-        $xmlData = '<ns5:kommunal.Aktualisieren.0402 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test update</ns5:kommunal.Aktualisieren.0402>';
+        $xmlData = '<ns5:kommunal.Aktualisieren.0402 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/1/2/1">test update</ns5:kommunal.Aktualisieren.0402>';
 
         $response = $this->executeProcedureTest(
             'updateProcedure',
@@ -280,7 +280,7 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testCreateProcedureWithServiceException(): void
     {
-        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test</ns5:kommunal.Initiieren.0401>';
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/1/2/1">test</ns5:kommunal.Initiieren.0401>';
 
         $response = $this->executeProcedureTest(
             'createProcedure',
@@ -295,7 +295,7 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testAuthTokenWithoutBearerPrefix(): void
     {
-        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test</ns5:kommunal.Initiieren.0401>';
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/1/2/1">test</ns5:kommunal.Initiieren.0401>';
         $expectedResponse = '<xml>response</xml>';
 
         $response = $this->executeProcedureTest(
@@ -310,7 +310,7 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testCreateProcedureWithMissingRoutingKey(): void
     {
-        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test</ns5:kommunal.Initiieren.0401>';
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/1/2/1">test</ns5:kommunal.Initiieren.0401>';
 
         $response = $this->executeProcedureTest(
             'createProcedure',
@@ -326,7 +326,7 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testCreateProcedureWithEmptyRoutingKey(): void
     {
-        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test</ns5:kommunal.Initiieren.0401>';
+        $xmlData = '<ns5:kommunal.Initiieren.0401 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/1/2/1">test</ns5:kommunal.Initiieren.0401>';
 
         $response = $this->executeProcedureTest(
             'createProcedure',
@@ -342,7 +342,7 @@ class XBeteiligungRestControllerTest extends TestCase
 
     public function testUpdateProcedureWithMissingRoutingKey(): void
     {
-        $xmlData = '<ns5:kommunal.Aktualisieren.0402 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/12">test update</ns5:kommunal.Aktualisieren.0402>';
+        $xmlData = '<ns5:kommunal.Aktualisieren.0402 xmlns:ns5="https://www.xleitstelle.de/xbeteiligung/1/2/1">test update</ns5:kommunal.Aktualisieren.0402>';
 
         $response = $this->executeProcedureTest(
             'updateProcedure',

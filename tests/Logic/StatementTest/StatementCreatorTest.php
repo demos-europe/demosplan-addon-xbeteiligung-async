@@ -25,6 +25,7 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\Permission\PermissionEvaluatorInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\PhaseBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
@@ -109,7 +110,8 @@ class StatementCreatorTest extends TestCase
             $reusableMessageBlocks,
             $this->createMock(XBeteiligungAuditService::class),
             $this->createMock(XBeteiligungPhaseDefinitionCodeMappingRepository::class),
-            new Din91379TextSanitizerService($this->createMock(LoggerInterface::class))
+            new Din91379TextSanitizerService($this->createMock(LoggerInterface::class)),
+            $this->createMock(ProcedurePhaseCodeDetector::class),
         );
         $this->XBeteiligungService = $xbeteiligungService;
         $this->logger = new Logger();
@@ -160,6 +162,8 @@ class StatementCreatorTest extends TestCase
         $this->validateStatement($statementCreated, $stellungnahme);
         self::assertSame('invalid', $stellungnahme->getVerfahrensteilschritt()->getCode());
         self::assertSame('invalid', $stellungnahme->getVerfahrensschrittKommunal()->getCode());
+        self::assertSame('5000', $stellungnahme->getAbwaegungsvorschlag()->getEmpfehlung()->getCode());
+        self::assertNull($stellungnahme->getAbwaegungsvorschlag()->getErlaeuterung());
     }
 
     private function createStatement0701(int $version): StatementCreated
@@ -259,7 +263,7 @@ class StatementCreatorTest extends TestCase
         self::assertSame('demosplan', $xmlMessage->getProdukt());
         self::assertSame('DEMOS plan GmbH', $xmlMessage->getProdukthersteller());
         self::assertSame('XBeteiligung', $xmlMessage->getStandard());
-        self::assertSame('1.2', $xmlMessage->getVersion());
+        self::assertSame(XBeteiligungService::STANDARD_VERSION, $xmlMessage->getVersion());
     }
 
     private function validateMessageId(string $msgType, NachrichtenkopfG2GTypeType $header): void

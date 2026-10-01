@@ -27,6 +27,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungDcatApPluStandard
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungPhaseDefinitionCodeMapping;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungAuditService;
@@ -98,6 +99,7 @@ class XBeteiligungServiceConfiguredPhaseCodeTest extends TestCase
             $this->createMock(XBeteiligungAuditService::class),
             $this->phaseDefinitionCodeMappingRepository,
             new Din91379TextSanitizerService($this->createMock(LoggerInterface::class)),
+            $this->createMock(ProcedurePhaseCodeDetector::class),
         );
     }
 

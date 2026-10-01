@@ -28,5 +28,6 @@ class XBeteiligungService402Test extends XBeteiligungServiceTest
     {
         $procedureXml = $this->sut->createXMLFor302($this->testProcedure);
         $this->validateProcedureXML($procedureXml, RaumordnungAktualisieren0302::class);
+        $this->assertRaumordnungParticipationParts($procedureXml, RaumordnungAktualisieren0302::class);
     }
 }

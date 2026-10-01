@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-           xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/12"
+           xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/1/2/1"
            xmlns:bn-g2g="http://xoev.de/schemata/basisnachricht/g2g/1_1"
            xmlns:bn-uq-g2g="http://xoev.de/schemata/basisnachricht/unqualified/g2g/1_1"
            xmlns:xbauk="http://www.xleitstelle.de/xbau/kernmodul/1/2/1"
-           targetNamespace="https://www.xleitstelle.de/xbeteiligung/12"
-           version="1.2"
+           targetNamespace="https://www.xleitstelle.de/xbeteiligung/1/2/1"
+           version="1.2.1"
            elementFormDefault="qualified"
            attributeFormDefault="unqualified">
    <xs:annotation>
@@ -18,9 +18,9 @@
             <beschreibung>Beteiligungsverfahren - OZG</beschreibung>
          </standard>
          <versionStandard>
-            <version>1.2</version>
-            <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren nach dem BauGB, dem ROG und in der Planfeststellung. Die Version 1.2.1 beinhaltet ausschließlich Korrekturen an den Nachrichten zur Planfeststellung, die bisher nicht produktiv genutzt wurden.</beschreibung>
-            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <version>1.2.1</version>
+            <beschreibung>XBeteiligung ist der Standard für Beteiligungsverfahren nach dem BauGB, dem ROG und in der Planfeststellung.</beschreibung>
+            <versionXOEVProfil>3.0.0</versionXOEVProfil>
             <versionXOEVHandbuch>2.4</versionXOEVHandbuch>
             <versionXGenerator>3.1.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0 SP 4</versionModellierungswerkzeug>

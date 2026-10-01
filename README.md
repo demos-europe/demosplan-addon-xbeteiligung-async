@@ -122,9 +122,9 @@ Add `xbeteiligung:` as prefix to xml_root_name and add `xml_namespaces` configur
 ```yaml
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiieren0401:
     xml_root_name: xbeteiligung:kommunal.Initiieren.0401
-    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
     xml_namespaces:
-        xbeteiligung: 'https://www.xleitstelle.de/xbeteiligung/12'
+        xbeteiligung: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
         g2g: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
         behoerde: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
         kommunikation: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'
@@ -134,9 +134,9 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiie
 ```yaml
 DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\KommunalInitiierenOK0411:
     xml_root_name: xbeteiligung:kommunal.Initiieren.OK.0411
-    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+    xml_root_namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
     xml_namespaces:
-        xbeteiligung: 'https://www.xleitstelle.de/xbeteiligung/12'
+        xbeteiligung: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
         g2g: 'http://xoev.de/schemata/basisnachricht/g2g/1_1'
         behoerde: 'http://xoev.de/schemata/basisnachricht/behoerde/1_1'
         kommunikation: 'http://xoev.de/schemata/basisnachricht/kommunikation/1_1'

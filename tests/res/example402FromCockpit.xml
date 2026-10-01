@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xbeteiligung:kommunal.Aktualisieren.0402 produkt="DiPlan Cockpit" produkthersteller="]init[ AG"
-                                          standard="XBeteiligung" version="1.2"
-                                          xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/12"
+                                          standard="XBeteiligung" version="1.2.1"
+                                          xmlns:xbeteiligung="https://www.xleitstelle.de/xbeteiligung/1/2/1"
                                           xmlns:bn-g2g="http://xoev.de/schemata/basisnachricht/g2g/1_1"
                                           xmlns:bn-kom="http://xoev.de/schemata/basisnachricht/kommunikation/1_1"
                                           xmlns:bn-beh="http://xoev.de/schemata/basisnachricht/behoerde/1_1"
                                           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                          xsi:schemaLocation="https://www.xleitstelle.de/xbeteiligung/12 ../xbeteiligung.xsd">
+                                          xsi:schemaLocation="https://www.xleitstelle.de/xbeteiligung/1/2/1 ../xbeteiligung.xsd">
     <bn-g2g:nachrichtenkopf.g2g>
         <bn-g2g:identifikation.nachricht>
             <bn-g2g:nachrichtenUUID>f4d3b213-1ce1-4ec5-a7b1-763ca250dcf1</bn-g2g:nachrichtenUUID>

@@ -23,7 +23,7 @@
          <versionStandard>
             <version>1.2.1</version>
             <beschreibung>Für diese Version des XBau-Kernmoduls ist umgesetzt worden: Die Anpassung an die neue Nachrichtenarchitektur gemäß XÖV-Bibliothek. Eine neue generische Nachricht zur Übermittlung eines Gebührenbescheids (prozessfrei innerhalb eines Vorgangs). Die bisher in XBau verwendeten Datentypen des XInneres-Basismoduls sind ersetzt durch Datentypen der XÖV-Basisnachricht und durch im Kernmodul neu definierte Datentypen für 'Jahr' und 'JahrMonat'. Diese und weitere Änderungen sind im Detail in der Versionshistorie des Spezifikationsdokuments beschrieben.</beschreibung>
-            <versionXOEVProfil>2.1.0_p3</versionXOEVProfil>
+            <versionXOEVProfil>3.0.0</versionXOEVProfil>
             <versionXOEVHandbuch>3.0.1</versionXOEVHandbuch>
             <versionXGenerator>3.1.1</versionXGenerator>
             <versionModellierungswerkzeug>19.0</versionModellierungswerkzeug>

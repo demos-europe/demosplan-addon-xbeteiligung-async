@@ -31,6 +31,7 @@ grep -r "targetNamespace" Resources/xsd/*.xsd | grep xbeteiligung
 
 **Common version mappings:**
 - Version 1.2: `https://www.xleitstelle.de/xbeteiligung/12`
+- Version 1.2.1: `https://www.xleitstelle.de/xbeteiligung/1/2/1`
 - Version 1.3: `https://www.xleitstelle.de/xbeteiligung/1/3`
 - Version 1.4: `https://www.xleitstelle.de/xbeteiligung/14`
 
@@ -79,13 +80,17 @@ Run the xsd2php conversion command:
 vendor/bin/xsd2php convert config/xsd2php.yml Resources/xsd/*.xsd
 ```
 
-**Note:** This command will overwrite existing PHP classes and JMS metadata files.
+**Note:** This command will overwrite existing PHP classes and JMS metadata files, but it does not delete classes for types that were removed from the XSDs.
+
+**Recommended:** Back up `src/Soap`, empty `src/Soap/Schema` and `src/Soap/Metadata`, regenerate, then compare file lists with the backup. Metadata files whose only differences are the manual adjustments from step 5 (commented-out namespaces, `xbeteiligung:` root prefix, `xml_namespaces` blocks) can be restored from the backup (after replacing the namespace URI); only files with real schema changes need to be patched by hand.
+
+**Only copy XSDs that are actually imported.** Release archives can contain extra files (e.g. `xoev-basisnachricht-*` without `_1.1`, `xbau-kernmodul-nachrichten.xsd`) that `xbeteiligung.xsd` does not import. They would need extra namespace mappings and only produce unused classes.
 
 ### 5. Apply Required Metadata Adjustments
 
 The following metadata adjustments are typically required after generation:
 
-#### 5.1 Add XBeteiligung Prefix to XML Root Names
+#### 5.1 Add XBeteiligung Prefix and Namespaces to XML Root Messages
 
 Find all schema files that need the `xbeteiligung:` prefix:
 
@@ -117,6 +122,8 @@ xml_root_name: kommunal.Initiieren.0401
 xml_root_name: xbeteiligung:kommunal.Initiieren.0401
 ```
 
+The root message files also carry a manually added `xml_namespaces` block (see README.md); keep it.
+
 #### 5.2 Comment Out Namespace in Code Schema
 
 **File:** `src/Soap/Metadata/Schema.Code.CodeType.yml`
@@ -141,6 +148,8 @@ xml_element:
 - `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungOeffentlichkeitType.yml`
 - `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungPlanfeststellungTOEBType.yml`
 - `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungType.yml`
+- `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungOeffentlichkeitType.yml` (since 1.2.1)
+- `src/Soap/Metadata/Schema.XBeteiligung.BeteiligungRaumordnungTOEBType.yml` (since 1.2.1)
 
 Comment out namespace for `anlagen.xml_list` in all these files:
 
@@ -163,6 +172,7 @@ Comment out namespace entries for these fields:
 - `datum`
 - `anlageart`
 - `mimeType`
+- `hatKapitelstruktur` (since 1.2.1)
 - `anhangOderVerlinkung`
 
 **Example:**
@@ -259,6 +269,12 @@ grep "xleitstelle.de" config/xsd2php.yml
 - Uses simplified namespace: `/12`
 - May require gmlProfilexplan.xsd fix
 - Test files should use `version="1.2"`
+
+### Version 1.2.1
+- Uses nested namespace: `/1/2/1` (kernmodul stays on `1/2/1`)
+- Upstream `gmlProfilexplan.xsd` lacks the `anyType` fix again; re-apply it
+- `AnlagenLinkType` and `AnlagenType` also have commented-out namespaces; keep them
+- Test files should use `version="1.2.1"`
 
 ### Version 1.3
 - Uses nested namespace: `/1/3`

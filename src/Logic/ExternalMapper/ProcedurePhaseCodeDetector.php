@@ -4,6 +4,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper;
 
 use DemosEurope\DemosplanAddon\XBeteiligung\Configuration\XBeteiligungConfiguration;
 use DemosEurope\DemosplanAddon\XBeteiligung\Entity\XBeteiligungProcedurePhaseCockpit;
+use DemosEurope\DemosplanAddon\XBeteiligung\Enum\ParticipationType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\MessageComponentsBuilders\VerfasserBuilder;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungProcedurePhaseCockpitRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\Procedure\ProcedureDataValueObject;
@@ -76,26 +77,32 @@ class ProcedurePhaseCodeDetector {
     }
 
     public function getExternalProcedureSubPhaseCode(StatementCreated $statementCreated): string {
-        /**
-         * @var XBeteiligungProcedurePhaseCockpit $xBeteiligungProcedurePhaseCockpit
-         */
-        $procedureId = $statementCreated->getProcedureId();
+        $participationType = $this->verfasserBuilder->isPrivatePerson($statementCreated)
+            ? ParticipationType::PUBLIC
+            : ParticipationType::INSTITUTION;
+
+        return $this->getExternalProcedureSubPhaseCodeByProcedureId(
+            $statementCreated->getProcedureId(),
+            $participationType
+        );
+    }
+
+    public function getExternalProcedureSubPhaseCodeByProcedureId(
+        string $procedureId,
+        ParticipationType $participationType
+    ): string {
+        /** @var XBeteiligungProcedurePhaseCockpit|null $xBeteiligungProcedurePhaseCockpit */
         $xBeteiligungProcedurePhaseCockpit = $this->repository->findOneBy(['procedureId' => $procedureId]);
 
         if (null === $xBeteiligungProcedurePhaseCockpit) {
             return $this->getFallbackSubPhaseCode();
         }
 
-        $subPhaseCode = $this->verfasserBuilder->isPrivatePerson($statementCreated)
+        $subPhaseCode = ParticipationType::PUBLIC === $participationType
             ? $xBeteiligungProcedurePhaseCockpit->getPublicParticipationSubPhaseCode()
             : $xBeteiligungProcedurePhaseCockpit->getInstitutionParticipationSubPhaseCode();
 
-        if (null === $subPhaseCode) {
-            return $this->getFallbackSubPhaseCode();
-        }
-
-
-        return $subPhaseCode;
+        return $subPhaseCode ?? $this->getFallbackSubPhaseCode();
     }
 
     private function getFallbackSubPhaseCode(): string {

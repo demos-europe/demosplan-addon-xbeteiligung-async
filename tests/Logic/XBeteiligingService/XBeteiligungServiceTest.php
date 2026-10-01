@@ -27,6 +27,7 @@ use DemosEurope\DemosplanAddon\Contracts\Repositories\GisLayerCategoryRepository
 use DemosEurope\DemosplanAddon\Contracts\Services\ProcedureNewsServiceInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\CommonHelpers;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\Din91379TextSanitizerService;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\ExternalMapper\ProcedurePhaseCodeDetector;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\MessageFactory\ReusableMessageBlocks;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType;
@@ -36,6 +37,9 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungIncomingMessagePar
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\XBeteiligungService;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\ProcedureMessageRepository;
 use DemosEurope\DemosplanAddon\XBeteiligung\Repository\XBeteiligungPhaseDefinitionCodeMappingRepository;
+use DemosEurope\DemosplanAddon\XBeteiligung\Logic\SerializerFactory;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungAktualisieren0302;
+use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\RaumordnungInitiieren0301;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -50,6 +54,8 @@ abstract class XBeteiligungServiceTest extends TestCase
     protected MockObject $testProcedureWithoutBBox;
     protected MockObject $procedureNewsService;
     protected MockObject $procedureMessageRepository;
+    protected MockObject $procedurePhaseCodeDetector;
+    protected const SUB_PHASE_CODE_TEST = '1000';
     protected XBeteiligungService $sut;
     protected const GEO_JSON_FG_TEST = '{"type":"FeatureCollection","features":[{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[[1116296.9705734858,6634813.663749559],[1117905.9884860306,6634187.8624979565],[1117301.031359643,6636161.866445964],[1115603.7905328334,6635901.465925163],[1116296.9705734858,6634813.663749559]]]},"properties":null}]}';
 
@@ -59,6 +65,9 @@ abstract class XBeteiligungServiceTest extends TestCase
 
         $this->gisLayerCategoryRepository = $this->createMock(GisLayerCategoryRepositoryInterface::class);
         $this->procedureNewsService = $this->createMock(ProcedureNewsServiceInterface::class);
+        $this->procedurePhaseCodeDetector = $this->createMock(ProcedurePhaseCodeDetector::class);
+        $this->procedurePhaseCodeDetector->method('getExternalProcedureSubPhaseCodeByProcedureId')
+            ->willReturn(self::SUB_PHASE_CODE_TEST);
         $this->testProcedure = $this->getTestProcedure($this->getTestProcedureSettings());
         $this->testProcedureWithoutBBox = $this->getTestProcedure($this->getTestProcedureSettings(false));
         $this->procedureMessageRepository = $this->createMock(ProcedureMessageRepository::class);
@@ -91,6 +100,7 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->createMock(XBeteiligungAuditService::class),
             $this->createMock(XBeteiligungPhaseDefinitionCodeMappingRepository::class),
             new Din91379TextSanitizerService($this->createMock(LoggerInterface::class)),
+            $this->procedurePhaseCodeDetector,
         );
     }
 
@@ -212,6 +222,30 @@ abstract class XBeteiligungServiceTest extends TestCase
         );
 
         self::assertTrue($isValid);
+    }
+
+    protected function assertRaumordnungParticipationParts(string $procedureXml, string $messageClass): void
+    {
+        /** @var RaumordnungInitiieren0301|RaumordnungAktualisieren0302 $message */
+        $message = SerializerFactory::getSerializer()->deserialize($procedureXml, $messageClass, 'xml');
+        $beteiligung = $message->getNachrichteninhalt()->getBeteiligung();
+
+        $public = $beteiligung->getBeteiligungOeffentlichkeit();
+        self::assertNotNull($public);
+        self::assertSame(
+            'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung',
+            $public->getBeteiligungRaumordnungOeffentlichkeitArt()->getBeteiligungRaumordnungFormalOeffentlichkeit()->getListURI()
+        );
+        self::assertSame(self::SUB_PHASE_CODE_TEST, $public->getVerfahrensteilschrittRaumordnung()->getCode());
+        self::assertCount(count($beteiligung->getAnlagen()), $public->getAnlagen());
+
+        $institution = $beteiligung->getBeteiligungTOEB();
+        self::assertNotNull($institution);
+        self::assertSame(
+            'urn:xoev-de:xleitstelle:codeliste:verfahrensschrittraumordnung',
+            $institution->getBeteiligungRaumordnungTOEBArt()->getBeteiligungRaumordnungFormalTOEB()->getListURI()
+        );
+        self::assertSame(self::SUB_PHASE_CODE_TEST, $institution->getVerfahrensteilschrittRaumordnung()->getCode());
     }
 
     protected function createMockedPlanningDocumentsLinkCreator(): PlanningDocumentsLinkCreator

@@ -30,6 +30,7 @@ class XBeteiligungService401Test extends XBeteiligungServiceTest
     {
         $procedureXml = $this->sut->createXMLFor301($this->testProcedure);
         $this->validateProcedureXML($procedureXml, RaumordnungInitiieren0301::class);
+        $this->assertRaumordnungParticipationParts($procedureXml, RaumordnungInitiieren0301::class);
     }
 
     public function testPlanung2BeteiligungBeteiligungNeu0401NoBBox(): void
