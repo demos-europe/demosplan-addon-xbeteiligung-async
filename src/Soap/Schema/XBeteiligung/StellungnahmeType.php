@@ -143,7 +143,7 @@ class StellungnahmeType
     /**
      * Hier kann ein Abwägungsvorschlag zur Stellungnahme übermittelt werden.
      *
-     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeAbwaegungsvorschlagType $abwaegungsvorschlag
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AbwaegungsvorschlagType $abwaegungsvorschlag
      */
     private $abwaegungsvorschlag = null;
 
@@ -716,7 +716,7 @@ class StellungnahmeType
      *
      * Hier kann ein Abwägungsvorschlag zur Stellungnahme übermittelt werden.
      *
-     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeAbwaegungsvorschlagType
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AbwaegungsvorschlagType
      */
     public function getAbwaegungsvorschlag()
     {
@@ -728,10 +728,10 @@ class StellungnahmeType
      *
      * Hier kann ein Abwägungsvorschlag zur Stellungnahme übermittelt werden.
      *
-     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeAbwaegungsvorschlagType $abwaegungsvorschlag
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AbwaegungsvorschlagType $abwaegungsvorschlag
      * @return self
      */
-    public function setAbwaegungsvorschlag(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeAbwaegungsvorschlagType $abwaegungsvorschlag = null)
+    public function setAbwaegungsvorschlag(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AbwaegungsvorschlagType $abwaegungsvorschlag = null)
     {
         $this->abwaegungsvorschlag = $abwaegungsvorschlag;
         return $this;

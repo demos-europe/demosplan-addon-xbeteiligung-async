@@ -1,0 +1,22 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungOeffentlichkeitType\BeteiligungRaumordnungOeffentlichkeitArtAnonymousPHPType:
+    properties:
+        beteiligungRaumordnungFormalOeffentlichkeit:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungRaumordnungFormalOeffentlichkeit
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getBeteiligungRaumordnungFormalOeffentlichkeit
+                setter: setBeteiligungRaumordnungFormalOeffentlichkeit
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensschrittRaumordnungType
+        beteiligungRaumordnungInformellOeffentlichkeit:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungRaumordnungInformellOeffentlichkeit
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getBeteiligungRaumordnungInformellOeffentlichkeit
+                setter: setBeteiligungRaumordnungInformellOeffentlichkeit
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeBeteiligungRaumodnungInformellOeffentlichkeitType

@@ -1,0 +1,101 @@
+DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungTOEBType:
+    properties:
+        beteiligungsID:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungsID
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getBeteiligungsID
+                setter: setBeteiligungsID
+            type: string
+        durchgang:
+            expose: true
+            access_type: public_method
+            serialized_name: durchgang
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getDurchgang
+                setter: setDurchgang
+            type: int
+        bekanntmachung:
+            expose: true
+            access_type: public_method
+            serialized_name: bekanntmachung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getBekanntmachung
+                setter: setBekanntmachung
+            type: GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Date
+        aktuelleMitteilung:
+            expose: true
+            access_type: public_method
+            serialized_name: aktuelleMitteilung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getAktuelleMitteilung
+                setter: setAktuelleMitteilung
+            xml_list:
+                inline: true
+                entry_name: aktuelleMitteilung
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            type: array<string>
+        zeitraum:
+            expose: true
+            access_type: public_method
+            serialized_name: zeitraum
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getZeitraum
+                setter: setZeitraum
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType
+        anlagen:
+            expose: true
+            access_type: public_method
+            serialized_name: anlagen
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getAnlagen
+                setter: setAnlagen
+            type: array<DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType>
+            xml_list:
+                inline: false
+                entry_name: anlage
+                skip_when_empty: true
+#                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+        beteiligungRaumordnungTOEBArt:
+            expose: true
+            access_type: public_method
+            serialized_name: beteiligungRaumordnungTOEBArt
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getBeteiligungRaumordnungTOEBArt
+                setter: setBeteiligungRaumordnungTOEBArt
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungTOEBType\BeteiligungRaumordnungTOEBArtAnonymousPHPType
+        verfahrensteilschrittRaumordnung:
+            expose: true
+            access_type: public_method
+            serialized_name: verfahrensteilschrittRaumordnung
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getVerfahrensteilschrittRaumordnung
+                setter: setVerfahrensteilschrittRaumordnung
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensteilschrittType
+        veroeffentlichungszeitraum:
+            expose: true
+            access_type: public_method
+            serialized_name: veroeffentlichungszeitraum
+            xml_element:
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
+            accessor:
+                getter: getVeroeffentlichungszeitraum
+                setter: setVeroeffentlichungszeitraum
+            type: DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\ZeitraumType

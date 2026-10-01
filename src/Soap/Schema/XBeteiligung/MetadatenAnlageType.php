@@ -46,6 +46,13 @@ class MetadatenAnlageType
     private $mimeType = null;
 
     /**
+     * Anlage ist in Kapitel gegliedert und ermöglicht in Stellungnahmen kapitelscharfe Bezüge = true Anlage ist als Gesamtdokument referenzierbar und erlaubt keine kapitelbezogenen Stellungnahmen = false
+     *
+     * @var bool $hatKapitelstruktur
+     */
+    private $hatKapitelstruktur = null;
+
+    /**
      * Dieses Elements enthält die Angabe, ob die Anlage (i) als Anhang mit dieser XBeteiligungs-Nachricht übermittelt wird, (ii) über einen Link zugänglich gemacht wird, der in diese XBeteiligungs-Nachricht eingetragen ist oder ob sie (iii) base64-codiert innerhalb dieser XBeteiligungs-Nachricht übermittelt wird.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnhangOderVerlinkungType $anhangOderVerlinkung
@@ -186,6 +193,32 @@ class MetadatenAnlageType
     public function setMimeType(\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeXBauMimeTypeType $mimeType)
     {
         $this->mimeType = $mimeType;
+        return $this;
+    }
+
+    /**
+     * Gets as hatKapitelstruktur
+     *
+     * Anlage ist in Kapitel gegliedert und ermöglicht in Stellungnahmen kapitelscharfe Bezüge = true Anlage ist als Gesamtdokument referenzierbar und erlaubt keine kapitelbezogenen Stellungnahmen = false
+     *
+     * @return bool
+     */
+    public function getHatKapitelstruktur()
+    {
+        return $this->hatKapitelstruktur;
+    }
+
+    /**
+     * Sets a new hatKapitelstruktur
+     *
+     * Anlage ist in Kapitel gegliedert und ermöglicht in Stellungnahmen kapitelscharfe Bezüge = true Anlage ist als Gesamtdokument referenzierbar und erlaubt keine kapitelbezogenen Stellungnahmen = false
+     *
+     * @param bool $hatKapitelstruktur
+     * @return self
+     */
+    public function setHatKapitelstruktur($hatKapitelstruktur)
+    {
+        $this->hatKapitelstruktur = $hatKapitelstruktur;
         return $this;
     }
 

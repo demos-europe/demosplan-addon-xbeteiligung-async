@@ -132,18 +132,32 @@ class BeteiligungRaumordnungType
     private $veroeffentlichungszeitraum = null;
 
     /**
-     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
-     *
-     * @var string $beteiligungURL
-     */
-    private $beteiligungURL = null;
-
-    /**
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
      *
      * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType[] $anlagen
      */
     private $anlagen = null;
+
+    /**
+     * Hier können Angaben zur Beteiligung der Öffentlichkeit gemacht werden.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungOeffentlichkeitType $beteiligungOeffentlichkeit
+     */
+    private $beteiligungOeffentlichkeit = null;
+
+    /**
+     * Hier können Angaben zur Beteiligung der Träger öffentlicher Belange gemacht werden.
+     *
+     * @var \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungTOEBType $beteiligungTOEB
+     */
+    private $beteiligungTOEB = null;
+
+    /**
+     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
+     *
+     * @var string $beteiligungURL
+     */
+    private $beteiligungURL = null;
 
     /**
      * Gets as akteurVorhaben
@@ -628,32 +642,6 @@ class BeteiligungRaumordnungType
     }
 
     /**
-     * Gets as beteiligungURL
-     *
-     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
-     *
-     * @return string
-     */
-    public function getBeteiligungURL()
-    {
-        return $this->beteiligungURL;
-    }
-
-    /**
-     * Sets a new beteiligungURL
-     *
-     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
-     *
-     * @param string $beteiligungURL
-     * @return self
-     */
-    public function setBeteiligungURL($beteiligungURL)
-    {
-        $this->beteiligungURL = $beteiligungURL;
-        return $this;
-    }
-
-    /**
      * Adds as anlage
      *
      * Die für die Beteiligung erforderlichen Anlagen und Verfahrensunterlagen werden in diesem Element referenziert.
@@ -716,6 +704,84 @@ class BeteiligungRaumordnungType
     public function setAnlagen(array $anlagen = null)
     {
         $this->anlagen = $anlagen;
+        return $this;
+    }
+
+    /**
+     * Gets as beteiligungOeffentlichkeit
+     *
+     * Hier können Angaben zur Beteiligung der Öffentlichkeit gemacht werden.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungOeffentlichkeitType
+     */
+    public function getBeteiligungOeffentlichkeit()
+    {
+        return $this->beteiligungOeffentlichkeit;
+    }
+
+    /**
+     * Sets a new beteiligungOeffentlichkeit
+     *
+     * Hier können Angaben zur Beteiligung der Öffentlichkeit gemacht werden.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungOeffentlichkeitType $beteiligungOeffentlichkeit
+     * @return self
+     */
+    public function setBeteiligungOeffentlichkeit(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungOeffentlichkeitType $beteiligungOeffentlichkeit = null)
+    {
+        $this->beteiligungOeffentlichkeit = $beteiligungOeffentlichkeit;
+        return $this;
+    }
+
+    /**
+     * Gets as beteiligungTOEB
+     *
+     * Hier können Angaben zur Beteiligung der Träger öffentlicher Belange gemacht werden.
+     *
+     * @return \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungTOEBType
+     */
+    public function getBeteiligungTOEB()
+    {
+        return $this->beteiligungTOEB;
+    }
+
+    /**
+     * Sets a new beteiligungTOEB
+     *
+     * Hier können Angaben zur Beteiligung der Träger öffentlicher Belange gemacht werden.
+     *
+     * @param \DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungTOEBType $beteiligungTOEB
+     * @return self
+     */
+    public function setBeteiligungTOEB(?\DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungRaumordnungTOEBType $beteiligungTOEB = null)
+    {
+        $this->beteiligungTOEB = $beteiligungTOEB;
+        return $this;
+    }
+
+    /**
+     * Gets as beteiligungURL
+     *
+     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
+     *
+     * @return string
+     */
+    public function getBeteiligungURL()
+    {
+        return $this->beteiligungURL;
+    }
+
+    /**
+     * Sets a new beteiligungURL
+     *
+     * Hier kann eine URL übermittelt werden, unter der Detailinformationen zum Beteiligungsverfahren eingesehen werden können. Beim Mapping auf DCAT-AP-plu kann die Dokumentart plu:docType: participationURL verwendet werden.
+     *
+     * @param string $beteiligungURL
+     * @return self
+     */
+    public function setBeteiligungURL($beteiligungURL)
+    {
+        $this->beteiligungURL = $beteiligungURL;
         return $this;
     }
 }

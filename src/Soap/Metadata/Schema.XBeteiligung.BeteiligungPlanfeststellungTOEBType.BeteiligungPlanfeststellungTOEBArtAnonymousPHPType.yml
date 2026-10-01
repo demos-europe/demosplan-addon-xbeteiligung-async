@@ -5,7 +5,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlan
             access_type: public_method
             serialized_name: beteiligungPlanfeststellungFormalTOEB
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
             accessor:
                 getter: getBeteiligungPlanfeststellungFormalTOEB
                 setter: setBeteiligungPlanfeststellungFormalTOEB
@@ -15,7 +15,7 @@ DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlan
             access_type: public_method
             serialized_name: beteiligungPlanfeststellungInformellTOEB
             xml_element:
-                namespace: 'https://www.xleitstelle.de/xbeteiligung/12'
+                namespace: 'https://www.xleitstelle.de/xbeteiligung/1/2/1'
             accessor:
                 getter: getBeteiligungPlanfeststellungInformellTOEB
                 setter: setBeteiligungPlanfeststellungInformellTOEB
