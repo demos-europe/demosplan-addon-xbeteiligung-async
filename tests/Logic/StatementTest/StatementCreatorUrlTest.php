@@ -14,6 +14,7 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic\StatementTest;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
+use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedurePhaseDefinitionInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
@@ -35,13 +36,9 @@ class StatementCreatorUrlTest extends TestCase
         $procedure->method('getName')->willReturn('Procedure');
         $procedure->method('getXtaPlanId')->willReturn('plan-1');
 
-        $phaseDefinition = new class() {
-            public function getName(): string
-            {
-                return 'phase';
-            }
-        };
-        $statement = $this->createMock(StatementWithPhaseDefinition::class);
+        $phaseDefinition = $this->createMock(ProcedurePhaseDefinitionInterface::class);
+        $phaseDefinition->method('getName')->willReturn('phase');
+        $statement = $this->createMock(StatementInterface::class);
         $statement->method('getPhaseDefinition')->willReturn($phaseDefinition);
         $statement->method('getText')->willReturn('text');
         $statement->method('getOName')->willReturn('orga');
@@ -84,12 +81,4 @@ class StatementCreatorUrlTest extends TestCase
         $url = (new ReflectionProperty($statementCreated, 'plannerDetailViewUrl'))->getValue($statementCreated);
         self::assertSame('https://customer.example/statement', $url);
     }
-}
-
-/**
- * StatementInterface of the SDK does not declare the methods the creator reads from the phase.
- */
-interface StatementWithPhaseDefinition extends StatementInterface
-{
-    public function getPhaseDefinition();
 }

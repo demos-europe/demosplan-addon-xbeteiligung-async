@@ -14,7 +14,6 @@ namespace DemosEurope\DemosplanAddon\XBeteiligung\Tests\Logic;
 
 use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
-use DemosEurope\DemosplanAddon\Contracts\Entities\FileInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\SingleDocumentInterface;
 use DemosEurope\DemosplanAddon\Contracts\FileServiceInterface;
@@ -23,7 +22,6 @@ use DemosEurope\DemosplanAddon\Contracts\Services\ParagraphServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\ValueObject\FileInfoInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Logic\PlanningDocumentsLinkCreator;
 use Doctrine\Common\Collections\ArrayCollection;
-use LogicException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -42,52 +40,12 @@ class PlanningDocumentsLinkCreatorTest extends TestCase
 
     public function testFileLinkIsGeneratedForCustomerOfProcedure(): void
     {
-        $fileInfo = new class() implements FileInfoInterface {
-            public function getHash(): string
-            {
-                return 'hash-1';
-            }
-
-            public function getFileName(): string
-            {
-                return 'plan.pdf';
-            }
-
-            public function getContentType(): string
-            {
-                return 'application/pdf';
-            }
-        };
-        $fileService = new class($fileInfo) implements FileServiceInterface {
-            public function __construct(private readonly FileInfoInterface $fileInfo)
-            {
-            }
-
-            public function getFileInfoFromFileString($fileString): FileInfoInterface
-            {
-                return $this->fileInfo;
-            }
-
-            public function saveTemporaryFile(
-                string $filePath,
-                string $fileName,
-                ?string $userId = null,
-                ?string $procedureId = null,
-                ?string $virencheck = FileServiceInterface::VIRUSCHECK_SYNC,
-                ?string $hash = null
-            ): FileInterface {
-                throw new LogicException('not needed');
-            }
-
-            public function getFileById($fileId)
-            {
-                return null;
-            }
-
-            public function checkMimeTypeAllowed($mimeType, $temporaryFilePath)
-            {
-            }
-        };
+        $fileInfo = $this->createMock(FileInfoWithGetters::class);
+        $fileInfo->method('getHash')->willReturn('hash-1');
+        $fileInfo->method('getFileName')->willReturn('plan.pdf');
+        $fileInfo->method('getContentType')->willReturn('application/pdf');
+        $fileService = $this->createMock(FileServiceWithFileInfo::class);
+        $fileService->method('getFileInfoFromFileString')->willReturn($fileInfo);
 
         $singleDocument = $this->createMock(SingleDocumentInterface::class);
         $singleDocument->method('getDocument')->willReturn('plan.pdf:file-id');
@@ -158,4 +116,21 @@ class PlanningDocumentsLinkCreatorTest extends TestCase
 
         return $procedure;
     }
+}
+
+/**
+ * The SDK only documents these methods with @method tags, which PHPUnit cannot configure.
+ */
+interface FileServiceWithFileInfo extends FileServiceInterface
+{
+    public function getFileInfoFromFileString(string $fileString): FileInfoInterface;
+}
+
+interface FileInfoWithGetters extends FileInfoInterface
+{
+    public function getHash(): string;
+
+    public function getFileName(): string;
+
+    public function getContentType(): string;
 }
