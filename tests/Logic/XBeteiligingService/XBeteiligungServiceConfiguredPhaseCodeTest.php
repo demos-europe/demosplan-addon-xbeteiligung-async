@@ -39,7 +39,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Routing\RouterInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\CustomerUrlGeneratorInterface;
 
 /**
  * DPLAN-18120: outgoing K3 messages must prefer the mandant-configured DCAT-AP-PLU code
@@ -92,7 +92,7 @@ class XBeteiligungServiceConfiguredPhaseCodeTest extends TestCase
             $this->createMock(PlanningDocumentsLinkCreator::class),
             $this->createMock(ProcedureMessageRepository::class),
             $procedureNewsService,
-            $this->createMock(RouterInterface::class),
+            $this->createMock(CustomerUrlGeneratorInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,

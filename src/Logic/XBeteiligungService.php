@@ -22,6 +22,7 @@ use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\Beteiligung
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungTOEBType\BeteiligungPlanfeststellungTOEBArtAnonymousPHPType;
 use DemosEurope\DemosplanAddon\Contracts\Config\GlobalConfigInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\CustomerUrlGeneratorInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\BeteiligungPlanfeststellungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodePlanartPlanfeststellungType;
@@ -82,8 +83,6 @@ use proj4php\Point;
 use proj4php\Proj;
 use proj4php\Proj4php;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 use Webmozart\Assert\Assert;
 
 class XBeteiligungService
@@ -114,7 +113,7 @@ class XBeteiligungService
         private readonly PlanningDocumentsLinkCreator           $planningDocumentsLinkCreator,
         private readonly ProcedureMessageRepository             $procedureMessageRepository,
         private readonly ProcedureNewsServiceInterface          $procedureNewsService,
-        private readonly RouterInterface                        $router,
+        private readonly CustomerUrlGeneratorInterface          $customerUrlGenerator,
         private readonly XBeteiligungIncomingMessageParser      $incomingMessageParser,
         private readonly CommonHelpers                          $commonHelpers,
         private readonly ReusableMessageBlocks                  $reusableMessageBlocks,
@@ -429,10 +428,10 @@ class XBeteiligungService
             );
         }
         $participationType->setBeteiligungURL(
-            $this->router->generate(
+            $this->customerUrlGenerator->generate(
+                $procedure->getCustomer(),
                 'DemosPlan_procedure_public_detail',
-                ['procedure' => $procedure->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
+                ['procedure' => $procedure->getId()]
             )
         );
         $participationType->setRaeumlicheBeschreibung('');

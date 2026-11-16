@@ -45,7 +45,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Routing\RouterInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\CustomerUrlGeneratorInterface;
 
 abstract class XBeteiligungServiceTest extends TestCase
 {
@@ -93,7 +93,7 @@ abstract class XBeteiligungServiceTest extends TestCase
             $this->createMockedPlanningDocumentsLinkCreator(),
             $this->procedureMessageRepository,
             $this->procedureNewsService,
-            $this->createMock(RouterInterface::class),
+            $this->createMock(CustomerUrlGeneratorInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,

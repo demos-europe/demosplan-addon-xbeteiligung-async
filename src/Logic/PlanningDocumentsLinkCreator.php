@@ -14,18 +14,18 @@ declare(strict_types=1);
 namespace DemosEurope\DemosplanAddon\XBeteiligung\Logic;
 
 
+use DemosEurope\DemosplanAddon\Contracts\Entities\CustomerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ElementsInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\ProcedureInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\SingleDocumentInterface;
 use DemosEurope\DemosplanAddon\Contracts\FileServiceInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\CustomerUrlGeneratorInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\ParagraphServiceInterface;
 use DemosEurope\DemosplanAddon\Contracts\ValueObject\FileInfoInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\Kernmodul\CodeXBauMimeTypeType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\AnhangOderVerlinkungType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\CodeVerfahrensunterlagetypType;
 use DemosEurope\DemosplanAddon\XBeteiligung\Soap\Schema\XBeteiligung\MetadatenAnlageType;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
 
 class PlanningDocumentsLinkCreator
 {
@@ -38,7 +38,7 @@ class PlanningDocumentsLinkCreator
 
     public function __construct(
         private readonly FileServiceInterface $fileService,
-        private readonly RouterInterface $router,
+        private readonly CustomerUrlGeneratorInterface $customerUrlGenerator,
         private readonly ParagraphServiceInterface $paragraphService
     )
     {
@@ -76,10 +76,10 @@ class PlanningDocumentsLinkCreator
                 continue;
             }
             if ($element->getCategory() === ElementsInterface::ELEMENT_CATEGORIES['file']) {
-                $planningDocumentsFromFiles = $this->handleCategoryFile($element, $procedure->getId());
+                $planningDocumentsFromFiles = $this->handleCategoryFile($element, $procedure->getId(), $procedure->getCustomer());
             }
             if ($element->getCategory() === ElementsInterface::ELEMENT_CATEGORIES['paragraph']) {
-                $planningDocumentsFromParagraphs = $this->handleCategoryParagraph($element, $procedure->getId());
+                $planningDocumentsFromParagraphs = $this->handleCategoryParagraph($element, $procedure->getId(), $procedure->getCustomer());
             }
         }
 
@@ -88,7 +88,7 @@ class PlanningDocumentsLinkCreator
         return 0 < count($planningDocuments) ? $planningDocuments : null;
     }
 
-    private function handleCategoryFile(ElementsInterface $element, string $procedureId): array
+    private function handleCategoryFile(ElementsInterface $element, string $procedureId, ?CustomerInterface $customer): array
     {
         $planningDocuments = [];
         // a new single doc was added
@@ -97,7 +97,8 @@ class PlanningDocumentsLinkCreator
             $planningDocuments[] = $this->createLinkForSingleDoc(
                 $element->getTitle(),
                 $this->fileService->getFileInfoFromFileString($this->newSingleDocuments[$procedureId]->getDocument()),
-                $procedureId
+                $procedureId,
+                $customer
             );
         }
         if (0 === count($element->getDocuments())) {
@@ -114,7 +115,8 @@ class PlanningDocumentsLinkCreator
                 $planningDocuments[] = $this->createLinkForSingleDoc(
                     $element->getTitle(),
                     $this->fileService->getFileInfoFromFileString($this->updatedSingleDocuments[$procedureId]->getDocument()),
-                    $procedureId
+                    $procedureId,
+                    $customer
                 );
                 continue;
             }
@@ -133,7 +135,8 @@ class PlanningDocumentsLinkCreator
             $planningDocuments[] = $this->createLinkForSingleDoc(
                 $element->getTitle(),
                 $this->fileService->getFileInfoFromFileString($singleDocument->getDocument()),
-                $procedureId
+                $procedureId,
+                $customer
             );
         }
 
@@ -152,7 +155,7 @@ class PlanningDocumentsLinkCreator
         return false;
     }
 
-    private function handleCategoryParagraph(ElementsInterface $element, string $procedureId): array
+    private function handleCategoryParagraph(ElementsInterface $element, string $procedureId, ?CustomerInterface $customer): array
     {
         $planningDocuments = [];
 
@@ -161,7 +164,8 @@ class PlanningDocumentsLinkCreator
                 $element->getTitle(),
                 $element->getTitle(),
                 $procedureId,
-                $element->getId()
+                $element->getId(),
+                $customer
             );
         }
 
@@ -172,7 +176,8 @@ class PlanningDocumentsLinkCreator
         $planningDocuments[] = $this->createLinkForSingleDoc(
             $element->getTitle(),
             $this->fileService->getFileInfoFromFileString($element->getFile()),
-            $procedureId
+            $procedureId,
+            $customer
         );
 
 
@@ -183,15 +188,16 @@ class PlanningDocumentsLinkCreator
         string $categoryName,
         FileInfoInterface $fileInfo,
         string $procedureId,
+        ?CustomerInterface $customer,
     ): MetadatenAnlageType {
         return $this->createMetadatenAnlageType(
             $categoryName,
             $fileInfo->getFileName(),
             $fileInfo->getContentType(),
-            $this->router->generate(
+            $this->customerUrlGenerator->generate(
+                $customer,
                 'core_file_procedure',
-                ['procedureId' => $procedureId, 'hash' => $fileInfo->getHash()],
-                UrlGeneratorInterface::ABSOLUTE_URL
+                ['procedureId' => $procedureId, 'hash' => $fileInfo->getHash()]
             )
         );
     }
@@ -200,16 +206,17 @@ class PlanningDocumentsLinkCreator
         string $categoryName,
         string $fileName,
         string $procedureId,
-        string $elementId
+        string $elementId,
+        ?CustomerInterface $customer
     ): MetadatenAnlageType {
         return $this->createMetadatenAnlageType(
             $categoryName,
             $fileName,
             'text/html',
-            $this->router->generate(
+            $this->customerUrlGenerator->generate(
+                $customer,
                 'DemosPlan_public_plandocument_paragraph',
-                ['procedure' => $procedureId, 'elementId' => $elementId],
-                UrlGeneratorInterface::ABSOLUTE_URL
+                ['procedure' => $procedureId, 'elementId' => $elementId]
             )
         );
     }
