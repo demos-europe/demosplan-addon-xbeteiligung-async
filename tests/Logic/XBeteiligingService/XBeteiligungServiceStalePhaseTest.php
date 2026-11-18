@@ -38,7 +38,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Routing\RouterInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\CustomerUrlGeneratorInterface;
 
 /**
  * Test that XBeteiligungService correctly handles stale phase names during onFlush events.
@@ -99,7 +99,7 @@ class XBeteiligungServiceStalePhaseTest extends TestCase
             $this->createMock(PlanningDocumentsLinkCreator::class),
             $this->createMock(ProcedureMessageRepository::class),
             $this->procedureNewsService,
-            $this->createMock(RouterInterface::class),
+            $this->createMock(CustomerUrlGeneratorInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,

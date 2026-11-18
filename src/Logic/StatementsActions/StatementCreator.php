@@ -19,19 +19,18 @@ use DemosEurope\DemosplanAddon\Contracts\Entities\StatementMetaInterface;
 use DemosEurope\DemosplanAddon\Contracts\Entities\UserInterface;
 use DemosEurope\DemosplanAddon\Contracts\Events\StatementCreatedEventInterface;
 use DemosEurope\DemosplanAddon\XBeteiligung\ValueObject\StatementCreated;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\RouterInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\CustomerUrlGeneratorInterface;
 
 class StatementCreator
 {
-    protected RouterInterface $router;
+    protected CustomerUrlGeneratorInterface $customerUrlGenerator;
     protected UserInterface $user;
     protected ProcedureInterface $procedure;
     protected StatementMetaInterface $meta;
 
-    public function __construct(RouterInterface $router)
+    public function __construct(CustomerUrlGeneratorInterface $customerUrlGenerator)
     {
-        $this->router = $router;
+        $this->customerUrlGenerator = $customerUrlGenerator;
     }
     public function getStatementCreatedFromEvent(StatementCreatedEventInterface $event): StatementCreated
     {
@@ -51,10 +50,10 @@ class StatementCreator
             'procedureId' => $eventStatement->getProcedureId(),
             'statement'   => $eventStatement->getId(),
         ];
-        $plannerDetailViewUrl = $this->router->generate(
+        $plannerDetailViewUrl = $this->customerUrlGenerator->generate(
+            $procedure->getCustomer(),
             'dm_plan_assessment_single_view',
-            $routeParameters,
-            UrlGeneratorInterface::ABSOLUTE_URL
+            $routeParameters
         );
         $statementCreated->setPlannerDetailViewUrl($plannerDetailViewUrl);
         // manual Statements may possibly have no real Orga

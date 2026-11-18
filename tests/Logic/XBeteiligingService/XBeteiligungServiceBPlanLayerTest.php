@@ -40,7 +40,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Routing\RouterInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\CustomerUrlGeneratorInterface;
 
 /**
  * Tests specifically for BPlan layer handling in XBeteiligung messages.
@@ -104,7 +104,7 @@ class XBeteiligungServiceBPlanLayerTest extends TestCase
             $this->createMock(PlanningDocumentsLinkCreator::class),
             $this->createMock(ProcedureMessageRepository::class),
             $this->createMock(ProcedureNewsServiceInterface::class),
-            $this->createMock(RouterInterface::class),
+            $this->createMock(CustomerUrlGeneratorInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,

@@ -1,6 +1,8 @@
 # Changelog
 
 ## UNRELEASED
+- fix ado-56359: links in outgoing messages (procedure URL, planning documents, statement detail) now point to the host of the procedure's customer instead of `localhost` when the message is created by the worker; requires demosplan-addon with `CustomerUrlGeneratorInterface`
+
 ## v0.80 (2026-10-05)
 - **feat DPLAN-18209**: Update XBeteiligung standard from 1.2 to 1.2.1
   - Namespace changes from `xbeteiligung/12` to `xbeteiligung/1/2/1` for incoming and outgoing messages (hard switch, 1.2 messages are no longer processed)

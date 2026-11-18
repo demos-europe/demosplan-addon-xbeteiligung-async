@@ -53,7 +53,7 @@ use Psr\Log\LoggerInterface;
 use DemosEurope\DemosplanAddon\Contracts\Services\MapProjectionConverterInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Log\Logger;
-use Symfony\Component\Routing\RouterInterface;
+use DemosEurope\DemosplanAddon\Contracts\Services\CustomerUrlGeneratorInterface;
 
 class StatementCreatorTest extends TestCase
 {
@@ -104,7 +104,7 @@ class StatementCreatorTest extends TestCase
             $this->createMock(PlanningDocumentsLinkCreator::class),
             $this->procedureMessageRepository,
             $this->procedureNewsService,
-            $this->createMock(RouterInterface::class),
+            $this->createMock(CustomerUrlGeneratorInterface::class),
             $this->createMock(XBeteiligungIncomingMessageParser::class),
             $this->createMock(CommonHelpers::class),
             $reusableMessageBlocks,
