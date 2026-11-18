@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.81 (2026-11-18)
 - fix ado-56359: links in outgoing messages (procedure URL, planning documents, statement detail) now point to the host of the procedure's customer instead of `localhost` when the message is created by the worker; requires demosplan-addon with `CustomerUrlGeneratorInterface`
 
 ## v0.80 (2026-10-05)
