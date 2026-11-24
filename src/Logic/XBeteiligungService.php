@@ -572,8 +572,8 @@ class XBeteiligungService
     ): BeteiligungKommunalTOEBType|BeteiligungPlanfeststellungTOEBType|BeteiligungRaumordnungTOEBType {
         $institutionParticipationType = $this->getSpecificParticipationToebType($participationType);
 
-        // we as demos think this id is useless - did not win the discussion as it seems :(
-        $institutionParticipationType?->setBeteiligungsID($this->commonHelpers->uuid());
+        // must stay identical across all messages of a procedure, K3 uses it to correlate them
+        $institutionParticipationType?->setBeteiligungsID($procedure->getId());
         // this MetadatenAnlageType should support a base64 container to dump files into, but it does not - S.C. is informed
         //$publicParticipationType->setAnlagen([new MetadatenAnlageType()]); // optional - still not fixed
         $institutionParticipationType?->setZeitraum($this->createTimeSpanOfProcedurePhase($procedure->getPhaseObject()));
@@ -599,8 +599,8 @@ class XBeteiligungService
     {
         $publicParticipationType = $this->getSpecificParticipationOeffentlichkeitType($participationType);
 
-        // we as demos think this id is useless - did not win the discussion as it seems :(
-        $publicParticipationType?->setBeteiligungsID($this->commonHelpers->uuid());
+        // must stay identical across all messages of a procedure, K3 uses it to correlate them
+        $publicParticipationType?->setBeteiligungsID($procedure->getId());
         $publicParticipationType?->setZeitraum(
             $this->createTimeSpanOfProcedurePhase($procedure->getPublicParticipationPhaseObject())
         );
