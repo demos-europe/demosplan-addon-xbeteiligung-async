@@ -63,6 +63,11 @@ export default {
         })
         .catch(error => {
           console.error('Could not load the planID of the procedure', error)
+
+          // The messages of the server are already shown by dpApi, so only show a generic one if there are none
+          if (!error?.data?.meta?.messages) {
+            dplan.notify.error(Translator.trans('error.api.generic'))
+          }
         })
     },
 
