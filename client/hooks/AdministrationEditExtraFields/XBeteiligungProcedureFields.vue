@@ -46,7 +46,7 @@ export default {
 
   computed: {
     planIdUrl () {
-      return `${Routing.getBaseUrl()}/api/3.0/XBeteiligungProcedurePlanId/${encodeURIComponent(this.procedureId)}`
+      return `${Routing.getBaseUrl()}/api/3.0/XBeteiligungProcedurePlanId/${this.procedureId}`
     },
   },
 
