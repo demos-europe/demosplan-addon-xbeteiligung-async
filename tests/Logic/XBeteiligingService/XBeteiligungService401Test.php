@@ -63,4 +63,20 @@ class XBeteiligungService401Test extends XBeteiligungServiceTest
         self::assertStringNotContainsString($enDash, $procedureXml);
         self::assertStringContainsString('Krater Alpha - Düne Beta - Marsbasis Süd', $procedureXml);
     }
+
+    public function testBeteiligungsIdIsStableAndEqualsProcedureId(): void
+    {
+        $firstXml = $this->sut->createProcedureNew401FromObject($this->testProcedure);
+        $secondXml = $this->sut->createProcedureNew401FromObject($this->testProcedure);
+
+        $pattern = '#<(?:\w+:)?beteiligungsID>([^<]+)</(?:\w+:)?beteiligungsID>#';
+        preg_match_all($pattern, $firstXml, $firstIds);
+        preg_match_all($pattern, $secondXml, $secondIds);
+
+        self::assertNotEmpty($firstIds[1]);
+        self::assertSame($firstIds[1], $secondIds[1]);
+        foreach ($firstIds[1] as $beteiligungsId) {
+            self::assertSame('7606f622-439b-4929-8625-0856c161409e', $beteiligungsId);
+        }
+    }
 }

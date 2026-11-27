@@ -25,6 +25,7 @@ enum RelevantPropertiesForUpdatedProcedure: string
     case Territory = 'territory'; // geoJson FG for Geltungsbereich
     case File = 'file';
     case CurrentSlug = 'currentSlug'; // public procedure url
+    case XtaPlanId = 'xtaPlanId'; // planID of the linked Cockpit procedure
     case Enabled = 'enabled'; // category (element) is enabled in procedure
     case NewSingleDocument = 'new_single_document';
     case DeleteSingleDocument = 'delete_single_document';

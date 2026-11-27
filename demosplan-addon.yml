@@ -8,6 +8,8 @@ demosplan_addon:
   ui:
     manifest: dist/assets-manifest.json
     hooks:
+        administration.edit.extra.fields:
+            entry: XBeteiligungProcedureFields
         phase.create.form:
             entry: XBeteiligungCreateFormFields
         phase.list.fields:

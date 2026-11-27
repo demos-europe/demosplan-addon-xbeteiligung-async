@@ -4,6 +4,9 @@ const DemosPlanAddon = require('@demos-europe/demosplan-addon-client-builder')
 const config = DemosPlanAddon.build(
   'demosplan-addon-xbeteiligung-async',
   {
+    XBeteiligungProcedureFields: DemosPlanAddon.resolve(
+      'client/hooks/AdministrationEditExtraFields/XBeteiligungProcedureFields.vue'
+    ),
     XBeteiligungCreateFormFields: DemosPlanAddon.resolve(
       'client/hooks/PhaseCreateForm/XBeteiligungCreateFormFields.vue'
     ),
