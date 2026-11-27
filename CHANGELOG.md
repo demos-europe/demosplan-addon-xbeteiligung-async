@@ -1,6 +1,7 @@
 # Changelog
 
 ## UNRELEASED
+## v0.82 (2026-11-27)
 - **feat DPLAN-18448**: planId field in the procedure settings; changing it sends an update message to K3; the beteiligungsID is now the procedure id. Requires the core support for saving the fields of the extra fields hook on the procedure settings page
 ## v0.81 (2026-11-18)
 - fix ado-56359: links in outgoing messages (procedure URL, planning documents, statement detail) now point to the host of the procedure's customer instead of `localhost` when the message is created by the worker; requires demosplan-addon with `CustomerUrlGeneratorInterface`
